@@ -14,7 +14,6 @@ import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/progra
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
-import {pdFetch} from '../../redux/actions/pd';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/page-body';
@@ -27,7 +26,7 @@ import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import Endpoints from '../../endpoints';
+
 import {
   computeIndicatorsUrl,
   computeFormattedData,
@@ -38,6 +37,7 @@ import {
   canSave
 } from './js/pd-details-calculation-methods-functions';
 import {RootState} from '../../typings/redux.types';
+import {includes} from 'lodash-es';
 
 /**
  * @polymer
@@ -89,11 +89,22 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
         .buttons {
           margin: 1em 0;
         }
+
+        .missing-indicator {
+          margin-left: 40px;
+          font-weight: normal;
+        }
+
+        [hidden] {
+          display: none !important;
+        }
+
+        paper-radio-button[name='latest'] {
+          text-transform: uppercase;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
-
-      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax id="indicators" url="[[indicatorsUrl]]"> </etools-prp-ajax>
 
@@ -126,6 +137,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
               <etools-data-table-row class="pd-output" no-collapse>
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">[[item.text]]</div>
+                </div>
+              </etools-data-table-row>
+            </template>
+            <template is="dom-if" if="[[_equals(item.type, 'missingIndicators')]]" restamp="true">
+              <etools-data-table-row class="pd-output" no-collapse>
+                <div slot="row-data">
+                  <div class="table-cell table-cell--text missing-indicator">[[localize(item.text)]]</div>
                 </div>
               </etools-data-table-row>
             </template>
@@ -177,6 +195,13 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
                         <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
                           [[localize('avg')]]
                         </paper-radio-button>
+                        <paper-radio-button
+                          name="latest"
+                          hidden$="[[!_hasTypeRatioOrPercentage(item.data)]]"
+                          disabled="[[_computeDisabled(item.data.display_type)]]"
+                        >
+                          [[localize('latest')]]
+                        </paper-radio-button>
                       </paper-radio-group>
                     </template>
                     <template is="dom-if" if="[[!_canEdit(item, permissions)]]">
@@ -225,16 +250,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
   @property({type: String, computed: '_computeIndicatorsUrl(locationId, pdId)', observer: '_fetchData'})
   indicatorsUrl!: string;
 
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
-  programmeDocumentsUrl!: string;
-
-  @property({
-    type: Object,
-    computed: 'getReduxStateValue(rootState.programmeDocumentReports.countByPD)',
-    observer: '_getPdReports'
-  })
-  pdReportsCount!: GenericObject;
-
   private _debouncer!: Debouncer;
   private _fetchDataDebouncer!: Debouncer;
 
@@ -254,10 +269,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
     return pdIndicatorsLoading(rootState);
   }
 
-  _computeProgrammeDocumentsUrl(locationId: string) {
-    return locationId ? Endpoints.programmeDocuments(locationId) : '';
-  }
-
   _computeFormattedData(data: any) {
     return computeFormattedData(data);
   }
@@ -268,6 +279,10 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
   _computeDisabled(display_type: any) {
     return computeDisabled(display_type);
+  }
+
+  _hasTypeRatioOrPercentage(data: any) {
+    return ['ratio', 'percentage'].includes(data.display_type);
   }
 
   _fetchData(url: string) {
@@ -342,31 +357,6 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
     if (this._debouncer && this._debouncer.isActive()) {
       this._debouncer.cancel();
-    }
-  }
-
-  _getPdReports() {
-    // Status being present prevents Redux / res.data from getting reports,
-    // preventing pd-details title from rendering. In that case (which we
-    // check by seeing if this.pdReportsCount is present), just get the reports again
-    if (this.pdReportsCount[this.pdId] === undefined) {
-      this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-        const pdThunk = this.$.programmeDocuments as EtoolsPrpAjaxEl;
-        pdThunk.params = {
-          page: 1,
-          page_size: 10,
-          programme_document: this.pdId
-        };
-        // Cancel the pending request, if any
-        (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-
-        this.reduxStore
-          .dispatch(pdFetch(pdThunk.thunk()))
-          // @ts-ignore
-          .catch((_err: GenericObject) => {
-            //   // TODO: error handling
-          });
-      });
     }
   }
 }

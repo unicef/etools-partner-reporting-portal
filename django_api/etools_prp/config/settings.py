@@ -101,6 +101,8 @@ INSTALLED_APPS = [
     'django_cron',
     'social_django',
 
+    'unicef_locations',
+
     'etools_prp.apps.account',
     'etools_prp.apps.cluster',
     'etools_prp.apps.core',
@@ -430,7 +432,7 @@ IGNORE_DEFAULT_SCOPE = True
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
@@ -493,7 +495,16 @@ elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
 if not DISABLE_JWT_AUTH:
-    with open(os.path.join(BASE_DIR, 'keys/jwt/certificate.txt'), 'rb') as public_key:
+    cert_path = "keys/jwt/certificate.txt"
+    if all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
+        cert_path = "keys/jwt/certificate.pem"
+        from storages.backends.azure_storage import AzureStorage
+        storage = AzureStorage()
+        with storage.open('keys/jwt/certificate.pem') as jwt_cert:
+            with open(os.path.join(BASE_DIR, 'keys/jwt/certificate.pem'), 'wb+') as new_jwt_cert:
+                new_jwt_cert.write(jwt_cert.read())
+
+    with open(os.path.join(BASE_DIR, cert_path), 'rb') as public_key:
         public_key_text = public_key.read()  # noqa: F405
         certificate = load_pem_x509_certificate(public_key_text, default_backend())
 
@@ -530,3 +541,10 @@ if DEBUG:
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
 
 DOCS_URL = 'api/docs/'
+
+UNICEF_LOCATIONS_MODEL = 'core.Location'
+
+# Matomo settings
+MATOMO_HOST_URL = env('MATOMO_HOST_URL', default='https://unisitetracker.unicef.io/')
+MATOMO_TRACKER_URL = env('MATOMO_TRACKER_URL', default='matomo.php')
+MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
 import {html} from '@polymer/polymer';
 import {property} from '@polymer/decorators/lib/decorators';
@@ -132,6 +133,12 @@ class PdOutput extends LocalizeMixin(
         /* indicator-details {
         padding-top: 15px;
       } */
+
+        .indicatorType {
+          font-weight: 600;
+          font-size: 16px;
+          margin-right: 4px;
+        }
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -178,12 +185,20 @@ class PdOutput extends LocalizeMixin(
               <div class="indicator-header__title flex-3 layout vertical center-justified">
                 <div class="layout horizontal">
                   <div class="status-badge layout vertical center-justified">
-                    <report-status status="[[_computeCompleteIndicator(indicator.is_complete)]]" no-label>
+                    <report-status
+                      status="[[_computeCompleteIndicator(indicator.is_complete, indicator.id, disaggregationsByIndicator)]]"
+                      no-label
+                    >
                     </report-status>
                   </div>
                   <div>
-                    <h3>[[indicator.reportable.blueprint.title]]</h3>
-
+                    <div class="layout horizontal">
+                      <label class="indicatorType"
+                        >[[getIndicatorDisplayType(indicator.reportable.blueprint.unit,
+                        indicator.reportable.blueprint.display_type)]]</label
+                      >
+                      <h3>[[indicator.reportable.blueprint.title]]</h3>
+                    </div>
                     <dl class="layout horizontal">
                       <dt>
                         <a href="[[calculationMethodUrl]]"
@@ -322,6 +337,9 @@ class PdOutput extends LocalizeMixin(
   @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
   mode!: string;
 
+  @property({type: String, computed: 'getReduxStateValue(rootState.disaggregations.byIndicator)'})
+  disaggregationsByIndicator!: string;
+
   @property({type: String, computed: '_computeMode(mode, overrideMode, currentReport, permissions)'})
   computedMode!: string;
 
@@ -367,8 +385,19 @@ class PdOutput extends LocalizeMixin(
     return computeIcon(opened);
   }
 
-  _computeCompleteIndicator(complete: boolean) {
-    return computeCompleteIndicator(complete);
+  _computeCompleteIndicator(complete: boolean, indicatorId: string, disaggregationsByIndicator: any) {
+    let status = computeCompleteIndicator(complete);
+    if (status === 'Ove') {
+      // trigger computation after data entered for a location
+
+      if (
+        disaggregationsByIndicator &&
+        disaggregationsByIndicator[indicatorId]?.indicator_location_data.every((l) => l.is_complete)
+      ) {
+        status = 'Met';
+      }
+    }
+    return status;
   }
 
   _computeReportableUrl(reportId: string, data: GenericObject) {
@@ -470,6 +499,26 @@ class PdOutput extends LocalizeMixin(
     this.shadowRoot!.querySelectorAll('[id^="collapse-"]').forEach((section: any) => {
       section.opened = false;
     });
+  }
+
+  getIndicatorDisplayType(unit: string, displayType: string) {
+    if (!unit) {
+      return '';
+    }
+
+    switch (unit) {
+      case 'number':
+        return '# ';
+      case 'percentage':
+        if (displayType === 'percentage') {
+          return '% ';
+        } else if (displayType === 'ratio') {
+          return '÷ ';
+        }
+        return '';
+      default:
+        return '';
+    }
   }
 }
 

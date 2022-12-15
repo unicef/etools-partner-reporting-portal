@@ -78,6 +78,7 @@ from .serializers import (
     ProgrammeDocumentProgressSerializer,
     ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
+    ProgressReportFinalUpdateSerializer,
     ProgressReportPullHFDataSerializer,
     ProgressReportReviewSerializer,
     ProgressReportSerializer,
@@ -434,7 +435,10 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         if pr.report_type == "SR":
             serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data)
         else:
-            serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+            if pr.is_final:
+                serializer = ProgressReportFinalUpdateSerializer(instance=pr, data=request.data)
+            else:
+                serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -1191,8 +1195,8 @@ class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
             raise ValidationError('This progress report already has 1 FACE attachment')
 
         if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
-                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 2:
-            raise ValidationError('This progress report already has 2 Other attachments')
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 3:
+            raise ValidationError('This progress report already has 3 Other attachments')
 
         serializer.save(progress_report_id=self.kwargs['progress_report_id'])
 

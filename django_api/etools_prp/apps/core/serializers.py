@@ -31,7 +31,6 @@ class WorkspaceSerializer(serializers.ModelSerializer):
             'latitude',
             'longitude',
             'business_area_code',
-            'can_import_ocha_response_plans',
         )
 
 
@@ -227,6 +226,7 @@ class PMPLocationSerializer(serializers.ModelSerializer):
                 fields=[
                     "name",
                     "p_code",
+                    "admin_level"
                 ],
             )
         ]

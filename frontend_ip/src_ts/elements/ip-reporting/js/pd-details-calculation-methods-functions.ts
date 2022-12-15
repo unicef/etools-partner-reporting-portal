@@ -12,6 +12,13 @@ export function computeFormattedData(data: GenericObject) {
       text: curr.ll_output.title
     });
 
+    if (!curr.indicators.length) {
+      acc.push({
+        type: 'missingIndicators',
+        text: 'missing_active_indicators'
+      });
+    }
+
     const items = curr.indicators.map(function (indicator: GenericObject) {
       return {
         type: 'data',
@@ -29,7 +36,9 @@ export function computeFormattedData(data: GenericObject) {
 }
 
 export function computeSelected(data: GenericObject, scope: string) {
-  return data[scope];
+  return ['ratio', 'percentage'].includes(data.display_type) && scope === 'calculation_formula_across_periods'
+    ? 'latest'
+    : data[scope];
 }
 
 export function computeDisabled(display_type: string) {

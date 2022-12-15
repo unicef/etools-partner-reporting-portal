@@ -12,11 +12,11 @@ def convert_string_number_to_float(num):
 
 
 def format_total_value_to_string(total, is_percentage=False, percentage_display_type=None):
-    value = total.get(ValueType.VALUE, 0)
+    value = int(convert_string_number_to_float(total.get(ValueType.VALUE, 0)))
     locale = to_locale(get_language())
 
     if is_percentage:
-        denominator = total.get(ValueType.DENOMINATOR, 1)
+        denominator = int(convert_string_number_to_float(total.get(ValueType.DENOMINATOR, 1)))
         if percentage_display_type and percentage_display_type == 'ratio':
             return f"{value}/{denominator}"
         else:

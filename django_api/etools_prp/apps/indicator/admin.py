@@ -62,10 +62,13 @@ class IndicatorReportAdmin(admin.ModelAdmin):
 
 class IndicatorLocationDataAdmin(admin.ModelAdmin):
     list_display = ('indicator_report', 'location', 'num_disaggregation',
-                    'level_reported')
-    list_filter = ('num_disaggregation', 'level_reported',)
-    search_fields = ('indicator_report__title', 'location__title')
+                    'level_reported', 'indicator_type')
+    list_filter = ('num_disaggregation', 'level_reported', 'indicator_report__reportable__blueprint__display_type')
+    search_fields = ('indicator_report__title', 'location__name')
     raw_id_fields = ['location', 'indicator_report']
+
+    def indicator_type(self, obj):
+        return obj.indicator_report.reportable.blueprint.display_type
 
 
 class DisaggregationAdmin(admin.ModelAdmin):

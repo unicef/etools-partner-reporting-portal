@@ -46,6 +46,7 @@ from etools_prp.apps.unicef.serializers import (
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
 )
+from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
 
@@ -324,7 +325,7 @@ def process_programme_documents(fast=False, area=False):
                                 },
                             )
 
-                        if item['status'] not in ("draft, signed",):
+                        if item['status'] not in ("draft", "signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
                             llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
                             llos.update(active=False)
@@ -405,6 +406,9 @@ def process_programme_documents(fast=False, area=False):
                                         elif i['unit'] == 'number':
                                             i['display_type'] = 'number'
 
+                                        elif i['unit'] == 'percentage':
+                                            i['calculation_formula_across_periods'] = 'latest'
+
                                         blueprint = process_model(
                                             IndicatorBlueprint,
                                             PMPIndicatorBlueprintSerializer,
@@ -424,7 +428,7 @@ def process_programme_documents(fast=False, area=False):
                                             logger.warning("Admin level empty! Skipping!")
                                             continue
 
-                                        if loc['pcode'] is None or not loc['pcode']:
+                                        if loc['p_code'] is None or not loc['p_code']:
                                             logger.warning("Location code empty! Skipping!")
                                             continue
 
@@ -437,7 +441,6 @@ def process_programme_documents(fast=False, area=False):
                                                 'name': loc['name'],
                                                 'p_code': loc['p_code'],
                                                 'admin_level': loc['admin_level'],
-                                                'location_type': loc['location_type'],
                                             }
                                         )
                                         locations.append(location)
@@ -488,6 +491,9 @@ def process_programme_documents(fast=False, area=False):
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
+
+                                    convert_string_values_to_numeric(i['target'])
+                                    convert_string_values_to_numeric(i['baseline'])
 
                                     reportable = process_model(
                                         Reportable,

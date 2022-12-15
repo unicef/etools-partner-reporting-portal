@@ -43,28 +43,8 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
             Workspace, id=self.kwargs['workspace_id']
         )
 
-    def get_country_iso3_codes(self):
-        iso3_codes = []
-
-        countries = self.get_workspace().countries.all()
-        if not countries:
-            raise serializers.ValidationError(
-                'Workspace has no countries assigned.'
-            )
-
-        for country in countries:
-            if country.details:
-                iso3_codes.append(country.details.alpha_3)
-
-        if not iso3_codes:
-            raise serializers.ValidationError(
-                'Countries in the workspace have invalid setup, cannot proceed.'
-            )
-
-        return iso3_codes
-
     def get_response_plans(self):
-        return get_response_plans_for_countries(self.get_country_iso3_codes())
+        return get_response_plans_for_countries([])
 
     def get(self, request, *args, **kwargs):
         response_plans = self.get_response_plans()

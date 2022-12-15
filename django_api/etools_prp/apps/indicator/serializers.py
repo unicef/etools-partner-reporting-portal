@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -25,12 +26,13 @@ from etools_prp.apps.core.helpers import (
 )
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.serializers import IdLocationSerializer, LocationSerializer
-from etools_prp.apps.core.validators import add_indicator_object_type_validator
+from etools_prp.apps.core.validators import add_indicator_object_type_validator, JSONSchemaValidator
 from etools_prp.apps.ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
 from etools_prp.apps.unicef.models import LowerLevelOutput, ProgressReport
 
 from .fields import SortedDateArrayField
+from .json_schemas import disaggregation_schema, indicator_schema
 from .models import (
     create_pa_reportables_for_new_ca_reportable,
     Disaggregation,
@@ -69,7 +71,7 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
 
             if len(disaggregation_values) != len(unique_list_dicts):
                 raise serializers.ValidationError({
-                    "disaggregation_values": "Duplicated disaggregation value is not allowed",
+                    "disaggregation_values": _("Duplicated disaggregation value is not allowed"),
                 })
 
         instance = Disaggregation.objects.create(**validated_data)
@@ -110,6 +112,17 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
             'calculation_formula_across_periods',
             'calculation_formula_across_locations',
         )
+
+    def validate(self, data):
+
+        unit = data.get('unit', None)
+        calc_periods = data.get('calculation_formula_across_periods', None)
+        if unit and unit == IndicatorBlueprint.RATIO and \
+                calc_periods and calc_periods != IndicatorBlueprint.LATEST:
+            raise ValidationError({
+                "calculation_formula_across_periods": _("Calculation Formula Across Periods has to be Latest"),
+            })
+        return data
 
 
 class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
@@ -227,9 +240,16 @@ class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSeriali
 
 class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
-    baseline = serializers.JSONField()
-    in_need = serializers.JSONField(required=False, allow_null=True)
-    target = serializers.JSONField()
+    baseline = serializers.JSONField(
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    in_need = serializers.JSONField(
+        required=False, allow_null=True,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
+    target = serializers.JSONField(
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
     location = LocationSerializer(read_only=True)
 
     def validate(self, data):
@@ -594,7 +614,9 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
     disaggregation_reported_on = serializers.ListField(
         child=serializers.IntegerField()
     )
-    disaggregation = serializers.JSONField()
+    disaggregation = serializers.JSONField(
+        validators=[JSONSchemaValidator(json_schema=disaggregation_schema)]
+    )
     reporting_entity_percentage_map = serializers.JSONField(
         required=False,
     )
@@ -1126,8 +1148,8 @@ class ClusterObjectiveIndicatorAdoptSerializer(serializers.Serializer):
     cluster_objective_id = serializers.IntegerField()
     reportable_id = serializers.IntegerField()
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
-    target = serializers.JSONField()
-    baseline = serializers.JSONField()
+    target = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
+    baseline = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
 
     def validate(self, data):
         """
@@ -1245,12 +1267,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
     object_type = serializers.CharField(
-        validators=[add_indicator_object_type_validator], write_only=True)
+        validators=[add_indicator_object_type_validator], write_only=True
+    )
     blueprint = IndicatorBlueprintSerializer()
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
-    target = serializers.JSONField()
-    baseline = serializers.JSONField()
-    in_need = serializers.JSONField(required=False, allow_null=True)
+    target = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
+    baseline = serializers.JSONField(validators=[JSONSchemaValidator(json_schema=indicator_schema)])
+    in_need = serializers.JSONField(
+        required=False,
+        allow_null=True,
+        validators=[JSONSchemaValidator(json_schema=indicator_schema)]
+    )
     project_context_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     cs_dates = SortedDateArrayField(child=serializers.DateField(), required=False)
 
@@ -2011,6 +2038,7 @@ class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
             'disaggregatable',
             'unit',
             'display_type',
+            'calculation_formula_across_periods'
         )
 
 

@@ -55,7 +55,7 @@ class WorkspaceAPIView(ListAPIView):
         """
         Only return workspaces that the user is associated with.
         """
-        return Workspace.objects.user_workspaces(self.request.user).prefetch_related('countries').distinct()
+        return Workspace.objects.user_workspaces(self.request.user).distinct()
 
 
 class LocationListAPIView(ListAPIView):

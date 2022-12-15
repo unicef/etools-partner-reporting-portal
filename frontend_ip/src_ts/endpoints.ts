@@ -22,7 +22,7 @@ const Endpoints = {
   },
 
   programmeDocuments(locationId: string) {
-    return this._buildUrl('/unicef/' + locationId + '/programme-document/');
+    return this._buildUrl('/unicef/' + locationId + '/programme-document/?page_size=all');
   },
 
   programmeDocumentDetail(locationId: string, pdId: string) {
@@ -101,7 +101,7 @@ const Endpoints = {
   },
 
   userSignOut() {
-    return this._buildUrl('/account/user-logout/');
+    return '/social/unicef-logout/';
   },
 
   userLogin() {
