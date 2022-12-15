@@ -55,7 +55,6 @@ if settings.DEBUG:
     # Serving staticserve files for both dev and remote environments
     urlpatterns += staticfiles_urlpatterns('/api/static/')
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += [re_path(r'api-auth/', include('rest_framework.urls')), ]
 elif settings.STATICFILES_STORAGE == 'django.contrib.staticfiles.storage.StaticFilesStorage':
     from django.views.static import serve
     urlpatterns += [
