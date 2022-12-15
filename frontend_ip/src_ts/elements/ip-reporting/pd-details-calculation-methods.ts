@@ -37,6 +37,7 @@ import {
   canSave
 } from './js/pd-details-calculation-methods-functions';
 import {RootState} from '../../typings/redux.types';
+import {includes} from 'lodash-es';
 
 /**
  * @polymer
@@ -196,7 +197,7 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
                         </paper-radio-button>
                         <paper-radio-button
                           name="latest"
-                          hidden$="[[!_hasTypeRatio(item.data)]]"
+                          hidden$="[[!_hasTypeRatioOrPercentage(item.data)]]"
                           disabled="[[_computeDisabled(item.data.display_type)]]"
                         >
                           [[localize('latest')]]
@@ -280,8 +281,8 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
     return computeDisabled(display_type);
   }
 
-  _hasTypeRatio(data: any) {
-    return data.display_type === 'ratio';
+  _hasTypeRatioOrPercentage(data: any) {
+    return ['ratio', 'percentage'].includes(data.display_type);
   }
 
   _fetchData(url: string) {

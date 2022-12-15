@@ -17,6 +17,7 @@ import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
 import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
@@ -32,7 +33,7 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
+class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
       <style include="app-grid-style">
@@ -115,6 +116,15 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
           font-style: italic;
           margin: 10px 80px 0 0;
         }
+
+        :host etools-content-panel {
+          margin-bottom:25px;
+        }
+
+        :host labelled-item paper-radio-group paper-radio-button:first-child {
+          padding-left: 0;
+        }
+
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -139,7 +149,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
               <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
                 <paper-input
                   id="partner_contribution_to_date"
-                  value="[[data.partner_contribution_to_date]]"
+                  value="{{localData.partner_contribution_to_date}}"
                   no-label-float
                   char-counter
                   maxlength="2000"
@@ -157,7 +167,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                   id="financial_contribution_to_date"
                   class="w100"
                   type="number"
-                  value="{{data.financial_contribution_to_date}}"
+                  value="{{localData.financial_contribution_to_date}}"
                   placeholder="&#8212;"
                   readonly="[[_equals(computedMode, 'view')]]"
                   no-label-float
@@ -171,7 +181,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
                   options="[[currencies]]"
                   option-value="value"
                   option-label="label"
-                  selected="[[data.financial_contribution_currency]]"
+                  selected="{{localData.financial_contribution_currency}}"
                   readonly="[[_equals(computedMode, 'view')]]"
                   required="[[_hasCurrencyAmmount(data.financial_contribution_to_date)]]"
                   no-dynamic-align
@@ -190,7 +200,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
               <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
                 <paper-input
                   id="challenges_in_the_reporting_period"
-                  value="[[data.challenges_in_the_reporting_period]]"
+                  value="{{localData.challenges_in_the_reporting_period}}"
                   no-label-float
                   char-counter
                   maxlength="2000"
@@ -209,7 +219,7 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
               <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
                 <paper-input
                   id="proposed_way_forward"
-                  value="[[data.proposed_way_forward]]"
+                  value="{{localData.proposed_way_forward}}"
                   no-label-float
                   char-counter
                   maxlength="2000"
@@ -223,6 +233,226 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
             </labelled-item>
           </div>
 
+          <template is="dom-if" if="[[_isFinalReport(currentReport)]]" restamp="true">
+            <div class="row">
+              <labelled-item label="[[localize('release_cash_in_time')]]">
+                <paper-radio-group selected="{{localData.final_review.release_cash_in_time_choice}}">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('yes')]]
+                  </paper-radio-button>
+
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('no')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.release_cash_in_time_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                  <paper-input
+                    id="release_cash_in_time_comment"
+                    value="{{localData.final_review.release_cash_in_time_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+
+            <div class="row">
+              <labelled-item label="[[localize('release_supplies_in_time')]]">
+                <paper-radio-group selected="{{localData.final_review.release_supplies_in_time_choice}}">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('yes')]]
+                  </paper-radio-button>
+
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('no')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.release_supplies_in_time_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                  <paper-input
+                    id="release_supplies_in_time_comment"
+                    value="{{localData.final_review.release_supplies_in_time_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+
+            <div class="row">
+              <labelled-item label="[[localize('feedback_face_form_in_time')]]">
+                <paper-radio-group selected="{{localData.final_review.feedback_face_form_in_time_choice}}">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('yes')]]
+                  </paper-radio-button>
+
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('no')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.feedback_face_form_in_time_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                  <paper-input
+                    id="feedback_face_form_in_time_comment"
+                    value="{{localData.final_review.feedback_face_form_in_time_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+
+            <div class="row">
+              <labelled-item label="[[localize('respond_requests_in_time')]]">
+                <paper-radio-group selected="{{localData.final_review.respond_requests_in_time_choice}}">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('yes')]]
+                  </paper-radio-button>
+
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('no')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.respond_requests_in_time_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                  <paper-input
+                    id="respond_requests_in_time_comment"
+                    value="{{localData.final_review.respond_requests_in_time_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+
+            <div class="row">
+              <labelled-item label="[[localize('implemented_as_planned')]]">
+                <paper-radio-group selected="{{localData.final_review.implemented_as_planned_choice}}">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('yes')]]
+                  </paper-radio-button>
+
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('no')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.implemented_as_planned_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                  <paper-input
+                    id="implemented_as_planned_comment"
+                    value="{{localData.final_review.implemented_as_planned_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+
+            <div class="row">
+              <labelled-item label="[[localize('action_to_address')]]">
+                <paper-radio-group selected="{{localData.final_review.action_to_address_choice}}">
+                  <paper-radio-button name="yes" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('yes')]]
+                  </paper-radio-button>
+
+                  <paper-radio-button name="no" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('no')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.action_to_address_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+                  <paper-input
+                    id="action_to_address_comment"
+                    value="{{localData.final_review.action_to_address_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+
+            <div class="row">
+              <labelled-item label="[[localize('overall_satisfaction')]]">
+                <paper-radio-group selected="{{localData.final_review.overall_satisfaction_choice}}">
+                  <paper-radio-button name="very_unsatisfied" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('very_unsatisfied')]]
+                  </paper-radio-button>
+                  <paper-radio-button name="unsatisfied" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('unsatisfied')]]
+                  </paper-radio-button>
+                  <paper-radio-button name="neutral" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('neutral')]]
+                  </paper-radio-button>
+                  <paper-radio-button name="satisfied" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('satisfied')]]
+                  </paper-radio-button>
+                  <paper-radio-button name="very_satisfied" disabled$="[[_equals(computedMode, 'view')]]">
+                    [[localize('very_satisfied')]]
+                  </paper-radio-button>
+                </paper-radio-group>
+
+                <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
+                  <div class="value">[[_withDefault(data.final_review.overall_satisfaction_comment)]]</div>
+                </template>
+
+                <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
+
+                  <paper-input
+                    id="overall_satisfaction_comment"
+                    value="{{localData.final_review.overall_satisfaction_comment}}"
+                    no-label-float
+                    placeholder="[[localize('comments')]]"
+                    char-counter
+                    maxlength="2000"
+                  >
+                  </paper-input>
+                </template>
+              </labelled-item>
+            </div>
+          </template>
           <div class="toggle-button-container row">
             <template is="dom-if" if="[[!_equals(computedMode, 'view')]]">
               <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
@@ -283,12 +513,19 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
 
   updateDebouncer!: Debouncer | null;
 
-  public static get observers() {
-    return ['_updateData(localData.*)'];
-  }
-
   _reportInfoCurrent(rootState: RootState) {
-    return reportInfoCurrent(rootState);
+    const data = reportInfoCurrent(rootState);
+    if(!data.final_review){
+      data.final_review = {};
+    }
+    else{
+      Object.keys(data.final_review).forEach((key) => {
+        data.final_review[key] =
+          data.final_review[key] === true ? 'yes' : data.final_review[key] === false ? 'no' : data.final_review[key];
+      });
+    }
+    this.set('localData',  {...data});
+    return data;
   }
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
@@ -303,28 +540,10 @@ class PdReportInfo extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConn
     if (!this._fieldsAreValid()) {
       return;
     }
-
-    const textInputs = this.shadowRoot!.querySelectorAll('paper-input, etools-currency-amount-input');
-    const dropDowns = this.shadowRoot!.querySelectorAll('etools-dropdown');
-
-    textInputs.forEach((input: any) => {
-      if (input.value && String(input.value).trim()) {
-        this.set(['localData', input.id], String(input.value).trim());
-      }
-    });
-    dropDowns.forEach((dropDown: any) => {
-      if (dropDown.selectedItem && dropDown.selectedItem[dropDown.optionValue]) {
-        this.set(['localData', dropDown.id], dropDown.selectedItem[dropDown.optionValue]);
-      }
-    });
+    this._updateData();
   }
 
-  _updateData(change: GenericObject) {
-    if (change.path.split('.').length < 2) {
-      // Skip the initial assignment
-      return;
-    }
-
+  _updateData() {
     this.updateDebouncer = Debouncer.debounce(this.updateDebouncer, timeOut.after(250), () => {
       const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
 

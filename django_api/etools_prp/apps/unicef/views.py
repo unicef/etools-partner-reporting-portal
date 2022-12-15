@@ -78,6 +78,7 @@ from .serializers import (
     ProgrammeDocumentProgressSerializer,
     ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
+    ProgressReportFinalUpdateSerializer,
     ProgressReportPullHFDataSerializer,
     ProgressReportReviewSerializer,
     ProgressReportSerializer,
@@ -434,7 +435,10 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         if pr.report_type == "SR":
             serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data)
         else:
-            serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+            if pr.is_final:
+                serializer = ProgressReportFinalUpdateSerializer(instance=pr, data=request.data)
+            else:
+                serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
