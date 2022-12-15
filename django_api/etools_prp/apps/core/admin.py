@@ -20,16 +20,20 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         'point',
     ]
     list_filter = (
-        'admin_level_name',
         'admin_level',
+        'workspaces',
+        'admin_level_name',
     )
-    list_display = ('name', 'parent', 'admin_level_name', 'admin_level', 'p_code',)
+    list_display = ('name', 'parent', 'admin_level_name', 'admin_level', 'p_code', 'get_workspaces')
     search_fields = ('name', 'p_code',)
     raw_id_fields = ('parent', )
 
     def get_form(self, request, obj=None, **kwargs):
         self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point']
         return super().get_form(request, obj, **kwargs)
+
+    def get_workspaces(self, obj):
+        return "\n".join([p.title for p in obj.workspaces.all()])
 
 
 class CartoDBTableAdmin(admin.ModelAdmin):
