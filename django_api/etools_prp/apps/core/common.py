@@ -88,6 +88,7 @@ CSO_TYPES = Choices(
     ('Nat', 'National', 'National'),
     ('CBO', 'CBO', 'Community Based Organization'),
     ('AI', 'AI', 'Academic Institution'),
+    ('RC', 'RC', 'Red Cross/Red Crescent National Societies')
 )
 
 PARTNER_TYPE = Choices(
