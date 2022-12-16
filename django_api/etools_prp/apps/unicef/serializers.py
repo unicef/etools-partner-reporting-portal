@@ -4,13 +4,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.account.validators import EmailValidator
-from etools_prp.apps.core.common import (
-    CURRENCIES,
-    INTERVENTION_TYPES,
-    OVERALL_STATUS,
-    PD_STATUS,
-    PROGRESS_REPORT_STATUS,
-)
+from etools_prp.apps.core.common import CURRENCIES, OVERALL_STATUS, PD_DOCUMENT_TYPE, PD_STATUS, PROGRESS_REPORT_STATUS
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.models import IndicatorBlueprint
@@ -775,7 +769,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
     amendments = serializers.JSONField(allow_null=True)
-    document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES, required=False)
+    document_type = serializers.ChoiceField(choices=PD_DOCUMENT_TYPE, required=False)
 
     def validate(self, attrs):
         validated_data = super().validate(attrs)

@@ -49,7 +49,6 @@ from etools_prp.apps.unicef.serializers import (
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
-
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
 LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
@@ -89,7 +88,7 @@ def save_person_and_user(person_data, create_user=False):
             Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
         )
     except ValidationError:
-        logger.exception('Error trying to save Person model with {}'.format(person_data))
+        logger.debug('Error trying to save Person model with {}'.format(person_data))
         return None, None
 
     if create_user:
@@ -202,7 +201,7 @@ def process_programme_documents(fast=False, area=False):
                             continue
 
                         # Create PD
-                        item['status'] = item['status'].title()[:3]
+                        item['status'] = item['status']
                         item['external_business_area_code'] = workspace.business_area_code
                         # Amendment date formatting
                         for idx in range(len(item['amendments'])):
