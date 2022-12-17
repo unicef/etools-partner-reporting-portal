@@ -105,11 +105,6 @@ SHARED_PARTNER_TYPE = Choices(
     ('U&U', 'UNDP_UNFPA', 'with UNDP & UNFPA'),
 )
 
-INTERVENTION_TYPES = Choices(
-    ('PD', 'PD', 'Programme Document'),
-    ('HPD', 'HPD', 'Humanitarian Programme Document'),
-    ('SSFA', 'SSFA', 'SSFA'),
-)
 
 INTERVENTION_STATUS = Choices(
     ("Dra", "draft", "Draft"),
@@ -156,8 +151,9 @@ PD_LIST_REPORT_STATUS = Choices(
 
 PD_DOCUMENT_TYPE = Choices(
     ('PD', 'PD', 'Programme Document'),
+    ('SPD', 'SPD' 'Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSFA', 'SSFA_TOR', 'SSFA TOR'),
+    ('SSFA', 'SSFA', 'SSFA'),
 )
 
 PROGRESS_REPORT_STATUS = Choices(
@@ -178,13 +174,18 @@ FINAL_REVIEW_CHOICES = Choices(
 )
 
 PD_STATUS = Choices(
-    ("Dra", "draft", "Draft"),
-    ("Sig", "signed", "Signed"),
-    ("Act", "active", "Active"),
-    ("Sus", "suspended", "Suspended"),
-    ('End', 'ended', 'Ended'),
-    ('Clo', 'closed', 'Closed'),
-    ('Ter', 'terminated', 'Terminated'),
+    ("draft", "development", "Development"),
+    ("review", "review", "Review"),
+    ("signature", "signature", "Signature"),
+    ("signed", "signed", "Signed"),
+    ("active", "active", "Active"),
+    ("cancelled", "cancelled", "Cancelled"),
+    ('ended', 'ended', 'Ended'),
+    ('closed', 'closed', 'Closed'),
+    ("suspended", "suspended", "Suspended"),
+    ('terminated', 'terminated', 'Terminated'),
+    ('expired', 'expired', 'Expired'),
+
 )
 
 RESPONSE_PLAN_TYPE = Choices(

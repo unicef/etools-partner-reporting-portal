@@ -289,7 +289,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             document['title'])
 
         response = self.client.get(
-            url + "?ref_title=&status=%s&location=" % document['status'][:3],
+            url + "?ref_title=&status=%s&location=" % document['status'].lower(),
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
@@ -856,6 +856,26 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(pr_queryset))
+
+    def test_list_api_filter_by_year(self):
+        current_year = datetime.datetime.today().year
+
+        pr_queryset = ProgressReport.objects.filter(end_date__year=current_year)
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        current_year_url = f'{url}?year={current_year}'
+        response = self.client.get(current_year_url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(pr_queryset))
+
+        # test for 0 results on future year
+        future_year = (datetime.datetime.today() + datetime.timedelta(days=1365)).year
+        future_year_url = f'{url}?year={future_year}'
+        response = self.client.get(future_year_url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), 0)
 
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
