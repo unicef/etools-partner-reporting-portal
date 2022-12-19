@@ -314,7 +314,7 @@ LOGGING = {
         },
         'ocha-sync': {
             'handlers': ['ocha'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True
         },
         'django.request': {
@@ -322,6 +322,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'etools_prp.apps.unicef.tasks': {
+            'handlers': ['default'],
+            'level': 'INFO',
+        }
         # 'elasticapm.errors': {
         #     'level': 'ERROR',
         #     'handlers': ['default'],
