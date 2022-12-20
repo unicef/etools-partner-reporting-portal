@@ -855,8 +855,7 @@ class ProgressReportPullHFDataAPIView(APIView):
         if not target_hf_irs.exists():
             # The passed-in indicator report is non-HF indicator
             raise ValidationError(
-                "This indicator is not a high frequency indicator. "
-                "Data pull only works with high frequency indicator."
+                "This HR indicator does not have any High frequency reports within this QPR period."
             )
 
         return indicator_report, hf_reports
