@@ -81,12 +81,12 @@ class PdFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _initStatuses() {
     return [
-      {title: this.localize('signed'), id: 'Sig'},
-      {title: this.localize('active'), id: 'Act'},
-      {title: this.localize('suspended'), id: 'Sus'},
-      {title: this.localize('ended'), id: 'End'},
-      {title: this.localize('closed'), id: 'Clo'},
-      {title: this.localize('terminated'), id: 'Ter'}
+      {title: this.localize('signed'), id: 'signed'},
+      {title: this.localize('active'), id: 'active'},
+      {title: this.localize('suspended'), id: 'suspended'},
+      {title: this.localize('ended'), id: 'ended'},
+      {title: this.localize('closed'), id: 'closed'},
+      {title: this.localize('terminated'), id: 'terminated'}
     ];
   }
 }
