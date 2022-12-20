@@ -67,6 +67,7 @@
     "@unicef-polymer/etools-dropdown": "^4.0.3",
     "@unicef-polymer/etools-file": "^3.0.3",
     "@unicef-polymer/etools-loading": "^5.0.1",
+    "@unicef-polymer/etools-toasts": "^1.0.4",
     "@webcomponents/webcomponentsjs": "^2.6.0",
     "browser-capabilities": "^1.1.4",
     "dayjs": "^1.11.5",

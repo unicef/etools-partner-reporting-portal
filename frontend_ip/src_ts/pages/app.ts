@@ -17,6 +17,7 @@ import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../etools-prp-common/config';
+import '@unicef-polymer/etools-toasts';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
 /**
@@ -73,19 +74,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         </template>
       </iron-pages>
 
-      <paper-toast id="changes-saved" text="[[localize('changes_saved')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="server-error" text="[[localize('an_error_occurred')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="file-uploaded" text="[[localize('file_uploaded')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="file-deleted" text="[[localize('file_deleted')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="ocha-timeout" text="[[localize('request_ocha_timed_out')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="message-sent" text="[[localize('message_sent')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="error-message" duration="5000"> </paper-toast>
+      <etools-toasts></etools-toasts>
     `;
   }
 
@@ -262,18 +251,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
   }
 
-  _notify(e: CustomEvent) {
-    e.stopPropagation();
-    const options = e.detail;
-    try {
-      if (options.text) {
-        (this.$[options.type] as any).text = options.text;
-      }
-      (this.$[options.type] as any).open();
-      // eslint-disable-next-line no-empty
-    } catch (err) {}
-  }
-
   _fetchProfile() {
     const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
     return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
@@ -287,14 +264,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _addEventListeners() {
-    this._notify = this._notify.bind(this);
-    this.addEventListener('notify', this._notify as any);
     this._fetchProfile = this._fetchProfile.bind(this);
     this.addEventListener('fetch-profile', this._fetchProfile);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('notify', this._notify as any);
     this.removeEventListener('fetch-profile', this._fetchProfile);
   }
 
