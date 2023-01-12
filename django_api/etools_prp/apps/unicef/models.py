@@ -449,9 +449,9 @@ class ProgressReport(TimeStampedModel):
         unique_together = ('programme_document', 'report_type', 'report_number')
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if self.is_final and not hasattr(self, 'final_review'):
             FinalReview.objects.create(progress_report=self)
-        super().save(*args, **kwargs)
 
     @cached_property
     def latest_indicator_report(self):
