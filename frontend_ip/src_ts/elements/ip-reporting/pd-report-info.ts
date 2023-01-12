@@ -15,7 +15,6 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -25,6 +24,8 @@ import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
 import {RootState} from '../../typings/redux.types';
+import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parser';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -33,7 +34,7 @@ import {RootState} from '../../typings/redux.types';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement)))) {
+class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMixin(ReduxConnectedElement))) {
   public static get template() {
     return html`
       <style include="app-grid-style">
@@ -118,13 +119,12 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
         }
 
         :host etools-content-panel {
-          margin-bottom:25px;
+          margin-bottom: 25px;
         }
 
         :host labelled-item paper-radio-group paper-radio-button:first-child {
           padding-left: 0;
         }
-
       </style>
 
       <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
@@ -439,7 +439,6 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
                 </template>
 
                 <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
-
                   <paper-input
                     id="overall_satisfaction_comment"
                     value="{{localData.final_review.overall_satisfaction_comment}}"
@@ -515,16 +514,15 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
 
   _reportInfoCurrent(rootState: RootState) {
     const data = reportInfoCurrent(rootState);
-    if(!data.final_review){
+    if (!data.final_review) {
       data.final_review = {};
-    }
-    else{
+    } else {
       Object.keys(data.final_review).forEach((key) => {
         data.final_review[key] =
           data.final_review[key] === true ? 'yes' : data.final_review[key] === false ? 'no' : data.final_review[key];
       });
     }
-    this.set('localData',  {...data});
+    this.set('localData', {...data});
     return data;
   }
 
@@ -553,11 +551,17 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(NotificationsM
         .dispatch(pdReportsUpdate(updateThunk, this.pdId, this.reportId))
         // @ts-ignore
         .then(() => {
-          this._notifyChangesSaved();
+          fireEvent(this, 'toast', {
+            text: this.localize('changes_saved'),
+            showCloseBtn: true
+          });
         })
         // @ts-ignore
         .catch((err) => {
-          this._notifyErrorMessage({text: this.localize('an_error_occurred')});
+          fireEvent(this, 'toast', {
+            text: formatServerErrorAsText(err, this.localize('an_error_occurred')),
+            showCloseBtn: true
+          });
           console.log(err);
         });
     });

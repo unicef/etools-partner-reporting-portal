@@ -12,7 +12,6 @@ import '../../../../../elements/ip-reporting/report-attachments';
 import '../pd-sent-back';
 
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import NotificationsMixin from '../../../../../etools-prp-common/mixins/notifications-mixin';
 import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
 import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../../../endpoints';
@@ -24,16 +23,16 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../../../../redux/actions/pdReports';
 import {RootState} from '../../../../../typings/redux.types';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
+import {fireEvent} from '../../../../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin NotificationsMixin
  * @appliesMixin LocalizeMixin
  */
-class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
+class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       <style include="app-grid-style">
@@ -200,7 +199,10 @@ class PagePdReportSrReporting extends LocalizeMixin(NotificationsMixin(UtilsMixi
         .dispatch(pdReportsUpdate(updateThunk, this.pdId, this.reportId))
         // @ts-ignore
         .then(() => {
-          this._notifyChangesSaved();
+          fireEvent(this, 'toast', {
+            text: this.localize('changes_saved'),
+            showCloseBtn: true
+          });
         })
         // @ts-ignore
         .catch(function (err) {

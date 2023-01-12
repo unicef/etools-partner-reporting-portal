@@ -12,7 +12,6 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
@@ -37,7 +36,7 @@ import {
   canSave
 } from './js/pd-details-calculation-methods-functions';
 import {RootState} from '../../typings/redux.types';
-import {includes} from 'lodash-es';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -46,11 +45,8 @@ import {includes} from 'lodash-es';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  * @appliesMixin DataTableMixin
- * @appliesMixin NotificationsMixin
  */
-class PdDetailsCalculationMethods extends LocalizeMixin(
-  NotificationsMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))
-) {
+class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
       ${buttonsStyles} ${tableStyles}
@@ -320,7 +316,12 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
         const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
         return this.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, this.pdId));
       })
-      .then(this._notifyChangesSaved.bind(this))
+      .then(() =>
+        fireEvent(this, 'toast', {
+          text: this.localize('changes_saved'),
+          showCloseBtn: true
+        })
+      )
       .catch((_err: any) => {
         console.log(_err);
       });
