@@ -5,7 +5,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -448,6 +448,7 @@ class ProgressReport(TimeStampedModel):
         ordering = ['-due_date', '-id']
         unique_together = ('programme_document', 'report_type', 'report_number')
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.is_final and not hasattr(self, 'final_review'):
