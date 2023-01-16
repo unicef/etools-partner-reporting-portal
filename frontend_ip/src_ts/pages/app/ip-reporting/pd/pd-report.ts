@@ -414,7 +414,7 @@ class PageIpReportingPdReport extends LocalizeMixin(
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this.fetchReportDebouncer && this.fetchReportDebouncer.isActive) {
+    if (this.fetchReportDebouncer && this.fetchReportDebouncer.isActive()) {
       this.fetchReportDebouncer.cancel();
     }
 

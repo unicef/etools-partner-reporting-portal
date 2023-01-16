@@ -514,6 +514,11 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMixin(Red
 
   _reportInfoCurrent(rootState: RootState) {
     const data = reportInfoCurrent(rootState);
+
+    if (data.id === this.localData.id) {
+      return;
+    }
+
     if (!data.final_review) {
       data.final_review = {};
     } else {
