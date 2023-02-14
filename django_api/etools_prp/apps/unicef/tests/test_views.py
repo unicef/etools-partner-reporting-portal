@@ -846,7 +846,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             .filter(due_date=today) \
             .values_list('progress_report_id') \
             .distinct()
-        pr_queryset = self.queryset.filter(id__in=ir_ids)
+        pr_queryset = self.queryset.filter(indicator_reports__id__in=ir_ids)
 
         url = reverse(
             'progress-reports',
@@ -1218,7 +1218,7 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             ir_qs.count(),
         )
 
-        # test no indicator reports exist for a unused location
+        # test no indicator reports exist for an unused location
         unused_loc = factories.LocationFactory()
         ir_qs = ir_qs.filter(reportable__locations__id=unused_loc.pk)
         self.assertEquals(ir_qs.count(), 0)
