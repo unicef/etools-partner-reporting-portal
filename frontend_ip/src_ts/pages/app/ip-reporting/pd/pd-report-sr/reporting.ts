@@ -267,7 +267,7 @@ class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedEle
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    if (this.updateDataDebouncer && this.updateDataDebouncer.isActive) {
+    if (this.updateDataDebouncer && this.updateDataDebouncer.isActive()) {
       this.updateDataDebouncer.cancel();
     }
   }
