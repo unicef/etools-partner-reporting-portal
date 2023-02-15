@@ -19,7 +19,7 @@ Babel = "<=2.9.1"
 boto3 = "<=1.18.24"
 carto = "<=1.11.3"
 cryptography = "<3.4"  # issue with image
-django = "<3.2.16"
+django = "<3.2.19"
 django-admin-extra-urls = "<=3.5.1"
 django-celery-beat = "<=2.2.1"
 django-celery-email = "<=3.0"
