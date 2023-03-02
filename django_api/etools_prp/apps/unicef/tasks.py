@@ -205,6 +205,10 @@ def process_programme_documents(fast=False, area=False):
                         item['external_business_area_code'] = workspace.business_area_code
                         # Amendment date formatting
                         for idx in range(len(item['amendments'])):
+                            if item['amendments'][idx]['signed_date'] is None:
+                                # no signed date yet, so formatting is not required
+                                continue
+
                             item['amendments'][idx]['signed_date'] = datetime.datetime.strptime(
                                 item['amendments'][idx]['signed_date'], "%Y-%m-%d"
                             ).strftime("%d-%b-%Y")
