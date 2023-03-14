@@ -356,7 +356,7 @@ CURRENCIES = Choices(
     ("SEK", "sek", "sek"),
     ("SGD", "sgd", "sgd"),
     ("SHP", "shp", "shp"),
-    ("SLL", "sll", "sll"),
+    ("SLE", "sle", "sle"),
     ("SOS", "sos", "sos"),
     ("SPL", "spl", "spl"),
     ("SRD", "srd", "srd"),
