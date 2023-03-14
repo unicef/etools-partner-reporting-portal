@@ -9,19 +9,20 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
 import {RootState} from '../../typings/redux.types';
+import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin NotificationsMixin
+ * @appliesMixin LocalizeMixin
  */
-class PdDetailsDocDownload extends MatomoMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
+class PdDetailsDocDownload extends MatomoMixin(LocalizeMixin(UtilsMixin(ReduxConnectedElement))) {
   static get template() {
     return html`
       <style>
@@ -76,7 +77,10 @@ class PdDetailsDocDownload extends MatomoMixin(NotificationsMixin(UtilsMixin(Red
       this.set('spinnerActive', false);
       if (res.status !== 200 || !res.data.signed_pd_document_file) {
         // Fire Toast with error
-        this._notifyServerError();
+        fireEvent(this, 'toast', {
+          text: this.localize('an_error_occurred'),
+          showCloseBtn: true
+        });
         console.error(res);
       } else {
         const anchor = document.createElement('a');
