@@ -9,6 +9,7 @@ const keys = [
   'challenges_in_the_reporting_period',
   'proposed_way_forward',
   'narrative',
+  'final_review',
   'id'
 ];
 

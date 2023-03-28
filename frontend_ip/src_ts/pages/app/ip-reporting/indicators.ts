@@ -105,7 +105,7 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnecte
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    if (this.fetchIndicatorsDebouncer && this.fetchIndicatorsDebouncer.isActive) {
+    if (this.fetchIndicatorsDebouncer && this.fetchIndicatorsDebouncer.isActive()) {
       this.fetchIndicatorsDebouncer.cancel();
     }
   }
