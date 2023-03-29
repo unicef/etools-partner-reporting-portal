@@ -10,6 +10,7 @@ import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement'
 import {localizeSet} from '../redux/actions/localize';
 import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
+import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 
 /**
  * @polymer
@@ -117,6 +118,8 @@ class LanguageDropdown extends MatomoMixin(ReduxConnectedElement) {
     }
     this.trackAnalytics(e);
     this._storeSelectedLanguage(newLanguage);
+    // Event caught by self translating npm packages
+    fireEvent(this, 'language-changed', {language: newLanguage});
   }
 
   _storeSelectedLanguage(language: string) {

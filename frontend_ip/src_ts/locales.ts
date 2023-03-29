@@ -353,6 +353,7 @@ export const locales = {
     name_of_funding_agency: 'Name of Funding Agency (acronyms)',
     is_this_project_hrp_fa: 'Is this project part of a HRP or FA?',
     no: 'No',
+    yes: 'Yes',
     add_custom_field: 'Add Custom Field',
     add_from_cluster_activities: 'Add from Cluster Activities',
     add_custom_activity: 'Add Custom Activity',
@@ -481,7 +482,25 @@ export const locales = {
     please_make_sure_indicators: 'Please make sure indicators have locations set for reports to be generated.',
     you_are_about_to_location:
       "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
-    progress_reports_export_status: 'The export contains only Accepted and Submitted Reports'
+    progress_reports_export_status: 'The export contains only Accepted and Submitted Reports',
+    release_cash_in_time: 'During the course of programme implementation, did UNICEF release cash in a timely manner?',
+    release_supplies_in_time:
+      'During the course of programme implementation, did UNICEF release programme supplies in a timely manner?',
+    feedback_face_form_in_time:
+      'During the course of programme implementation, did UNICEF provide timely feedback on FACE forms and narrative progress reports?',
+    respond_requests_in_time:
+      'During the course of programme implementation, did UNICEF staff respond to queries and requests for technical assistance in a timely manner?',
+    implemented_as_planned:
+      'Were joint monitoring and assurance activities implemented as planned in the Programme Document?',
+    action_to_address:
+      'Did your organization and UNICEF take action to address findings identified in monitoring and assurance activities?',
+    overall_satisfaction:
+      'Overall, how satisfied was your organization with its partnership with UNICEF on this Programme Document?',
+    very_unsatisfied: 'Very Unsatisfied',
+    unsatisfied: 'Unsatisfied',
+    neutral: 'Neutral',
+    satisfied: 'Satisfied',
+    very_satisfied: 'Very Satisfied',
   },
   fr: {
     civil_society_organization: 'Civil Society Organization',
@@ -838,6 +857,7 @@ export const locales = {
     name_of_funding_agency: "Nom de l'Organisme de financement (acronymes)",
     is_this_project_hrp_fa: 'Ce projet fait-il partie d’un HRP ou FA?',
     no: 'Non',
+    yes: 'Oui',
     add_custom_field: 'Ajouter un champ personnalisé',
     add_from_cluster_activities: 'Ajouter à partir des activités du cluster',
     add_custom_activity: 'Ajouter une activité personnalisée',
@@ -969,7 +989,26 @@ export const locales = {
       'Veuillez vous assurer que les indicateurs ont des emplacements pour les rapports à générer.',
     you_are_about_to_location:
       "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
-    progress_reports_export_status: "L'exportation ne contient que les rapports acceptés et soumis"
+    progress_reports_export_status: "L'exportation ne contient que les rapports acceptés et soumis",
+    release_cash_in_time:
+      'Au cours de l’exécution du programme, l’UNICEF a-t-il débloqué des liquidités en temps voulu?',
+    release_supplies_in_time:
+      'Au cours de l’exécution du programme, l’UNICEF a-t-il débloqué les fournitures du programme en temps voulu?',
+    feedback_face_form_in_time:
+      'Au cours de l’exécution du programme, l’UNICEF a-t-il fourni en temps voulu des informations en retour sur les formulaires AEAE et les rapports d’activité narratifs?',
+    respond_requests_in_time:
+      'Au cours de l’exécution du programme, le personnel de l’UNICEF a-t-il répondu en temps voulu aux questions et aux demandes d’assistance technique?',
+    implemented_as_planned:
+      'Les activités conjointes de suivi et d’assurance ont-elles été mises en œuvre comme prévu dans le descriptif de programme?',
+    action_to_address:
+      'Votre organisation et l’UNICEF ont-ils pris des mesures pour donner suite aux conclusions des activités de suivi et d’assurance?',
+    overall_satisfaction:
+      'Dans l’ensemble, dans quelle mesure votre organisation a-t-elle été satisfaite de son partenariat avec l’UNICEF sur ce descriptif de programme?',
+    very_unsatisfied: 'Très insatisfait',
+    unsatisfied: 'Insatisfait',
+    neutral: 'Neutre',
+    satisfied: 'Satisfait',
+    very_satisfied: 'Très satisfait'
   },
   es: {
     civil_society_organization: 'Civil Society Organization',
@@ -1327,6 +1366,7 @@ export const locales = {
     name_of_funding_agency: 'Nombre de la Agencia de financiamiento (acrónimos)',
     is_this_project_hrp_fa: '¿Forma parte este proyecto de un HRP o FA?',
     no: 'No',
+    yes: 'Sí',
     add_custom_field: 'Agregue campo personalizado',
     add_from_cluster_activities: 'Agregue de las actividades del conglomerado',
     add_custom_activity: 'Agregue actividad personalizada',
@@ -1457,7 +1497,25 @@ export const locales = {
       'Por favor asegúrese de que los indicadores tengan ubicaciones establecidas para generar informes.',
     you_are_about_to_location:
       "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
-    progress_reports_export_status: 'La exportación contiene solo informes aceptados y enviados'
+    progress_reports_export_status: 'La exportación contiene solo informes aceptados y enviados',
+    release_cash_in_time: 'Durante la ejecución del programa, ¿liberó el UNICEF efectivo oportunamente?',
+    release_supplies_in_time:
+      'Durante la ejecución del programa, ¿distribuyó oportunamente el UNICEF los suministros para programas?',
+    feedback_face_form_in_time:
+      'Durante la ejecución del programa, ¿proporcionó el UNICEF información oportuna sobre los formularios FACE y los informes descriptivos sobre la marcha de los trabajos?',
+    respond_requests_in_time:
+      'Durante la ejecución del programa, ¿respondió oportunamente el personal del UNICEF a las consultas y solicitudes de asistencia técnica?',
+    implemented_as_planned:
+      '¿Se llevaron a cabo actividades conjuntas de supervisión y garantía según lo previsto en el documento de programa?',
+    action_to_address:
+      '¿Adoptaron medidas su organización y el UNICEF para abordar las conclusiones detectadas en las actividades de supervisión y garantía?',
+    overall_satisfaction:
+      'En general, ¿qué tan satisfecha estaba su organización con su asociación con UNICEF en este documento programático?',
+    very_unsatisfied: 'Muy insatisfecho',
+    unsatisfied: 'Insatisfecho',
+    neutral: 'Neutral',
+    satisfied: 'Satisfecho',
+    very_satisfied: 'Muy satisfecho'
   },
   ru: {
     civil_society_organization: 'Civil Society Organization',
@@ -1818,6 +1876,7 @@ export const locales = {
     is_this_project_hrp_fa:
       'Этот проект является частью Плана гуманитарного реагирования или проектом финансирующего учреждения?',
     no: 'Нет',
+    yes: 'Да',
     add_custom_field: 'Добавить специальное поле',
     add_from_cluster_activities: 'Добавить из мероприятий кластера',
     add_custom_activity: 'Добавить специальный вид деятельности',
@@ -1949,7 +2008,24 @@ export const locales = {
       'Пожалуйста, удостоверьтесь, что индикаторы включают местоположения, установленные для данных отчетов.',
     you_are_about_to_location:
       "You are about to reset all location data and entered info for this Indicator Report; including Overall status, Narrative Assessment, and Report Status. New location data entries will be generated. This action is irreversible. Please click 'Refresh' if you wish to proceed.",
-    progress_reports_export_status: 'Экспорт содержит только принятые и отправленные отчеты.'
+    progress_reports_export_status: 'Экспорт содержит только принятые и отправленные отчеты.',
+    release_cash_in_time: 'Своевременно ли ЮНИСЕФ в ходе осуществления программы выделял наличные средства?',
+    release_supplies_in_time: 'Своевременно ли в ходе осуществления программ ЮНИСЕФ выделял материалы по программам?',
+    feedback_face_form_in_time:
+      'Своевременно ли в ходе осуществления программ ЮНИСЕФ представлял ли ЮНИСЕФ информацию о формах FACE и описательных докладах о ходе работы?',
+    respond_requests_in_time:
+      'Своевременно ли сотрудники ЮНИСЕФ в ходе осуществления программ отвечали на запросы и просьбы об оказании технической помощи?',
+    implemented_as_planned:
+      'Осуществлялись ли совместные мероприятия по наблюдению и обеспечению гарантий, как это было запланировано в Программном документе?',
+    action_to_address:
+      'Приняли ли ваша организация и ЮНИСЕФ меры по учету выводов, выявленных в ходе деятельности по контролю и обеспечению гарантий?',
+    overall_satisfaction:
+      'В целом, насколько ваша организация удовлетворена своим партнерством с ЮНИСЕФ по этому программному документу?',
+    very_unsatisfied: 'Очень неудовлетворен',
+    unsatisfied: 'Неудовлетворённый',
+    neutral: 'Нейтральный',
+    satisfied: 'Довольный',
+    very_satisfied: 'Очень доволен'
   },
   pt: {
     civil_society_organization: 'Organização da Sociedade Civil',
@@ -2307,6 +2383,7 @@ export const locales = {
     name_of_funding_agency: 'Nome da Agência de Financiamento (siglas)',
     is_this_project_hrp_fa: 'O projeto faz parte do HRP ou FA?',
     no: 'Não',
+    yes: 'Sim',
     add_custom_field: 'Adicionar campo personalizado',
     add_from_cluster_activities: 'Adicionar atividades agrupadas',
     add_custom_activity: 'Adicionar atividades personalizadas',
@@ -2435,7 +2512,25 @@ export const locales = {
       'Favor garantir que todos os indicadores possuem locais definidos para os relatórios à serem gerados',
     you_are_about_to_location:
       "Você está prestes à reiniciar todos os dados de local e informações inseridas para este indicador do relatório; incluindo status geral, análise narrativa e status do relatório. Novos campos para entrada de dados de local serão gerados. Esta ação é irreversível. Favor clicar em 'Atualizar' caso você queira prosseguir.",
-    progress_reports_export_status: 'A exportação contém apenas relatórios aceitos e enviados'
+    progress_reports_export_status: 'A exportação contém apenas relatórios aceitos e enviados',
+    release_cash_in_time: 'Durante a execução do programa, a UNICEF divulgou dinheiro em tempo útil?',
+    release_supplies_in_time:
+      'Durante a execução do programa, a UNICEF divulgou o fornecimento do programa em tempo útil?',
+    feedback_face_form_in_time:
+      'Durante a execução do programa, a UNICEF forneceu feedback oportuno sobre os formulários FACE e relatórios de progresso narrativo?',
+    respond_requests_in_time:
+      'Durante a execução do programa, o pessoal da UNICEF respondeu em tempo útil às perguntas e aos pedidos de assistência técnica?',
+    implemented_as_planned:
+      'As atividades de acompanhamento e de garantia conjuntas foram implementadas como previsto no documento do programa?',
+    action_to_address:
+      'A sua organização e a UNICEF tomaram medidas para abordar as conclusões identificadas nas atividades de monitorização e garantia?',
+    overall_satisfaction:
+      'Globalmente, quão satisfeita ficou a sua organização com a sua parceria com a UNICEF neste Documento de Programa?',
+    very_unsatisfied: 'Muito insatisfeito',
+    unsatisfied: 'Insatisfeito',
+    neutral: 'Neutro',
+    satisfied: 'Satisfeito',
+    very_satisfied: 'Muito satisfeito'
   },
   ar: {
     civil_society_organization: 'منظمة المجتمع المدني',
@@ -2790,6 +2885,7 @@ export const locales = {
     name_of_funding_agency: 'اسم الوكالة المُمولة ( المختصرات)',
     is_this_project_hrp_fa: 'هل هذا المشروع جزء من خطة الاستجابة الانسانية أو اذن التمويل؟',
     no: 'لا',
+    yes: 'نعم',
     add_custom_field: 'إضافة حقل مخصص',
     add_from_cluster_activities: 'إضافة من أنشطة القطاع',
     add_custom_activity: 'إضافة نشاط مخصص',
@@ -2918,6 +3014,20 @@ export const locales = {
     please_make_sure_indicators: 'الرجاء التأكد من أن المؤشرات تحتوي على مواقع محددة للتقارير التي سيتم إنشاؤها.',
     you_are_about_to_location:
       'أنت على وشك إعادة تعيين كافة بيانات الموقع وإدخال المعلومات  المتغلقة بتقرير المؤشر هذا؛ بما في ذلك الحالة العامة والتقييم السردي وحالة التقرير. سيتم إنشاء مدخلات بيانات الموقع الجديد. وهذا الإجراء لا رجعة فيه. الرجاء النقر فوق "تحديث" إذا كنت ترغب في المتابعة',
-    progress_reports_export_status: 'يحتوي التصدير على التقارير المقبولة والمرسلة فقط'
+    progress_reports_export_status: 'يحتوي التصدير على التقارير المقبولة والمرسلة فقط',
+    release_cash_in_time: 'وخلال تنفيذ البرنامج، هل أفرجت اليونيسيف عن الأموال النقدية في الوقت المناسب؟',
+    release_supplies_in_time: 'وأثناء تنفيذ البرنامج، هل أفرجت اليونيسيف عن الإمدادات البرنامجية في الوقت المناسب؟',
+    feedback_face_form_in_time:
+      'وخلال تنفيذ البرنامج، هل قدمت اليونيسيف في الوقت المناسب تعليقات على استمارات FACE وتقارير مرحلية سردية؟',
+    respond_requests_in_time:
+      'وأثناء تنفيذ البرنامج، هل استجاب موظفو اليونيسيف للاستفسارات وطلبات المساعدة التقنية في الوقت المناسب؟',
+    implemented_as_planned: 'وهل نفذت أنشطة مشتركة للرصد والضمان على النحو المخطط له في وثيقة البرنامج؟',
+    action_to_address: 'هل اتخذت منظمتكم واليونيسيف إجراءات لمعالجة النتائج المحددة في أنشطة الرصد والضمان؟',
+    overall_satisfaction: 'وعموما، ما مدى رضا منظمتكم عن شراكتها مع اليونيسيف في وثيقة البرنامج هذه؟',
+    very_unsatisfied: 'غير راض جدا',
+    unsatisfied: 'غير الملباه',
+    neutral: 'محايد',
+    satisfied: 'قنع',
+    very_satisfied: 'راض جدا'
   }
 };
