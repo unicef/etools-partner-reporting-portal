@@ -7,8 +7,6 @@ import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
 
-from etools_prp.apps.core.common import PRP_IP_ROLE_TYPES
-
 
 def fwd_migrate_to_user_realms(apps, schema_editor):
     User = apps.get_model('account', 'User')
@@ -24,7 +22,7 @@ def fwd_migrate_to_user_realms(apps, schema_editor):
                 user_id=user.id,
                 workspace_id=prp_role.workspace.id,
                 partner_id=user.partner.id,
-                group_id=Group.objects.get_or_create(name=PRP_IP_ROLE_TYPES[prp_role.role])[0].id,
+                group_id=Group.objects.get_or_create(name=prp_role.role)[0].id,
                 is_active=prp_role.is_active
             ))
         user.workspace = prp_role.workspace

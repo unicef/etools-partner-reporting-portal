@@ -134,10 +134,13 @@ class UserListCreateAPIView(ListCreateAPIView):
                 PRP_ROLE_TYPES.ip_editor,
             )
             user_workspaces = user.prp_roles.filter(
-                realms__group__name__in=ip_users_access
+                name__in=ip_users_access
             ).values_list('realms__workspace', flat=True).distinct()
+
             users_queryset = users_queryset.filter(
-                Q(realms__workspace__in=user_workspaces) | Q(realms__group__name__in=cluster_roles),
+                Q(realms__workspace__in=user_workspaces) |
+                Q(realms__isnull=True) |
+                Q(realms__group__name__in=cluster_roles),
                 partner_id__isnull=False, partner_id=user.partner_id)
         else:
             raise PermissionDenied()

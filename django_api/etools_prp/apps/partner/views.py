@@ -23,7 +23,7 @@ from etools_prp.apps.core.paginations import SmallPagination
 from etools_prp.apps.core.permissions import (
     AnyPermission,
     has_permission_for_clusters_check,
-    HasAnyRole,
+    HasAnyClusterRole,
     IsAuthenticated,
     IsClusterSystemAdmin,
     IsIMO,
@@ -147,10 +147,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
                 message = {'clusters': 'You may not have required permission to add some of the clusters.'}
                 self.permission_denied(request, message=message)
 
-        if not request.user.prp_roles.filter(
-                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(realms__group__name__in=roles_permitted,
-                  realms__partner__clusters__response_plan_id=response_plan_id)
+        if not request.user.old_prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -215,10 +214,9 @@ class PartnerProjectAPIView(APIView):
         if request.method == 'GET':
             roles_permitted.extend([PRP_ROLE_TYPES.cluster_viewer])
 
-        if not request.user.prp_roles.filter(
-            Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
-            Q(realms__group__name__in=roles_permitted,
-              realms__partner__clusters__partner_projects=obj)
+        if not request.user.old_prp_roles.filter(
+            Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+            Q(role__in=roles_permitted, cluster__partner_projects=obj)
         ).exists():
             self.permission_denied(request)
 
@@ -295,10 +293,9 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         response_plan_id = self.kwargs.get('response_plan_id')
         roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
 
-        if not request.user.prp_roles.filter(
-                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(realms__group__name__in=roles_permitted,
-                  realms__partner__clusters__response_plan_id=response_plan_id)
+        if not request.user.old_prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -320,9 +317,9 @@ class PartnerActivityCreateAPIView(CreateAPIView):
 
         # If user is IMO check if incoming partner belongs to IMO's clusters
         if (not request.user.is_cluster_system_admin and
-                not request.user.prp_roles.filter(
-                    realms__group__name__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
-                    realms__partner=partner  # TODO REALMS TBD
+                not request.user.old_prp_roles.filter(
+                    role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
+                    cluster__partners=partner
                 ).exists()):
 
             raise ValidationError({
@@ -363,10 +360,9 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
         response_plan_id = self.kwargs.get('response_plan_id')
         roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member]
 
-        if not request.user.prp_roles.filter(
-                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(realms__group__name__in=roles_permitted,
-                  realms__partner__clusters__response_plan_id=response_plan_id)
+        if not request.user.old_prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -397,9 +393,9 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
 
         # If user is IMO check if incoming partner belongs to IMO's clusters
         if (not request.user.is_cluster_system_admin and
-                not request.user.prp_roles.filter(
-                    realms__group__name__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
-                    realms__partner__clusters__partner=instance.partner  # TODO REALMS TBD
+                not request.user.old_prp_roles.filter(
+                    role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
+                    cluster__partners=instance.partner_id
                 ).exists()):
 
             raise ValidationError({
@@ -420,7 +416,7 @@ class ClusterActivityPartnersAPIView(ListAPIView):
     serializer_class = ClusterActivityPartnersSerializer
     permission_classes = (
         IsAuthenticated,
-        HasAnyRole(
+        HasAnyClusterRole(
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
@@ -454,10 +450,9 @@ class PartnerActivityListAPIView(ListAPIView):
         roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member,
                            PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer]
 
-        if not request.user.prp_roles.filter(
-                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(realms__group__name__in=roles_permitted,
-                  realms__partner__clusters__response_plan_id=response_plan_id)
+        if not request.user.old_prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 
@@ -496,10 +491,9 @@ class PartnerActivityAPIView(RetrieveAPIView):
         roles_permitted = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member,
                            PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer]
 
-        if not request.user.prp_roles.filter(
-                Q(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin) |
-                Q(realms__group__name__in=roles_permitted,
-                  realms__partner__clusters__response_plan_id=response_plan_id)
+        if not request.user.old_prp_roles.filter(
+                Q(role=PRP_ROLE_TYPES.cluster_system_admin) |
+                Q(role__in=roles_permitted, cluster__response_plan_id=response_plan_id)
         ).exists():
             self.permission_denied(request)
 

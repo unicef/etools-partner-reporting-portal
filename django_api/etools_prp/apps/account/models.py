@@ -102,7 +102,7 @@ class User(AbstractUser):
 
     @cached_property
     def is_cluster_system_admin(self):
-        return self.prp_roles.filter(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin).exists()
+        return self.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
 
     def send_email_notification_on_create(self, portal=None):
         template_data = {

@@ -1,16 +1,21 @@
-from django.contrib.auth.models import Group
-
 from rest_framework import serializers
 
-from etools_prp.apps.cluster.serializers import ClusterIDManagementSerializer
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
+from etools_prp.apps.core.models import Realm
 from etools_prp.apps.core.serializers import WorkspaceSimpleSerializer
 
 
 class PRPRoleWithRelationsSerializer(serializers.ModelSerializer):
-    role_display = serializers.CharField(source='name')
-    workspace = WorkspaceSimpleSerializer()
-    cluster = ClusterIDManagementSerializer()
+    role = serializers.CharField(source='group.name', read_only=True)
+    role_display = serializers.SerializerMethodField(read_only=True)
+    workspace = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = Group
-        fields = ('id', 'role_display', 'is_active')  # 'workspace', 'cluster',
+        model = Realm
+        fields = ('id', 'is_active', 'role', 'role_display', 'workspace')
+
+    def get_role_display(self, obj):
+        return PRP_ROLE_TYPES[obj.group.name]
+
+    def get_workspace(self, obj):
+        return WorkspaceSimpleSerializer(obj.workspace).data
