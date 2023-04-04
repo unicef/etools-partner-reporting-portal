@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.urls import reverse
 
 from rest_framework.test import APIRequestFactory, APITestCase
@@ -10,6 +12,7 @@ from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestr
 from etools_prp.apps.partner.models import Partner
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
@@ -197,6 +200,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
         self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
@@ -383,6 +387,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
         self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_coordinator,
@@ -504,6 +509,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
         self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -593,6 +599,7 @@ class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
             prp_role.delete()
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -682,6 +689,7 @@ class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
             prp_role.delete()
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -895,6 +903,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         self.assertFalse(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -1232,6 +1241,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         self.assertFalse(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,

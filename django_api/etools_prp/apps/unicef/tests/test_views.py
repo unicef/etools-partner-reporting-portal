@@ -89,7 +89,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         self.partner_user = factories.PartnerUserFactory(
             workspace=self.workspace,
             partner=self.partner,
-            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.project = factories.PartnerProjectFactory(
@@ -383,7 +383,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
         self.partner_user = factories.PartnerUserFactory(
             workspace=self.workspace,
             partner=self.partner,
-            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.project = factories.PartnerProjectFactory(
@@ -598,7 +598,7 @@ class BaseProgressReportAPITestCase(BaseAPITestCase):
         self.partner_user = factories.PartnerUserFactory(
             workspace=self.workspace,
             partner=self.partner,
-            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.project = factories.PartnerProjectFactory(
@@ -1607,7 +1607,7 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.partner_user = factories.PartnerUserFactory(
+        self.user = factories.PartnerUserFactory(
             workspace=self.workspace,
             partner=self.partner,
             realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]

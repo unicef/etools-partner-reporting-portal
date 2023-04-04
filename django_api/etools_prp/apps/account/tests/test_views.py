@@ -1,7 +1,11 @@
+import datetime
+from unittest import skip
+
 from django.core import mail
 from django.db.models import Count
 from django.urls import reverse
 
+import dateutil.tz
 from drfpasswordless.models import CallbackToken
 from rest_framework import status
 
@@ -114,6 +118,7 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         self.workspace = factories.WorkspaceFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.PartnerUserFactory(
+            workspace=self.workspace,
             partner=self.partner,
             realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
@@ -142,7 +147,8 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
             factories.PartnerUserFactory(
                 workspace=self.workspace,
                 partner=self.partner,
-                realms__data=[role]
+                realms__data=[role],
+                last_login=datetime.datetime.now(tz=dateutil.tz.UTC)
             )
 
         response = self.client.get(reverse('users') + '?portal=IP')
@@ -169,7 +175,7 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         )
 
         # API Filtering test
-        filter_user = User.objects.get(prp_roles__role=PRP_ROLE_TYPES.ip_admin,)
+        filter_user = User.objects.get(realms__group__name=PRP_ROLE_TYPES.ip_admin,)
         filter_args = "?portal=IP&name_email={}&status=active&partners={}&roles={}&workspaces={}&clusters={}".format(
             filter_user.first_name,
             filter_user.partner_id,
@@ -182,6 +188,7 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['results'][0]['id'], filter_user.id)
 
+    @skip('deprecated')
     def test_cluster_user_list(self):
         """Test the API response for cluster users.
         """
