@@ -35,7 +35,7 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[EmailValidator()])
     partner = PartnerDetailsSerializer(read_only=True)
-    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
+    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True, source='realms')
     access = serializers.SerializerMethodField()
 
     def get_access(self, obj):
@@ -83,7 +83,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserWithPRPRolesSerializer(serializers.ModelSerializer):
     partner = PartnerSimpleSerializer(read_only=True)
-    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
+    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True, source='realms')
     status = serializers.SerializerMethodField(read_only=True)
     user_type = serializers.ChoiceField(choices=USER_TYPES, required=False)
     is_incomplete = serializers.SerializerMethodField(read_only=True)

@@ -82,7 +82,7 @@ class WorkspaceManager(models.Manager):
             ip_kw['realms__group__name__in'] = role_list
             cluster_kw['response_plans__clusters__old_prp_roles__role__in'] = role_list
 
-        if user.prp_roles.filter(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin).exists():
+        if user.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
             q_cluster_admin = Q(response_plans__clusters__isnull=False)
         else:
             q_cluster_admin = Q()

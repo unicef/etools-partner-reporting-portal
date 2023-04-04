@@ -2,25 +2,25 @@
   {
     "model": "auth.group",
     "fields": {
-      "name": "IP Viewer"
+      "name": "IP_VIEWER"
     }
   },
   {
     "model": "auth.group",
     "fields": {
-      "name": "IP Editor"
+      "name": "IP_EDITOR"
     }
   },
   {
     "model": "auth.group",
     "fields": {
-      "name": "IP Authorized Officer"
+      "name": "IP_AUTHORIZED_OFFICER"
     }
   },
   {
     "model": "auth.group",
     "fields": {
-      "name": "IP Admin"
+      "name": "IP_ADMIN"
     }
   }
 ]

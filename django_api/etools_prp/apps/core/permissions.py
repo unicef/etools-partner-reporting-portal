@@ -72,7 +72,18 @@ class HasAnyRole(HasConditionalPermission):
         return self
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(realms__group__name__in=self.roles).exists()
+        return request.user.prp_roles.filter(name__in=self.roles).exists()
+
+
+class HasAnyClusterRole(HasConditionalPermission):
+    def __init__(self, *roles):
+        self.roles = roles
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def condition_check(self, request):
+        return request.user.old_prp_roles.filter(role__in=self.roles).exists()
 
 
 class IsSafe(BasePermission):
@@ -131,22 +142,22 @@ class IsPartnerViewerForCurrentWorkspace(HasWorkspacePermission):
 class IsIMOForCurrentWorkspace(HasWorkspacePermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(
-            name=PRP_ROLE_TYPES.cluster_imo,
-            realms__partner__clusters__response_plan__workspace__id=self.workspace_id,
+        return request.user.old_prp_roles.filter(
+            role=PRP_ROLE_TYPES.cluster_imo,
+            cluster__response_plan__workspace__id=self.workspace_id,
         ).exists()
 
 
 class IsClusterSystemAdmin(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(name=PRP_ROLE_TYPES.cluster_system_admin).exists()
+        return request.user.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
 
 
 class IsIMO(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(name=PRP_ROLE_TYPES.cluster_imo).exists()
+        return request.user.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists()
 
 
 class IsIPAuthorizedOfficer(HasConditionalPermission):
