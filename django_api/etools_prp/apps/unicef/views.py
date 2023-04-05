@@ -72,6 +72,7 @@ from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, 
 from .import_report import ProgressReportXLSXReader
 from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
+    ImportUserSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
@@ -1393,3 +1394,14 @@ class ProgressReportExcelImportView(APIView):
 
         else:
             return Response({}, status=statuses.HTTP_200_OK)
+
+
+class UserRealmsImportView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = ImportUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(get_user_model(), email=serializer.validated_data['email'])
+        serializer.set_realms(user)
+        return Response({}, status=statuses.HTTP_200_OK)

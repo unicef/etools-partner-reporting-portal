@@ -1,4 +1,7 @@
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -14,6 +17,7 @@ from etools_prp.apps.indicator.serializers import (
 )
 from etools_prp.apps.partner.models import Partner
 
+from ..core.models import Realm
 from .models import (
     FinalReview,
     LowerLevelOutput,
@@ -976,3 +980,71 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
             'file_name',
             'type',
         )
+
+
+class ImportRealmSerializer(serializers.Serializer):
+    default_error_messages = {
+        'does_not_exist': _('Object does not exist.'),
+    }
+
+    country = serializers.SlugRelatedField(queryset=Workspace.objects.all(), slug_field='external_id')
+    organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
+    group = serializers.CharField()
+
+    def validate_group(self, value):
+        """
+        prp groups:
+
+
+
+        """
+        try:
+            # todo: use mapping
+            return Group.objects.filter(name=value).get()
+        except ObjectDoesNotExist:
+            self.fail('does_not_exist')
+
+
+class ImportUserSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    realms = ImportRealmSerializer(many=True)
+
+    def validate_email(self, value):
+        return value.lower()
+
+    def set_realms(self, user):
+        realms = self.validated_data['realms']
+        realms_set = {
+            (realm['country'].id, realm['organization'].id, realm['group'].id)
+            for realm in realms
+        }
+        user_realms = user.realms.all()
+        user_realms_dict = {
+            (realm.workspace_id, realm.partner_id, realm.group_id): realm
+            for realm in user_realms
+        }
+        realms_to_create = []
+        realms_to_activate = []
+        realms_to_deactivate = []
+
+        for workspace_id, organization_id, group_id in realms_set:
+            realm_key = (workspace_id, organization_id, group_id)
+            if realm_key in user_realms_dict:
+                user_realm = user_realms_dict[realm_key]
+                if not user_realm.is_active:
+                    realms_to_activate.append(user_realm)
+            else:
+                realms_to_create.append(Realm(
+                    user=user,
+                    workspace_id=workspace_id,
+                    partner_id=organization_id,
+                    group_id=group_id,
+                ))
+
+        for realm_key, realm in user_realms_dict.items():
+            if realm_key not in realms_set:
+                realms_to_deactivate.append(realm)
+
+        Realm.objects.bulk_create(realms_to_create)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
