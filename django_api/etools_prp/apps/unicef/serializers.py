@@ -1,13 +1,21 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.account.validators import EmailValidator
-from etools_prp.apps.core.common import CURRENCIES, OVERALL_STATUS, PD_DOCUMENT_TYPE, PD_STATUS, PROGRESS_REPORT_STATUS
+from etools_prp.apps.core.common import (
+    CURRENCIES,
+    OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
+    PD_STATUS,
+    PROGRESS_REPORT_STATUS,
+    PRP_IP_ROLE_TYPES,
+)
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.models import IndicatorBlueprint
@@ -1009,8 +1017,29 @@ class ImportUserSerializer(serializers.Serializer):
     email = serializers.CharField()
     realms = ImportRealmSerializer(many=True)
 
+    @cached_property
+    def allowed_groups(self):
+        return [t[0] for t in PRP_IP_ROLE_TYPES]
+
     def validate_email(self, value):
         return value.lower()
+
+    def cleanup_realms(self, raw_data):
+        # remove groups not allowed by prp
+        if 'realms' not in raw_data:
+            return raw_data
+
+        raw_data['realms'] = [
+            raw_realm
+            for raw_realm in raw_data['realms']
+            if raw_realm.get('group', None) in self.allowed_groups
+        ]
+        return raw_data
+
+    def run_validation(self, data=None):
+        # we should do cleanup before empty default validators
+        data = self.cleanup_realms(data or {})
+        return super(ImportUserSerializer, self).run_validation(data)
 
     def set_realms(self, user):
         realms = self.validated_data['realms']

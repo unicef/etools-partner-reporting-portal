@@ -260,7 +260,7 @@ class TesteToolsRolesSynchronization(BaseAPITestCase):
         user = PartnerUserFactory(realms__data=['IP_VIEWER'])
         self.assertIsNotNone(user.workspace.external_id)
         self.assertIsNotNone(user.partner.vendor_number)
-        group_to_activate = GroupFactory(name='Existing group to activate')
+        group_to_activate = GroupFactory(name='IP_AUTHORIZED_OFFICER')
         RealmFactory(
             user=user,
             workspace=user.workspace,
@@ -268,14 +268,18 @@ class TesteToolsRolesSynchronization(BaseAPITestCase):
             group=group_to_activate,
             is_active=False,
         )
-        new_group = GroupFactory(name='New group to assign')
+        new_group = GroupFactory(name='IP_EDITOR')
         input_data = {
             'email': user.email,
             'realms': [
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    # 'group': 'Partnership Manager',
+                    'group': 'Partnership Manager',
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
                     'group': new_group.name,
                 },
                 {
