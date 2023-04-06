@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -991,26 +989,9 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
 
 
 class ImportRealmSerializer(serializers.Serializer):
-    default_error_messages = {
-        'does_not_exist': _('Object does not exist.'),
-    }
-
     country = serializers.SlugRelatedField(queryset=Workspace.objects.all(), slug_field='external_id')
     organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
-    group = serializers.CharField()
-
-    def validate_group(self, value):
-        """
-        prp groups:
-
-
-
-        """
-        try:
-            # todo: use mapping
-            return Group.objects.filter(name=value).get()
-        except ObjectDoesNotExist:
-            self.fail('does_not_exist')
+    group = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name')
 
 
 class ImportUserSerializer(serializers.Serializer):
