@@ -182,6 +182,35 @@ class Realm(TimeStampedExternalSyncModelMixin):
         return f"{self.user.email} - {self.workspace.title} - " \
                f"{self.partner.title}: {self.group.name}"
 
+    # TODO REALMS: also send notification when new user is created in PRP?
+    #  Also in AMP receives notif
+    def send_email_notification(self, deleted=None):
+        template_data = {
+            'user': self.user.get_fullname(),
+            'role': PRP_ROLE_TYPES[self.group.name],
+            'workspace': self.workspace,
+            'portal_url': settings.FRONTEND_HOST,
+            'portal': 'IP'
+        }
+        to_email_list = [self.user.email]
+        content_subtype = 'html'
+
+        if deleted:
+            subject_template_path = 'emails/on_role_remove_subject.txt'
+            body_template_path = 'emails/on_role_remove.html'
+        else:
+            subject_template_path = 'emails/on_role_assign_change_subject.txt'
+            body_template_path = 'emails/on_role_assign_change.html'
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype=content_subtype
+        )
+        return True
+
 
 # TODO REALMS clean up
 class PRPRoleOld(TimeStampedExternalSourceModel):
@@ -231,22 +260,10 @@ class PRPRoleOld(TimeStampedExternalSourceModel):
             'user': self.user,
             'role': self,
             'portal_url': settings.FRONTEND_HOST,
-            'portal': None
+            'portal': 'CLUSTER'
         }
         to_email_list = [self.user.email]
         content_subtype = 'html'
-
-        if self.role in {PRP_ROLE_TYPES.cluster_system_admin,
-                         PRP_ROLE_TYPES.cluster_imo,
-                         PRP_ROLE_TYPES.cluster_member,
-                         PRP_ROLE_TYPES.cluster_viewer,
-                         PRP_ROLE_TYPES.cluster_coordinator}:
-            template_data['portal'] = 'CLUSTER'
-        elif self.role in {PRP_ROLE_TYPES.ip_authorized_officer,
-                           PRP_ROLE_TYPES.ip_admin,
-                           PRP_ROLE_TYPES.ip_editor,
-                           PRP_ROLE_TYPES.ip_viewer}:
-            template_data['portal'] = 'IP'
 
         if deleted:
             subject_template_path = 'emails/on_role_remove_subject.txt'

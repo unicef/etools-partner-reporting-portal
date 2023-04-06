@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
@@ -10,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import Location, PRPRoleOld, Workspace
+from etools_prp.apps.core.models import Location, PRPRoleOld, Realm, Workspace
 from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,
@@ -255,10 +256,11 @@ def process_programme_documents(fast=False, area=False):
                             user.partner = partner
                             user.save()
 
-                            obj, created = PRPRoleOld.objects.get_or_create(
+                            obj, created = Realm.objects.get_or_create(
                                 user=user,
-                                role=PRP_ROLE_TYPES.ip_authorized_officer,
+                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
                                 workspace=workspace,
+                                partner=partner
                             )
 
                             if created:
