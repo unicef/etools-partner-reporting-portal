@@ -72,7 +72,7 @@ from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, 
 from .import_report import ProgressReportXLSXReader
 from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
-    ImportUserSerializer,
+    ImportUserRealmsSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
@@ -1400,8 +1400,9 @@ class UserRealmsImportView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        serializer = ImportUserSerializer(data=request.data)
+        user = get_object_or_404(get_user_model(), email=request.data.get('email', None))
+        serializer = ImportUserRealmsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(get_user_model(), email=serializer.validated_data['email'])
-        serializer.set_realms(user)
+        serializer.instance = user
+        serializer.save()
         return Response({}, status=statuses.HTTP_200_OK)

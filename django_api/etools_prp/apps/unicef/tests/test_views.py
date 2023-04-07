@@ -6,6 +6,7 @@ import tempfile
 from unittest.mock import patch
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
@@ -26,7 +27,7 @@ from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
-from etools_prp.apps.core.tests.factories import faker
+from etools_prp.apps.core.tests.factories import faker, GroupFactory, PartnerUserFactory, RealmFactory
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
@@ -1720,3 +1721,91 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             f"{url}?report_status={report_status}&export=pdf"
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class TestEToolsRolesSynchronization(BaseAPITestCase):
+    def test_sync(self):
+        user = PartnerUserFactory(realms__data=['IP_VIEWER'])
+        self.assertIsNotNone(user.workspace.external_id)
+        self.assertIsNotNone(user.partner.vendor_number)
+        group_to_activate = GroupFactory(name='IP_AUTHORIZED_OFFICER')
+        RealmFactory(
+            user=user,
+            workspace=user.workspace,
+            partner=user.partner,
+            group=group_to_activate,
+            is_active=False,
+        )
+        new_group = GroupFactory(name='IP_EDITOR')
+        input_data = {
+            'email': user.email,
+            'realms': [
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': 'Partnership Manager',
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': "unknown country code",
+                    'organization': user.partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': "unknown organization vendor number",
+                    'group': "IP Editor",
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': "IP_AUTHORIZED_OFFICER",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertCountEqual(
+            list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
+            [
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, False),
+                (user.workspace.id, user.partner.id, new_group.name, True),
+                (user.workspace.id, user.partner.id, group_to_activate.name, True),
+            ]
+        )
+
+    def test_auth_required(self):
+        self.client.force_authenticate()
+        response = self.client.post(reverse('user-realms-import'), data={})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_empty_realms(self):
+        user = PartnerUserFactory(realms__data=['IP_VIEWER'])
+        input_data = {
+            'email': user.email,
+            'realms': [
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': 'Partnership Manager',
+                },
+                {
+                    'country': "unknown country code",
+                    'organization': user.partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': "unknown organization vendor number",
+                    'group': "IP Editor",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)

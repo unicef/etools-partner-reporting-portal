@@ -1,14 +1,9 @@
-from django.contrib.auth.models import Group
-from django.urls import reverse
-
-from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
-from etools_prp.apps.core.tests.factories import GroupFactory, PartnerUserFactory, RealmFactory
 from etools_prp.apps.indicator.models import IndicatorBlueprint, Reportable
 from etools_prp.apps.indicator.serializers import PMPIndicatorBlueprintSerializer, PMPReportableSerializer
 from etools_prp.apps.partner.models import Partner
@@ -253,55 +248,3 @@ class TestProcessModel(BaseAPITestCase):
             filter_dict=filter_dict,
         )
         self.assertTrue(location_qs.exists())
-
-
-class TesteToolsRolesSynchronization(BaseAPITestCase):
-    def test_sync(self):
-        user = PartnerUserFactory(realms__data=['IP_VIEWER'])
-        self.assertIsNotNone(user.workspace.external_id)
-        self.assertIsNotNone(user.partner.vendor_number)
-        group_to_activate = GroupFactory(name='IP_AUTHORIZED_OFFICER')
-        RealmFactory(
-            user=user,
-            workspace=user.workspace,
-            partner=user.partner,
-            group=group_to_activate,
-            is_active=False,
-        )
-        new_group = GroupFactory(name='IP_EDITOR')
-        input_data = {
-            'email': user.email,
-            'realms': [
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': 'Partnership Manager',
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': new_group.name,
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': group_to_activate.name,
-                },
-            ]
-        }
-        self.client.force_authenticate(factories.NonPartnerUserFactory())
-        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
-        self.assertCountEqual(
-            list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
-            [
-                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, False),
-                (user.workspace.id, user.partner.id, new_group.name, True),
-                (user.workspace.id, user.partner.id, group_to_activate.name, True),
-            ]
-        )
-
-    def test_auth_required(self):
-        self.client.force_authenticate()
-        response = self.client.post(reverse('user-realms-import'), data={})
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

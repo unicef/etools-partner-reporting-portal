@@ -24,6 +24,7 @@ from etools_prp.apps.indicator.serializers import (
 from etools_prp.apps.partner.models import Partner
 
 from ..core.models import Realm
+from ..utils.serializers import OptionalElementsListSerializer
 from .models import (
     FinalReview,
     LowerLevelOutput,
@@ -993,37 +994,29 @@ class ImportRealmSerializer(serializers.Serializer):
     organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
     group = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name')
 
-
-class ImportUserSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    realms = ImportRealmSerializer(many=True)
-
     @cached_property
     def allowed_groups(self):
         return [t[0] for t in PRP_IP_ROLE_TYPES]
 
-    def validate_email(self, value):
-        return value.lower()
-
-    def cleanup_realms(self, raw_data):
-        # remove groups not allowed by prp
-        if 'realms' not in raw_data:
-            return raw_data
-
-        raw_data['realms'] = [
-            raw_realm
-            for raw_realm in raw_data['realms']
-            if raw_realm.get('group', None) in self.allowed_groups
-        ]
-        return raw_data
+    def map_group(self, value):
+        return {
+            "IP Authorized Officer": PRP_IP_ROLE_TYPES.ip_authorized_officer,
+            "IP Editor": PRP_IP_ROLE_TYPES.ip_editor,
+            "IP Viewer": PRP_IP_ROLE_TYPES.ip_viewer,
+            "IP Admin": PRP_IP_ROLE_TYPES.ip_admin,
+        }.get(value, value)
 
     def run_validation(self, data=None):
-        # we should do cleanup before empty default validators
-        data = self.cleanup_realms(data or {})
-        return super(ImportUserSerializer, self).run_validation(data)
+        if 'group' in data:
+            data['group'] = self.map_group(data['group'])
 
-    def set_realms(self, user):
-        realms = self.validated_data['realms']
+        return super(ImportRealmSerializer, self).run_validation(data)
+
+
+class ImportUserRealmsSerializer(serializers.Serializer):
+    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=False)
+
+    def save_realms(self, user, realms):
         realms_set = {
             (realm['country'].id, realm['organization'].id, realm['group'].id)
             for realm in realms
@@ -1058,3 +1051,8 @@ class ImportUserSerializer(serializers.Serializer):
         Realm.objects.bulk_create(realms_to_create)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
+
+    def update(self, instance, validated_data):
+        realms = validated_data['realms']
+        self.save_realms(instance, realms)
+        return instance
