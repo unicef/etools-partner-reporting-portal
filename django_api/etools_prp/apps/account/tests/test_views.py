@@ -272,3 +272,86 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(user_qs.exists())
+
+
+class TestChangeUserWorkspaceView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.partner = factories.PartnerFactory()
+        cls.user = factories.PartnerUserFactory(partner=cls.partner)
+
+    def setUp(self):
+        self.url = reverse("workspace-change")
+        super().setUp()
+
+    def test_post_workspace_403(self):
+        self.assertIsNotNone(self.user.workspace)
+        response = self.client.post(
+            self.url,
+            data={"workspace": factories.WorkspaceFactory().pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_workspace_400(self):
+        self.assertIsNotNone(self.user.workspace)
+        response = self.client.post(
+            self.url,
+            data={"workspace": 9999}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post(self):
+        another_workspace = factories.WorkspaceFactory()
+        factories.RealmFactory(user=self.user, workspace=another_workspace,
+                               group=factories.GroupFactory(name='IP_ADMIN'))
+        user_workspace = self.user.workspace
+        self.assertNotEqual(another_workspace, user_workspace)
+
+        response = self.client.post(
+            self.url,
+            data={"workspace": another_workspace.pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(self.user.workspace, another_workspace)
+
+
+class TestChangeUserPartnerView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.partner = factories.PartnerFactory()
+        cls.user = factories.PartnerUserFactory(partner=cls.partner)
+
+    def setUp(self):
+        self.url = reverse("partner-change")
+        super().setUp()
+
+    def test_post_partner_403(self):
+        self.assertIsNotNone(self.user.partner)
+        response = self.client.post(
+            self.url,
+            data={"partner": factories.PartnerFactory().pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_partner_400(self):
+        self.assertIsNotNone(self.user.partner)
+        response = self.client.post(
+            self.url,
+            data={"partner": 9999}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post(self):
+        another_partner = factories.PartnerFactory()
+        factories.RealmFactory(user=self.user, workspace=self.user.workspace,
+                               partner=another_partner,
+                               group=factories.GroupFactory(name='IP_ADMIN'))
+        user_partner = self.user.partner
+        self.assertNotEqual(another_partner, user_partner)
+
+        response = self.client.post(
+            self.url,
+            data={"partner": another_partner.pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(self.user.partner, another_partner)
