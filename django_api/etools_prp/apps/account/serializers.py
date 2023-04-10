@@ -7,9 +7,9 @@ from etools_prp.apps.account.validators import EmailValidator
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
 from etools_prp.apps.core.models import PRPRoleOld, Realm
-from etools_prp.apps.id_management.serializers import PRPRoleWithRelationsSerializer
 from etools_prp.apps.partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 
+from ..core.serializers import WorkspaceSerializer, WorkspaceSimpleSerializer
 from .models import User
 
 
@@ -32,10 +32,30 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class PRPRoleWithRelationsSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='group.name', read_only=True)
+    role_display = serializers.SerializerMethodField(read_only=True)
+    # TODO REALMS TBD check with FE to remove
+    workspace = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Realm
+        fields = ('id', 'is_active', 'role', 'role_display', 'workspace')
+
+    def get_role_display(self, obj):
+        return PRP_ROLE_TYPES[obj.group.name]
+
+    def get_workspace(self, obj):
+        return WorkspaceSimpleSerializer(obj.workspace).data
+
+
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[EmailValidator()])
+    workspace = WorkspaceSerializer(read_only=True)
+    workspaces_available = WorkspaceSerializer(many=True, read_only=True)
     partner = PartnerDetailsSerializer(read_only=True)
-    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True, source='realms')
+    partners_available = PartnerSimpleSerializer(many=True, read_only=True)
+    prp_roles = serializers.SerializerMethodField()
     access = serializers.SerializerMethodField()
 
     def get_access(self, obj):
@@ -68,12 +88,17 @@ class UserSerializer(serializers.ModelSerializer):
 
         return accesses
 
+    def get_prp_roles(self, obj):
+        return PRPRoleWithRelationsSerializer(
+            obj.realms.filter(workspace=obj.workspace, partner=obj.partner, is_active=True), many=True).data
+
     class Meta:
         model = User
         fields = (
             'id', 'email', 'first_name',
             'last_name', 'profile',
-            'partner', 'organization',
+            'workspace', 'workspaces_available',
+            'partner', 'partners_available',
             'access', 'prp_roles',
             'position'
         )

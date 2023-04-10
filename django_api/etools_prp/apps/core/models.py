@@ -75,7 +75,7 @@ class WorkspaceManager(models.Manager):
         if user.is_unicef:
             return self.all()
 
-        ip_kw = {'realms__user': user}
+        ip_kw = {'realms__user': user, 'realms__is_active': True}
         cluster_kw = {'response_plans__clusters__old_prp_roles__user': user}
 
         if role_list:
@@ -182,8 +182,6 @@ class Realm(TimeStampedExternalSyncModelMixin):
         return f"{self.user.email} - {self.workspace.title} - " \
                f"{self.partner.title}: {self.group.name}"
 
-    # TODO REALMS: also send notification when new user is created in PRP?
-    #  Also in AMP receives notif
     def send_email_notification(self, deleted=None):
         template_data = {
             'user': self.user.get_fullname(),
