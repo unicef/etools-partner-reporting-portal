@@ -18,8 +18,9 @@ class User(AbstractUser):
     related models:
         partner.Partner (ForeignKey): "partner"
     """
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
+    first_name = models.CharField(max_length=150)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=150)
     # current workspace
     workspace = models.ForeignKey(
         'core.Workspace',
