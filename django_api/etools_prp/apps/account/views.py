@@ -200,7 +200,7 @@ class ChangeUserWorkspaceView(APIView):
         try:
             self.change_workspace()
 
-        except ValidationError as err:
+        except DjangoValidationError as err:
             if err.code == 'access_to_workspace_denied':
                 status_code = status.HTTP_403_FORBIDDEN
             else:
