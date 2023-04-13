@@ -1400,9 +1400,8 @@ class UserRealmsImportView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        user = get_object_or_404(get_user_model(), email=request.data.get('email', None))
-        serializer = ImportUserRealmsSerializer(data=request.data)
+        user = get_user_model().objects.filter(email=request.data.get('email', None)).first()
+        serializer = ImportUserRealmsSerializer(data=request.data, instance=user)
         serializer.is_valid(raise_exception=True)
-        serializer.instance = user
         serializer.save()
         return Response({}, status=statuses.HTTP_200_OK)

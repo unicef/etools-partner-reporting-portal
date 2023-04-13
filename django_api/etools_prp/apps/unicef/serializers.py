@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.utils.functional import cached_property
 
@@ -1013,8 +1014,17 @@ class ImportRealmSerializer(serializers.Serializer):
         return super(ImportRealmSerializer, self).run_validation(data)
 
 
-class ImportUserRealmsSerializer(serializers.Serializer):
+class ImportUserRealmsSerializer(serializers.ModelSerializer):
     realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=False)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'email',
+            'first_name',
+            'last_name',
+            'realms',
+        )
 
     def save_realms(self, user, realms):
         realms_set = {
@@ -1052,7 +1062,19 @@ class ImportUserRealmsSerializer(serializers.Serializer):
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
 
+    def create(self, validated_data):
+        realms = validated_data.pop('realms')
+
+        first_realm = realms[0]
+        validated_data['workspace_id'] = first_realm['country'].id
+        validated_data['partner_id'] = first_realm['organization'].id
+
+        instance = super().create(validated_data)
+        self.save_realms(instance, realms)
+        return instance
+
     def update(self, instance, validated_data):
-        realms = validated_data['realms']
+        realms = validated_data.pop('realms')
+        instance = super().update(instance, validated_data)
         self.save_realms(instance, realms)
         return instance
