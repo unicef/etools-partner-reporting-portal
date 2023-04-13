@@ -156,7 +156,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
         model = Group
         django_get_or_create = ('name',)
 
-    name = "IP Viewer"
+    name = "IP_VIEWER"
 
 
 class AbstractUserFactory(factory.django.DjangoModelFactory):

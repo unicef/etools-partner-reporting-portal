@@ -53,10 +53,12 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -403,10 +405,12 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -632,10 +636,12 @@ class TestPartnerActivityBaseAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code(), clusters=[self.cluster, ])
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -804,10 +810,12 @@ class TestCustomPartnerProjectAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code(), clusters=[self.cluster, ])
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
