@@ -18,7 +18,7 @@ import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-fu
 import '@unicef-polymer/etools-file/etools-file';
 // import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
-import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer

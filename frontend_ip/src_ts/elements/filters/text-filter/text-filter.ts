@@ -5,7 +5,7 @@ import {property} from '@polymer/decorators';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
 
 /**
