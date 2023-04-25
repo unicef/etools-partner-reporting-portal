@@ -515,10 +515,6 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMixin(Red
   _reportInfoCurrent(rootState: RootState) {
     const data = reportInfoCurrent(rootState);
 
-    if (data.id === this.localData.id) {
-      return;
-    }
-
     if (!data.final_review) {
       data.final_review = {};
     } else {
@@ -527,6 +523,11 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMixin(Red
           data.final_review[key] === true ? 'yes' : data.final_review[key] === false ? 'no' : data.final_review[key];
       });
     }
+
+    if (data.id === this.localData.id) {
+      return data;
+    }
+    
     this.set('localData', {...data});
     return data;
   }
