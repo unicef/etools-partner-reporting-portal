@@ -1022,6 +1022,7 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         fields = (
             'email',
             'first_name',
+            'middle_name',
             'last_name',
             'realms',
         )

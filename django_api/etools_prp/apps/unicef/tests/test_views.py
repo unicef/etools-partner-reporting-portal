@@ -1758,6 +1758,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         input_data = {
             'email': user.email,
             'first_name': 'John',
+            'middle_name': '_',
             'last_name': 'Doe',
             'realms': [
                 {
@@ -1792,6 +1793,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         user.refresh_from_db()
         self.assertEqual(user.first_name, 'John')
+        self.assertEqual(user.middle_name, '_')
         self.assertEqual(user.last_name, 'Doe')
         self.assertCountEqual(
             list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
@@ -1811,6 +1813,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         input_data = {
             'email': user.email,
             'first_name': user.first_name,
+            'middle_name': user.middle_name,
             'last_name': user.last_name,
             'realms': [
                 {
@@ -1847,6 +1850,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         input_data = {
             'email': user.email,
             'first_name': user.first_name,
+            'middle_name': user.middle_name,
             'last_name': user.last_name,
             'realms': [
                 {
