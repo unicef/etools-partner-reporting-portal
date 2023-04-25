@@ -3,7 +3,7 @@ from django.db.models import Q
 from rest_framework.permissions import BasePermission
 
 from etools_prp.apps.core.common import PRP_ROLE_TYPES as ROLES
-from etools_prp.apps.core.models import PRPRole
+from etools_prp.apps.core.models import PRPRoleOld
 
 
 class RoleGroupCreateUpdateDestroyPermission(BasePermission):
@@ -31,14 +31,13 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
             if obj.role == ROLES.ip_authorized_officer:
                 if ('is_active' in request.data.keys() and
                         len(request.data.keys()) == 1 and
-                        user.prp_roles.filter(workspace__isnull=False,
-                                              workspace_id=obj.workspace_id,
-                                              role=ROLES.ip_authorized_officer)):
+                        user.prp_roles.filter(realms__workspace_id=obj.workspace_id,
+                                              realms__group__name=ROLES.ip_authorized_officer)):
                     return True
                 return False
 
         if (request.method == 'POST' and
-                PRPRole.objects.filter(
+                PRPRoleOld.objects.filter(
                     Q(workspace__isnull=False, workspace_id=obj.workspace_id) |
                     Q(cluster__isnull=False, cluster_id=obj.cluster_id) |
                     Q(role=ROLES.cluster_system_admin),
@@ -50,24 +49,30 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
         # for CLUSTER roles:
         cluster_roles_set = {ROLES.cluster_member, ROLES.cluster_viewer}
         has_cluster_role = user.prp_roles.filter(
-            Q(role=ROLES.cluster_system_admin) |
-            Q(role=ROLES.cluster_imo, cluster__isnull=False, cluster_id=obj.cluster_id) |
-            Q(role=ROLES.cluster_member, user__partner_id__isnull=False, user__partner_id=obj.user.partner_id)
+            Q(realms__group__name=ROLES.cluster_system_admin) |
+            Q(realms__group__name=ROLES.cluster_imo,
+              realms__partner__clusters__isnull=False,
+              realms__partner__clusters=obj.cluster) |
+            Q(realms__group__name=ROLES.cluster_member,
+              user__partner_id__isnull=False,
+              user__partner_id=obj.user.partner_id)
         ).exists()
         if obj_roles_set.issubset(cluster_roles_set) and has_cluster_role:
             return True
 
         cluster_roles_set.add(ROLES.cluster_coordinator)
         has_cluster_role = user.prp_roles.filter(
-            Q(role=ROLES.cluster_system_admin) |
-            Q(role=ROLES.cluster_imo, cluster__isnull=False, cluster_id=obj.cluster_id)
+            Q(realms__group__name=ROLES.cluster_system_admin) |
+            Q(realms__group__name=ROLES.cluster_imo,
+              realms__partner__clusters__isnull=False,
+              realms__partner__clusters=obj.cluster)
         ).exists()
         if obj_roles_set.issubset(cluster_roles_set) and has_cluster_role:
             return True
 
         cluster_roles_set.update({ROLES.cluster_imo, ROLES.cluster_system_admin})
         if (obj_roles_set.issubset(cluster_roles_set) and
-                user.prp_roles.filter(role=ROLES.cluster_system_admin).exists()):
+                user.prp_roles.filter(realms__group__name=ROLES.cluster_system_admin).exists()):
             return True
 
         if obj_roles_set.intersection(cluster_roles_set):
@@ -75,20 +80,20 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
 
         # for IP roles:
         if user.partner_id == obj.user.partner_id:
-            workspace_kwargs = {'workspace__isnull': False, 'workspace_id': obj.workspace_id}
+            workspace_kwargs = {'realms__workspace_id': obj.workspace_id}
 
             if ((ROLES.ip_admin == role_in_payload or
                  obj.role == ROLES.ip_admin and (request.method == 'POST' or request.method == 'PATCH')) and
-                    user.prp_roles.filter(role__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs)):
+                    user.prp_roles.filter(realms__group__name__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs)):
                 return True
 
             if (obj.role == ROLES.ip_admin and
                     request.method == 'DELETE' and
-                    user.prp_roles.filter(role=ROLES.ip_authorized_officer, **workspace_kwargs)):
+                    user.prp_roles.filter(realms__group__name=ROLES.ip_authorized_officer, **workspace_kwargs)):
                 return True
 
             if (obj_roles_set.issubset({ROLES.ip_editor, ROLES.ip_viewer}) and
-                    user.prp_roles.filter(role__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs).exists()):
+                    user.prp_roles.filter(realms__group__name__in=(ROLES.ip_admin, ROLES.ip_authorized_officer), **workspace_kwargs).exists()):
                 return True
 
         return False

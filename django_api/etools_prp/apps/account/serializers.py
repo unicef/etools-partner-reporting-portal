@@ -6,10 +6,10 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from etools_prp.apps.account.validators import EmailValidator
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
-from etools_prp.apps.core.models import PRPRole
-from etools_prp.apps.id_management.serializers import PRPRoleWithRelationsSerializer
+from etools_prp.apps.core.models import PRPRoleOld, Realm
 from etools_prp.apps.partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 
+from ..core.serializers import WorkspaceSerializer, WorkspaceSimpleSerializer
 from .models import User
 
 
@@ -32,10 +32,30 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class PRPRoleWithRelationsSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='group.name', read_only=True)
+    role_display = serializers.SerializerMethodField(read_only=True)
+    # TODO REALMS TBD check with FE to remove
+    workspace = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Realm
+        fields = ('id', 'is_active', 'role', 'role_display', 'workspace')
+
+    def get_role_display(self, obj):
+        return PRP_ROLE_TYPES[obj.group.name]
+
+    def get_workspace(self, obj):
+        return WorkspaceSimpleSerializer(obj.workspace).data
+
+
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(validators=[EmailValidator()])
+    workspace = WorkspaceSerializer(read_only=True)
+    workspaces_available = WorkspaceSerializer(many=True, read_only=True)
     partner = PartnerDetailsSerializer(read_only=True)
-    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
+    partners_available = PartnerSimpleSerializer(many=True, read_only=True)
+    prp_roles = serializers.SerializerMethodField()
     access = serializers.SerializerMethodField()
 
     def get_access(self, obj):
@@ -68,12 +88,17 @@ class UserSerializer(serializers.ModelSerializer):
 
         return accesses
 
+    def get_prp_roles(self, obj):
+        return PRPRoleWithRelationsSerializer(
+            obj.realms.filter(workspace=obj.workspace, partner=obj.partner, is_active=True), many=True).data
+
     class Meta:
         model = User
         fields = (
             'id', 'email', 'first_name',
             'last_name', 'profile',
-            'partner', 'organization',
+            'workspace', 'workspaces_available',
+            'partner', 'partners_available',
             'access', 'prp_roles',
             'position'
         )
@@ -83,7 +108,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserWithPRPRolesSerializer(serializers.ModelSerializer):
     partner = PartnerSimpleSerializer(read_only=True)
-    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
+    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True, source='realms')
     status = serializers.SerializerMethodField(read_only=True)
     user_type = serializers.ChoiceField(choices=USER_TYPES, required=False)
     is_incomplete = serializers.SerializerMethodField(read_only=True)
@@ -99,10 +124,10 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
             return USER_STATUS_TYPES.deactivated
 
     def get_is_incomplete(self, obj):
-        role_count = getattr(obj, 'role_count', None)
-        if role_count is not None:
-            return not role_count
-        return not PRPRole.objects.filter(user=obj).exists()
+        realm_count = getattr(obj, 'realm_count', None)
+        if realm_count is not None:
+            return not realm_count
+        return not Realm.objects.filter(user=obj, is_active=True).exists()
 
     class Meta:
         model = User
@@ -159,7 +184,7 @@ class UserWithPRPRolesSerializer(serializers.ModelSerializer):
                                       user_l.send_email_notification_on_create(portal='CLUSTER'))
 
                 if user_type == USER_TYPES.cluster_admin:
-                    role = PRPRole.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
+                    role = PRPRoleOld.objects.create(user=new_user, role=PRP_ROLE_TYPES.cluster_system_admin)
                     transaction.on_commit(lambda role_l=role: role_l.send_email_notification())
 
                 return new_user

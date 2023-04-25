@@ -3,6 +3,7 @@ import json
 import random
 from collections import defaultdict
 
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import signals
@@ -36,7 +37,7 @@ from etools_prp.apps.core.common import (
     SHARED_PARTNER_TYPE,
 )
 from etools_prp.apps.core.countries import COUNTRIES_ALPHA2_CODE, COUNTRIES_ALPHA2_CODE_DICT
-from etools_prp.apps.core.models import Location, PRPRole, ResponsePlan, Workspace
+from etools_prp.apps.core.models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
 from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
@@ -150,6 +151,14 @@ class JSONFactory(factory.DictFactory):
         return json.dumps(model_class(**kwargs))
 
 
+class GroupFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Group
+        django_get_or_create = ('name',)
+
+    name = "IP_VIEWER"
+
+
 class AbstractUserFactory(factory.django.DjangoModelFactory):
     first_name = factory.LazyFunction(faker.first_name)
     last_name = factory.LazyFunction(faker.last_name)
@@ -174,6 +183,17 @@ class UserProfileFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory('etools_prp.apps.core.tests.factories.AbstractUserFactory', profile=None)
 
 
+class RealmFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Realm
+        django_get_or_create = ('user', 'workspace', 'partner', 'group')
+
+    user = factory.SubFactory('etools_prp.apps.core.tests.factories.UserFactory')
+    workspace = factory.SubFactory('etools_prp.apps.core.tests.factories.WorkspaceFactory')
+    partner = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerFactory')
+    group = factory.SubFactory(GroupFactory)
+
+
 @factory.django.mute_signals(signals.post_save)
 class PartnerUserFactory(AbstractUserFactory):
     """
@@ -184,10 +204,28 @@ class PartnerUserFactory(AbstractUserFactory):
     """
 
     # We are going to let PartnerFactory create PartnerUser
+    workspace = factory.SubFactory('etools_prp.apps.core.tests.factories.WorkspaceFactory')
     partner = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerFactory')
+    realms__data = ['IP_VIEWER']
 
     class Meta:
         model = User
+
+    @factory.post_generation
+    def realms(self, create, extracted, data=None, **kwargs):
+        if not create:
+            return
+        extracted = (extracted or []) + (data or [])
+
+        if extracted:
+            for group_name in extracted:
+                if isinstance(group_name, str):
+                    RealmFactory(
+                        user=self,
+                        workspace=self.workspace,
+                        partner=self.partner,
+                        group=GroupFactory(name=group_name)
+                    )
 
 
 @factory.django.mute_signals(signals.post_save)
@@ -209,24 +247,24 @@ class AbstractPRPRoleFactory(factory.django.DjangoModelFactory):
     is_active = True
 
     class Meta:
-        model = PRPRole
+        model = PRPRoleOld
         abstract = True
 
 
-class IPPRPRoleFactory(AbstractPRPRoleFactory):
-    """
-    Arguments:
-        user {User} -- User ORM object to bind
-        workspace {Workspace} -- Workspace ORM object to bind for specific role on user
-        role {str} Optional -- Argument to override role for Partner user
-
-    Ex) IPPRPRoleFactory(user=user, workspace=workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-    """
-
-    role = fuzzy.FuzzyChoice(IP_PRP_ROLE_TYPES_LIST)
-
-    class Meta:
-        model = PRPRole
+# class IPPRPRoleFactory(AbstractPRPRoleFactory):
+#     """
+#     Arguments:
+#         user {User} -- User ORM object to bind
+#         workspace {Workspace} -- Workspace ORM object to bind for specific role on user
+#         role {str} Optional -- Argument to override role for Partner user
+#
+#     Ex) IPPRPRoleFactory(user=user, workspace=workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+#     """
+#
+#     role = fuzzy.FuzzyChoice(IP_PRP_ROLE_TYPES_LIST)
+#
+#     class Meta:
+#         model = PRPRoleOld
 
 
 class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
@@ -244,7 +282,7 @@ class ClusterPRPRoleFactory(AbstractPRPRoleFactory):
     role = fuzzy.FuzzyChoice(CLUSTER_PRP_ROLE_TYPES_LIST)
 
     class Meta:
-        model = PRPRole
+        model = PRPRoleOld
 
 
 class WorkspaceFactory(factory.django.DjangoModelFactory):
@@ -255,6 +293,7 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
     Ex) WorkspaceFactory(countries=[country1, country2, ...])
     """
 
+    external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
     workspace_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
     title = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.workspace_code])
     business_area_code = factory.LazyFunction(lambda: faker.random_number(4, True))
@@ -329,6 +368,7 @@ class PartnerFactory(factory.django.DjangoModelFactory):
     Ex) PartnerFactory(clusters=[cluster1, cluster2, ...])
     """
 
+    external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
     title = factory.LazyFunction(faker.company)
     short_title = factory.LazyAttribute(lambda o: o.title)
     alternate_title = factory.LazyAttribute(lambda o: o.title)

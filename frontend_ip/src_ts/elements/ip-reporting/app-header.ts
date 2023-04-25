@@ -7,6 +7,7 @@ import '@polymer/iron-icons/iron-icons';
 import {etoolsLogo} from '../../etools-prp-common/elements/etools-logo';
 import '../../etools-prp-common/elements/app-switcher';
 import '../../etools-prp-common/elements/workspace-dropdown';
+import '../organization-dropdown';
 import '../language-dropdown';
 import '../../etools-prp-common/elements/user-profile/profile-dropdown';
 import {property} from '@polymer/decorators';
@@ -74,6 +75,7 @@ class IpReportingAppHeader extends PolymerElement {
             <div class="wrapper">
               <language-dropdown data="[[languages]]" current="[[language]]"> </language-dropdown>
               <workspace-dropdown data="[[workspaces]]" current="[[workspace]]"> </workspace-dropdown>
+              <organization-dropdown></organization-dropdown>
 
               <profile-dropdown></profile-dropdown>
             </div>
