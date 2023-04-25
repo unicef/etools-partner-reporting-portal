@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import Location, PRPRoleOld, Realm, Workspace
+from etools_prp.apps.core.models import Location, Realm, Workspace
 from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,

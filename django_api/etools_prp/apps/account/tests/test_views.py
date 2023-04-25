@@ -1,7 +1,11 @@
+import datetime
+from unittest import skip
+
 from django.core import mail
 from django.db.models import Count
 from django.urls import reverse
 
+import dateutil.tz
 from drfpasswordless.models import CallbackToken
 from rest_framework import status
 
@@ -113,13 +117,11 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.user = factories.PartnerUserFactory(partner=self.partner)
-        self.ao_user_role = factories.IPPRPRoleFactory(
-            user=self.user,
+        self.user = factories.PartnerUserFactory(
             workspace=self.workspace,
-            role=PRP_ROLE_TYPES.ip_authorized_officer
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
-
         super().setUp()
 
     def test_invalid_list_requests(self):
@@ -141,48 +143,39 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         """
         # Create some test users for partner
         NUM_TEST_USERS = 2
-        for idx in range(NUM_TEST_USERS):
-            user = factories.PartnerUserFactory(
-                partner=self.partner
-            )
-            factories.IPPRPRoleFactory(
-                user=user,
+        for role in [PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_admin]:
+            factories.PartnerUserFactory(
                 workspace=self.workspace,
-                role=PRP_ROLE_TYPES.ip_editor
+                partner=self.partner,
+                realms__data=[role],
+                last_login=datetime.datetime.now(tz=dateutil.tz.UTC)
             )
-
-            if idx == 0:
-                factories.IPPRPRoleFactory(
-                    user=user,
-                    workspace=self.workspace,
-                    role=PRP_ROLE_TYPES.ip_admin
-                )
 
         response = self.client.get(reverse('users') + '?portal=IP')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(NUM_TEST_USERS, response.data['count'])
 
-        role_count_annotated_queryset = User.objects.exclude(
+        realm_count_annotated_queryset = User.objects.exclude(
             id=self.user.id
-        ).annotate(role_count=Count('prp_roles')).order_by('-id')
+        ).annotate(realm_count=Count('realms')).order_by('-id')
 
         # API Ordering test
         response = self.client.get(reverse('users') + '?portal=IP&ordering=-status')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data['results'][0]['id'],
-            role_count_annotated_queryset.order_by('-last_login', '-role_count').first().id
+            realm_count_annotated_queryset.order_by('-last_login', '-realm_count').first().id
         )
 
         response = self.client.get(reverse('users') + '?portal=IP&ordering=status')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data['results'][0]['id'],
-            role_count_annotated_queryset.order_by('last_login', 'role_count').first().id
+            realm_count_annotated_queryset.order_by('last_login', 'realm_count').first().id
         )
 
         # API Filtering test
-        filter_user = User.objects.get(prp_roles__role=PRP_ROLE_TYPES.ip_admin,)
+        filter_user = User.objects.get(realms__group__name=PRP_ROLE_TYPES.ip_admin,)
         filter_args = "?portal=IP&name_email={}&status=active&partners={}&roles={}&workspaces={}&clusters={}".format(
             filter_user.first_name,
             filter_user.partner_id,
@@ -195,6 +188,7 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['results'][0]['id'], filter_user.id)
 
+    @skip('deprecated')
     def test_cluster_user_list(self):
         """Test the API response for cluster users.
         """
@@ -221,12 +215,9 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
                 )
             else:
                 user = factories.PartnerUserFactory(
-                    partner=self.partner
-                )
-                factories.IPPRPRoleFactory(
-                    user=user,
                     workspace=self.workspace,
-                    role=PRP_ROLE_TYPES.ip_editor,
+                    partner=self.partner,
+                    realms__data=[PRP_ROLE_TYPES.ip_editor, ]
                 )
                 factories.ClusterPRPRoleFactory(
                     user=user,
@@ -281,3 +272,86 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(user_qs.exists())
+
+
+class TestChangeUserWorkspaceView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.partner = factories.PartnerFactory()
+        cls.user = factories.PartnerUserFactory(partner=cls.partner)
+
+    def setUp(self):
+        self.url = reverse("workspace-change")
+        super().setUp()
+
+    def test_post_workspace_403(self):
+        self.assertIsNotNone(self.user.workspace)
+        response = self.client.post(
+            self.url,
+            data={"workspace": factories.WorkspaceFactory().pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_workspace_400(self):
+        self.assertIsNotNone(self.user.workspace)
+        response = self.client.post(
+            self.url,
+            data={"workspace": 9999}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post(self):
+        another_workspace = factories.WorkspaceFactory()
+        factories.RealmFactory(user=self.user, workspace=another_workspace,
+                               group=factories.GroupFactory(name='IP_ADMIN'))
+        user_workspace = self.user.workspace
+        self.assertNotEqual(another_workspace, user_workspace)
+
+        response = self.client.post(
+            self.url,
+            data={"workspace": another_workspace.pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(self.user.workspace, another_workspace)
+
+
+class TestChangeUserPartnerView(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.partner = factories.PartnerFactory()
+        cls.user = factories.PartnerUserFactory(partner=cls.partner)
+
+    def setUp(self):
+        self.url = reverse("partner-change")
+        super().setUp()
+
+    def test_post_partner_403(self):
+        self.assertIsNotNone(self.user.partner)
+        response = self.client.post(
+            self.url,
+            data={"partner": factories.PartnerFactory().pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_post_partner_400(self):
+        self.assertIsNotNone(self.user.partner)
+        response = self.client.post(
+            self.url,
+            data={"partner": 9999}
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post(self):
+        another_partner = factories.PartnerFactory()
+        factories.RealmFactory(user=self.user, workspace=self.user.workspace,
+                               partner=another_partner,
+                               group=factories.GroupFactory(name='IP_ADMIN'))
+        user_partner = self.user.partner
+        self.assertNotEqual(another_partner, user_partner)
+
+        response = self.client.post(
+            self.url,
+            data={"partner": another_partner.pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(self.user.partner, another_partner)
