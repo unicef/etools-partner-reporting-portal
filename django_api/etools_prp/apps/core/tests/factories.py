@@ -293,6 +293,7 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
     Ex) WorkspaceFactory(countries=[country1, country2, ...])
     """
 
+    external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
     workspace_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
     title = factory.LazyAttribute(lambda o: COUNTRIES_ALPHA2_CODE_DICT[o.workspace_code])
     business_area_code = factory.LazyFunction(lambda: faker.random_number(4, True))
@@ -367,6 +368,7 @@ class PartnerFactory(factory.django.DjangoModelFactory):
     Ex) PartnerFactory(clusters=[cluster1, cluster2, ...])
     """
 
+    external_id = factory.LazyFunction(lambda: faker.uuid4()[:32])
     title = factory.LazyFunction(faker.company)
     short_title = factory.LazyAttribute(lambda o: o.title)
     alternate_title = factory.LazyAttribute(lambda o: o.title)
