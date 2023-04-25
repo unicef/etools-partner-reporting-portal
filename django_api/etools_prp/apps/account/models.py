@@ -8,6 +8,8 @@ from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 
 from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_TYPES
+from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.utils.emails import send_email_from_template
 
 
@@ -18,8 +20,9 @@ class User(AbstractUser):
     related models:
         partner.Partner (ForeignKey): "partner"
     """
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
+    first_name = models.CharField(max_length=150)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=150)
     # current workspace
     workspace = models.ForeignKey(
         'core.Workspace',
@@ -82,6 +85,18 @@ class User(AbstractUser):
     @cached_property
     def role_list(self):
         return self.prp_roles.values_list('name', flat=True)
+
+    @cached_property
+    def workspaces_available(self):
+        return Workspace.objects.user_workspaces(self).distinct()
+
+    @cached_property
+    def partners_available(self):
+        if self.workspace:
+            return Partner.objects.filter(
+                realms__workspace=self.workspace,
+                realms__user=self,
+                realms__is_active=True).distinct()
 
     @property
     def user_type(self):
