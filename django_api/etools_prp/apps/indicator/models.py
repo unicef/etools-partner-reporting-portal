@@ -912,7 +912,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
             indicator_type = ''
 
         if cluster:
-            cluster_imos = [role.user for role in cluster.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
+            cluster_imos = [role.user for role in cluster.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
             workspace_code = cluster.response_plan.workspace.workspace_code
 
             url_part = f'/app/{workspace_code}/cluster-reporting/plan/{cluster.response_plan_id}/results/draft'

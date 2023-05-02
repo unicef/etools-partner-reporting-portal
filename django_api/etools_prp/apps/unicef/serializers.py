@@ -1,10 +1,20 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.utils.functional import cached_property
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.account.validators import EmailValidator
-from etools_prp.apps.core.common import CURRENCIES, OVERALL_STATUS, PD_DOCUMENT_TYPE, PD_STATUS, PROGRESS_REPORT_STATUS
+from etools_prp.apps.core.common import (
+    CURRENCIES,
+    OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
+    PD_STATUS,
+    PROGRESS_REPORT_STATUS,
+    PRP_IP_ROLE_TYPES,
+)
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.models import IndicatorBlueprint
@@ -14,6 +24,8 @@ from etools_prp.apps.indicator.serializers import (
 )
 from etools_prp.apps.partner.models import Partner
 
+from ..core.models import Realm
+from ..utils.serializers import OptionalElementsListSerializer
 from .models import (
     FinalReview,
     LowerLevelOutput,
@@ -976,3 +988,94 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
             'file_name',
             'type',
         )
+
+
+class ImportRealmSerializer(serializers.Serializer):
+    country = serializers.SlugRelatedField(queryset=Workspace.objects.all(), slug_field='external_id')
+    organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
+    group = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name')
+
+    @cached_property
+    def allowed_groups(self):
+        return [t[0] for t in PRP_IP_ROLE_TYPES]
+
+    def map_group(self, value):
+        return {
+            "IP Authorized Officer": PRP_IP_ROLE_TYPES.ip_authorized_officer,
+            "IP Editor": PRP_IP_ROLE_TYPES.ip_editor,
+            "IP Viewer": PRP_IP_ROLE_TYPES.ip_viewer,
+            "IP Admin": PRP_IP_ROLE_TYPES.ip_admin,
+        }.get(value, value)
+
+    def run_validation(self, data=None):
+        if 'group' in data:
+            data['group'] = self.map_group(data['group'])
+
+        return super(ImportRealmSerializer, self).run_validation(data)
+
+
+class ImportUserRealmsSerializer(serializers.ModelSerializer):
+    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=False)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'email',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'realms',
+        )
+
+    def save_realms(self, user, realms):
+        realms_set = {
+            (realm['country'].id, realm['organization'].id, realm['group'].id)
+            for realm in realms
+        }
+        user_realms = user.realms.all()
+        user_realms_dict = {
+            (realm.workspace_id, realm.partner_id, realm.group_id): realm
+            for realm in user_realms
+        }
+        realms_to_create = []
+        realms_to_activate = []
+        realms_to_deactivate = []
+
+        for workspace_id, organization_id, group_id in realms_set:
+            realm_key = (workspace_id, organization_id, group_id)
+            if realm_key in user_realms_dict:
+                user_realm = user_realms_dict[realm_key]
+                if not user_realm.is_active:
+                    realms_to_activate.append(user_realm)
+            else:
+                realms_to_create.append(Realm(
+                    user=user,
+                    workspace_id=workspace_id,
+                    partner_id=organization_id,
+                    group_id=group_id,
+                ))
+
+        for realm_key, realm in user_realms_dict.items():
+            if realm_key not in realms_set:
+                realms_to_deactivate.append(realm)
+
+        Realm.objects.bulk_create(realms_to_create)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
+
+    def create(self, validated_data):
+        realms = validated_data.pop('realms')
+
+        first_realm = realms[0]
+        validated_data['workspace_id'] = first_realm['country'].id
+        validated_data['partner_id'] = first_realm['organization'].id
+
+        instance = super().create(validated_data)
+        self.save_realms(instance, realms)
+        return instance
+
+    def update(self, instance, validated_data):
+        realms = validated_data.pop('realms')
+        instance = super().update(instance, validated_data)
+        self.save_realms(instance, realms)
+        return instance
