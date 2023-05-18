@@ -13,7 +13,7 @@ import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import PageNavMixin from '../../etools-prp-common/mixins/page-nav-mixin';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
-import {getCorrespondingPMPEnvironment} from '../../etools-prp-common/config';
+import {getCorrespondingEtoolsEnvironment} from '../../etools-prp-common/config';
 
 /**
  * @polymer
@@ -121,7 +121,7 @@ class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin
   indicatorsQuery = {pd_statuses: String(['active'])};
 
   getAMPUrl() {
-    return `${getCorrespondingPMPEnvironment()}/amp/`;
+    return `${getCorrespondingEtoolsEnvironment()}/amp/`;
   }
 }
 
