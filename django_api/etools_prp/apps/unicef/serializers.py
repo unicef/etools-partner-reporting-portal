@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.utils.functional import cached_property
 
 from rest_framework import serializers
@@ -1070,6 +1071,7 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
 
+    @transaction.atomic
     def create(self, validated_data):
         validated_data['username'] = validated_data['email']
 
@@ -1083,6 +1085,7 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         self.save_realms(instance, realms)
         return instance
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         realms = validated_data.pop('realms')
         instance = super().update(instance, validated_data)
