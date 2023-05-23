@@ -236,7 +236,7 @@ class PartnerProjectAPIView(APIView):
     def patch(self, request, *args, **kwargs):
         partner_id = self.kwargs.get('partner_id')
 
-        if partner_id and not request.user.prp_roles.filter(realms__group=PRP_ROLE_TYPES.cluster_system_admin).exists():
+        if partner_id and not request.user.prp_roles.filter(realms__group__name=PRP_ROLE_TYPES.cluster_system_admin).exists():
             # Check if incoming partner belongs to IMO's clusters
             user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
             if not Cluster.objects.filter(

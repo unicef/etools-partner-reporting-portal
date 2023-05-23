@@ -20,9 +20,11 @@ from unicef_notification.models import Notification
 from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
+    REPORTING_TYPES,
 )
 from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
 from etools_prp.apps.core.models import Location
@@ -1268,6 +1270,99 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         )
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
+
+    def test_submit_hr_report(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.HR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.submission_date = None
+        progress_report.save(update_fields=['submission_date'])
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
+
+    def test_submit_qpr_report(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.submission_date = None
+        progress_report.save(update_fields=['submission_date'])
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
+
+
+class TestProgressReportSRSubmitAPIView(BaseProgressReportAPITestCase):
+
+    def test_submit_sr_report(self):
+        progress_report = factories.ProgressReportFactory(
+            report_number=random.randint(1, 50),
+            report_type=REPORTING_TYPES.SR,
+            is_final=False,
+            programme_document=self.pd,
+            submission_date=None,
+            submitted_by=None,
+            submitting_user=None,
+        )
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
 
 
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
