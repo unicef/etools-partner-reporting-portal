@@ -2,7 +2,7 @@ import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer

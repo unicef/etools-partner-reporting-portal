@@ -6,7 +6,7 @@ import '@polymer/iron-location/iron-location';
 import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../endpoints';
-import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {BASE_PATH} from '../etools-prp-common/config';
 
 /**

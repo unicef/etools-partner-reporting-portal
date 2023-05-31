@@ -13,7 +13,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
 import {RootState} from '../../typings/redux.types';
-import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer
