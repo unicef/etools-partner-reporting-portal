@@ -501,7 +501,7 @@ export const locales = {
     unsatisfied: 'Unsatisfied',
     neutral: 'Neutral',
     satisfied: 'Satisfied',
-    very_satisfied: 'Very Satisfied',
+    very_satisfied: 'Very Satisfied'
   },
   fr: {
     civil_society_organization: 'Civil Society Organization',

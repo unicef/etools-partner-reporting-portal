@@ -4,7 +4,7 @@ import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
 import {property} from '@polymer/decorators';
-import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {timeOut} from '@polymer/polymer/lib/utils/async';
 
 /**

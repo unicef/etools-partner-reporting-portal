@@ -4,7 +4,7 @@ import {property} from '@polymer/decorators/lib/decorators';
 import {GenericObject} from '../etools-prp-common/typings/globals.types';
 import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
 import '../etools-prp-common/elements/etools-prp-ajax';
-import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import {BASE_PATH} from '../etools-prp-common/config';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';

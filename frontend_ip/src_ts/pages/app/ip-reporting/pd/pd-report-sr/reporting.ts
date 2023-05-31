@@ -23,7 +23,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../../../../redux/actions/pdReports';
 import {RootState} from '../../../../../typings/redux.types';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
-import {fireEvent} from '../../../../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer

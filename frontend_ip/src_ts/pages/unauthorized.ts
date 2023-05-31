@@ -10,7 +10,7 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/page-body';
 import '../etools-prp-common/elements/user-profile/profile-dropdown';
-import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {BASE_PATH} from '../etools-prp-common/config';
 import {GenericObject} from '../etools-prp-common/typings/globals.types';
 
