@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.utils.functional import cached_property
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.account.validators import EmailValidator
@@ -1015,6 +1017,7 @@ class ImportRealmSerializer(serializers.Serializer):
 
 
 class ImportUserRealmsSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
     realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=False)
 
     class Meta:
@@ -1026,6 +1029,11 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
             'last_name',
             'realms',
         )
+
+    def validate_email(self, value):
+        if value.endswith('@unicef.org'):
+            raise ValidationError('UNICEF users cannot be added through Access Management Portal.')
+        return value
 
     def save_realms(self, user, realms):
         realms_set = {
@@ -1063,7 +1071,10 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
 
+    @transaction.atomic
     def create(self, validated_data):
+        validated_data['username'] = validated_data['email']
+
         realms = validated_data.pop('realms')
 
         first_realm = realms[0]
@@ -1074,6 +1085,7 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         self.save_realms(instance, realms)
         return instance
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         realms = validated_data.pop('realms')
         instance = super().update(instance, validated_data)

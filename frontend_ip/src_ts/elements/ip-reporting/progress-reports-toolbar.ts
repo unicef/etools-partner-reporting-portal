@@ -20,6 +20,7 @@ class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
       <style>
         :host {
           display: block;
+          position: relative;
         }
       </style>
 
@@ -28,12 +29,16 @@ class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElem
           <download-button id="btnDownloadPdf" url="[[pdfExportUrl]]" tracker="Progress Reports Export Pdf"
             >PDF</download-button
           >
-          <paper-tooltip for="btnDownloadPdf">[[localize('progress_reports_export_status')]]</paper-tooltip>
+          <paper-tooltip for="btnDownloadPdf" fit-to-visible-bounds
+            >[[localize('progress_reports_export_status')]]</paper-tooltip
+          >
 
           <download-button id="btnDownloadXLS" url="[[xlsExportUrl]]" tracker="Progress Reports Export Xls"
             >XLS</download-button
           >
-          <paper-tooltip for="btnDownloadXLS">[[localize('progress_reports_export_status')]]</paper-tooltip>
+          <paper-tooltip for="btnDownloadXLS" fit-to-visible-bounds
+            >[[localize('progress_reports_export_status')]]</paper-tooltip
+          >
         </template>
       </etools-prp-toolbar>
     `;

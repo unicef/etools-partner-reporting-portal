@@ -232,16 +232,16 @@ class UserListCreateAPIViewTestCase(BaseAPITestCase):
         self.assertEqual(NUM_TEST_USERS + 1, response.data['count'])
 
         # Test API as Cluster member
-        member_user = User.objects.filter(prp_roles__role=PRP_ROLE_TYPES.cluster_member).first()
+        member_user = User.objects.filter(old_prp_roles__role=PRP_ROLE_TYPES.cluster_member).first()
         self.client.force_authenticate(member_user)
 
         response = self.client.get(reverse('users') + '?portal=CLUSTER')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.filter(prp_roles__role=PRP_ROLE_TYPES.cluster_member).count(),
+        self.assertEqual(User.objects.filter(old_prp_roles__role=PRP_ROLE_TYPES.cluster_member).count(),
                          response.data['count'])
 
         # Test API as Cluster viewer
-        viewer_user = User.objects.filter(prp_roles__role=PRP_ROLE_TYPES.cluster_viewer).first()
+        viewer_user = User.objects.filter(old_prp_roles__role=PRP_ROLE_TYPES.cluster_viewer).first()
         self.client.force_authenticate(viewer_user)
 
         response = self.client.get(reverse('users') + '?portal=CLUSTER')
