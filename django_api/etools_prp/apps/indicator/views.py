@@ -31,6 +31,7 @@ from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.paginations import SmallPagination
 from etools_prp.apps.core.permissions import (
     AnyPermission,
+    HasAnyClusterRole,
     HasAnyRole,
     IsAuthenticated,
     IsSafe,
@@ -180,7 +181,7 @@ class IndicatorListAPIView(ListAPIView):
     """
     permission_classes = (
         IsAuthenticated,
-        HasAnyRole(
+        HasAnyClusterRole(
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
@@ -284,8 +285,8 @@ class ReportableDetailAPIView(RetrieveAPIView):
     permission_classes = (
         IsAuthenticated,
         HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
+            # PRP_ROLE_TYPES.cluster_system_admin,
+            # PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_admin,
             PRP_ROLE_TYPES.ip_editor,
@@ -387,7 +388,7 @@ class IndicatorDataAPIView(APIView):
             or_q_list.append(Q(cluster__cluster_objectives__cluster_activities__partner_activities=obj.reportable.content_object.activity))
             or_q_list.append(Q(cluster__cluster_objectives__partner_activities=obj.reportable.content_object.activity))
 
-        if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
+        if not request.user.is_cluster_system_admin and not request.user.old_prp_roles.filter(
             role__in=(PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_member),
         ).filter(reduce(operator.or_, or_q_list)).exists():
             self.permission_denied(request)
@@ -486,12 +487,12 @@ class PDLowerLevelOutputStatusAPIView(APIView):
         super().check_permissions(request)
         pd_progress_report_id = self.kwargs.get('pd_progress_report_id')
         if not request.user.prp_roles.filter(
-                role__in=[
+                name__in=[
                     PRP_ROLE_TYPES.ip_authorized_officer,
                     PRP_ROLE_TYPES.ip_editor,
                     PRP_ROLE_TYPES.ip_admin,
                 ],
-                workspace__partner_focal_programme_documents__progress_reports__id=pd_progress_report_id
+                realms__workspace__partner_focal_programme_documents__progress_reports__id=pd_progress_report_id
         ).exists():
             self.permission_denied(request)
 
@@ -543,11 +544,11 @@ class IndicatorReportListAPIView(APIView):
             PRP_ROLE_TYPES.ip_admin,
             PRP_ROLE_TYPES.ip_editor,
             PRP_ROLE_TYPES.ip_viewer,
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member,
-            PRP_ROLE_TYPES.cluster_coordinator,
-            PRP_ROLE_TYPES.cluster_viewer
+            # PRP_ROLE_TYPES.cluster_system_admin,
+            # PRP_ROLE_TYPES.cluster_imo,
+            # PRP_ROLE_TYPES.cluster_member,
+            # PRP_ROLE_TYPES.cluster_coordinator,
+            # PRP_ROLE_TYPES.cluster_viewer
         )
     )
 
@@ -600,17 +601,17 @@ class IndicatorReportReviewAPIView(APIView):
 
     def check_indicator_report_permission(self, request, obj):
         or_q_list = [
-            Q(cluster__cluster_objectives__reportables__indicator_reports=obj),
-            Q(cluster__cluster_objectives__cluster_activities__reportables__indicator_reports=obj),
-            Q(cluster__partner_projects__reportables__indicator_reports=obj),
+            Q(realms__partner__clusters__cluster_objectives__reportables__indicator_reports=obj),
+            Q(realms__partner__clusters__cluster_objectives__cluster_activities__reportables__indicator_reports=obj),
+            Q(realms__partner__clusters__partner_projects__reportables__indicator_reports=obj),
         ]
 
         if isinstance(obj.reportable.content_object, PartnerActivityProjectContext):
-            or_q_list.append(Q(cluster__cluster_objectives__cluster_activities__partner_activities=obj.reportable.content_object.activity))
-            or_q_list.append(Q(cluster__cluster_objectives__partner_activities=obj.reportable.content_object.activity))
+            or_q_list.append(Q(realms__partner__clusters__cluster_objectives__cluster_activities__partner_activities=obj.reportable.content_object.activity))
+            or_q_list.append(Q(realms__partner__clusters__cluster_objectives__partner_activities=obj.reportable.content_object.activity))
 
         if not request.user.is_cluster_system_admin and not request.user.prp_roles.filter(
-            role=PRP_ROLE_TYPES.cluster_imo,
+            realms__group__name=PRP_ROLE_TYPES.cluster_imo,
         ).filter(reduce(operator.or_, or_q_list)).exists():
             self.permission_denied(request)
 
@@ -663,9 +664,9 @@ class IndicatorLocationDataUpdateAPIView(APIView):
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_editor,
             PRP_ROLE_TYPES.ip_admin,
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member,
+            # PRP_ROLE_TYPES.cluster_system_admin,
+            # PRP_ROLE_TYPES.cluster_imo,
+            # PRP_ROLE_TYPES.cluster_member,
         )
     )
 
@@ -728,7 +729,7 @@ class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (
         IsAuthenticated,
-        HasAnyRole(
+        HasAnyClusterRole(
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,
@@ -774,7 +775,6 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         HasAnyRole(
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_editor,
-            PRP_ROLE_TYPES.cluster_member,
         ),
     )
 
@@ -870,9 +870,6 @@ class ReportRefreshAPIView(APIView):
     permission_classes = (
         IsAuthenticated,
         HasAnyRole(
-            PRP_ROLE_TYPES.cluster_system_admin,
-            PRP_ROLE_TYPES.cluster_imo,
-            PRP_ROLE_TYPES.cluster_member,
             PRP_ROLE_TYPES.ip_authorized_officer,
             PRP_ROLE_TYPES.ip_editor,
         ),
@@ -947,7 +944,7 @@ class ClusterObjectiveIndicatorAdoptAPIView(APIView):
     """
     permission_classes = (
         IsAuthenticated,
-        HasAnyRole(
+        HasAnyClusterRole(
             PRP_ROLE_TYPES.cluster_system_admin,
             PRP_ROLE_TYPES.cluster_imo,
             PRP_ROLE_TYPES.cluster_member,

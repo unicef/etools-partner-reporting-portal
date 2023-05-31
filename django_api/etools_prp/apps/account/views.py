@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.contrib.auth import login, logout
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import Count, Prefetch, Q
 from django.http import HttpResponseRedirect
+from django.utils.translation import gettext_lazy as _
 
 import django_filters
 from drfpasswordless.utils import authenticate_by_token
-from rest_framework import status as statuses
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
@@ -13,10 +15,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from etools_prp.apps.core.common import PRP_ROLE_TYPES
-from etools_prp.apps.core.models import PRPRole
+from etools_prp.apps.core.models import Realm, Workspace
 from etools_prp.apps.core.paginations import SmallPagination
 from etools_prp.apps.core.permissions import IsAuthenticated
 
+from ..partner.models import Partner
 from .filters import UserFilter
 from .models import User
 from .serializers import UserSerializer, UserWithPRPRolesSerializer
@@ -34,10 +37,10 @@ class UserProfileAPIView(RetrieveAPIView):
     permission_classes = (IsAuthenticated, )
 
     def get_object(self):
-        prefetch_queryset = PRPRole.objects.select_related('workspace', 'cluster', 'cluster__response_plan',
-                                                           'cluster__response_plan__workspace')
-        prefetch_prp_roles = Prefetch('prp_roles', queryset=prefetch_queryset)
-        queryset = User.objects.select_related('profile', 'partner').prefetch_related(prefetch_prp_roles)
+        prp_roles_queryset = Realm.objects.filter(user=self.request.user).select_related('workspace')
+        prp_roles_prefetch = Prefetch('realms', queryset=prp_roles_queryset)
+
+        queryset = User.objects.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
         return queryset.get(id=self.request.user.id)
 
 
@@ -52,7 +55,7 @@ class UserLogoutAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         logout(request)
-        return Response({}, status=statuses.HTTP_200_OK)
+        return Response({}, status=status.HTTP_200_OK)
 
     def get(self, request, *args, **kwargs):
         logout(request)
@@ -92,10 +95,10 @@ class UserListCreateAPIView(ListCreateAPIView):
         ordering = self.request.query_params.get('ordering')
 
         if ordering == 'status':
-            return queryset.order_by('last_login', 'role_count')
+            return queryset.order_by('last_login', 'realm_count')
 
         if ordering == '-status':
-            return queryset.order_by('-last_login', '-role_count')
+            return queryset.order_by('-last_login', '-realm_count')
 
         return queryset
 
@@ -105,7 +108,7 @@ class UserListCreateAPIView(ListCreateAPIView):
         user = self.request.user
         user_prp_roles = set(user.role_list)
 
-        users_queryset = User.objects.exclude(id=user.id).annotate(role_count=Count('prp_roles')).order_by('-id')
+        users_queryset = User.objects.exclude(id=user.id).annotate(realm_count=Count('realms')).order_by('-id')
 
         ip_users_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin}
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
@@ -134,19 +137,124 @@ class UserListCreateAPIView(ListCreateAPIView):
                 PRP_ROLE_TYPES.ip_editor,
             )
             user_workspaces = user.prp_roles.filter(
-                role__in=ip_users_access
-            ).values_list('workspace', flat=True).distinct()
-            users_queryset = users_queryset.filter(Q(prp_roles__workspace__in=user_workspaces) |
-                                                   Q(prp_roles__isnull=True) |
-                                                   Q(prp_roles__role__in=cluster_roles),
-                                                   partner_id__isnull=False, partner_id=user.partner_id)
+                name__in=ip_users_access
+            ).values_list('realms__workspace', flat=True).distinct()
+
+            users_queryset = users_queryset.filter(
+                Q(realms__workspace__in=user_workspaces) |
+                Q(realms__isnull=True) |
+                Q(realms__group__name__in=cluster_roles),
+                partner_id__isnull=False, partner_id=user.partner_id)
         else:
             raise PermissionDenied()
 
-        prp_roles_queryset = PRPRole.objects.filter(role__in=roles_in).select_related(
-            'workspace', 'cluster', 'cluster__response_plan', 'cluster__response_plan__workspace')
-        prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
+        prp_roles_queryset = Realm.objects.filter(group__name__in=roles_in).select_related('workspace')
+        prp_roles_prefetch = Prefetch('realms', queryset=prp_roles_queryset)
 
         users_queryset = self.custom_ordering(users_queryset)
 
         return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
+
+
+class ChangeUserWorkspaceView(APIView):
+    """
+    Allows a user to switch workspace context if they have access to more than one
+    """
+
+    ERROR_MESSAGES = {
+        'workspace_does_not_exist': 'The workspace that you are attempting to switch to does not exist',
+        'access_to_workspace_denied': 'You do not have access to the workspace you are trying to switch to'
+    }
+
+    permission_classes = (IsAuthenticated, )
+
+    def get_workspace(self):
+        workspace_id = self.request.data.get('workspace', None)
+
+        try:
+            workspace = Workspace.objects.get(id=workspace_id)
+        except Workspace.DoesNotExist:
+            raise DjangoValidationError(self.ERROR_MESSAGES['workspace_does_not_exist'],
+                                        code='workspace_does_not_exist')
+
+        return workspace
+
+    def change_workspace(self):
+        user = self.request.user
+        workspace = self.get_workspace()
+
+        if workspace == user.workspace:
+            return
+
+        if workspace not in user.workspaces_available.all():
+            raise DjangoValidationError(self.ERROR_MESSAGES['access_to_workspace_denied'],
+                                        code='access_to_workspace_denied')
+        user.workspace = workspace
+
+        if user.partner not in Partner.objects\
+                .filter(realms__workspace=workspace, realms__user=user):
+            user.partner = None
+        user.save(update_fields=['workspace', 'partner'])
+
+    def post(self, request, format=None):
+        try:
+            self.change_workspace()
+
+        except DjangoValidationError as err:
+            if err.code == 'access_to_workspace_denied':
+                status_code = status.HTTP_403_FORBIDDEN
+            else:
+                status_code = status.HTTP_400_BAD_REQUEST
+            return Response(err, status=status_code)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ChangeUserPartnerView(APIView):
+    """
+    Allows a user to switch partner context if they have access to more than one
+    """
+
+    ERROR_MESSAGES = {
+        'partner_does_not_exist': _('The partner that you are attempting to switch to does not exist'),
+        'access_to_partner_denied': _('You do not have access to the partner you are trying to switch to')
+    }
+
+    permission_classes = (IsAuthenticated, )
+
+    def get_partner(self):
+        partner_id = self.request.data.get('partner', None)
+        try:
+            partner = Partner.objects.get(id=partner_id)
+        except Partner.DoesNotExist:
+            raise DjangoValidationError(
+                self.ERROR_MESSAGES['partner_does_not_exist'],
+                code='partner_does_not_exist'
+            )
+        return partner
+
+    def change_partner(self):
+        user = self.request.user
+        partner = self.get_partner()
+
+        if partner == user.partner:
+            return
+
+        if partner not in user.partners_available.all():
+            raise DjangoValidationError(self.ERROR_MESSAGES['access_to_partner_denied'],
+                                        code='access_to_partner_denied')
+
+        user.partner = partner
+        user.save(update_fields=['partner'])
+
+    def post(self, request, format=None):
+        try:
+            self.change_partner()
+        except DjangoValidationError as err:
+            if err.code == 'access_to_partner_denied':
+                status_code = status.HTTP_403_FORBIDDEN
+            else:
+                status_code = status.HTTP_400_BAD_REQUEST
+            return Response(err, status=status_code)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

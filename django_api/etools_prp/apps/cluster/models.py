@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 from etools_prp.apps.account.models import User
 from etools_prp.apps.core.common import CLUSTER_TYPES, INDICATOR_REPORT_STATUS, OVERALL_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import PRPRole, TimeStampedExternalSourceModel
+from etools_prp.apps.core.models import PRPRoleOld, TimeStampedExternalSourceModel
 from etools_prp.apps.indicator.models import IndicatorReport, Reportable
 from etools_prp.apps.partner.models import PartnerActivity
 
@@ -55,7 +55,7 @@ class Cluster(TimeStampedExternalSourceModel):
     @property
     def imo_users(self):
         return User.objects.filter(
-            id__in=PRPRole.objects.filter(
+            id__in=PRPRoleOld.objects.filter(
                 cluster=self, role=PRP_ROLE_TYPES.cluster_imo
             ).values_list('user', flat=True).distinct()
         )

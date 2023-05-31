@@ -4,7 +4,7 @@ from celery import shared_task
 
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import CLUSTER_TYPES, EXTERNAL_DATA_SOURCES, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import PRPRole, ResponsePlan
+from etools_prp.apps.core.models import PRPRoleOld, ResponsePlan
 from etools_prp.apps.ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
 from etools_prp.apps.ocha.imports.project import import_project_details
 from etools_prp.apps.ocha.imports.response_plan import (
@@ -122,11 +122,11 @@ def finish_partner_project_import(project_id, external_id, response_plan_id=None
 
     project.clusters.add(*clusters)
     for partner_cluster in project.partner.clusters.all():
-        non_partner_cluster_roles = partner_cluster.prp_roles.exclude(role=PRP_ROLE_TYPES.cluster_member)
+        non_partner_cluster_roles = partner_cluster.old_prp_roles.exclude(role=PRP_ROLE_TYPES.cluster_member)
 
         for prp_role in non_partner_cluster_roles:
             for ocha_cluster in clusters:
-                PRPRole.objects.update_or_create(
+                PRPRoleOld.objects.update_or_create(
                     user=prp_role.user,
                     workspace=prp_role.workspace,
                     cluster=ocha_cluster,
