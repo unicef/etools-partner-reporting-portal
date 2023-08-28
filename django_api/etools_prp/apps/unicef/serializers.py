@@ -1018,7 +1018,7 @@ class ImportRealmSerializer(serializers.Serializer):
 
 class ImportUserRealmsSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
-    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=False)
+    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=True)
 
     class Meta:
         model = get_user_model()
@@ -1070,6 +1070,7 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         Realm.objects.bulk_create(realms_to_create)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
         Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
+        user.update_active_state()
 
     @transaction.atomic
     def create(self, validated_data):
