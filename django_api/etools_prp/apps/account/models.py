@@ -4,11 +4,13 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
+
+from model_utils.models import TimeStampedModel
+
 from etools_prp.apps.core.common import PRP_ROLE_TYPES, USER_TYPES
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.utils.emails import send_email_from_template
-from model_utils.models import TimeStampedModel
 
 
 class User(AbstractUser):
