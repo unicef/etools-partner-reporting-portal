@@ -1941,6 +1941,10 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_empty_realms(self):
+        """
+        Invalid realms payload is reduced to empty list, therefore no user realms will be active
+        and user is deactivated as well
+        """
         user = PartnerUserFactory(realms__data=['IP_VIEWER'])
         input_data = {
             'email': user.email,
@@ -1967,4 +1971,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         }
         self.client.force_authenticate(factories.NonPartnerUserFactory())
         response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
+        self.assertFalse(user.realms.filter(is_active=True).exists())
