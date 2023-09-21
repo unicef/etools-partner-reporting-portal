@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.gis.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
@@ -74,14 +75,14 @@ class WorkspaceManager(models.Manager):
         if user.is_unicef:
             return self.all()
 
-        ip_kw = {'prp_roles__user': user}
-        cluster_kw = {'response_plans__clusters__prp_roles__user': user}
+        ip_kw = {'realms__user': user, 'realms__is_active': True}
+        cluster_kw = {'response_plans__clusters__old_prp_roles__user': user}
 
         if role_list:
-            ip_kw['prp_roles__role__in'] = role_list
-            cluster_kw['response_plans__clusters__prp_roles__role__in'] = role_list
+            ip_kw['realms__group__name__in'] = role_list
+            cluster_kw['response_plans__clusters__old_prp_roles__role__in'] = role_list
 
-        if user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
+        if user.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists():
             q_cluster_admin = Q(response_plans__clusters__isnull=False)
         else:
             q_cluster_admin = Q()
@@ -145,9 +146,74 @@ class Workspace(TimeStampedExternalSourceModel):
     #     return Location.objects.filter(pk__in=pks)
 
 
-class PRPRole(TimeStampedExternalSourceModel):
+class Realm(TimeStampedExternalSyncModelMixin):
+    user = models.ForeignKey(
+        'account.User',
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    workspace = models.ForeignKey(
+        Workspace,
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    partner = models.ForeignKey(
+        'partner.Partner',
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    group = models.ForeignKey(
+        Group,
+        related_name="realms",
+        on_delete=models.CASCADE,
+    )
+    is_active = models.BooleanField(_('Active'), default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'workspace', 'partner', 'group'], name='unique_realm')
+        ]
+        indexes = [
+            models.Index(fields=['user', 'workspace', 'partner'])
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} - {self.workspace.title} - " \
+               f"{self.partner.title}: {self.group.name}"
+
+    def send_email_notification(self, deleted=None):
+        template_data = {
+            'user': self.user.get_fullname(),
+            'role': PRP_ROLE_TYPES[self.group.name],
+            'workspace': self.workspace,
+            'portal_url': settings.FRONTEND_HOST,
+            'portal': 'IP'
+        }
+        to_email_list = [self.user.email]
+        content_subtype = 'html'
+
+        if deleted:
+            subject_template_path = 'emails/on_role_remove_subject.txt'
+            body_template_path = 'emails/on_role_remove.html'
+        else:
+            subject_template_path = 'emails/on_role_assign_change_subject.txt'
+            body_template_path = 'emails/on_role_assign_change.html'
+
+        send_email_from_template(
+            subject_template_path=subject_template_path,
+            body_template_path=body_template_path,
+            template_data=template_data,
+            to_email_list=to_email_list,
+            content_subtype=content_subtype
+        )
+        return True
+
+
+# TODO REALMS clean up
+class PRPRoleOld(TimeStampedExternalSourceModel):
     """
-    PRPRole model present a workspace-partner level permission entity
+    PRPRoleOld model present a workspace-partner level permission entity
     with cluster association.
 
     related models:
@@ -155,20 +221,20 @@ class PRPRole(TimeStampedExternalSourceModel):
     """
     user = models.ForeignKey(
         'account.User',
-        related_name="prp_roles",
+        related_name="old_prp_roles",
         on_delete=models.CASCADE,
     )
     role = models.CharField(max_length=32, choices=PRP_ROLE_TYPES)
     workspace = models.ForeignKey(
         'core.Workspace',
-        related_name="prp_roles",
+        related_name="old_prp_roles",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
     cluster = models.ForeignKey(
         'cluster.Cluster',
-        related_name="prp_roles",
+        related_name="old_prp_roles",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
@@ -192,22 +258,10 @@ class PRPRole(TimeStampedExternalSourceModel):
             'user': self.user,
             'role': self,
             'portal_url': settings.FRONTEND_HOST,
-            'portal': None
+            'portal': 'CLUSTER'
         }
         to_email_list = [self.user.email]
         content_subtype = 'html'
-
-        if self.role in {PRP_ROLE_TYPES.cluster_system_admin,
-                         PRP_ROLE_TYPES.cluster_imo,
-                         PRP_ROLE_TYPES.cluster_member,
-                         PRP_ROLE_TYPES.cluster_viewer,
-                         PRP_ROLE_TYPES.cluster_coordinator}:
-            template_data['portal'] = 'CLUSTER'
-        elif self.role in {PRP_ROLE_TYPES.ip_authorized_officer,
-                           PRP_ROLE_TYPES.ip_admin,
-                           PRP_ROLE_TYPES.ip_editor,
-                           PRP_ROLE_TYPES.ip_viewer}:
-            template_data['portal'] = 'IP'
 
         if deleted:
             subject_template_path = 'emails/on_role_remove_subject.txt'

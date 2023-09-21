@@ -25,7 +25,7 @@ import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
 import {RootState} from '../../typings/redux.types';
 import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parser';
-import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer
@@ -527,7 +527,7 @@ class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMixin(Red
     if (data.id === this.localData.id) {
       return data;
     }
-    
+
     this.set('localData', {...data});
     return data;
   }

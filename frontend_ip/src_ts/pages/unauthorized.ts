@@ -10,8 +10,9 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/page-body';
 import '../etools-prp-common/elements/user-profile/profile-dropdown';
-import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {BASE_PATH} from '../etools-prp-common/config';
+import {GenericObject} from '../etools-prp-common/typings/globals.types';
 
 /**
  * @polymer
@@ -54,8 +55,6 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
 
       <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
 
-      <etools-prp-ajax id="workspaces" url="[[workspacesUrl]]"> </etools-prp-ajax>
-
       <page-body>
         <div class="item">
           <span class="sign-out-button" on-tap="_logout">
@@ -92,9 +91,6 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
   @property({type: String})
   profileUrl = Endpoints.userProfile();
 
-  @property({type: String})
-  workspacesUrl = Endpoints.interventions();
-
   @property({type: Boolean})
   isAccessError = true;
 
@@ -113,7 +109,7 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
       .thunk()()
       .then((res: any) => {
         if (res.data && (res.data.access || []).includes('ip-reporting')) {
-          this.checkWorkspaceExistence();
+          this.checkWorkspaceExistence(res.data.workspace);
         } else {
           this.showMessage(true);
         }
@@ -123,19 +119,12 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
       });
   }
 
-  checkWorkspaceExistence() {
-    (this.$.workspaces as EtoolsPrpAjaxEl)
-      .thunk()()
-      .then((res: any) => {
-        if (res.data && res.data.length) {
-          window.location.href = `/${BASE_PATH}/`;
-        } else {
-          this.showMessage(false);
-        }
-      })
-      .catch(() => {
-        this.showMessage(false);
-      });
+  checkWorkspaceExistence(workspace: GenericObject) {
+    if (workspace && workspace.id) {
+      window.location.href = `/${BASE_PATH}/`;
+    } else {
+      this.showMessage(false);
+    }
   }
 
   showMessage(isAccessError: boolean) {

@@ -17,10 +17,10 @@ from .models import User
 class UserFilter(django_filters.FilterSet):
     name_email = CharFilter(method='get_name_email')
     status = CharFilter(method='get_status')
-    roles = CommaSeparatedListFilter(field_name='prp_roles__role')
+    roles = CommaSeparatedListFilter(field_name='realms__group__name')
     partners = CommaSeparatedListFilter(field_name='partner_id')
     clusters = CommaSeparatedListFilter(field_name='prp_roles__cluster_id')
-    workspaces = CommaSeparatedListFilter(field_name='prp_roles__workspace_id')
+    workspaces = CommaSeparatedListFilter(field_name='realms__workspace_id')
 
     class Meta:
         model = User
@@ -33,9 +33,9 @@ class UserFilter(django_filters.FilterSet):
     def get_status(self, queryset, name, value):
         statuses = parse.unquote(value).split(',')
         status_to_q = {
-            USER_STATUS_TYPES.active: Q(is_active__isnull=False, last_login__isnull=False, prp_roles__isnull=False),
-            USER_STATUS_TYPES.invited: Q(is_active__isnull=False, last_login__isnull=True, prp_roles__isnull=False),
-            USER_STATUS_TYPES.incomplete: Q(prp_roles__isnull=True)
+            USER_STATUS_TYPES.active: Q(is_active__isnull=False, last_login__isnull=False, realms__isnull=False),
+            USER_STATUS_TYPES.invited: Q(is_active__isnull=False, last_login__isnull=True, realms__isnull=False),
+            USER_STATUS_TYPES.incomplete: Q(realms__isnull=True)
         }
         return queryset.filter(reduce(
             operator.or_, [status_to_q.get(status, Q()) for status in statuses]

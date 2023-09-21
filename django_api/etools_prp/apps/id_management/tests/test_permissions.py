@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.urls import reverse
 
 from rest_framework.test import APIRequestFactory, APITestCase
@@ -5,11 +7,12 @@ from rest_framework.test import APIRequestFactory, APITestCase
 from etools_prp.apps.account.models import User
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import PRP_ROLE_TYPES
-from etools_prp.apps.core.models import PRPRole, Workspace
+from etools_prp.apps.core.models import PRPRoleOld, Workspace
 from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from etools_prp.apps.partner.models import Partner
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
@@ -22,7 +25,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
         self.cluster = Cluster.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_member, cluster=self.cluster)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_member, cluster=self.cluster)
 
     # Tests when request user role is in roles_without_permission:
 
@@ -32,7 +35,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -69,7 +72,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -105,7 +108,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_imo
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, cluster=self.cluster)  # cluster assigned
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, cluster=self.cluster)  # cluster assigned
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -136,7 +139,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_imo
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)  # no cluster assigned
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)  # no cluster assigned
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -169,7 +172,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_system_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -197,6 +200,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
         self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
@@ -209,7 +213,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
         self.cluster = Cluster.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_viewer, cluster=self.cluster)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_viewer, cluster=self.cluster)
 
     # Tests when request user role is in roles_without_permission:
 
@@ -219,7 +223,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -255,7 +259,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -291,7 +295,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_imo
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, cluster=self.cluster)  # cluster assigned
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, cluster=self.cluster)  # cluster assigned
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -322,7 +326,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_imo
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)  # no cluster assigned
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)  # no cluster assigned
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -355,7 +359,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_system_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -383,6 +387,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
         self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_imo, PRP_ROLE_TYPES.cluster_coordinator,
@@ -396,7 +401,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
         self.cluster = Cluster.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_imo, cluster=self.cluster)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_imo, cluster=self.cluster)
 
     # Tests when request user role is in roles_without_permission:
 
@@ -406,7 +411,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -442,7 +447,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -476,7 +481,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
         request_user_role = PRP_ROLE_TYPES.cluster_system_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -504,6 +509,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
         self.assertTrue(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -517,8 +523,8 @@ class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
         self.cluster = Cluster.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_system_admin,
-                                           cluster=self.cluster)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.cluster_system_admin,
+                                              cluster=self.cluster)
 
     def test_permission_as_role_without_permission__partner_match(self):
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
@@ -526,7 +532,7 @@ class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -562,7 +568,7 @@ class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -593,6 +599,7 @@ class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
             prp_role.delete()
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -606,8 +613,8 @@ class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
         self.cluster = Cluster.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_authorized_officer,
-                                           cluster=self.cluster)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_authorized_officer,
+                                              cluster=self.cluster)
 
     def test_permission_as_role_without_permission__partner_match(self):
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
@@ -615,7 +622,7 @@ class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -651,7 +658,7 @@ class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -682,6 +689,7 @@ class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
             prp_role.delete()
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -695,8 +703,8 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         self.workspace = Workspace.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_admin,
-                                           cluster=self.cluster, workspace=self.workspace)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_admin,
+                                              cluster=self.cluster, workspace=self.workspace)
 
     def test_permission_as_role_without_permission__partner_match__workspace_match(self):
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
@@ -704,7 +712,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -740,7 +748,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -774,7 +782,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -805,7 +813,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -836,7 +844,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -867,7 +875,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -895,6 +903,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
         self.assertFalse(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -908,8 +917,8 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         self.workspace = Workspace.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_editor,
-                                           cluster=self.cluster, workspace=self.workspace)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_editor,
+                                              cluster=self.cluster, workspace=self.workspace)
 
     def test_permission_as_role_without_permission__partner_match__workspace_match(self):
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
@@ -917,7 +926,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -953,7 +962,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -987,7 +996,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1018,7 +1027,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1049,7 +1058,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1080,7 +1089,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1111,7 +1120,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1142,7 +1151,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1173,7 +1182,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1204,7 +1213,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1232,6 +1241,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
         self.assertFalse(self.perm.has_object_permission(request, None, self.role))
 
 
+@skip('deprecated')
 class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
     def setUp(self):
         self.roles_without_permission = [PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo,
@@ -1245,8 +1255,8 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         self.workspace = Workspace.objects.create()
         cluster_user = User.objects.create_user(email='cluster_user@example.com', username='cluster_user_test',
                                                 password='pass', partner=self.partner)
-        self.role = PRPRole.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_viewer,
-                                           cluster=self.cluster, workspace=self.workspace)
+        self.role = PRPRoleOld.objects.create(user=cluster_user, role=PRP_ROLE_TYPES.ip_viewer,
+                                              cluster=self.cluster, workspace=self.workspace)
 
     def test_permission_as_role_without_permission__partner_match__workspace_match(self):
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
@@ -1254,7 +1264,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1290,7 +1300,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
 
         for role_without_permission in self.roles_without_permission:
             request_user_role = role_without_permission
-            prp_role = PRPRole.objects.create(user=request_user, role=request_user_role)
+            prp_role = PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
             # PATCH
             request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1324,7 +1334,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1355,7 +1365,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1386,7 +1396,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1417,7 +1427,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_authorized_officer
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1448,7 +1458,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1479,7 +1489,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role, workspace=self.workspace)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1510,7 +1520,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass')
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))
@@ -1541,7 +1551,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
         request_user_role = PRP_ROLE_TYPES.ip_admin
         request_user = User.objects.create_user(email='request_user@example.com', username='request_user',
                                                 password='pass', partner=self.partner)
-        PRPRole.objects.create(user=request_user, role=request_user_role)
+        PRPRoleOld.objects.create(user=request_user, role=request_user_role)
 
         # PATCH
         request = self.factory.patch(reverse('role-group-update-destroy', args=[self.role.id]))

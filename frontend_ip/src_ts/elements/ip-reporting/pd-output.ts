@@ -30,7 +30,7 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
 import {RootState} from '../../typings/redux.types';
-import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer
@@ -41,8 +41,7 @@ import {fireEvent} from '../../etools-prp-common/utils/fire-custom-event';
  * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
-class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(ReduxConnectedElement)))
-) {
+class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
       <style include="iron-flex iron-flex-factors">
