@@ -11,7 +11,7 @@ django-fixture-magic = "*"
 isort = "*"
 
 [packages]
-aiohttp = "<=3.7.4.post0"
+aiohttp = "<=3.9.0"
 azure-common = "<=1.1.27"
 azure-storage-blob = "<12.0"
 azure-storage-common = "<=2.1"
