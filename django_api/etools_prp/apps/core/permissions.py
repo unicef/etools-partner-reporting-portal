@@ -40,6 +40,13 @@ class PermissionGetObjectMixin:
             return None
 
 
+def object_status_permission(*statuses):
+    class ObjectStatusPermission(IsAuthenticated):
+        def has_object_permission(self, request, view, obj):
+            return obj.status in statuses
+    return ObjectStatusPermission
+
+
 #######################################################
 # Generic classes
 #######################################################

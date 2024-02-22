@@ -19,6 +19,8 @@ from rest_framework.views import APIView
 from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_STATUS,
+    PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
     REPORTABLE_CA_CONTENT_OBJECT,
     REPORTABLE_CO_CONTENT_OBJECT,
@@ -888,6 +890,21 @@ class ReportRefreshAPIView(APIView):
 
         if serializer.validated_data['report_type'] == 'PR':
             report = get_object_or_404(ProgressReport, id=serializer.validated_data['report_id'])
+            self.check_object_permissions(self.request, obj=report)
+
+            if report.status in [
+                PROGRESS_REPORT_STATUS.overdue,
+                PROGRESS_REPORT_STATUS.submitted,
+                PROGRESS_REPORT_STATUS.accepted,
+            ]:
+                raise ValidationError('This  progress report is not available for refresh')
+
+            if report.programme_document and report.programme_document.status in [
+                PD_STATUS.signed,
+                PD_STATUS.closed,
+            ]:
+                raise ValidationError('This  progress report is not available for refresh')
+
             target_prs = ProgressReport.objects.filter(
                 programme_document=report.programme_document,
                 report_type=report.report_type,
@@ -904,6 +921,8 @@ class ReportRefreshAPIView(APIView):
                     "This indicator report is linked to a progress report. "
                     "Use the progress report ID instead.",
                 )
+
+            self.check_object_permissions(self.request, obj=report)
 
             # if future report and indicator location data exists,
             # then do not perform reset
