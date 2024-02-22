@@ -897,13 +897,13 @@ class ReportRefreshAPIView(APIView):
                 PROGRESS_REPORT_STATUS.submitted,
                 PROGRESS_REPORT_STATUS.accepted,
             ]:
-                raise ValidationError('This  progress report is not available for refresh')
+                raise ValidationError('This progress report is not available for refresh')
 
             if report.programme_document and report.programme_document.status in [
                 PD_STATUS.signed,
                 PD_STATUS.closed,
             ]:
-                raise ValidationError('This  progress report is not available for refresh')
+                raise ValidationError('This progress report is not available for refresh')
 
             target_prs = ProgressReport.objects.filter(
                 programme_document=report.programme_document,
