@@ -11,6 +11,7 @@ from celery.utils.log import get_task_logger
 from pyrestcli.auth import BaseAuthClient
 from unicef_locations.models import CartoDBTable
 
+from etools_prp.apps.core.locations_sync import PRPLocationSynchronizer
 from etools_prp.apps.core.models import Location
 
 logger = get_task_logger('core.cartodb')
@@ -151,6 +152,12 @@ def create_location(pcode,
         ))
 
         return True, sites_not_added, sites_created, sites_updated
+
+
+@shared_task
+def import_locations(carto_table_pk):
+    print("import locations started")
+    PRPLocationSynchronizer(carto_table_pk).sync()
 
 
 @shared_task
