@@ -1,0 +1,94 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    "plugin:lit/recommended",
+    "google",
+    "prettier/@typescript-eslint", // Uses eslint-config-prettier to disable ESLint rules
+    // from @typescript-eslint/eslint-plugin that would conflict with prettier
+    "plugin:prettier/recommended" // Enables eslint-plugin-prettier and eslint-config-prettier.
+    //This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "lit",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "lit/attribute-value-entities": "off",
+    "linebreak-style": "off",
+    "no-irregular-whitespace": [
+      "error",
+      {
+        "skipTemplates": true
+      }
+    ],
+    "@typescript-eslint/no-object-literal-type-assertion": "off",
+    "padded-blocks": "off",
+    "brace-style": "off",
+    "new-cap": [
+      "error",
+      {
+        "capIsNewExceptions": [
+          "GestureEventListeners"
+        ],
+        "capIsNewExceptionPattern": "^Etools..|..Mixin$"
+      }
+    ],
+    "no-var": "off",
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off",
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "ignoreUrls": true
+      }
+    ],
+    "prefer-promise-reject-errors": "off",
+    "camelcase": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+    "@typescript-eslint/ban-types": [
+      "warn"
+    ],
+    "@typescript-eslint/no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": true,
+        "variables": true
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "globals": {
+    "dayjs": true
+  }
+}
