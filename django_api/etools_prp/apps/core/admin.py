@@ -56,7 +56,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
     def import_sites(self, request, queryset):
         for table in queryset:
-            import_locations(table.pk)
+            import_locations.delay(table.pk)
 
 
 class WorkspaceAdmin(admin.ModelAdmin):
