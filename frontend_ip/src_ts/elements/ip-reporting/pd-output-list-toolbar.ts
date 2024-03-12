@@ -24,6 +24,7 @@ import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-rep
 import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
 import {RootState} from '../../typings/redux.types';
+import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 
 /**
  * @polymer
@@ -80,10 +81,10 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   @property({type: String})
   locationId!: string;
 
-  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
+  @property({type: Object, computed: '_programmeDocument(rootState)'})
   programmeDocument!: GenericObject;
 
-  @property({type: Boolean, computed: '_computeShowImportButtons(programmeDocument)'})
+  @property({type: Boolean, computed: '_computeShowImportButtons(currentUserRoles, currentReport, programmeDocument)'})
   showImportButtons!: boolean;
 
   @property({type: String, computed: '_computeImportTemplateUrl(locationId, reportId)'})
@@ -110,7 +111,7 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   @property({type: Object, computed: '_computeRefreshData(reportId)'})
   refreshData!: GenericObject;
 
-  @property({type: Boolean, computed: '_computeCanRefresh(currentReport, programmeDocument)'})
+  @property({type: Boolean, computed: '_computeCanRefresh(currentUserRoles, currentReport, programmeDocument)'})
   canRefresh = false;
 
   @property({type: Boolean, computed: '_computeShowRefresh(canRefresh, currentUserRoles)'})
@@ -121,6 +122,10 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
 
   @property({type: String})
   refreshUrl = Endpoints.reportProgressReset();
+
+  _programmeDocument(rootState: RootState) {
+    return currentProgrammeDocument(rootState);
+  }
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
     return programmeDocumentReportsCurrent(rootState);
@@ -134,8 +139,8 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
     return computeImportUrl(locationId, reportId);
   }
 
-  _computeShowImportButtons(programmeDocument: GenericObject) {
-    return computeShowImportButtons(programmeDocument);
+  _computeShowImportButtons(roles: any[], report: GenericObject, programmeDocument: GenericObject) {
+    return computeShowImportButtons(roles, report, programmeDocument);
   }
 
   _computePdReportUrl(locationId: string, reportId: string) {
@@ -146,8 +151,8 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
     return computeRefreshData(reportId);
   }
 
-  _computeCanRefresh(report: GenericObject, programmeDocument: GenericObject) {
-    return computeCanRefresh(report, programmeDocument);
+  _computeCanRefresh(roles: any[], report: GenericObject, programmeDocument: GenericObject) {
+    return computeCanRefresh(roles, report, programmeDocument);
   }
 
   _computeShowRefresh(canRefresh: boolean, currentUserRoles: any[]) {
