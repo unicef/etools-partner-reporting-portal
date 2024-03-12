@@ -156,7 +156,6 @@ def create_location(pcode,
 
 @shared_task
 def import_locations(carto_table_pk):
-    print("import locations started")
     PRPLocationSynchronizer(carto_table_pk).sync()
 
 
