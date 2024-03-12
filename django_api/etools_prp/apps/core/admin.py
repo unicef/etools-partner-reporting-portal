@@ -3,7 +3,7 @@ from django.contrib.gis import admin
 from leaflet.admin import LeafletGeoAdmin
 from unicef_locations.models import CartoDBTable
 
-from .cartodb import update_sites_from_cartodb
+from .cartodb import import_locations
 from .forms import CartoDBTableForm
 from .models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
 
@@ -56,7 +56,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
     def import_sites(self, request, queryset):
         for table in queryset:
-            update_sites_from_cartodb.delay(table.pk)
+            import_locations.delay(table.pk)
 
 
 class WorkspaceAdmin(admin.ModelAdmin):
