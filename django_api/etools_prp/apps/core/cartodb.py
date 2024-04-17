@@ -10,6 +10,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from pyrestcli.auth import BaseAuthClient
 from unicef_locations.models import CartoDBTable
+from unicef_locations.utils import get_location_model
 
 from etools_prp.apps.core.locations_sync import PRPLocationSynchronizer
 from etools_prp.apps.core.models import Location
@@ -156,8 +157,14 @@ def create_location(pcode,
 
 @shared_task
 def import_locations(carto_table_pk):
-    print("import locations started")
+    logger.info("import locations started")
     PRPLocationSynchronizer(carto_table_pk).sync()
+
+
+@shared_task
+def rebuild_tree():
+    logger.info("rebuild tree started")
+    get_location_model().objects.rebuild()
 
 
 @shared_task

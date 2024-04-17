@@ -146,9 +146,9 @@ class PRPLocationSynchronizer(LocationSynchronizer):
                 for loc in newly_created:
                     loc.workspaces.add(self.workspace)
 
-        logger.info("Rebuilding the tree, have patience")
-        get_location_model().objects.rebuild()
-        logger.info("Rebuilt")
+        logger.info("Rebuilding the tree, have patience -deferred for now. done separately")
+        # get_location_model().objects.rebuild()
+        # logger.info("Rebuilt")
         return new, updated, skipped, error
 
     def clean_upper_level(self):
