@@ -39,6 +39,7 @@ from etools_prp.apps.core.permissions import (
     IsSafe,
     IsSuperuser,
     IsUNICEFAPIUser,
+    object_status_permission,
     UnicefPartnershipManager,
 )
 from etools_prp.apps.core.serializers import ShortLocationSerializer
@@ -1358,10 +1359,30 @@ class ProgressReportExcelExportView(RetrieveAPIView):
 
 
 class ProgressReportExcelImportView(APIView):
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
+        ),
+        object_status_permission(
+            PROGRESS_REPORT_STATUS.due,
+            PROGRESS_REPORT_STATUS.not_yet_due,
+            PROGRESS_REPORT_STATUS.sent_back,
+        ),
+    )
 
-    permission_classes = (IsAuthenticated, )
+    def get_object(self, request, workspace_id, pk):
+        obj = get_object_or_404(
+            ProgressReport,
+            id=pk,
+            programme_document__workspace_id=workspace_id,
+        )
+        self.check_object_permissions(self.request, obj=obj)
+        return obj
 
     def post(self, request, workspace_id, pk):
+        progress_report = self.get_object(request, workspace_id, pk)
 
         up_file = request.FILES['file']
         filepath = "/tmp/" + up_file.name
@@ -1370,12 +1391,6 @@ class ProgressReportExcelImportView(APIView):
         tokens = up_file.name[:up_file.name.rfind('.')].split('_')
         file_report_name = tokens[0].lower()
         file_ref_num = tokens[1].lower()
-
-        progress_report = get_object_or_404(
-            ProgressReport,
-            id=pk,
-            programme_document__workspace_id=workspace_id,
-        )
 
         report_name = f"{progress_report.report_type}{progress_report.report_number}".lower()
         ref_num = progress_report.programme_document.reference_number.split('/')[-1].lower()
