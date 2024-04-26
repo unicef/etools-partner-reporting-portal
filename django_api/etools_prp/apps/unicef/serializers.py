@@ -216,7 +216,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'partner_focal_point',
             'start_date',
             'end_date',
-            # 'status',
+            'status',
             'frequency',
             'sections',
             'budget_currency',

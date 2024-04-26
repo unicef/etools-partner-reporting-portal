@@ -279,6 +279,7 @@ class PageIpReportingPdReport extends LocalizeMixin(
 
   _programmeDocumentReportsCurrent(rootState: RootState) {
     const currentReport = programmeDocumentReportsCurrent(rootState);
+    currentReport.status = 'Due';
     if (currentReport && Object.keys(currentReport).length) {
       return currentReport;
     }
@@ -343,8 +344,10 @@ class PageIpReportingPdReport extends LocalizeMixin(
     if (!report || !permissions) {
       return false;
     }
+
     switch (true) {
-      case report.status === 'Sub' && (!permissions || !permissions.exportSubmittedProgressReport):
+      case !['Sub', 'Acc'].includes(report.status):
+      case ['Sub', 'Acc'].includes(report.status) && (!permissions || !permissions.exportSubmittedProgressReport):
       case mode === 'edit':
         return false;
 
