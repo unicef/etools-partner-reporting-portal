@@ -8,6 +8,8 @@ from calendar import monthrange
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import date, timedelta
+
+from django.db import IntegrityError
 from itertools import combinations, product
 
 from dateutil.relativedelta import relativedelta
@@ -494,18 +496,20 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
         report_number = 1
         report_type = reporting_period.report_type
         is_final = False
+    try:
+        next_progress_report = ProgressReport.objects.create(
+            start_date=start_date,
+            end_date=end_date,
+            due_date=due_date,
+            programme_document=pd,
+            report_type=report_type,
+            report_number=report_number,
+            is_final=is_final,
+        )
+    except IntegrityError as exc:
+        logger.exception(exc)
 
-    next_progress_report = ProgressReport.objects.create(
-        start_date=start_date,
-        end_date=end_date,
-        due_date=due_date,
-        programme_document=pd,
-        report_type=report_type,
-        report_number=report_number,
-        is_final=is_final,
-    )
-
-    return (next_progress_report, start_date, end_date, due_date)
+    return next_progress_report, start_date, end_date, due_date
 
 
 def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, end_date, due_date):
