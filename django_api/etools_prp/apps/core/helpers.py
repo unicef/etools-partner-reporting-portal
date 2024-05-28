@@ -8,9 +8,9 @@ from calendar import monthrange
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import date, timedelta
+from itertools import combinations, product
 
 from django.db import IntegrityError
-from itertools import combinations, product
 
 from dateutil.relativedelta import relativedelta
 
