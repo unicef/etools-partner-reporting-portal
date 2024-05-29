@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.db.models import F
 
 from celery import shared_task
 from rest_framework.exceptions import ValidationError
@@ -19,6 +20,7 @@ from etools_prp.apps.indicator.models import (
     Disaggregation,
     DisaggregationValue,
     IndicatorBlueprint,
+    IndicatorLocationData,
     Reportable,
     ReportableLocationGoal,
 )
@@ -35,6 +37,7 @@ from etools_prp.apps.unicef.models import (
     PDResultLink,
     Person,
     ProgrammeDocument,
+    ProgressReport,
     ReportingPeriodDates,
     Section,
 )
@@ -98,6 +101,50 @@ def save_person_and_user(person_data, create_user=False):
         user = None
 
     return person, user
+
+
+def handle_reporting_dates(business_area_code, pd, reporting_reqs):
+    """
+    Function that handles misaligned start/end dates from etools reporting requirements
+    :param business_area_code: workspace business_area_code
+    :param pd: programme document
+    :param reporting_reqs: the pd reporting requirements from etools API
+    """
+    for report_req in reporting_reqs:
+        try:
+            reporting_period = pd.reporting_periods.get(
+                external_id=report_req['id'],
+                report_type=report_req['report_type'],
+                external_business_area_code=business_area_code)
+        except ReportingPeriodDates.DoesNotExist:
+            continue
+
+        if reporting_period.start_date.strftime('%Y-%m-%d') == report_req['start_date'] and \
+                reporting_period.end_date.strftime('%Y-%m-%d') == report_req['end_date']:
+            continue
+
+        # if start/end dates are not aligned for a ReportingPeriodDates obj, check the corresponding pd ProgressReports
+        try:
+            progress_rep = pd.progress_reports.get(
+                start_date=reporting_period.start_date, end_date=reporting_period.end_date)
+        except ProgressReport.DoesNotExist:
+            # if no progress report found, delete ReportingPeriodDates obj from the db
+            reporting_period.delete()
+            continue
+
+        # if there is any data input from the partner on the progress report
+        # (including indicator reports, indicator location data)
+        if progress_rep.created != progress_rep.modified or \
+                progress_rep.attachments.exists() or \
+                progress_rep.indicator_reports.exclude(created=F('modified')).exists() or \
+                IndicatorLocationData.objects.filter(indicator_report__progress_report=progress_rep).exclude(created=F('modified')).exists():
+            # log exception and skip the report in reporting_requirements
+            logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} with user input data. Skipping..')
+            report_req['skip'] = True
+        else:
+            # if there is no user input data, delete the Progress Report and the ReportingPeriodDates obj
+            progress_rep.delete()
+            reporting_period.delete()
 
 
 @shared_task
@@ -297,7 +344,10 @@ def process_programme_documents(fast=False, area=False):
 
                         # Create Reporting Date Periods for QPR and HR report type
                         reporting_requirements = item['reporting_requirements']
+                        handle_reporting_dates(workspace.business_area_code, pd, reporting_requirements)
                         for reporting_requirement in reporting_requirements:
+                            if 'skip' in reporting_requirement and reporting_requirements['skip']:
+                                continue
                             reporting_requirement['programme_document'] = pd.id
                             reporting_requirement['external_business_area_code'] = workspace.business_area_code
                             process_model(
