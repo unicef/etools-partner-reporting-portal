@@ -97,7 +97,7 @@ class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin
   }
 
   @property({type: String})
-  selected!: string;
+  selected!: any;
 
   @property({type: String, computed: "buildUrl(_baseUrl, 'overview')"})
   overviewUrl!: string;

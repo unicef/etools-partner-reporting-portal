@@ -16,7 +16,6 @@ import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
 
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import OverlayHelperMixin from '../../etools-prp-common/mixins/overlay-helper-mixin';
 import {getDomainByEnv} from '../../etools-prp-common/config';
 
 /**
@@ -25,7 +24,7 @@ import {getDomainByEnv} from '../../etools-prp-common/config';
  * @appliesMixin UtilsMixin
  * @appliesMixin LocalizeMixin
  */
-class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxConnectedElement))) {
+class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   static get template() {
     return html`
       ${appThemeIpStyles}
