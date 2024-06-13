@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
@@ -10,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import Location, PRPRole, Workspace
+from etools_prp.apps.core.models import Location, Realm, Workspace
 from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,
@@ -49,7 +50,6 @@ from etools_prp.apps.unicef.serializers import (
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
-
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
 LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
@@ -89,7 +89,7 @@ def save_person_and_user(person_data, create_user=False):
             Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
         )
     except ValidationError:
-        logger.exception('Error trying to save Person model with {}'.format(person_data))
+        logger.debug('Error trying to save Person model with {}'.format(person_data))
         return None, None
 
     if create_user:
@@ -202,10 +202,14 @@ def process_programme_documents(fast=False, area=False):
                             continue
 
                         # Create PD
-                        item['status'] = item['status'].title()[:3]
+                        item['status'] = item['status']
                         item['external_business_area_code'] = workspace.business_area_code
                         # Amendment date formatting
                         for idx in range(len(item['amendments'])):
+                            if item['amendments'][idx]['signed_date'] is None:
+                                # no signed date yet, so formatting is not required
+                                continue
+
                             item['amendments'][idx]['signed_date'] = datetime.datetime.strptime(
                                 item['amendments'][idx]['signed_date'], "%Y-%m-%d"
                             ).strftime("%d-%b-%Y")
@@ -252,10 +256,11 @@ def process_programme_documents(fast=False, area=False):
                             user.partner = partner
                             user.save()
 
-                            obj, created = PRPRole.objects.get_or_create(
+                            obj, created = Realm.objects.get_or_create(
                                 user=user,
-                                role=PRP_ROLE_TYPES.ip_authorized_officer,
+                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
                                 workspace=workspace,
+                                partner=partner
                             )
 
                             if created:
@@ -405,6 +410,9 @@ def process_programme_documents(fast=False, area=False):
 
                                         elif i['unit'] == 'number':
                                             i['display_type'] = 'number'
+
+                                        elif i['unit'] == 'percentage':
+                                            i['calculation_formula_across_periods'] = 'latest'
 
                                         blueprint = process_model(
                                             IndicatorBlueprint,

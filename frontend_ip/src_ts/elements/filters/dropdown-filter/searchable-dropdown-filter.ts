@@ -2,7 +2,7 @@ import {html, PolymerElement} from '@polymer/polymer';
 import {property} from '@polymer/decorators';
 import '@unicef-polymer/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import {fireEvent} from '../../../etools-prp-common/utils/fire-custom-event';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 /**
@@ -45,7 +45,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
   disabled!: boolean;
 
   @property({type: String})
-  value = '';
+  value = '-1';
 
   @property({type: String})
   name!: string;
@@ -64,7 +64,7 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
       setTimeout(() => {
         fireEvent(this, 'filter-changed', {
           name: this.name,
-          value: String(event.detail.selectedItem.id)
+          value: event.detail.selectedItem.id == -1 ? '' : String(event.detail.selectedItem.id)
         });
       });
     }

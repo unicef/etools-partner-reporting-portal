@@ -4,6 +4,7 @@ import sys
 
 import environ
 import sentry_sdk
+from corsheaders.defaults import default_headers
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_pem_x509_certificate
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -138,6 +139,11 @@ CORS_ORIGIN_WHITELIST = [
     'https://etools-staging.unicef.org',
     'https://etools-dev.unicef.org',
 ]
+
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "language",
+)
 
 ROOT_URLCONF = 'etools_prp.config.urls'
 
@@ -314,7 +320,7 @@ LOGGING = {
         },
         'ocha-sync': {
             'handlers': ['ocha'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True
         },
         'django.request': {
@@ -322,6 +328,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'etools_prp.apps.unicef.tasks': {
+            'handlers': ['default'],
+            'level': 'INFO',
+        }
         # 'elasticapm.errors': {
         #     'level': 'ERROR',
         #     'handlers': ['default'],

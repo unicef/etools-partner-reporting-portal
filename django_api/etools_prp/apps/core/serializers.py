@@ -8,7 +8,7 @@ from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
 from etools_prp.apps.utils.serializers import CurrentWorkspaceDefault
 
-from .models import Location, PRPRole, ResponsePlan, Workspace
+from .models import Location, PRPRoleOld, ResponsePlan, Workspace
 
 
 class WorkspaceSimpleSerializer(serializers.ModelSerializer):
@@ -178,7 +178,7 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
             if 'request' in self.context:
                 user = self.context['request'].user
                 if not user.is_cluster_system_admin:
-                    user.prp_roles.create(
+                    user.old_prp_roles.create(
                         role=PRP_ROLE_TYPES.cluster_imo,
                         cluster=cluster_obj,
                         workspace=response_plan.workspace,
@@ -234,7 +234,7 @@ class PMPLocationSerializer(serializers.ModelSerializer):
 
 class PRPRoleUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PRPRole
+        model = PRPRoleOld
         fields = ('role', 'is_active')
 
     def update(self, instance, validated_data):
@@ -246,7 +246,7 @@ class PRPRoleUpdateSerializer(serializers.ModelSerializer):
 
 class PRPRoleCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PRPRole
+        model = PRPRoleOld
         fields = ('role', 'workspace', 'cluster')
 
 
@@ -260,7 +260,7 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
         roles_created = []
 
         for prp_roles_data in validated_data['prp_roles']:
-            new_role = PRPRole.objects.create(user_id=user_id, **prp_roles_data)
+            new_role = PRPRoleOld.objects.create(user_id=user_id, **prp_roles_data)
             roles_created.append(new_role)
             transaction.on_commit(lambda role=new_role: role.send_email_notification())
 
@@ -271,7 +271,7 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
                     PRP_ROLE_TYPES.cluster_viewer,
                     PRP_ROLE_TYPES.cluster_coordinator
                 )
-                PRPRole.objects.filter(user_id=user_id, role__in=cluster_roles).delete()
+                PRPRoleOld.objects.filter(user_id=user_id, role__in=cluster_roles).delete()
                 break
 
         return {'user_id': user_id, 'prp_roles': roles_created}

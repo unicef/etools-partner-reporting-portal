@@ -2,7 +2,6 @@ import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedEleme
 import {property} from '@polymer/decorators/lib/decorators';
 import {html} from '@polymer/polymer';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
@@ -19,15 +18,15 @@ import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-fu
 import '@unicef-polymer/etools-file/etools-file';
 // import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
 import {RootState} from '../../typings/redux.types';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
- * @appliesMixin NotificationsMixin
  * @appliesMixin LocalizeMixin
  */
-class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))) {
+class ReportAttachments extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   public static get template() {
     return html`
       <style>
@@ -252,7 +251,11 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         .dispatch(pdReportsAttachmentsSync(deleteThunk, this.reportId))
         // @ts-ignore
         .then(() => {
-          this._notifyFileDeleted();
+          fireEvent(this, 'toast', {
+            text: this.localize('file_deleted'),
+            showCloseBtn: true
+          });
+
           this.set('attachmentDeleteUrl', undefined);
 
           if (this.get('faceAttachment').length !== 0 && e.detail.file.id === this.get('faceAttachment')[0].id) {
@@ -354,8 +357,10 @@ class ReportAttachments extends LocalizeMixin(NotificationsMixin(UtilsMixin(Redu
         .dispatch(pdReportsAttachmentsSync(thunk, this.reportId))
         // @ts-ignore
         .then(() => {
-          this._notifyFileUploaded();
-
+          fireEvent(this, 'toast', {
+            text: this.localize('file_uploaded'),
+            showCloseBtn: true
+          });
           this.set('faceLoading', false);
           this.set('otherOneLoading', false);
           this.set('otherTwoLoading', false);

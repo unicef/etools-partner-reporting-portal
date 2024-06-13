@@ -9,7 +9,6 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
 import '@polymer/paper-tooltip/paper-tooltip.js';
 import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
@@ -31,20 +30,18 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
 import {RootState} from '../../typings/redux.types';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 /**
  * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin NotificationsMixin
  * @appliesMixin ProgressReportUtilsMixin
  * @appliesMixin RoutingMixin
  * @appliesMixin LocalizeMixin
  */
-class PdOutput extends LocalizeMixin(
-  RoutingMixin(ProgressReportUtilsMixin(NotificationsMixin(UtilsMixin(ReduxConnectedElement))))
-) {
+class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(ReduxConnectedElement)))) {
   public static get template() {
     return html`
       <style include="iron-flex iron-flex-factors">
@@ -451,7 +448,10 @@ class PdOutput extends LocalizeMixin(
       .dispatch(pdReportsUpdateReportable(updateThunk, this.pdId, this.reportId, this.data.id))
       // @ts-ignore
       .then(() => {
-        this._notifyChangesSaved();
+        fireEvent(this, 'toast', {
+          text: this.localize('changes_saved'),
+          showCloseBtn: true
+        });
       })
       .catch((_err: GenericObject) => {
         //   // TODO: error handling

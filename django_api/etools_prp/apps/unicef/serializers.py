@@ -1,15 +1,21 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.db import transaction
+from django.utils.functional import cached_property
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.account.validators import EmailValidator
 from etools_prp.apps.core.common import (
     CURRENCIES,
-    INTERVENTION_TYPES,
     OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
     PD_STATUS,
     PROGRESS_REPORT_STATUS,
+    PRP_IP_ROLE_TYPES,
 )
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
@@ -20,7 +26,10 @@ from etools_prp.apps.indicator.serializers import (
 )
 from etools_prp.apps.partner.models import Partner
 
+from ..core.models import Realm
+from ..utils.serializers import OptionalElementsListSerializer
 from .models import (
+    FinalReview,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -176,6 +185,7 @@ class SectionSerializer(serializers.ModelSerializer):
 class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 
     document_type = serializers.CharField(source='get_document_type_display')
+    document_type_display = serializers.CharField(source='get_document_type_display')
     # status is choice field on different branch with migration #23 - should be uncomment when it will be merged
     # status = serializers.CharField(source='get_status_display')
     frequency = serializers.CharField(source='get_frequency_display')
@@ -185,12 +195,19 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
     unicef_focal_point = serializers.SerializerMethodField()
     partner_focal_point = serializers.SerializerMethodField()
 
+    total_unicef_supplies = serializers.CharField(source='in_kind_amount')
+    total_unicef_supplies_currency = serializers.CharField(source='in_kind_amount_currency')
+    locations = serializers.SerializerMethodField(allow_null=True)
+    reporting_periods = ReportingPeriodDatesSerializer(many=True)
+    amendments = serializers.JSONField(read_only=True)
+
     class Meta:
         model = ProgrammeDocument
         fields = (
             'id',
             'agreement',
             'document_type',
+            'document_type_display',
             'reference_number',
             'title',
             'unicef_office',
@@ -202,10 +219,21 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             # 'status',
             'frequency',
             'sections',
+            'budget_currency',
             'cso_contribution',
+            'cso_contribution_currency',
             'total_unicef_cash',
+            'total_unicef_cash_currency',
             'in_kind_amount',
             'budget',
+            'locations',
+            'amendments',
+            'reporting_periods',
+            'funds_received_to_date',
+            'funds_received_to_date_percentage',
+            'total_unicef_supplies',
+            'total_unicef_supplies_currency',
+
         )
 
     def get_unicef_officers(self, obj):
@@ -216,6 +244,14 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 
     def get_partner_focal_point(self, obj):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
+
+    def get_locations(self, obj):
+        return ShortLocationSerializer(
+            Location.objects.filter(
+                indicator_location_data__indicator_report__progress_report__programme_document=obj
+            ).distinct(),
+            many=True
+        ).data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):
@@ -263,6 +299,12 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
             'status',
             'external_id',
         )
+
+
+class FinalReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinalReview
+        exclude = ('id', 'progress_report')
 
 
 class ProgressReportSimpleSerializer(serializers.ModelSerializer):
@@ -348,6 +390,14 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
         super().__init__(*args, **kwargs)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.is_final:
+            if not hasattr(instance, 'final_review') or not instance.final_review:
+                FinalReview.objects.create(progress_report=instance)
+            data['final_review'] = FinalReviewSerializer(instance.final_review).data
+        return data
+
     class Meta:
         model = ProgressReport
         fields = (
@@ -418,7 +468,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         queryset = obj.indicator_reports.all()
         if self.llo_id and self.llo_id is not None:
             queryset = queryset.filter(reportable__object_id=self.llo_id)
-        if self.location_id and self.llo_id is not None:
+        if self.location_id and self.location_id is not None:
             queryset = queryset.filter(reportable__locations__id=self.location_id)
 
         if self.show_incomplete_only in [1, "1", "true", "True", True]:
@@ -477,6 +527,26 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
             'id',
             'narrative',
         )
+
+
+class ProgressReportFinalUpdateSerializer(ProgressReportUpdateSerializer):
+    final_review = FinalReviewSerializer(required=False)
+
+    class Meta(ProgressReportUpdateSerializer.Meta):
+        fields = ProgressReportUpdateSerializer.Meta.fields + (
+            "final_review",
+        )
+
+    def update(self, instance, validated_data):
+        final_review = validated_data.pop('final_review', None)
+
+        instance = super().update(instance, validated_data)
+        if final_review:
+            for key, value in final_review.items():
+                setattr(instance.final_review, key, value)
+            instance.final_review.save()
+
+        return instance
 
 
 class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
@@ -713,7 +783,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
     amendments = serializers.JSONField(allow_null=True)
-    document_type = serializers.ChoiceField(choices=INTERVENTION_TYPES, required=False)
+    document_type = serializers.ChoiceField(choices=PD_DOCUMENT_TYPE, required=False)
 
     def validate(self, attrs):
         validated_data = super().validate(attrs)
@@ -920,3 +990,105 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
             'file_name',
             'type',
         )
+
+
+class ImportRealmSerializer(serializers.Serializer):
+    country = serializers.SlugRelatedField(queryset=Workspace.objects.all(), slug_field='external_id')
+    organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
+    group = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name')
+
+    @cached_property
+    def allowed_groups(self):
+        return [t[0] for t in PRP_IP_ROLE_TYPES]
+
+    def map_group(self, value):
+        return {
+            "IP Authorized Officer": PRP_IP_ROLE_TYPES.ip_authorized_officer,
+            "IP Editor": PRP_IP_ROLE_TYPES.ip_editor,
+            "IP Viewer": PRP_IP_ROLE_TYPES.ip_viewer,
+            "IP Admin": PRP_IP_ROLE_TYPES.ip_admin,
+        }.get(value, value)
+
+    def run_validation(self, data=None):
+        if 'group' in data:
+            data['group'] = self.map_group(data['group'])
+
+        return super(ImportRealmSerializer, self).run_validation(data)
+
+
+class ImportUserRealmsSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'email',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'realms',
+        )
+
+    def validate_email(self, value):
+        if value.endswith('@unicef.org'):
+            raise ValidationError('UNICEF users cannot be added through Access Management Portal.')
+        return value
+
+    def save_realms(self, user, realms):
+        realms_set = {
+            (realm['country'].id, realm['organization'].id, realm['group'].id)
+            for realm in realms
+        }
+        user_realms = user.realms.all()
+        user_realms_dict = {
+            (realm.workspace_id, realm.partner_id, realm.group_id): realm
+            for realm in user_realms
+        }
+        realms_to_create = []
+        realms_to_activate = []
+        realms_to_deactivate = []
+
+        for workspace_id, organization_id, group_id in realms_set:
+            realm_key = (workspace_id, organization_id, group_id)
+            if realm_key in user_realms_dict:
+                user_realm = user_realms_dict[realm_key]
+                if not user_realm.is_active:
+                    realms_to_activate.append(user_realm)
+            else:
+                realms_to_create.append(Realm(
+                    user=user,
+                    workspace_id=workspace_id,
+                    partner_id=organization_id,
+                    group_id=group_id,
+                ))
+
+        for realm_key, realm in user_realms_dict.items():
+            if realm_key not in realms_set:
+                realms_to_deactivate.append(realm)
+
+        Realm.objects.bulk_create(realms_to_create)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
+        user.update_active_state()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data['username'] = validated_data['email']
+
+        realms = validated_data.pop('realms')
+
+        first_realm = realms[0]
+        validated_data['workspace_id'] = first_realm['country'].id
+        validated_data['partner_id'] = first_realm['organization'].id
+
+        instance = super().create(validated_data)
+        self.save_realms(instance, realms)
+        return instance
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        realms = validated_data.pop('realms')
+        instance = super().update(instance, validated_data)
+        self.save_realms(instance, realms)
+        return instance

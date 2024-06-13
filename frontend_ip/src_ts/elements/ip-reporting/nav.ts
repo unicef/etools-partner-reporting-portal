@@ -13,6 +13,7 @@ import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import PageNavMixin from '../../etools-prp-common/mixins/page-nav-mixin';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import {pageNavStyles} from '../../styles/page-nav-styles';
+import {getCorrespondingEtoolsEnvironment} from '../../etools-prp-common/config';
 
 /**
  * @polymer
@@ -72,17 +73,12 @@ class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin
             </a>
           </paper-item>
 
-          <template is="dom-if" if="[[permissions.accessIpIdManagement]]" restamp="true">
-            <hr />
-
-            <paper-item name="id-management" on-tap="goToIdManagement">
-              <a href="/id-management/ip-reporting/">
-                <span
-                  ><iron-icon icon="social:people" role="presentation"></iron-icon>[[localize('id_management')]]</span
-                >
-              </a>
-            </paper-item>
-          </template>
+          <hr />
+          <paper-item name="id-management" class="nav-menu-item">
+            <a href="[[getAMPUrl()]]" target="_blank">
+              <span><iron-icon icon="social:people" role="presentation"></iron-icon>[[localize('amp')]]</span>
+            </a>
+          </paper-item>
         </iron-selector>
 
         <div class="nav-menu-item section-title">
@@ -98,11 +94,6 @@ class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin
         </div>
       </div>
     `;
-  }
-
-  goToIdManagement(e: CustomEvent) {
-    e.preventDefault();
-    window.location.href = '/id-management/ip-reporting/';
   }
 
   @property({type: String})
@@ -121,13 +112,17 @@ class IpReportingNav extends MatomoMixin(LocalizeMixin(RoutingMixin(PageNavMixin
   indicatorsReportsUrl!: string;
 
   @property({type: Object})
-  pdQuery = {status: String(['Sig', 'Act', 'Sus'])};
+  pdQuery = {status: String(['signed', 'active', 'suspended'])};
 
   @property({type: Object})
   reportsQuery = {status: String(['Due', 'Ove', 'Sen'])};
 
   @property({type: Object})
-  indicatorsQuery = {pd_statuses: String(['Act'])};
+  indicatorsQuery = {pd_statuses: String(['active'])};
+
+  getAMPUrl() {
+    return `${getCorrespondingEtoolsEnvironment()}/amp/`;
+  }
 }
 
 window.customElements.define('ip-reporting-nav', IpReportingNav);

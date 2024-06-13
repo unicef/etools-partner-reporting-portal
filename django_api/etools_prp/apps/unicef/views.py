@@ -72,12 +72,14 @@ from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, 
 from .import_report import ProgressReportXLSXReader
 from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
+    ImportUserRealmsSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
     ProgrammeDocumentProgressSerializer,
     ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
+    ProgressReportFinalUpdateSerializer,
     ProgressReportPullHFDataSerializer,
     ProgressReportReviewSerializer,
     ProgressReportSerializer,
@@ -434,7 +436,10 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         if pr.report_type == "SR":
             serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data)
         else:
-            serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+            if pr.is_final:
+                serializer = ProgressReportFinalUpdateSerializer(instance=pr, data=request.data)
+            else:
+                serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -653,7 +658,7 @@ class ProgressReportSubmitAPIView(APIView):
 
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
+                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
                 email__in=progress_report.programme_document
                 .unicef_officers.filter(active=True).values_list('email', flat=True)
             ).first()
@@ -755,7 +760,7 @@ class ProgressReportSRSubmitAPIView(APIView):
 
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
+                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
                 email__in=progress_report.programme_document.unicef_officers
                 .filter(active=True).values_list('email', flat=True)
             ).first()
@@ -906,8 +911,10 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                         else:
                             calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
-
-                    calculated[loc_id]['total']['c'] = convert_string_number_to_float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
+                    if calculated[loc_id]['data']['d'] == 0:
+                        calculated[loc_id]['data']['c'] = 0
+                    else:
+                        calculated[loc_id]['total']['c'] = convert_string_number_to_float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
 
                     if calculated[loc_id]['total']['c'] is None:
                         calculated[loc_id]['total']['c'] = 0
@@ -931,9 +938,11 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                             else:
                                 calculated[loc_id]['data'][key]['d'] += ild.disaggregation[key]['d']
-
-                        calculated[loc_id]['data'][key]['c'] = convert_string_number_to_float(calculated[loc_id]['data'][key]['v']) \
-                            / calculated[loc_id]['data'][key]['d']
+                        if calculated[loc_id]['data'][key]['d'] == 0:
+                            calculated[loc_id]['data'][key]['c'] = 0
+                        else:
+                            calculated[loc_id]['data'][key]['c'] = convert_string_number_to_float(
+                                calculated[loc_id]['data'][key]['v']) / calculated[loc_id]['data'][key]['d']
 
                         if calculated[loc_id]['data'][key]['c'] is None:
                             calculated[loc_id]['data'][key]['c'] = 0
@@ -1389,3 +1398,14 @@ class ProgressReportExcelImportView(APIView):
 
         else:
             return Response({}, status=statuses.HTTP_200_OK)
+
+
+class UserRealmsImportView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = get_user_model().objects.filter(email=request.data.get('email', None)).first()
+        serializer = ImportUserRealmsSerializer(data=request.data, instance=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({}, status=statuses.HTTP_200_OK)

@@ -6,6 +6,8 @@ import tempfile
 from unittest.mock import patch
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import Q
@@ -18,15 +20,24 @@ from unicef_notification.models import Notification
 from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
     PRP_ROLE_TYPES,
+    REPORTING_TYPES,
 )
 from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
-from etools_prp.apps.core.tests.factories import faker
+from etools_prp.apps.core.tests.factories import (
+    faker,
+    GroupFactory,
+    PartnerFactory,
+    PartnerUserFactory,
+    RealmFactory,
+    WorkspaceFactory,
+)
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
@@ -86,10 +97,12 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -289,7 +302,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             document['title'])
 
         response = self.client.get(
-            url + "?ref_title=&status=%s&location=" % document['status'][:3],
+            url + "?ref_title=&status=%s&location=" % document['status'].lower(),
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
@@ -378,10 +391,12 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -562,7 +577,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             response.data['reference_number'])
 
 
-class TestProgressReportAPIView(BaseAPITestCase):
+class BaseProgressReportAPITestCase(BaseAPITestCase):
 
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
@@ -591,10 +606,12 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -778,6 +795,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
         return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
 
+
+class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
+
     def test_list_api(self):
         url = reverse(
             'progress-reports',
@@ -843,7 +863,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             .filter(due_date=today) \
             .values_list('progress_report_id') \
             .distinct()
-        pr_queryset = self.queryset.filter(id__in=ir_ids)
+        pr_queryset = self.queryset.filter(indicator_reports__id__in=ir_ids)
 
         url = reverse(
             'progress-reports',
@@ -854,30 +874,25 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(pr_queryset))
 
-    def test_detail_api_filter_incomplete(self):
-        progress_report = self.pd.progress_reports.first()
-        ir_qs = IndicatorReport.objects.filter(
-            progress_report=progress_report,
-        )
-        url = reverse(
-            'progress-reports-details',
-            args=[self.workspace.pk, progress_report.pk],
-        )
-        response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            ir_qs.count(),
-        )
+    def test_list_api_filter_by_year(self):
+        current_year = datetime.datetime.today().year
 
-        ir_qs = ir_qs.filter(submission_date__isnull=True)
-        url += '?incomplete=true'
-        response = self.client.get(url, format='json')
+        pr_queryset = ProgressReport.objects.filter(end_date__year=current_year)
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        current_year_url = f'{url}?year={current_year}'
+        response = self.client.get(current_year_url, format='json')
+
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
-            len(response.data['indicator_reports']),
-            ir_qs.count(),
-        )
+        self.assertEquals(len(response.data['results']), len(pr_queryset))
+
+        # test for 0 results on future year
+        future_year = (datetime.datetime.today() + datetime.timedelta(days=1365)).year
+        future_year_url = f'{url}?year={future_year}'
+        response = self.client.get(future_year_url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), 0)
 
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
@@ -1057,6 +1072,181 @@ class TestProgressReportAPIView(BaseAPITestCase):
         )
         self.assertTrue(len(self.reports))
 
+
+class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
+
+    def test_detail_api_not_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('final_review' not in response.data)
+
+    def test_detail_api_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+        progress_report.is_final = True
+        progress_report.save(update_fields=['is_final'])
+        self.assertTrue(hasattr(progress_report, 'final_review'))
+
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertTrue('final_review' in response.data)
+        self.assertEqual(response.data['final_review']['respond_requests_in_time_choice'], None)
+        self.assertEqual(response.data['final_review']['respond_requests_in_time_comment'], None)
+        self.assertEquals(response.data['final_review']['respond_requests_in_time_comment'],
+                          getattr(progress_report.final_review, 'respond_requests_in_time_comment'))
+
+    def test_detail_update_not_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+
+        url = reverse(
+            'progress-reports-details-update',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        data = {
+            "partner_contribution_to_date": "Partner contribution text",
+            "financial_contribution_currency": "USD",
+            "challenges_in_the_reporting_period": "Challenges in the reporting period text",
+            "proposed_way_forward": "Proposed way forward text"
+        }
+        response = self.client.put(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        for field in data.keys():
+            self.assertEquals(response.data[field], data[field])
+
+    def test_detail_update_final(self):
+        progress_report = self.pd.progress_reports.filter(is_final=False).first()
+        progress_report.is_final = True
+        progress_report.save(update_fields=['is_final'])
+
+        url = reverse(
+            'progress-reports-details-update',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        data = {
+            "financial_contribution_currency": "USD",
+            "proposed_way_forward": "Proposed way forward text",
+            "final_review": {
+                "release_cash_in_time_choice": True,
+                "release_cash_in_time_comment": "Unicef did release cash in time",
+
+                "release_supplies_in_time_choice": True,
+                "release_supplies_in_time_comment": "Unicef did release supplies in time",
+
+                "feedback_face_form_in_time_choice": False,
+                "feedback_face_form_in_time_comment": "Unicef did not feedback in time",
+
+                "respond_requests_in_time_choice": True,
+                "respond_requests_in_time_comment": "Unicef did respond in time",
+
+                "implemented_as_planned_choice": False,
+                "implemented_as_planned_comment": "Unicef did not implement",
+
+                "action_to_address_choice": True,
+                "action_to_address_comment": "Unicef action to address",
+
+                "overall_satisfaction_choice": "very_satisfied",
+                "overall_satisfaction_comment": "Very satisfied with Unicef",
+            }
+        }
+        response = self.client.put(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['proposed_way_forward'], data['proposed_way_forward'])
+        progress_report.final_review.refresh_from_db()
+        for field in data['final_review'].keys():
+            self.assertEquals(response.data['final_review'][field], data['final_review'][field])
+            self.assertEquals(response.data['final_review'][field], getattr(progress_report.final_review, field))
+
+    def test_detail_api_filter_incomplete(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+        ir_qs = ir_qs.filter(submission_date__isnull=True)
+        url += '?incomplete=true'
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+    def test_detail_api_filter_location(self):
+        progress_report = self.pd.progress_reports.first()
+        ir_qs = IndicatorReport.objects.filter(
+            progress_report=progress_report,
+        )
+        url = reverse(
+            'progress-reports-details',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+        new_loc = factories.LocationFactory()
+        llo_reportable_2 = factories.QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+        factories.LocationWithReportableLocationGoalFactory(
+            location=new_loc,
+            reportable=llo_reportable_2,
+        )
+        factories.ProgressReportIndicatorReportFactory(
+            progress_report=progress_report,
+            reportable=llo_reportable_2,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+            overall_status=OVERALL_STATUS.met,
+        )
+
+        # test an indicator report exists for given location
+        ir_qs = ir_qs.filter(reportable__locations__id=new_loc.pk)
+        self.assertEquals(ir_qs.count(), 1)
+        url_loc_filter = url + f'?location={new_loc.pk}'
+        response = self.client.get(url_loc_filter, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            ir_qs.count(),
+        )
+
+        # test no indicator reports exist for an unused location
+        unused_loc = factories.LocationFactory()
+        ir_qs = ir_qs.filter(reportable__locations__id=unused_loc.pk)
+        self.assertEquals(ir_qs.count(), 0)
+        url_loc_filter = url + f'?location={unused_loc.pk}'
+        response = self.client.get(url_loc_filter, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            len(response.data['indicator_reports']),
+            0,
+        )
+
     def test_detail_api_export_pdf(self):
         progress_report = self.pd.progress_reports.first()
         IndicatorReport.objects.filter(
@@ -1082,6 +1272,99 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
+class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
+
+    def test_submit_hr_report(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.HR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.submission_date = None
+        progress_report.save(update_fields=['submission_date'])
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
+
+    def test_submit_qpr_report(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.submission_date = None
+        progress_report.save(update_fields=['submission_date'])
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
+
+
+class TestProgressReportSRSubmitAPIView(BaseProgressReportAPITestCase):
+
+    def test_submit_sr_report(self):
+        progress_report = factories.ProgressReportFactory(
+            report_number=random.randint(1, 50),
+            report_type=REPORTING_TYPES.SR,
+            is_final=False,
+            programme_document=self.pd,
+            submission_date=None,
+            submitted_by=None,
+            submitting_user=None,
+        )
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
+
+
 class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
 
     def setUp(self):
@@ -1095,8 +1378,11 @@ class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -1259,8 +1545,11 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         self.sample_disaggregation_value_map = {
             "height": ["tall", "medium", "short", "extrashort"],
             "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -1422,13 +1711,11 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
     def setUp(self):
         self.workspace = factories.WorkspaceFactory()
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.user = factories.PartnerUserFactory(partner=self.partner)
-        self.prp_role = factories.IPPRPRoleFactory(
-            user=self.user,
+        self.user = factories.PartnerUserFactory(
             workspace=self.workspace,
-            role=PRP_ROLE_TYPES.ip_authorized_officer,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
         )
-
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
@@ -1547,3 +1834,144 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
             f"{url}?report_status={report_status}&export=pdf"
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class TestEToolsRolesSynchronization(BaseAPITestCase):
+    def test_sync(self):
+        user = PartnerUserFactory(realms__data=['IP_VIEWER'])
+        self.assertIsNotNone(user.workspace.external_id)
+        self.assertIsNotNone(user.partner.vendor_number)
+        group_to_activate = GroupFactory(name='IP_AUTHORIZED_OFFICER')
+        RealmFactory(
+            user=user,
+            workspace=user.workspace,
+            partner=user.partner,
+            group=group_to_activate,
+            is_active=False,
+        )
+        new_group = GroupFactory(name='IP_EDITOR')
+        input_data = {
+            'email': user.email,
+            'first_name': 'John',
+            'middle_name': '_',
+            'last_name': 'Doe',
+            'realms': [
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': 'Partnership Manager',
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': "unknown country code",
+                    'organization': user.partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': "unknown organization vendor number",
+                    'group': "IP Editor",
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': "IP_AUTHORIZED_OFFICER",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        user.refresh_from_db()
+        self.assertEqual(user.first_name, 'John')
+        self.assertEqual(user.middle_name, '_')
+        self.assertEqual(user.last_name, 'Doe')
+        self.assertCountEqual(
+            list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
+            [
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, False),
+                (user.workspace.id, user.partner.id, new_group.name, True),
+                (user.workspace.id, user.partner.id, group_to_activate.name, True),
+            ]
+        )
+
+    def test_create_user(self):
+        user = PartnerUserFactory.build(realms__data=[])
+        workspace = WorkspaceFactory()
+        partner = PartnerFactory()
+        self.assertFalse(get_user_model().objects.filter(email=user.email).exists())
+        GroupFactory(name='IP_VIEWER')
+        input_data = {
+            'email': user.email,
+            'first_name': user.first_name,
+            'middle_name': user.middle_name,
+            'last_name': user.last_name,
+            'realms': [
+                {
+                    'country': "unknown country code",
+                    'organization': "unknown organization vendor number",
+                    'group': "IP Editor",
+                },
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP Viewer",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertTrue(get_user_model().objects.filter(email=user.email).exists())
+        user = get_user_model().objects.get(email=user.email)
+        self.assertCountEqual(
+            list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
+            [
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, True),
+            ]
+        )
+
+    def test_auth_required(self):
+        self.client.force_authenticate()
+        response = self.client.post(reverse('user-realms-import'), data={})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_empty_realms(self):
+        """
+        Invalid realms payload is reduced to empty list, therefore no user realms will be active
+        and user is deactivated as well
+        """
+        user = PartnerUserFactory(realms__data=['IP_VIEWER'])
+        input_data = {
+            'email': user.email,
+            'first_name': user.first_name,
+            'middle_name': user.middle_name,
+            'last_name': user.last_name,
+            'realms': [
+                {
+                    'country': user.workspace.external_id,
+                    'organization': user.partner.vendor_number,
+                    'group': 'Partnership Manager',
+                },
+                {
+                    'country': "unknown country code",
+                    'organization': user.partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': user.workspace.external_id,
+                    'organization': "unknown organization vendor number",
+                    'group': "IP Editor",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
+        self.assertFalse(user.realms.filter(is_active=True).exists())

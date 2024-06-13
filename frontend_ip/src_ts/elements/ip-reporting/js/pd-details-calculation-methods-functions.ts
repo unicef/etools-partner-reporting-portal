@@ -36,7 +36,9 @@ export function computeFormattedData(data: GenericObject) {
 }
 
 export function computeSelected(data: GenericObject, scope: string) {
-  return (data.display_type === 'ratio' && scope === 'calculation_formula_across_periods') ? 'latest' : data[scope];
+  return ['ratio', 'percentage'].includes(data.display_type) && scope === 'calculation_formula_across_periods'
+    ? 'latest'
+    : data[scope];
 }
 
 export function computeDisabled(display_type: string) {

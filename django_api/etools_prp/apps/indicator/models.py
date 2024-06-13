@@ -108,6 +108,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
     SUM = 'sum'
     MAX = 'max'
     AVG = 'avg'
+    LATEST = 'latest'
     RATIO = 'ratio'
 
     QUANTITY_CALC_CHOICE_LIST = (
@@ -134,6 +135,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
         (SUM, SUM),
         (MAX, MAX),
         (AVG, AVG),
+        (LATEST, LATEST),
     )
 
     QUANTITY_DISPLAY_TYPE_CHOICES = (
@@ -910,7 +912,7 @@ def send_notification_on_status_change(sender, instance, **kwargs):
             indicator_type = ''
 
         if cluster:
-            cluster_imos = [role.user for role in cluster.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
+            cluster_imos = [role.user for role in cluster.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo)]
             workspace_code = cluster.response_plan.workspace.workspace_code
 
             url_part = f'/app/{workspace_code}/cluster-reporting/plan/{cluster.response_plan_id}/results/draft'
@@ -999,6 +1001,8 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                     accepted_indicator_reports,
                     key=lambda item: item.total['v'])
                 reportable_total = max_total_ir.total
+            elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.LATEST:
+                reportable_total = accepted_indicator_reports.order_by('-time_period_start').first().total
             else:   # if its SUM or avg then add data up
                 for indicator_report in accepted_indicator_reports:
                     reportable_total['v'] += indicator_report.total['v']

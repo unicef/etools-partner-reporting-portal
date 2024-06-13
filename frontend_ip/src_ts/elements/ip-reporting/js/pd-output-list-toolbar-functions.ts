@@ -34,7 +34,7 @@ export function computeCanRefresh(report: GenericObject, programmeDocument: Gene
 }
 
 export function computeShowRefresh(roles: any[]) {
-  return roles.every(function (role) {
-    return role.role !== 'IP_ADMIN' && role.role !== 'IP_VIEWER';
+  return roles.some(function (role) {
+    return role.role === 'IP_AUTHORIZED_OFFICER' || role.role === 'IP_EDITOR';
   });
 }

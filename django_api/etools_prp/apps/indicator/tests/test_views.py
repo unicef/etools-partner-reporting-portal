@@ -53,8 +53,11 @@ class TestPDReportsAPIView(BaseAPITestCase):
         self.workspace = factories.WorkspaceFactory()
         self.carto_table = factories.CartoDBTableFactory()
         self.partner = factories.PartnerFactory()
-        self.user = factories.PartnerUserFactory(partner=self.partner)
-        self.prp_role = factories.IPPRPRoleFactory(user=self.user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
+        self.user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         self.loc1 = factories.LocationFactory()
         self.loc2 = factories.LocationFactory()
         self.loc1.workspaces.add(self.workspace)
@@ -585,10 +588,12 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -800,10 +805,12 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -966,6 +973,38 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertNotEquals(response.data[0]['indicator_location_data'][
                              0]['disaggregation'], {})
 
+    def test_list_api_with_pks_query_param(self):
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-direct-list-api') + f'?pks={indicator_report.id}'
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 1)
+        self.assertEquals(response.data[0]['title'], indicator_report.title)
+
+    def test_list_api_with_pks_default_unicef_user(self):
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-direct-list-api') + f'?pks={indicator_report.id}'
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 1)
+        self.assertEquals(response.data[0]['title'], indicator_report.title)
+
+    def test_list_api_with_pks_forbidden(self):
+        default_unicef_user = factories.NonPartnerUserFactory(username='some_random_username')
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-direct-list-api') + f'?pks={indicator_report.id}'
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_list_api_with_limit(self):
         indicator_report = IndicatorReport.objects.last()
 
@@ -1012,11 +1051,13 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             ]
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.user = factories.NonPartnerUserFactory(workspace=self.workspace)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -1391,11 +1432,12 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             ]
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
-        self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -1944,10 +1986,12 @@ class TestReportRefreshAPIView(BaseAPITestCase):
         )
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.cluster_member]
+        )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],
@@ -2238,10 +2282,12 @@ class TestClusterObjectiveIndicatorAdoptAPIViewAPIView(BaseAPITestCase):
         self.partner = factories.PartnerFactory(country_code=faker.country_code())
         self.partner2 = factories.PartnerFactory(country_code=faker.country_code())
         self.user = factories.NonPartnerUserFactory()
-        self.partner_user = factories.PartnerUserFactory(partner=self.partner)
-        factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, role=PRP_ROLE_TYPES.ip_authorized_officer)
-        factories.IPPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=None, role=PRP_ROLE_TYPES.cluster_member)
+        self.partner_user = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
+        factories.ClusterPRPRoleFactory(user=self.partner_user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.project = factories.PartnerProjectFactory(
             partner=self.partner,
             clusters=[self.cluster],

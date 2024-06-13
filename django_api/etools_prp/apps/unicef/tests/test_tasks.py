@@ -95,7 +95,7 @@ class TestProcessModel(BaseAPITestCase):
         partner = factories.PartnerFactory()
         data = {
             "id": 101,
-            'status': 'Act',
+            'status': 'active',
             'agreement': 'BGD/PCA20182',
             'title': 'Executive Director',
             'offices': "Cox's Bazar",
@@ -118,6 +118,12 @@ class TestProcessModel(BaseAPITestCase):
                     'other_description': None,
                     'signed_date': '24-Jul-2019',
                     'amendment_number': '1',
+                },
+                {
+                    'types': ['budget_gt_20'],
+                    'other_description': None,
+                    'signed_date': None,
+                    'amendment_number': '2',
                 }
             ]
         }

@@ -22,6 +22,7 @@ from .views import (
     ProgressReportReviewAPIView,
     ProgressReportSRSubmitAPIView,
     ProgressReportSubmitAPIView,
+    UserRealmsImportView,
 )
 
 urlpatterns = [
@@ -89,4 +90,5 @@ urlpatterns = [
     re_path(r'^(?P<workspace_id>\d+)/progress-reports/(?P<progress_report_id>\d+)/attachments/(?P<pk>\d+)/$',
             ProgressReportAttachmentAPIView.as_view(),
             name="progress-reports-attachment"),
+    re_path(r'^users/realms/import/$', UserRealmsImportView.as_view(), name="user-realms-import")
 ]

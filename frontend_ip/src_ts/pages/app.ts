@@ -11,12 +11,13 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import Endpoints from '../endpoints';
-import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
+import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
 import {fetchCurrencies} from '../redux/actions/currencies';
 import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
 import '../pages/app/ip-reporting';
 import {locationSet} from '../redux/actions/location';
 import {getDomainByEnv} from '../etools-prp-common/config';
+import '@unicef-polymer/etools-toasts';
 // import {reset} from '../redux/actions';  (dci) TODO check use of reset
 
 /**
@@ -51,8 +52,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       <etools-prp-workspaces id="workspaces" all="{{workspaces}}" current="{{currentWorkspace}}">
       </etools-prp-workspaces>
 
-      <etools-prp-ajax id="interventions" url="[[interventionsUrl]]"> </etools-prp-ajax>
-
       <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
 
       <etools-prp-ajax id="currenciesData" url="[[currenciesUrl]]"> </etools-prp-ajax>
@@ -73,19 +72,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
         </template>
       </iron-pages>
 
-      <paper-toast id="changes-saved" text="[[localize('changes_saved')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="server-error" text="[[localize('an_error_occurred')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="file-uploaded" text="[[localize('file_uploaded')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="file-deleted" text="[[localize('file_deleted')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="ocha-timeout" text="[[localize('request_ocha_timed_out')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="message-sent" text="[[localize('message_sent')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="error-message" duration="5000"> </paper-toast>
+      <etools-toasts></etools-toasts>
     `;
   }
 
@@ -97,9 +84,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   @property({type: String, observer: '_pageChanged'})
   page!: string;
-
-  @property({type: String})
-  interventionsUrl: string = Endpoints.interventions();
 
   @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
   _workspaceCode!: string;
@@ -116,6 +100,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: String})
   currenciesUrl: string = Endpoints.currencies();
 
+  @property({type: String, computed: 'getReduxStateValue(rootState.userProfile.profile.partner)'})
+  userPartner!: string;
+
   @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
   prpRoles!: any[];
 
@@ -125,7 +112,7 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
   workspaces!: any[];
 
-  @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)'})
+  @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access, userPartner)'})
   userHasPrpRolesOrAccess!: boolean;
 
   @property({type: String})
@@ -140,11 +127,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     ];
   }
 
-  _redirectToWorkspace(workspace: GenericObject) {
-    const code = workspace.code;
-
-    this.set('route.path', '/' + code + '/');
-    // this.set('routeData.workspace_code', code);
+  _redirectToWorkspace(workspace_code: string) {
+    this.set('route.path', `/${workspace_code}/`);
   }
 
   _redirectToApp(app: string) {
@@ -167,9 +151,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   _routeWorkspaceChanged(workspaceCodeFromUrl: any) {
     if (!workspaceCodeFromUrl) {
       // this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
-      if (this.workspaces && this.workspaces.length) {
+      if ((this.workspaces && this.workspaces.length) || this._workspaceCode) {
         // Default to first
-        this._redirectToWorkspace(this.workspaces[0]);
+        this._redirectToWorkspace(this._workspaceCode ? this._workspaceCode : this.workspaces[0].code);
       } else {
         // Wait until workspaces are available, then pick one & redirect
         // this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
@@ -223,8 +207,8 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return val;
   }
 
-  _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[]) {
-    return !!prpRoles.length || !!access.length;
+  _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[], userPartner: GenericObject) {
+    return userPartner ? !!prpRoles.length || !!access.length : true;
   }
 
   _pageChanged(page: string) {
@@ -262,18 +246,6 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     }
   }
 
-  _notify(e: CustomEvent) {
-    e.stopPropagation();
-    const options = e.detail;
-    try {
-      if (options.text) {
-        (this.$[options.type] as any).text = options.text;
-      }
-      (this.$[options.type] as any).open();
-      // eslint-disable-next-line no-empty
-    } catch (err) {}
-  }
-
   _fetchProfile() {
     const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
     return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
@@ -287,14 +259,11 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   }
 
   _addEventListeners() {
-    this._notify = this._notify.bind(this);
-    this.addEventListener('notify', this._notify as any);
     this._fetchProfile = this._fetchProfile.bind(this);
     this.addEventListener('fetch-profile', this._fetchProfile);
   }
 
   _removeEventListeners() {
-    this.removeEventListener('notify', this._notify as any);
     this.removeEventListener('fetch-profile', this._fetchProfile);
   }
 
@@ -302,12 +271,9 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     super.connectedCallback();
 
     this._addEventListeners();
-    const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
-    await Promise.all([this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)), this._fetchProfile()]).catch(
-      (_err: GenericObject) => {
-        window.location.href = '/landing';
-      }
-    );
+    await Promise.all([this._fetchProfile()]).catch((_err: GenericObject) => {
+      window.location.href = '/landing';
+    });
   }
 
   disconnectedCallback() {
