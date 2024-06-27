@@ -50,6 +50,6 @@ const rootReducer = combineReducers({
   currencies: CurrenciesData
 });
 
-export const store = createStore(rootReducer, devCompose(applyMiddleware(thunk)));
+export const store = createStore(rootReducer, devCompose(applyMiddleware(thunk))) as any;
 
 export type ReduxDispatch = typeof store.dispatch;

@@ -1,31 +1,56 @@
-import {property} from '@polymer/decorators/lib/decorators';
-import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
+import {LitElement, html, css} from 'lit';
+import {property, customElement, state} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../redux/store';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
-/**
- * Why the f$%& is this component needed?
- * @polymer
- * @customElement
- */
-class EtoolsPrpWorkspaces extends ReduxConnectedElement {
-  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
+@customElement('etools-prp-workspaces')
+export class EtoolsPrpWorkspaces extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @state()
   _current!: string;
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
+  @state()
   _all!: any[];
 
-  @property({type: String, notify: true, computed: '_computeCurrent(_current)'})
+  @property({type: String, reflect: true})
   current!: string;
 
-  @property({type: Array, notify: true, computed: '_computeAll(_all)'})
+  @property({type: Array, reflect: true})
   all!: any[];
 
-  _computeCurrent(_current: string) {
-    return _current;
+  stateChanged(state: any) {
+    if ((this._current = state.workspaces.current)) {
+      this._current = state.workspaces.current;
+    }
+
+    if ((this._all = state.workspaces.all)) {
+      this._all = state.workspaces.all;
+    }
   }
 
-  _computeAll(_all: any[]) {
-    return _all.slice();
+  updated(changedProperties) {
+    if (changedProperties.has('_current')) {
+      this.current = this._current;
+      this._dispatchEvent('current', this.current);
+    }
+
+    if (changedProperties.has('_all')) {
+      this.all = this._all.slice();
+      this._dispatchEvent('all', this.all);
+    }
+  }
+
+  _dispatchEvent(propName: string, value: any) {
+    fireEvent(this, `${propName}-changed`, {value});
+  }
+
+  render() {
+    return html``;
   }
 }
-
-window.customElements.define('etools-prp-workspaces', EtoolsPrpWorkspaces);

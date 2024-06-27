@@ -1,26 +1,17 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/download-button';
-import {computePdUrl} from './js/pd-list-toolbar-functions';
+import {computePdUrl} from './js/pd-list-toolbar-functions.js';
 
-class PdListToolbar extends UtilsMixin(PolymerElement) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
-        <!-- TODO: Possibly use https://www.webcomponents.org/element/Collaborne/iron-file-icons for different files? -->
-        <download-button url="[[pdfExportUrl]]" tracker="Programme Documents Export Pdf">PDF</download-button>
-        <download-button url="[[xlsxExportUrl]]" tracker="Programme Documents Export Xlsx">XLS</download-button>
-      </etools-prp-toolbar>
-    `;
-  }
+@customElement('pd-list-toolbar')
+export class PdListToolbar extends UtilsMixin(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
 
   @property({type: String})
   query!: string;
@@ -28,20 +19,34 @@ class PdListToolbar extends UtilsMixin(PolymerElement) {
   @property({type: String})
   locationId!: string;
 
-  @property({type: String, computed: '_computePdUrl(locationId)'})
+  @property({type: String, attribute: false})
   pdUrl!: string;
 
-  @property({type: String, computed: "_appendQuery(pdUrl, query, 'export=xlsx')"})
-  xlsxExportUrl!: string;
+  @property({type: String, attribute: false})
+  pdfExportUrl?: string;
 
-  @property({type: String, computed: "_appendQuery(pdUrl, query, 'export=pdf')"})
-  pdfExportUrl!: string;
+  @property({type: String, attribute: false})
+  xlsxExportUrl?: string;
 
-  _computePdUrl(locationId: string) {
-    return computePdUrl(locationId);
+  updated(changedProperties: Map<string | number | symbol, unknown>) {
+    if (changedProperties.has('locationId')) {
+      this.pdUrl = computePdUrl(this.locationId);
+    }
+
+    if (changedProperties.has('pdUrl') || changedProperties.has('query')) {
+      this.pdfExportUrl = this._appendQuery(this.pdUrl, this.query, 'export=pdf');
+      this.xlsxExportUrl = this._appendQuery(this.pdUrl, this.query, 'export=xlsx');
+    }
+  }
+
+  render() {
+    return html`
+      <etools-prp-toolbar query="${this.query}" location-id="${this.locationId}">
+        <download-button url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+        <download-button url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
+      </etools-prp-toolbar>
+    `;
   }
 }
-
-window.customElements.define('pd-list-toolbar', PdListToolbar);
 
 export {PdListToolbar as PdListToolbarEl};

@@ -1,18 +1,18 @@
-import {PolymerElement} from '@polymer/polymer';
-import {Constructor, GenericObject} from '../etools-prp-common/typings/globals.types';
+import {Constructor} from '../etools-prp-common/typings/globals.types';
 import Settings from '../etools-prp-common/settings';
+import {LitElement} from 'lit';
 
 /**
  * @polymer
  * @mixinFunction
  */
-function ProgressReportUtilsMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
+function ProgressReportUtilsMixin<T extends Constructor<LitElement>>(baseClass: T) {
   class ProgressReportUtilsClass extends baseClass {
     public _isReadOnlyReport(report: any) {
       return Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
     }
 
-    _getMode(report: GenericObject, permissions: GenericObject) {
+    _getMode(report: any, permissions: any) {
       switch (true) {
         case this._isReadOnlyReport(report):
         case report.programme_document.status === 'Signed':

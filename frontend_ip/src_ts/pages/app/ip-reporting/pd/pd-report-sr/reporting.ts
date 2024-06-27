@@ -1,276 +1,291 @@
-import {ReduxConnectedElement} from '../../../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@polymer/paper-input/paper-input';
-import '@polymer/app-layout/app-grid/app-grid-style';
-import '../../../../../etools-prp-common/elements/labelled-item';
-import '../../../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax';
-import '../../../../../etools-prp-common/elements/etools-prp-permissions';
-import '../../../../../elements/ip-reporting/report-attachments';
-import '../pd-sent-back';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
+import '@polymer/paper-input/paper-input.js';
+import '@polymer/app-layout/app-grid/app-grid-style.js';
+import '../../../../../etools-prp-common/elements/labelled-item.js';
+import '../../../../../etools-prp-common/elements/etools-prp-ajax.js';
+import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax.js';
+import '../../../../../etools-prp-common/elements/etools-prp-permissions.js';
+import '../../../../../elements/ip-reporting/report-attachments.js';
+import '../pd-sent-back.js';
 
-import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../../../etools-prp-common/typings/globals.types';
-import Endpoints from '../../../../../endpoints';
+import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin.js';
+import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin.js';
+import Endpoints from '../../../../../endpoints.js';
 
-import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo';
-import {currentProgrammeDocument} from '../../../../../etools-prp-common/redux/selectors/programmeDocuments';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdReportsUpdate} from '../../../../../redux/actions/pdReports';
-import {RootState} from '../../../../../typings/redux.types';
-import {PaperInputElement} from '@polymer/paper-input/paper-input';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo.js';
+import {currentProgrammeDocument} from '../../../../../etools-prp-common/redux/selectors/programmeDocuments.js';
+import {pdReportsUpdate} from '../../../../../redux/actions/pdReports.js';
+import {RootState} from '../../../../../typings/redux.types.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
+import {store} from '../../../../../redux/store.js';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
+import { connect } from 'pwa-helpers';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
+@customElement('page-pd-report-sr-reporting')
+export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+      margin-bottom: 25px;
+    }
+    .row {
+      @apply --app-grid-expandible-item;
+    }
+    .value {
+      font-size: 16px;
+      word-wrap: break-word;
+    }
+    .toggle-button-container {
+      max-width: calc((100% - 0.1px) / 8 * 7 - 25px);
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    #toggle-button {
+      background-color: #0099ff;
+      color: #fff;
+      font-size: 14px;
+    }
+  `;
+
+  @property({type: Object})
+  localData: any = {};
+
+  @property({type: Object})
+  permissions: any = {};
+
+  @property({type: Object})
+  data: any = {};
+
+  @property({type: String})
+  pdId = '';
+
+  @property({type: Array})
+  programmeDocuments: any[] = [];
+
+  @property({type: Object})
+  allPdReports: any = {};
+
+  @property({type: String})
+  srDescription = '';
+
+  @property({type: String})
+  locationId = '';
+
+  @property({type: String})
+  reportId = '';
+
+  @property({type: String})
+  updateUrl?: string;
+
+  @property({type: String})
+  overrideMode = '';
+
+  @property({type: String})
+  mode = '';
+
+  @property({type: String})
+  computedMode = '';
+
+  @property({type: Object})
+  currentReport: any = {};
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('localData')) {
+      this._updateData(this.localData);
+    }
+
+    if (changedProperties.has('localData') || changedProperties.has('reportId')) {
+      this.updateUrl = this._computeUpdateUrl(this.locationId, this.reportId);
+    }
+
+    if (
+      changedProperties.has('mode') ||
+      changedProperties.has('overrideMode') ||
+      changedProperties.has('currentReport') ||
+      changedProperties.has('permissions')
+    ) {
+      this.computedMode = this._computeMode(this.mode, this.overrideMode, this.permissions);
+    }
+
+    if (
+      changedProperties.has('pdId') ||
+      changedProperties.has('programmeDocuments') ||
+      changedProperties.has('allPdReports') ||
+      changedProperties.has('reportId')
+    ) {
+      this.srDescription = this._computeSrDescription(
+        this.pdId,
+        this.programmeDocuments,
+        this.allPdReports,
+        this.reportId
+      );
+    }
+  }
+
+  stateChanged(state: RootState) {
+    super.stateChanged(state);
+
+    this.data = this._reportInfoCurrent(state);
+    this.currentReport = this._currentProgrammeDocument(state);
+
+    if (this.pdId !== state.programmeDocuments.current) {
+      this.pdId = state.programmeDocuments.current;
+    }
+    if (this.programmeDocuments !== state.programmeDocuments.all) {
+      this.programmeDocuments = state.programmeDocuments.all;
+    }
+    if (this.allPdReports !== state.programmeDocumentReports.byPD) {
+      this.allPdReports = state.programmeDocumentReports.byPD;
+    }
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+    if (this.reportId !== state.programmeDocumentReports.current.id) {
+      this.reportId = state.programmeDocumentReports.current.id;
+    }
+    if (this.mode !== state.programmeDocumentReports.current.mode) {
+      this.mode = state.programmeDocumentReports.current.mode;
+    }
+  }
+
+  render() {
     return html`
-      <style include="app-grid-style">
-        :host {
-          display: block;
-          margin-bottom: 25px;
-
-          --app-grid-columns: 8;
-          --app-grid-gutter: 25px;
-          --app-grid-item-height: auto;
-          --app-grid-expandible-item-columns: 7;
-        }
-
-        .row {
-          @apply --app-grid-expandible-item;
-        }
-
-        .value {
-          font-size: 16px;
-          word-wrap: break-word;
-        }
-
-        .toggle-button-container {
-          max-width: calc((100% - 0.1px) / 8 * 7 - 25px);
-
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-        }
-
-        #toggle-button {
-          background-color: #0099ff;
-          color: #fff;
-          font-size: 14px;
-        }
-      </style>
-
       <pd-sent-back></pd-sent-back>
 
-      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
+      <etools-prp-permissions .permissions="${this.permissions}"></etools-prp-permissions>
 
       <etools-prp-ajax
         id="update"
-        url="[[updateUrl]]"
-        body="[[localData]]"
+        .url="${this.updateUrl}"
+        .body="${this.localData}"
         content-type="application/json"
         method="put"
-      >
-      </etools-prp-ajax>
+      ></etools-prp-ajax>
 
       <etools-content-panel no-header>
         <div class="app-grid">
           <div class="row">
-            <labelled-item label="[[localize('description')]]">
-              <span class="value">[[srDescription]]</span>
+            <labelled-item label="${this.localize('description')}">
+              <span class="value">${this.srDescription}</span>
             </labelled-item>
           </div>
 
           <div class="row">
-            <labelled-item label="[[localize('narrative')]]">
-              <template is="dom-if" if="[[_equals(computedMode, 'view')]]" restamp="true">
-                <span class="value">[[_withDefault(data.narrative)]]</span>
-              </template>
-
-              <template is="dom-if" if="[[!_equals(computedMode, 'view')]]" restamp="true">
-                <paper-input id="narrative" value="[[data.narrative]]" no-label-float char-counter maxlength="2000">
-                </paper-input>
-              </template>
+            <labelled-item label="${this.localize('narrative')}">
+              ${this.computedMode === 'view'
+                ? html` <span class="value">${this._withDefault(this.data.narrative)}</span> `
+                : html`
+                    <paper-input
+                      id="narrative"
+                      value="${this.data.narrative}"
+                      no-label-float
+                      char-counter
+                      maxlength="2000"
+                    >
+                    </paper-input>
+                  `}
             </labelled-item>
           </div>
 
           <div class="toggle-button-container row">
-            <template is="dom-if" if="[[!_equals(computedMode, 'view')]]">
-              <paper-button class="btn-primary" id="toggle-button" on-tap="_handleInput" raised>
-                [[localize('save')]]
-              </paper-button>
-            </template>
+            ${this.computedMode !== 'view'
+              ? html`
+                  <paper-button class="btn-primary" id="toggle-button" @click="${this._handleInput}" raised>
+                    ${this.localize('save')}
+                  </paper-button>
+                `
+              : html``}
           </div>
 
           <div class="row">
-            <report-attachments readonly="[[_equals(computedMode, 'view')]]"> </report-attachments>
+            <report-attachments readonly="${this.computedMode === 'view'}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
     `;
   }
 
-  @property({type: Object})
-  localData!: GenericObject;
-
-  @property({type: Object})
-  permissions!: GenericObject;
-
-  @property({type: Object, computed: '_reportInfoCurrent(rootState)'})
-  data!: GenericObject;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
-  pdId!: string;
-
-  @property({type: Array, computed: 'getReduxStateArray(rootState.programmeDocuments.all)'})
-  programmeDocuments!: any[];
-
-  @property({type: Object, computed: 'getReduxStateObject(rootState.programmeDocumentReports.byPD)'})
-  allPdReports!: GenericObject;
-
-  @property({type: String, computed: '_computeSrDescription(pdId, programmeDocuments, allPdReports, reportId)'})
-  srDescription!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
-  reportId!: string;
-
-  @property({type: String, computed: '_computeUpdateUrl(locationId, reportId)'})
-  updateUrl!: string;
-
-  @property({type: String})
-  overrideMode = '';
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.mode)'})
-  mode!: string;
-
-  @property({type: String, computed: '_computeMode(mode, overrideMode, currentReport, permissions)'})
-  computedMode!: string;
-
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
-  currentReport!: GenericObject;
-
-  updateDataDebouncer!: Debouncer | null;
-
-  static get observers() {
-    return ['_updateData(localData.*)'];
+  connectedCallback() {
+    super.connectedCallback();
+    this.localData = {};
   }
 
-  _reportInfoCurrent(rootState: RootState) {
+  disconnectedCallback() {
+    super.disconnectedCallback();
+  }
+
+  _reportInfoCurrent(rootState) {
     return reportInfoCurrent(rootState);
   }
 
-  _currentProgrammeDocument(rootState: RootState) {
+  _currentProgrammeDocument(rootState) {
     return currentProgrammeDocument(rootState);
   }
 
   _handleInput() {
-    const textInput = this.shadowRoot!.querySelector('#narrative') as PaperInputElement;
+    const textInput = this.shadowRoot!.querySelector('#narrative') as any;
     if (textInput && textInput.value && textInput.value.trim()) {
-      this.set(['localData', textInput.id], textInput.value.trim());
+      this.localData = {...this.localData, [textInput.id]: textInput.value.trim()};
     }
   }
 
-  _updateData(change: GenericObject) {
-    if (change.path.split('.').length < 2) {
-      // Skip the initial assignment
+  _updateData(localData) {
+    if (!localData.narrative) {
       return;
     }
 
-    this.updateDataDebouncer = Debouncer.debounce(this.updateDataDebouncer, timeOut.after(250), () => {
-      if (!this.localData.narrative) {
-        return;
-      }
-      const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
-      (this.$.update as EtoolsPrpAjaxEl).abort();
-      this.reduxStore
-        .dispatch(pdReportsUpdate(updateThunk, this.pdId, this.reportId))
-        // @ts-ignore
+    debounce(() => {
+      const elem = this.shadowRoot!.getElementById('update') as EtoolsPrpAjaxEl;
+      elem.abort();
+      store
+        .dispatch(pdReportsUpdate(elem.thunk(), this.pdId, this.reportId))
         .then(() => {
           fireEvent(this, 'toast', {
             text: this.localize('changes_saved'),
             showCloseBtn: true
           });
         })
-        // @ts-ignore
-        .catch(function (err) {
+        .catch((err) => {
           console.log(err);
         });
-    });
+    }, 250);
   }
 
-  _computeUpdateUrl(locationId: string, reportId: string) {
+  _computeUpdateUrl(locationId, reportId) {
     if (!locationId || !reportId) {
       return;
     }
     return Endpoints.programmeDocumentReportUpdate(locationId, reportId);
   }
 
-  _computeSrDescription(pdId: string, programmeDocuments: any[], allPdReports: GenericObject, reportId: string) {
-    // for some reason method was getting run on detach, so catch that
+  _computeSrDescription(pdId, programmeDocuments, allPdReports, reportId) {
     if (!allPdReports || !allPdReports[pdId]) {
-      return;
+      return '...';
     }
 
-    // get the current progress report's due date
-    const progressReport = allPdReports[pdId].find((report: GenericObject) => {
-      return report.id === parseInt(reportId);
-    });
-
+    const progressReport = allPdReports[pdId].find((report) => report.id === parseInt(reportId));
     const progressReportDueDate = progressReport && progressReport.due_date ? progressReport.due_date : null;
 
-    // get the current programme document
-    const currentPdReport = (programmeDocuments || []).find((report) => {
-      return report.id === pdId;
-    });
+    const currentPdReport = (programmeDocuments || []).find((report) => report.id === pdId);
 
     if (!progressReportDueDate || !currentPdReport) {
       return '...';
     }
 
-    // get the current SR reporting_period object from the current programme document's reporting_periods array
-    const currentSrReport = (currentPdReport.reporting_periods || []).find((reporting_period: GenericObject) => {
-      return (
+    const currentSrReport = (currentPdReport.reporting_periods || []).find(
+      (reporting_period) =>
         reporting_period.report_type === 'SR' && new Date(reporting_period.due_date) <= new Date(progressReportDueDate)
-      );
-    });
+    );
 
-    if (currentSrReport !== undefined && currentSrReport.description !== undefined) {
-      return currentSrReport.description;
-    } else {
-      return '...';
-    }
+    return currentSrReport && currentSrReport.description !== undefined ? currentSrReport.description : '...';
   }
 
-  // @ts-ignore
-  _computeMode(mode: string, overrideMode: string, report: GenericObject, permissions: GenericObject) {
+  _computeMode(mode, overrideMode, permissions) {
     return permissions && permissions.savePdReport ? overrideMode || mode : 'view';
   }
-
-  connectedCallback() {
-    super.connectedCallback();
-
-    this.set('localData', {});
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    if (this.updateDataDebouncer && this.updateDataDebouncer.isActive()) {
-      this.updateDataDebouncer.cancel();
-    }
-  }
 }
-
-window.customElements.define('page-pd-report-sr-reporting', PagePdReportSrReporting);

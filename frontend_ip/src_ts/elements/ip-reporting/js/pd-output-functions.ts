@@ -1,7 +1,6 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../endpoints';
 
-export function calculationFormulaAcrossPeriods(indicator: GenericObject, localize: (x: string) => string) {
+export function calculationFormulaAcrossPeriods(indicator: any, localize: (x: string) => string) {
   const localized =
     indicator.reportable.blueprint.display_type === 'ratio'
       ? localize('latest')
@@ -31,6 +30,6 @@ export function computeCompleteIndicator(complete: boolean) {
   return complete ? 'Met' : 'Ove';
 }
 
-export function computeReportableUrl(reportId: string, data: GenericObject) {
+export function computeReportableUrl(reportId: string, data: any) {
   return Endpoints.reportable(reportId, data.id);
 }

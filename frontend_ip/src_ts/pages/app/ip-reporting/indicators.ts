@@ -1,114 +1,112 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-// import '@polymer/paper-material/paper-material';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@polymer/iron-location/iron-location.js';
+import '@polymer/iron-location/iron-query-params.js';
+import '../../../etools-prp-common/elements/page-header.js';
+import '../../../etools-prp-common/elements/page-body.js';
+import '../../../etools-prp-common/elements/etools-prp-ajax.js';
+import '../../../elements/ip-reporting/indicators-filters.js';
+import '../../../elements/ip-reporting/indicators-toolbar.js';
+import '../../../elements/list-view-indicators.js';
+import Endpoints from '../../../endpoints.js';
+import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
+import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin.js';
+import {fetchIndicators} from '../../../redux/actions/indicators.js';
+import {store} from '../../../redux/store.js';
+import {connect} from 'pwa-helpers/connect-mixin.js';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
+import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 
-import '../../../etools-prp-common/elements/page-header';
-import '../../../etools-prp-common/elements/page-body';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import '../../../elements/ip-reporting/indicators-filters';
-import '../../../elements/ip-reporting/indicators-toolbar';
-import '../../../elements/list-view-indicators';
-import Endpoints from '../../../endpoints';
+@customElement('page-ip-reporting-indicators')
+class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
 
-import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {fetchIndicators} from '../../../redux/actions/indicators';
+  @property({type: Array})
+  data = [];
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin SortingMixin
- * @appliesMixin LocalizeMixin
- */
-class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(ReduxConnectedElement)) {
-  public static get template() {
+  @property({type: Boolean})
+  loading = false;
+
+  @property({type: Number})
+  totalResults = 0;
+
+  @property({type: String})
+  workspaceId = '';
+
+  @property({type: String})
+  indicatorsUrl = '';
+
+  @property({type: String})
+  query = '';
+
+  @property({type: Object})
+  queryParams = {};
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-prp-ajax id="indicators" url="[[indicatorsUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
-
-      <page-header title="[[localize('indicators')]]"></page-header>
+      <iron-location .query="${this.query}"></iron-location>
+      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"></iron-query-params>
+      <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
+      <page-header .title="${this.localize('indicators')}"></page-header>
       <page-body>
         <indicators-filters></indicators-filters>
         <indicators-toolbar></indicators-toolbar>
-        <list-view-indicators data="[[data]]" total-results="[[totalResults]]"> </list-view-indicators>
+        <list-view-indicators .data="${this.data}" .totalResults="${this.totalResults}"></list-view-indicators>
       </page-body>
     `;
   }
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.indicators.all)'})
-  data!: GenericObject[];
-
-  @property({type: Boolean, computed: 'getReduxStateValue(rootState.indicators.loading)'})
-  loading!: boolean;
-
-  @property({type: Number, computed: 'getReduxStateValue(rootState.indicators.count)'})
-  totalResults!: number;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  workspaceId!: string;
-
-  @property({type: String, computed: '_computeIndicatorsUrl(workspaceId)'})
-  indicatorsUrl!: string;
-
-  @property({type: String})
-  query!: string;
-
-  @property({type: Object})
-  queryParams!: GenericObject;
-
-  fetchIndicatorsDebouncer!: Debouncer | null;
-
-  public static get observers() {
-    return ['_indicatorsAjax(indicatorsUrl, queryParams)'];
+  stateChanged(state) {
+    if (this.data !== state.indicators.all) {
+      this.data = state.indicators.all;
+    }
+    if (this.loading !== state.indicators.loading) {
+      this.loading = state.indicators.loading;
+    }
+    if (this.totalResults !== state.indicators.count) {
+      this.totalResults = state.indicators.count;
+    }
+    if (this.workspaceId !== state.location.id) {
+      this.workspaceId = state.location.id;
+    }
   }
 
-  _computeIndicatorsUrl(workspaceId: string) {
+  updated(changedProperties) {
+    if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
+      this._indicatorsAjax(this.queryParams);
+    }
+
+    if (changedProperties.has('workspaceId')) {
+      this.indicatorsUrl = this._computeIndicatorsUrl(this.workspaceId);
+    }
+  }
+
+  _computeIndicatorsUrl(workspaceId) {
     return Endpoints.allPDIndicators(workspaceId);
   }
 
-  _indicatorsAjax(_: any, queryParams: GenericObject) {
+  _indicatorsAjax(queryParams) {
     if (!Object.keys(queryParams).length) {
       return;
     }
 
-    this.fetchIndicatorsDebouncer = Debouncer.debounce(this.fetchIndicatorsDebouncer, timeOut.after(100), () => {
-      const indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
+    debounce(() => {
+      const indicatorEl = this.shadowRoot!.getElementById('indicators') as EtoolsPrpAjaxEl;
 
       // Cancel the pending request, if any
-      (this.$.indicators as EtoolsPrpAjaxEl).abort();
+      indicatorEl.abort();
 
-      this.reduxStore
-        .dispatch(fetchIndicators(indicatorsThunk))
-        // @ts-ignore
-        .catch((_err: GenericObject) => {
-          // TODO: error handling
-        });
-    });
+      store.dispatch(fetchIndicators(indicatorEl.thunk()));
+    }, 100);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
-    if (this.fetchIndicatorsDebouncer && this.fetchIndicatorsDebouncer.isActive()) {
-      this.fetchIndicatorsDebouncer.cancel();
-    }
   }
 }
 
-window.customElements.define('page-ip-reporting-indicators', PageIpReportingIndicators);
+export {PageIpReportingIndicators};

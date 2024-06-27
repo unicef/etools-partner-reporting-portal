@@ -1,36 +1,36 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {LitElement, html, css} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
 import '../etools-prp-common/elements/etools-prp-progress-bar';
-import {property} from '@polymer/decorators/lib/decorators';
 
 /**
- * @polymer
  * @customElement
  */
-class EtoolsPrpProgressBarAlt extends PolymerElement {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-          width: 100%;
-
-          --paper-progress-active-color: var(--paper-orange-a400);
-        }
-
-        etools-prp-progress-bar {
-          @apply --etools-prp-progress-bar;
-        }
-      </style>
-
-      <etools-prp-progress-bar display-type="[[displayType]]" number="[[number]]"></etools-prp-progress-bar>
-    `;
-  }
-
+@customElement('etools-prp-progress-bar-alt')
+export class EtoolsPrpProgressBarAlt extends LitElement {
   @property({type: String})
   displayType!: string;
 
   @property({type: Number})
   number!: number;
+
+  static styles = css`
+    :host {
+      display: block;
+      width: 100%;
+      --paper-progress-active-color: var(--paper-orange-a400);
+    }
+    etools-prp-progress-bar {
+      --etools-prp-progress-bar: {
+        /* Add specific styles if needed */
+      }
+    }
+  `;
+
+  render() {
+    return html`
+      <etools-prp-progress-bar .displayType="${this.displayType}" .number="${this.number}"></etools-prp-progress-bar>
+    `;
+  }
 }
 
-window.customElements.define('etools-prp-progress-bar-alt', EtoolsPrpProgressBarAlt);
+export {EtoolsPrpProgressBarAlt as EtoolsPrpProgressBarAltEl};

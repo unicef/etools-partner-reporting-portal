@@ -1,8 +1,7 @@
 import Constants from '../etools-prp-common/constants';
-import {GenericObject} from '../etools-prp-common/typings/globals.types';
 
 // L11N
-export const setL11NResources = function (resources: GenericObject) {
+export const setL11NResources = function (resources: any) {
   return {
     type: Constants.SET_L11N_RESOURCES,
     resources: resources
@@ -52,7 +51,7 @@ export const setUserProfile = function (data: any) {
   };
 };
 
-export const setAccountType = function (data: GenericObject) {
+export const setAccountType = function (data: any) {
   return {
     type: Constants.SET_ACCOUNT_TYPE,
     data: data
@@ -186,7 +185,7 @@ export const fetchProgrammeDocuments = function (pdThunk: any) {
   };
 };
 
-export const setProgrammeDocumentDetails = function (pdDetailsData: GenericObject) {
+export const setProgrammeDocumentDetails = function (pdDetailsData: any) {
   return {
     type: Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
     pdDetailsData: pdDetailsData

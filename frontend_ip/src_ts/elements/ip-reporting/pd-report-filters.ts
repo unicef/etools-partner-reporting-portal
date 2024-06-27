@@ -1,68 +1,41 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '@polymer/iron-location/iron-location.js';
 import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/paper-button/paper-button.js';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/dropdown-filter/dropdown-filter';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
-    return html`
-      ${filterStyles}
-      <style include="app-grid-style">
-        :host {
-          display: block;
-          background: white;
-
-          --app-grid-columns: 3;
-          --app-grid-item-height: auto;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <filter-list filters="{{filters}}">
-        <div class="app-grid">
-          <dropdown-filter
-            class="item"
-            label="[[localize('status')]]"
-            name="status"
-            value="[[_withDefault(queryParams.status, '-1')]]"
-            data="[[statuses]]"
-          >
-          </dropdown-filter>
-        </div>
-      </filter-list>
-    `;
-  }
+@customElement('pd-report-filters')
+export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = [
+    css`
+      :host {
+        display: block;
+        background: white;
+        --app-grid-columns: 3;
+        --app-grid-item-height: auto;
+      }
+    `
+  ];
 
   @property({type: String})
   query!: string;
 
   @property({type: Object})
-  queryParams!: GenericObject;
+  queryParams: any = {};
 
-  @property({type: Object, notify: true})
-  filters!: GenericObject;
+  @property({type: Object, attribute: false})
+  filters: any = {};
 
-  @property({type: Array, computed: '_localizeStatuses(resources)'})
-  statuses!: any[];
+  @property({type: Array})
+  statuses: any[] = [];
 
   _localizeStatuses() {
     return [
@@ -75,7 +48,32 @@ class PdReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
       {title: this.localize('not_yet_due'), id: 'Not'}
     ];
   }
+
+  render() {
+    return html`
+      ${filterStyles}
+      <iron-location .query=${this.query}></iron-location>
+      <iron-query-params .paramsString=${this.query} .paramsObject=${this.queryParams}></iron-query-params>
+
+      <filter-list .filters=${this.filters}>
+        <div class="app-grid">
+          <dropdown-filter
+            class="item"
+            .label=${this.localize('status')}
+            name="status"
+            .value=${this._withDefault(this.queryParams?.status, '-1')}
+            .data=${this.statuses}
+          ></dropdown-filter>
+        </div>
+      </filter-list>
+    `;
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has('resources')) {
+      this.statuses = this._localizeStatuses();
+    }
+  }
 }
-window.customElements.define('pd-report-filters', PdReportFilters);
 
 export {PdReportFilters as PdReportFiltersEl};

@@ -1,15 +1,8 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-
-export function shouldDisplayLink(
-  displayLink: string,
-  report: GenericObject,
-  permissions: GenericObject,
-  fn: (x?: any, y?: any) => boolean
-) {
+export function shouldDisplayLink(displayLink: string, report: any, permissions: any, fn: (x?: any, y?: any) => boolean) {
   return displayLink && fn(permissions, report);
 }
 
-export function getReportTitleFull(report: GenericObject, localize: (x: string) => string) {
+export function getReportTitleFull(report: any, localize: (x: string) => string) {
   let title = '';
   if (report.report_type === 'QPR') {
     title += localize('qpr_short') + report.report_number + ' ' + localize('qpr_long');
@@ -21,7 +14,7 @@ export function getReportTitleFull(report: GenericObject, localize: (x: string) 
   return title;
 }
 
-export function getReportTitle(report: GenericObject, localize: (x: string) => string) {
+export function getReportTitle(report: any, localize: (x: string) => string) {
   let title = '';
   if (report.report_type === 'QPR') {
     title += localize('qpr_short') + report.report_number;
@@ -34,7 +27,7 @@ export function getReportTitle(report: GenericObject, localize: (x: string) => s
 }
 
 export function getReportLink(
-  report: GenericObject,
+  report: any,
   suffix: string,
   buildUrlFn: (baseUrl: string, tail: string) => string,
   baseUrl: string

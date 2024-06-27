@@ -1,67 +1,71 @@
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-layout/app-grid/app-grid-style';
-import '@polymer/iron-location/iron-location';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import '../../elements/filters/reportable-filter/reportable-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/report-location-filter/report-location-filter';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- * @appliesMixin UtilsMixin
- */
-class ReportFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
+@customElement('report-filters')
+export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+  @property({type: Object})
+  queryParams: any = {};
+
+  @property({type: Object})
+  filters: any = {};
+
+  static styles = [
+    css`
+      :host {
+        display: block;
+        background: white;
+
+        --app-grid-columns: 4;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 4;
+      }
+
+      .incomplete {
+        grid-column: span var(--app-grid-expandible-item-columns);
+      }
+    `
+  ];
+
+  render() {
     return html`
       ${filterStyles}
-      <style include="app-grid-style">
-        :host {
-          display: block;
-          background: white;
+      <iron-location @query-changed="${this._onQueryChanged}"> </iron-location>
+      <iron-query-params .paramsString="${this.query}" @params-object-changed="${this._onParamsObjectChanged}">
+      </iron-query-params>
 
-          --app-grid-columns: 4;
-          --app-grid-item-height: auto;
-          --app-grid-expandible-item-columns: 4;
-        }
-
-        .incomplete {
-          @apply --app-grid-expandible-item;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <filter-list filters="{{filters}}">
+      <filter-list .filters="${this.filters}">
         <div class="app-grid">
-          <reportable-filter class="item" value="[[_withDefault(queryParams.llo, '-1')]]"> </reportable-filter>
-
-          <report-location-filter class="item" value="[[_withDefault(queryParams.location, '-1')]]">
-          </report-location-filter>
-
-          <checkbox-filter class="incomplete" name="incomplete" value="[[_withDefault(queryParams.incomplete, '')]]">
-            <span class="checkbox-label">[[localize('show_incomplete_only')]]</span>
+          <reportable-filter class="item" .value="${this._withDefault(this.queryParams.llo, '-1')}"></reportable-filter>
+          <report-location-filter
+            class="item"
+            .value="${this._withDefault(this.queryParams.location, '-1')}"
+          ></report-location-filter>
+          <checkbox-filter
+            class="incomplete"
+            name="incomplete"
+            .value="${this._withDefault(this.queryParams.incomplete, '')}"
+          >
+            <span class="checkbox-label">${this.localize('show_incomplete_only')}</span>
           </checkbox-filter>
         </div>
       </filter-list>
     `;
   }
 
-  @property({type: Object})
-  queryParams!: GenericObject;
+  _onQueryChanged(e: CustomEvent) {
+    this.query = e.detail.value;
+  }
 
-  @property({type: Object})
-  filters!: GenericObject;
+  _onParamsObjectChanged(e: CustomEvent) {
+    this.queryParams = e.detail.value;
+  }
 }
-
-window.customElements.define('report-filters', ReportFilters);

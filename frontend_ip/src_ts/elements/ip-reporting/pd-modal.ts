@@ -1,6 +1,5 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '@polymer/paper-dialog/paper-dialog.js';
@@ -12,103 +11,111 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {RootState} from '../../typings/redux.types';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin ModalMixin
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement))) {
-  public static get template() {
+@customElement('pd-modal')
+export class PdModal extends ModalMixin(UtilsMixin(LocalizeMixin(connect(store)(LitElement)))) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    :host {
+      --app-grid-columns: 6;
+      --app-grid-gutter: 25px;
+      --app-grid-item-height: auto;
+      --app-grid-expandible-item-columns: 2;
+
+      --paper-dialog: {
+        width: 900px;
+      }
+    }
+
+    .app-grid {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .item-2-col {
+      @apply --app-grid-expandible-item;
+    }
+
+    h3 {
+      @apply --paper-font-title;
+    }
+  `;
+
+  @property({type: Boolean})
+  opened = false;
+
+  @property({type: Object})
+  pd!: any;
+
+  stateChanged(state: RootState) {
+    this.pd = currentProgrammeDocument(state);
+  }
+
+  render() {
+    if (!this.pd) return html``;
+
     return html`
       ${buttonsStyles} ${modalStyles}
-      <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
-        :host {
-          display: block;
 
-          --app-grid-columns: 6;
-          --app-grid-gutter: 25px;
-          --app-grid-item-height: auto;
-          --app-grid-expandible-item-columns: 2;
-
-          --paper-dialog: {
-            width: 900px;
-          }
-        }
-
-        .app-grid {
-          padding: 0;
-          margin: 0;
-          list-style: none;
-        }
-
-        .item-2-col {
-          @apply --app-grid-expandible-item;
-        }
-
-        h3 {
-          @apply --paper-font-title;
-        }
-      </style>
-
-      <paper-dialog id="dialog" modal opened="{{opened}}">
+      <paper-dialog id="dialog" modal ?opened="${this.opened}">
         <div class="header layout horizontal justified">
-          <h2>[[pd.title]]</h2>
-
-          <paper-icon-button class="self-center" on-tap="close" icon="icons:close"> </paper-icon-button>
+          <h2>${this.pd.title}</h2>
+          <paper-icon-button class="self-center" @click="${this.close}" icon="icons:close"> </paper-icon-button>
         </div>
 
         <paper-dialog-scrollable>
-          <h3>[[localize('partnership_info')]]</h3>
+          <h3>${this.localize('partnership_info')}</h3>
           <ul class="app-grid">
             <li class="item item-2-col">
-              <labelled-item label="[[localize('agreement')]]">
-                <span class="field-value">[[_withDefault(pd.agreement)]]</span>
+              <labelled-item label="${this.localize('agreement')}">
+                <span class="field-value">${this._withDefault(this.pd.agreement)}</span>
               </labelled-item>
             </li>
             <li class="item item-2-col">
-              <labelled-item label="[[localize('document_type')]]">
-                <span class="field-value">[[_withDefault(pd.document_type_display)]]</span>
+              <labelled-item label="${this.localize('document_type')}">
+                <span class="field-value">${this._withDefault(this.pd.document_type_display)}</span>
               </labelled-item>
             </li>
             <li class="item item-2-col">
-              <labelled-item label="[[localize('reference_number')]]">
-                <span class="field-value">[[_withDefault(pd.reference_number)]]</span>
+              <labelled-item label="${this.localize('reference_number')}">
+                <span class="field-value">${this._withDefault(this.pd.reference_number)}</span>
               </labelled-item>
             </li>
           </ul>
 
-          <labelled-item label="[[localize('title')]]">
-            <span class="field-value">[[_withDefault(pd.title)]]</span>
+          <labelled-item label="${this.localize('title')}">
+            <span class="field-value">${this._withDefault(this.pd.title)}</span>
           </labelled-item>
 
           <br />
 
           <ul class="app-grid">
             <li class="item item-2-col">
-              <labelled-item label="[[localize('unicef_offices')]]">
-                <span class="field-value">[[_withDefault(pd.unicef_office)]]</span>
+              <labelled-item label="${this.localize('unicef_offices')}">
+                <span class="field-value">${this._withDefault(this.pd.unicef_office)}</span>
               </labelled-item>
             </li>
             <li class="item item-2-col">
-              <labelled-item label="[[localize('unicef_points')]]">
-                <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
+              <labelled-item label="${this.localize('unicef_points')}">
+                <span class="field-value">${this._formatFocalPoint(this.pd.unicef_focal_point)}</span>
               </labelled-item>
             </li>
             <li class="item item-2-col">
-              <labelled-item label="[[localize('partner_points')]]">
-                <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
+              <labelled-item label="${this.localize('partner_points')}">
+                <span class="field-value">${this._formatFocalPoint(this.pd.partner_focal_point)}</span>
               </labelled-item>
             </li>
           </ul>
 
-          <h3>[[localize('pd_ssfa_details')]]</h3>
+          <h3>${this.localize('pd_ssfa_details')}</h3>
           <ul class="app-grid">
             <li class="item">
               <labelled-item label="In response to an HRP">
@@ -117,73 +124,77 @@ class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="[[localize('start_date')]]">
-                <span class="field-value">[[_withDefault(pd.start_date)]]</span>
+              <labelled-item label="${this.localize('start_date')}">
+                <span class="field-value">${this._withDefault(this.pd.start_date)}</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="[[localize('end_date')]]">
-                <span class="field-value">[[_withDefault(pd.end_date)]]</span>
+              <labelled-item label="${this.localize('end_date')}">
+                <span class="field-value">${this._withDefault(this.pd.end_date)}</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="[[localize('cso_contribution')]]n">
-                <span class="field-value">
-                  <etools-prp-currency value="[[pd.cso_contribution]]" currency="[[pd.cso_contribution_currency]]">
-                  </etools-prp-currency>
-                </span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="[[localize('total_unicef_cash')]]">
-                <span class="field-value">
-                  <etools-prp-currency value="[[pd.total_unicef_cash]]" currency="[[pd.total_unicef_cash_currency]]">
-                  </etools-prp-currency>
-                </span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="[[localize('total_unicef_supplies')]]">
+              <labelled-item label="${this.localize('cso_contribution')}]">
                 <span class="field-value">
                   <etools-prp-currency
-                    value="[[pd.total_unicef_supplies]]"
-                    currency="[[pd.total_unicef_supplies_currency]]"
+                    value="${this.pd.cso_contribution}"
+                    currency="${this.pd.cso_contribution_currency}"
                   >
                   </etools-prp-currency>
                 </span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="[[localize('total_budget')]]">
+              <labelled-item label="${this.localize('total_unicef_cash')}">
                 <span class="field-value">
-                  <etools-prp-currency value="[[pd.budget]]" currency="[[pd.budget_currency]]"> </etools-prp-currency>
+                  <etools-prp-currency
+                    value="${this.pd.total_unicef_cash}"
+                    currency="${this.pd.total_unicef_cash_currency}"
+                  >
+                  </etools-prp-currency>
+                </span>
+              </labelled-item>
+            </li>
+            <li class="item">
+              <labelled-item label="${this.localize('total_unicef_supplies')}">
+                <span class="field-value">
+                  <etools-prp-currency
+                    value="${this.pd.total_unicef_supplies}"
+                    currency="${this.pd.total_unicef_supplies_currency}"
+                  >
+                  </etools-prp-currency>
                 </span>
               </labelled-item>
             </li>
             <li class="item item-2-col">
-              <labelled-item label="[[localize('disbursements')]]">
-                <span class="field-value">[[pd.funds_received_to_date]] [[pd.cso_contribution_currency]]</span>
-                <etools-prp-progress-bar number="[[_computeFunds(pd.funds_received_to_date_percentage)]]">
+              <labelled-item label="${this.localize('total_budget')}">
+                <span class="field-value">
+                  <etools-prp-currency value="${this.pd.budget}" currency="${this.pd.budget_currency}">
+                  </etools-prp-currency>
+                </span>
+              </labelled-item>
+            </li>
+            <li class="item item-2-col">
+              <labelled-item label="${this.localize('disbursements')}">
+                <span class="field-value">${this.pd.funds_received_to_date} ${this.pd.cso_contribution_currency}</span>
+                <etools-prp-progress-bar number="${this._computeFunds(this.pd.funds_received_to_date_percentage)}">
                 </etools-prp-progress-bar>
               </labelled-item>
             </li>
           </ul>
-          <labelled-item label="[[localize('locations')]]">
-            <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'name')]]</span>
+          <labelled-item label="${this.localize('locations')}">
+            <span class="field-value">${this._commaSeparatedDictValues(this.pd.locations, 'name')}</span>
           </labelled-item>
         </paper-dialog-scrollable>
 
         <div class="buttons layout horizontal-reverse">
-          <paper-button dialog-dismiss>[[localize('cancel')]]</paper-button>
+          <paper-button dialog-dismiss>${this.localize('cancel')}</paper-button>
         </div>
       </paper-dialog>
     `;
   }
 
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
-  pd!: GenericObject;
-
-  _computeFunds(num: number) {
+  _computeFunds(num) {
     if (num === null || num === -1) {
       return 'N/A';
     } else {
@@ -191,15 +202,9 @@ class PdModal extends LocalizeMixin(UtilsMixin(ModalMixin(ReduxConnectedElement)
     }
   }
 
-  _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState);
-  }
-
-  _formatFocalPoint(items: any[]) {
-    // need to be checked (dci)
+  _formatFocalPoint(items) {
     return this._withDefault(this._commaSeparatedDictValues(items, 'name'), null, this.localize);
   }
 }
-window.customElements.define('pd-modal', PdModal);
 
 export {PdModal as PdModalEl};

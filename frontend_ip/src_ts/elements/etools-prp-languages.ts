@@ -1,37 +1,45 @@
-import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import {GenericObject} from '../etools-prp-common/typings/globals.types';
+import {LitElement, html} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../redux/store';
+import {RootState} from '../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- */
-class EtoolsPrpLanguages extends ReduxConnectedElement {
-  static get template() {
-    return html``;
-  }
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
+@customElement('etools-prp-languages')
+export class EtoolsPrpLanguages extends connect(store)(LitElement) {
+  @property({type: String})
   _current!: string;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.localize.resources)'})
-  _all!: GenericObject;
+  @property({type: Object})
+  _all!: any;
 
-  @property({type: String, notify: true, computed: '_computeCurrent(_current)'})
+  @property({type: String, reflect: true})
   current!: string;
 
-  @property({type: Array, notify: true, computed: '_computeAll(_all)'})
+  @property({type: Array, reflect: true})
   all!: any[];
 
-  _computeCurrent(_current: string) {
-    return _current;
+  stateChanged(state: RootState) {
+    if (this._current !== state.localize.language) {
+      this._current = state.localize.language;
+    }
+
+    if (this._all !== state.localize.resources) {
+      this._all = state.localize.resources;
+    }
   }
 
-  _computeAll(_all: GenericObject) {
-    return Object.keys(_all).slice();
+  updated(changedProperties: any) {
+    if (changedProperties.has('_current')) {
+      this.current = this._current;
+    }
+    if (changedProperties.has('_all')) {
+      this.all = Object.keys(this._all).slice();
+    }
+  }
+
+  render() {
+    return html``;
   }
 }
-window.customElements.define('etools-prp-languages', EtoolsPrpLanguages);
 
 export {EtoolsPrpLanguages as EtoolsPrpLanguagesEl};

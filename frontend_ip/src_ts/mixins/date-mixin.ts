@@ -1,4 +1,4 @@
-import {PolymerElement} from '@polymer/polymer';
+import {LitElement} from 'lit';
 import {Constructor} from '../etools-prp-common/typings/globals.types';
 declare const dayjs: any;
 
@@ -6,7 +6,7 @@ declare const dayjs: any;
  * @polymer
  * @mixinFunction
  */
-function DateMixin<T extends Constructor<PolymerElement>>(baseClass: T) {
+function DateMixin<T extends Constructor<LitElement>>(baseClass: T) {
   class DateClass extends baseClass {
     prettyDate(dateString: string, format?: string) {
       if (!format) {

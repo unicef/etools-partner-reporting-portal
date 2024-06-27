@@ -1,50 +1,44 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../../redux/store';
 import '@polymer/paper-input/paper-input';
-import {property} from '@polymer/decorators';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {PaperInputElement} from '@polymer/paper-input/paper-input';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin FilterMixin
- */
-class TextFilter extends FilterMixin(ReduxConnectedElement) {
-  static get template() {
+@customElement('text-filter')
+class TextFilter extends FilterMixin(connect(store)(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: String})
+  properties = '';
+
+  @property({type: String})
+  type = 'text';
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
       <paper-input
         id="field"
-        type="[[type]]"
-        label="[[label]]"
-        value="[[value]]"
-        on-value-changed="_filterValueChanged"
+        .type="${this.type}"
+        .label="${this.label}"
+        .value="${this.value}"
+        @value-changed="${this._filterValueChanged}"
         always-float-label
       >
       </paper-input>
     `;
   }
 
-  @property({type: String})
-  properties!: string;
-
-  @property({type: String})
-  type = 'text';
-
-  private _debouncer!: Debouncer;
-
   _filterValueChanged() {
-    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const newValue = (this.$.field as PaperInputElement).value!.trim();
+    this._debouncer = debounce(() => {
+      const newValue = (this.shadowRoot!.getElementById('field') as PaperInputElement).value!.trim();
 
       if (newValue !== this.lastValue) {
         fireEvent(this, 'filter-changed', {
@@ -52,7 +46,7 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
           value: newValue
         });
       }
-    });
+    }, 250);
   }
 
   connectedCallback() {
@@ -61,11 +55,8 @@ class TextFilter extends FilterMixin(ReduxConnectedElement) {
   }
 
   disconnectedCallback() {
-    super.connectedCallback();
-    if (this._debouncer && this._debouncer.isActive()) {
-      this._debouncer.cancel();
-    }
+    super.disconnectedCallback();
   }
 }
 
-window.customElements.define('text-filter', TextFilter);
+export {TextFilter as TextFilterEl};

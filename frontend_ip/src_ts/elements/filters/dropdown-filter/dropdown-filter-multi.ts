@@ -1,67 +1,68 @@
-import {html, PolymerElement} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {LitElement, html, css} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
 import '@unicef-polymer/etools-dropdown/etools-dropdown-multi';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin FilterMixin
- */
-class DropdownFilterMulti extends FilterMixin(PolymerElement) {
-  static get template() {
+@customElement('dropdown-filter-multi')
+class DropdownFilterMulti extends FilterMixin(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    etools-dropdown-multi {
+      width: 100%;
+    }
+  `;
+
+  @property({type: String})
+  value = '';
+
+  @property({type: Boolean})
+  disabled = false;
+
+  @property({type: Boolean})
+  hideSearch = false;
+
+  @property({type: Array})
+  data: any[] = [];
+
+  @property({type: Array})
+  selectedValues: string[] = [];
+
+  @property({type: String})
+  optionLabel = 'title';
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        etools-dropdown-multi {
-          width: 100%;
-        }
-      </style>
-
       <etools-dropdown-multi
-        label="[[label]]"
-        options="[[data]]"
+        label="${this.label}"
+        .options="${this.data}"
         option-value="id"
-        option-label="[[optionLabel]]"
-        selected-values="{{selectedValues}}"
+        option-label="${this.optionLabel}"
+        .selectedValues="${this.selectedValues}"
         trigger-value-change-event
-        on-etools-selected-items-changed="_handleChange"
-        hide-search="[[hideSearch]]"
-        disabled="[[disabled]]"
+        @etools-selected-items-changed="${this._handleChange}"
+        .hideSearch="${this.hideSearch}"
+        .disabled="${this.disabled}"
       >
       </etools-dropdown-multi>
     `;
   }
 
-  @property({type: String})
-  value!: string;
-
-  @property({type: Boolean})
-  disabled!: boolean;
-
-  @property({type: Boolean})
-  hideSearch!: boolean;
-
-  @property({type: Array, observer: '_handleData'})
-  data!: any[];
-
-  @property({type: Array})
-  selectedValues = [];
-
-  @property({type: String})
-  optionLabel = 'title';
-
-  public static get observers() {
-    return ['_setSelectedValues(value, data)'];
+  updated(changedProperties) {
+    if (changedProperties.has('value') || changedProperties.has('data')) {
+      this._setSelectedValues(this.value, this.data);
+    }
+    if (changedProperties.has('data')) {
+      this._handleData(this.data);
+    }
   }
 
-  _handleChange(e: CustomEvent) {
+  _handleChange(e) {
     if (e.detail.selectedItems && this.data) {
-      const newValue = e.detail.selectedItems.map((item: any) => item['id']).join(',');
+      const newValue = e.detail.selectedItems.map((item) => item['id']).join(',');
       if (newValue !== this.value) {
         fireEvent(this, 'filter-changed', {
           name: this.name,
@@ -71,21 +72,24 @@ class DropdownFilterMulti extends FilterMixin(PolymerElement) {
     }
   }
 
-  _handleData(data: any) {
+  _handleData(data: any[]) {
     if (data) {
       this._filterReady();
     } else if (this.name === 'location' || this.name === 'locs') {
-      // Locations get populated by PDs so user can filter by location, so if there are no PDs,
-      // there are no locations - in that case, fire filterReady method to have filters stop loading.
       this._filterReady();
     }
   }
 
-  _setSelectedValues(value: any) {
+  _setSelectedValues(value: string, _data: any[]) {
     if (typeof value === 'string' && value !== this.selectedValues.join(',')) {
-      this.set('selectedValues', value.split(',').filter(Boolean));
+      this.selectedValues = value.split(',').filter(Boolean);
     }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._handleData(this.data);
   }
 }
 
-window.customElements.define('dropdown-filter-multi', DropdownFilterMulti);
+export {DropdownFilterMulti as DropdownFilterMultiEl};

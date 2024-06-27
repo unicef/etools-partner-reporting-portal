@@ -1,6 +1,5 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
-import {html} from '@polymer/polymer';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
@@ -20,128 +19,138 @@ import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import {getReportTitle} from './js/progress-reports-list-functions';
 import '@unicef-polymer/etools-data-table/data-table-styles';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
+import {RootState} from '../../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- * @appliesMixin DataTableMixin
- * @appliesMixin PaginationMixin
- * @appliesMixin RoutingMixin
- * @appliesMixin ProgressReportUtilsMixin
- * @appliesMixin SortingMixin
- * @appliesMixin LocalizeMixin
- */
-class ProgressReportsList extends LocalizeMixin(
+@customElement('progress-reports-list')
+export class ProgressReportsList extends LocalizeMixin(
   SortingMixin(
-    ProgressReportUtilsMixin(RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))))
+    ProgressReportUtilsMixin(RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement))))))
   )
 ) {
-  public static get template() {
+  static styles = [
+    css`
+      :host {
+        display: block;
+      }
+      etools-content-panel::part(ecp-content) {
+        padding: 0;
+      }
+    `
+  ];
+
+  @property({type: Boolean})
+  loading!: boolean;
+
+  @property({type: Array})
+  data!: any[];
+
+  @property({type: Number})
+  totalResults!: number;
+
+  @property({type: String})
+  query!: string;
+
+  @property({type: Object})
+  queryParams!: any;
+
+  @property({type: Number})
+  pageSize!: number;
+
+  @property({type: Number})
+  pageNumber!: number;
+
+  @property({type: Array})
+  visibleRange!: number[];
+
+  stateChanged(state: RootState) {
+    if (this.loading !== state.progressReports.loading) {
+      this.loading = state.progressReports.loading;
+    }
+
+    this.data = state.progressReports.all;
+    this.totalResults = state.progressReports.count;
+  }
+
+  render() {
     return html`
       ${tableStyles}
-      <style include="data-table-styles">
-        :host {
-          display: block;
-        }
-        etools-content-panel::part(ecp-content) {
-          padding: 0;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-content-panel panel-title="[[localize('list_of_reports')]]">
+      <iron-location .query="${this.query}"></iron-location>
+      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"></iron-query-params>
+      <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+          label="${this.visibleRange[0]}-${this.visibleRange[1]} of ${this.totalResults} ${this.localize(
+            'results_to_show'
+          )}"
         >
           <etools-data-table-column field="programme_document__reference_number" sortable>
-            <div class="table-column">[[localize('pd_ref_number')]]</div>
+            <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
           <etools-data-table-column>
-            <div class="table-column">[[localize('report_number')]]</div>
+            <div class="table-column">${this.localize('report_number')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable>
-            <div class="table-column">[[localize('report_status')]]</div>
+            <div class="table-column">${this.localize('report_status')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="due_date" sortable>
-            <div class="table-column">[[localize('due_date')]]</div>
+            <div class="table-column">${this.localize('due_date')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="submission_date" sortable>
-            <div class="table-column">[[localize('date_of_submission')]]</div>
+            <div class="table-column">${this.localize('date_of_submission')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="start_date" sortable>
-            <div class="table-column">[[localize('reporting_period')]]</div>
+            <div class="table-column">${this.localize('reporting_period')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
-
         <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
+          .pageSize="${this.pageSize}"
+          .pageNumber="${this.pageNumber}"
+          .totalResults="${this.totalResults}"
+          .visibleRange="${this.visibleRange}"
+          @page-size-changed="${this._pageSizeChanged}"
+          @page-number-changed="${this._pageNumberChanged}"
         >
         </etools-data-table-footer>
-
-        <template id="list" is="dom-repeat" items="[[data]]" as="report" initial-count="[[pageSize]]">
-          <etools-data-table-row no-collapse>
-            <div slot="row-data">
-              <div class="table-cell table-cell--text">
-                <span>
-                  [[_withDefault(report.programme_document.reference_number, '-')]]
-                  <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
-                </span>
+        ${this.data.map(
+          (report: any) => html`
+            <etools-data-table-row no-collapse>
+              <div slot="row-data">
+                <div class="table-cell table-cell--text">
+                  <span>
+                    ${this._withDefault(report.programme_document?.reference_number, '-')}
+                    <paper-tooltip>${report.programme_document?.title}</paper-tooltip>
+                  </span>
+                </div>
+                <div class="table-cell table-cell--text">
+                  <pd-reports-report-title display-link display-link-icon .report="${report}"></pd-reports-report-title>
+                </div>
+                <div class="table-cell table-cell--text">
+                  <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
+                </div>
+                <div class="table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
+                <div class="table-cell table-cell--text">${this._withDefault(report.submission_date, '-')}</div>
+                <div class="table-cell table-cell--text">${this._withDefault(report.reporting_period, '-')}</div>
               </div>
-              <div class="table-cell table-cell--text">
-                <pd-reports-report-title display-link display-link-icon report="[[report]]"></pd-reports-report-title>
-              </div>
-              <div class="table-cell table-cell--text">
-                <report-status status="[[report.status]]" report-type="[[report.report_type]]"> </report-status>
-              </div>
-              <div class="table-cell table-cell--text">[[_withDefault(report.due_date, '-')]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(report.submission_date)]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(report.reporting_period)]]</div>
-            </div>
-          </etools-data-table-row>
-        </template>
-
-        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
-
+            </etools-data-table-row>
+          `
+        )}
+        <list-placeholder .data="${this.data}" .loading="${this.loading}"></list-placeholder>
         <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
+          .pageSize="${this.pageSize}"
+          .pageNumber="${this.pageNumber}"
+          .totalResults="${this.totalResults}"
+          .visibleRange="${this.visibleRange}"
+          @page-size-changed="${this._pageSizeChanged}"
+          @page-number-changed="${this._pageNumberChanged}"
         >
         </etools-data-table-footer>
-
-        <etools-loading active="[[loading]]"></etools-loading>
+        <etools-loading .active="${this.loading}"></etools-loading>
       </etools-content-panel>
     `;
   }
-
-  @property({type: Boolean, computed: 'getReduxStateValue(rootState.progressReports.loading)'})
-  loading!: boolean;
-
-  @property({type: Array, computed: 'getReduxStateArray(rootState.progressReports.all)'})
-  data!: GenericObject[];
-
-  @property({type: Number, computed: 'getReduxStateValue(rootState.progressReports.count)'})
-  totalResults!: number;
-
-  _getReportTitle(report: GenericObject) {
-    return getReportTitle(report);
-  }
 }
 
-window.customElements.define('progress-reports-list', ProgressReportsList);
+export {ProgressReportsList as ProgressReportsListEl};

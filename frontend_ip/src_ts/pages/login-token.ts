@@ -1,61 +1,39 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/paper-styles/typography';
-import '@polymer/iron-location/iron-location';
-import '../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../endpoints';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import {BASE_PATH} from '../etools-prp-common/config';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@polymer/iron-location/iron-location.js';
+import '../etools-prp-common/elements/etools-prp-ajax.js';
+import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax.js';
+import Endpoints from '../endpoints.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
+import {BASE_PATH} from '../etools-prp-common/config.js';
 
-/**
- * @polymer
- * @customElement
- */
-class PageLoginToken extends PolymerElement {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-          padding: 25px;
-        }
+@customElement('page-login-token')
+export class PageLoginToken extends LitElement {
+  static styles = css`
+    :host {
+      display: block;
+      padding: 25px;
+    }
 
-        h3 {
-          @apply --paper-font-display1;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <etools-prp-ajax
-        id="validateToken"
-        url="[[tokenUrl]]"
-        body="[[data]]"
-        content-type="application/json"
-        method="post"
-      >
-      </etools-prp-ajax>
-
-      <h3>The page is loading...</h3>
-    `;
-  }
+    h3 {
+      font-size: var(--paper-font-display1_-_font-size);
+    }
+  `;
 
   @property({type: String})
-  query!: string;
+  query = '';
 
   @property({type: Object})
   data = {};
 
   @property({type: String})
-  tokenUrl: string = Endpoints.userLoginToken();
+  tokenUrl = Endpoints.userLoginToken();
 
   connectedCallback() {
     super.connectedCallback();
     const token = this.query.split('=')[1];
-    this.set('data', {token: token});
-    const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
+    this.data = {token: token};
+    const thunk = (this.shadowRoot!.getElementById('validateToken') as EtoolsPrpAjaxEl).thunk();
     thunk()
       .then((res: any) => {
         if (res.data.success) {
@@ -66,5 +44,32 @@ class PageLoginToken extends PolymerElement {
         fireEvent(this, 'token-error');
       });
   }
+
+  render() {
+    return html`
+      <style>
+        :host {
+          display: block;
+          padding: 25px;
+        }
+
+        h3 {
+          font-size: var(--paper-font-display1_-_font-size);
+        }
+      </style>
+
+      <iron-location .query="${this.query}"></iron-location>
+
+      <etools-prp-ajax
+        id="validateToken"
+        url="${this.tokenUrl}"
+        .body="${this.data}"
+        content-type="application/json"
+        method="post"
+      >
+      </etools-prp-ajax>
+
+      <h3>The page is loading...</h3>
+    `;
+  }
 }
-window.customElements.define('page-login-token', PageLoginToken);

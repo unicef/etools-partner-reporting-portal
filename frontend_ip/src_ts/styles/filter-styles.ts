@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer';
+import {html} from 'lit';
 
 export const filterStyles = html` <style>
   :host {

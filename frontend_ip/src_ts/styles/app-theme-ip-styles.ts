@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer';
+import {html} from 'lit';
 import '@polymer/paper-styles/color';
 
 export const appThemeIpStyles = html`

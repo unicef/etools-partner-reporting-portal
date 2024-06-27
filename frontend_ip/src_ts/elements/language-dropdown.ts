@@ -1,148 +1,119 @@
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu';
-import '@polymer/paper-listbox/paper-listbox';
-import '@polymer/paper-item/paper-item';
-import '@polymer/polymer/lib/elements/dom-repeat';
-
-import {GenericObject} from '../etools-prp-common/typings/globals.types';
-import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
-import {localizeSet} from '../redux/actions/localize';
-import {DomRepeat} from '@polymer/polymer/lib/elements/dom-repeat';
-import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
+import {localizeSet} from '../redux/actions/localize';
+import {store} from '../redux/store';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
- */
-class LanguageDropdown extends MatomoMixin(ReduxConnectedElement) {
-  public static get template() {
-    return html` <style>
-        :host {
-          display: block;
-          position: relative;
-          cursor: pointer;
-          @apply --select-plan-languages-offset;
-        }
+@customElement('language-dropdown')
+export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+      position: relative;
+      cursor: pointer;
+      /* Apply custom styles if needed */
+    }
 
-        paper-dropdown-menu {
-          width: 50px;
-          padding-right: 36px;
-          @apply --languages-dropdown-width;
+    paper-dropdown-menu {
+      /* Add your custom styles */
+    }
 
-          --paper-input-container-underline: {
-            display: none;
-            @apply --underline-shown;
-          }
+    paper-item {
+      /* Add your custom styles */
+    }
+  `;
 
-          --paper-input-container-underline-focus: {
-            display: none;
-          }
+  @property({type: String})
+  language!: string;
 
-          --paper-input-container-underline-disabled: {
-            display: none;
-          }
+  @property({type: Object})
+  availableLanguages!: any;
 
-          --paper-input-container-input: {
-            color: var(--theme-primary-text-color-medium);
-          }
+  @property({type: Array})
+  data!: any[];
 
-          --paper-dropdown-menu-icon: {
-            color: var(--theme-primary-text-color-medium);
-          }
+  @property({type: Number})
+  selected = 0;
 
-          --paper-input-container-label: {
-            top: 4px;
-            color: var(--theme-primary-text-color-medium);
-          }
+  @property({type: String})
+  current!: string;
 
-          --paper-input-container-input: {
-            margin-bottom: 2px;
-            color: var(--theme-primary-text-color-medium);
-            @apply --language-dropdown-input;
-          }
-        }
+  defaultLanguage = 'en';
 
-        paper-item {
-          font-size: 15px;
-          white-space: nowrap;
-          cursor: pointer;
-          min-height: 48px;
-          padding: 0px 16px;
-        }
-      </style>
-
-      <paper-dropdown-menu label="[[language]]" noink no-label-float>
+  render() {
+    return html`
+      <paper-dropdown-menu label="${this.language}" noink no-label-float>
         <paper-listbox
           slot="dropdown-content"
           class="dropdown-content"
-          on-iron-select="_languageSelected"
+          @iron-select="${this._languageSelected}"
           tracker="Language change"
-          selected="[[selected]]"
+          .selected="${this.selected}"
         >
-          <template id="repeat" is="dom-repeat" items="[[data]]">
-            <paper-item>[[item]]</paper-item>
-          </template>
+          ${this.data.map((item) => html` <paper-item>${item}</paper-item> `)}
         </paper-listbox>
-      </paper-dropdown-menu>`;
+      </paper-dropdown-menu>
+    `;
   }
 
-  @property({type: String, computed: '_computeLanguage(data, current)'})
-  language!: string;
+  stateChanged(state: any) {
+    if (this.current !== state.localize.language) {
+      this.current = state.localize.language;
+    }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.localize.resources)'})
-  availableLanguages!: GenericObject;
+    if (this.availableLanguages !== state.localize.resources) {
+      this.availableLanguages = state.localize.resources;
+    }
 
-  @property({type: Number, computed: '_computeSelected(data, language)'})
-  selected = 0;
+    this.data = this._computeLanguages(this.availableLanguages);
+  }
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
-  current!: string;
+  updated(changedProperties: Map<string | number | symbol, unknown>) {
+    if (changedProperties.has('data') || changedProperties.has('current')) {
+      this.language = this._computeLanguage(this.data, this.language);
+    }
 
-  @property({type: Array, computed: '_computeLanguages(availableLanguages)'})
-  data!: any[];
+    if (changedProperties.has('data') || changedProperties.has('language')) {
+      this.selected = this._computeSelected(this.data, this.language);
+      this._dispatchEvent('selected', this.selected);
+    }
+  }
 
-  private defaultLanguage = 'en';
-
-  _languageSelected(e: CustomEvent) {
+  private _languageSelected(e: CustomEvent) {
     const allLanguages = Object.keys(this.availableLanguages);
     if (!allLanguages.includes(this.current)) {
       this._storeSelectedLanguage(this.defaultLanguage);
     }
-    const newLanguage = (this.$.repeat as DomRepeat).itemForElement(e.detail.item);
+    const newLanguage = e.detail.item.innerText; //Hack
     if (newLanguage === this.current) {
       return;
     }
     this.trackAnalytics(e);
     this._storeSelectedLanguage(newLanguage);
-    // Event caught by self translating npm packages
     fireEvent(this, 'language-changed', {language: newLanguage});
   }
 
-  _storeSelectedLanguage(language: string) {
+  private _storeSelectedLanguage(language: string) {
     localStorage.setItem('defaultLanguage', language);
-    this.reduxStore.dispatch(localizeSet(language));
+    console.log(language);
+    store.dispatch(localizeSet(language));
   }
 
-  _computeLanguage(data: any[], current: string) {
-    return data.filter(function (language: string) {
-      return language === current;
-    })[0];
+  private _computeLanguage(data: any[], current: string): string {
+    return data.find((language) => language === current) || '';
   }
 
-  _computeSelected(data: any[], language: string) {
-    if (!data || !data.length || !language) {
-      return;
-    }
+  private _computeSelected(data: any[], language: string): number {
     return data.indexOf(language);
   }
 
-  _computeLanguages(availableLanguages: GenericObject) {
-    return Object.keys(availableLanguages).slice();
+  private _computeLanguages(availableLanguages: any): any[] {
+    return Object.keys(availableLanguages);
+  }
+
+  private _dispatchEvent(propName: string, value: any) {
+    fireEvent(this, `${propName}-changed`, {value});
   }
 }
-
-window.customElements.define('language-dropdown', LanguageDropdown);

@@ -1,70 +1,71 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route';
-import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
-import '@polymer/app-layout/app-drawer/app-drawer';
-import '@polymer/app-layout/app-header/app-header';
-import '@polymer/app-layout/app-toolbar/app-toolbar';
-import '@polymer/iron-pages/iron-pages';
-import '../../elements/ip-reporting/nav';
-import '../../elements/ip-reporting/app-header';
-import '../../etools-prp-common/elements/page-title';
-import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
-import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@polymer/app-route/app-route.js';
+import '@polymer/app-layout/app-drawer-layout/app-drawer-layout.js';
+import '@polymer/app-layout/app-drawer/app-drawer.js';
+import '@polymer/app-layout/app-header/app-header.js';
+import '@polymer/app-layout/app-toolbar/app-toolbar.js';
+import '@polymer/iron-pages/iron-pages.js';
+import '../../elements/ip-reporting/nav.js';
+import '../../elements/ip-reporting/app-header.js';
+import '../../etools-prp-common/elements/page-title.js';
+import {appThemeIpStyles} from '../../styles/app-theme-ip-styles.js';
+import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/iron-overlay-behavior/iron-overlay-backdrop.js';
 
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import {getDomainByEnv} from '../../etools-prp-common/config';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin.js';
+import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin.js';
+import {getDomainByEnv} from '../../etools-prp-common/config.js';
+import { Route } from '../../etools-prp-common/typings/globals.types.js';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  static get template() {
+@customElement('page-ip-reporting')
+export class PageIpReporting extends LocalizeMixin(UtilsMixin(LitElement)) {
+  static styles = [
+    css`
+      :host {
+        display: block;
+      }
+      app-drawer {
+        --app-drawer-width: 225px;
+        --app-drawer-content-container: {
+          box-shadow: 1px 0 2px 1px rgba(0, 0, 0, 0.1);
+        }
+        z-index: 0 !important;
+      }
+      app-toolbar {
+        background: var(--theme-primary-color);
+      }
+      .mode {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--theme-primary-text-color-light);
+        cursor: default;
+        user-select: none;
+      }
+      .content-align {
+        display: flex;
+        align-items: center;
+      }
+      #page-container {
+        margin-left: -30px;
+      }
+      #pageOverlay.opened {
+        opacity: 0.6 !important;
+        transition: opacity 0.2s linear;
+      }
+    `
+  ];
+
+  @property({type: String})
+  page = '';
+
+  render() {
     return html`
       ${appThemeIpStyles}
-      <style>
-        :host {
-          display: block;
-        }
-        app-drawer {
-          --app-drawer-width: 225px;
-          --app-drawer-content-container: {
-            box-shadow: 1px 0 2px 1px rgba(0, 0, 0, 0.1);
-          }
-          z-index: 0 !important;
-        }
-        app-toolbar {
-          background: var(--theme-primary-color);
-        }
-        .mode {
-          font-size: 16px;
-          text-transform: uppercase;
-          color: var(--theme-primary-text-color-light);
-          cursor: default;
-          user-select: none;
-        }
-        .content-align {
-          @apply --layout-horizontal;
-          @apply --layout-center;
-        }
-        #page-container {
-          margin-left: -30px;
-        }
-        #pageOverlay.opened {
-          opacity: 0.6 !important;
-          transition: opacity 0.2s linear;
-        }
-      </style>
+      <page-title .title="${this.localize('ip_reporting')}"></page-title>
 
-      <page-title title="[[localize('ip_reporting')]]"></page-title>
-
-      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"> </app-route>
+      <app-route .route="${this.route}" pattern="/:page" .data="${this.routeData}" .tail="${this.subroute}">
+      </app-route>
 
       <app-drawer-layout fullbleed responsive-width="0px">
         <app-drawer id="drawer" slot="drawer">
@@ -78,7 +79,7 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
             </app-toolbar>
           </app-header>
 
-          <ip-reporting-nav selected="{{page}}" role="navigation"> </ip-reporting-nav>
+          <ip-reporting-nav .selected="${this.page}" role="navigation"> </ip-reporting-nav>
         </app-drawer>
 
         <main role="main" id="page-container">
@@ -86,38 +87,43 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
           <ip-reporting-app-header></ip-reporting-app-header>
 
-          <iron-pages selected="[[page]]" attr-for-selected="name">
-            <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
-              <page-ip-reporting-overview name="overview" route="{{subroute}}"> </page-ip-reporting-overview>
-            </template>
-
-            <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
-              <page-ip-reporting-pd name="pd" route="{{subroute}}"> </page-ip-reporting-pd>
-            </template>
-
-            <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
-              <page-ip-reporting-indicators name="indicators" route="{{subroute}}"> </page-ip-reporting-indicators>
-            </template>
-
-            <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
-              <page-ip-progress-reports name="progress-reports" route="{{subroute}}"> </page-ip-progress-reports>
-            </template>
+          <iron-pages .selected="${this.page}" attr-for-selected="name">
+            ${this._equals(this.page, 'overview')
+              ? html` <page-ip-reporting-overview name="overview" .route="${this.subroute}">
+                </page-ip-reporting-overview>`
+              : ''}
+            ${this._equals(this.page, 'pd')
+              ? html` <page-ip-reporting-pd name="pd" .route="${this.subroute}"> </page-ip-reporting-pd>`
+              : ''}
+            ${this._equals(this.page, 'indicators')
+              ? html` <page-ip-reporting-indicators name="indicators" .route="${this.subroute}">
+                </page-ip-reporting-indicators>`
+              : ''}
+            ${this._equals(this.page, 'progress-reports')
+              ? html` <page-ip-progress-reports name="progress-reports" .route="${this.subroute}">
+                </page-ip-progress-reports>`
+              : ''}
           </iron-pages>
         </main>
       </app-drawer-layout>
     `;
   }
 
-  @property({type: String, observer: '_pageChanged'})
-  page!: string;
+  @property({type: Object})
+  route!: Route;
 
-  static get observers() {
-    return ['_routePageChanged(routeData.page)'];
+  @property({type: Object})
+  routeData!: {page: string};
+
+  updated(changedProperties){
+    if(changedProperties.has("routeData")){
+      this._routePageChanged(this.routeData.page);
+    }
   }
 
   _routePageChanged(page: string) {
     if (!page) {
-      this.set('route.path', '/overview'); // FIXME: correct default?
+      this.route.path = '/overview'; // FIXME: correct default?
     } else {
       this.page = page;
     }
@@ -135,10 +141,6 @@ class PageIpReporting extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     window.location.href = '/not-found';
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-  }
 }
-window.customElements.define('page-ip-reporting', PageIpReporting);
 
 export {PageIpReporting as PageIpReportingEl};

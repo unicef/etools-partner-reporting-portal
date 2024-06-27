@@ -13,6 +13,7 @@ import {ProgressReportsState} from '../redux/reducers/progressReports';
 import {ResponsePlansState} from '../redux/reducers/responsePlans';
 import {DisaggregationsState} from '../redux/reducers/disaggregations';
 import {CurrenciesDataState} from '../redux/reducers/currencies';
+import {LocationState} from '../redux/reducers/location';
 
 export interface RootState {
   localize: LocaLizeState;
@@ -20,6 +21,7 @@ export interface RootState {
   workspaces: WorkspacesState;
   app: AppState;
   partner: PartnerState;
+  location: LocationState;
   indicators: IndicatorsState;
   programmeDocuments: ProgrammeDocumentsState;
   programmeDocumentsIndicators: ProgrammeDocumentsIndicatorsState;

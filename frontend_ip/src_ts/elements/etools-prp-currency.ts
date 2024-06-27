@@ -1,18 +1,16 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import {GenericObject} from '../etools-prp-common/typings/globals.types';
-import '../etools-prp-common/elements/etools-prp-number';
+import {LitElement, html} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import './etools-prp-number';
 
-/**
- * @polymer
- * @customElement
- */
-class EtoolsPrpCurrency extends PolymerElement {
-  static get template() {
-    return html` [[meta.prefix]]<etools-prp-number value="[[value]]"></etools-prp-number>[[meta.suffix]] `;
-  }
+@customElement('etools-prp-currency')
+export class EtoolsPrpCurrency extends LitElement {
+  @property({type: Number})
+  value!: number;
 
-  private currencies: GenericObject = {
+  @property({type: String})
+  currency!: string;
+
+  private currencies: any = {
     USD: {
       prefix: '$ '
     },
@@ -21,14 +19,21 @@ class EtoolsPrpCurrency extends PolymerElement {
     }
   };
 
-  @property({type: Number})
-  value!: number;
+  @property({type: Object})
+  meta: {prefix?: string; suffix?: string} = {};
 
-  @property({type: String})
-  currency!: string;
+  render() {
+    const meta = this.meta || {};
+    return html`
+      ${meta.prefix || ''}<etools-prp-number .value="${this.value}"></etools-prp-number>${meta.suffix || ''}
+    `;
+  }
 
-  @property({type: Object, computed: '_computeMeta(currency)'})
-  meta!: string;
+  updated(changedProperties) {
+    if (changedProperties.has('currency')) {
+      this.meta = this._computeMeta(this.currency);
+    }
+  }
 
   _computeMeta(currency: string) {
     return (
@@ -38,6 +43,5 @@ class EtoolsPrpCurrency extends PolymerElement {
     );
   }
 }
-window.customElements.define('etools-prp-currency', EtoolsPrpCurrency);
 
 export {EtoolsPrpCurrency as EtoolsPrpCurrencyEl};

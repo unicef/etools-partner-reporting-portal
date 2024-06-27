@@ -1,49 +1,46 @@
-import {PolymerElement, html} from '@polymer/polymer';
+import {LitElement, html, css} from 'lit';
 import '@polymer/paper-checkbox/paper-checkbox';
+import {property, customElement} from 'lit/decorators.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {property} from '@polymer/decorators';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin FilterMixin
- */
-class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
-  static get template() {
+@customElement('checkbox-filter')
+export class CheckboxFilter extends UtilsMixin(FilterMixin(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    ::slotted() .checkbox-label {
+      font-size: 12px;
+    }
+  `;
+
+  @property({type: Boolean, reflect: true})
+  checked = false;
+
+  @property({type: String})
+  value = '';
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        ::slotted() .checkbox-label {
-          font-size: 12px;
-        }
-      </style>
-
-      <paper-checkbox id="field" name="[[name]]" checked="{{checked}}" on-tap="_handleInput">
+      <paper-checkbox id="field" name="${this.name}" .checked="${this.checked}" @tap="${this._handleInput}">
         <slot></slot>
       </paper-checkbox>
     `;
   }
 
-  @property({type: Boolean, notify: true, computed: '_computeChecked(value)'})
-  checked!: boolean;
-
-  @property({type: String})
-  value = '';
-
-  private _debouncer!: Debouncer;
+  updated(changedProperties) {
+    if (changedProperties.has('value')) {
+      this.checked = this._computeChecked(this.value);
+    }
+  }
 
   _handleInput() {
-    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const newValue = (this.$.field as HTMLInputElement).checked;
+    debounce(() => {
+      const newValue = (this.shadowRoot?.getElementById('field') as any)?.checked;
 
       if (newValue.toString() !== this.lastValue) {
         fireEvent(this, 'filter-changed', {
@@ -51,28 +48,21 @@ class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
           value: newValue.toString()
         });
       }
-    });
+    }, 250);
   }
 
-  _computeChecked(value: string) {
+  _computeChecked(value) {
     return value ? !!this._toNumber(value) : false;
   }
 
   connectedCallback() {
     super.connectedCallback();
-
     this._filterReady();
   }
 
   disconnectedCallback() {
-    super.connectedCallback();
-
-    if (this._debouncer && this._debouncer.isActive()) {
-      this._debouncer.cancel();
-    }
+    super.disconnectedCallback();
   }
 }
-
-window.customElements.define('checkbox-filter', CheckboxFilter);
 
 export {CheckboxFilter as CheckboxFilterEl};

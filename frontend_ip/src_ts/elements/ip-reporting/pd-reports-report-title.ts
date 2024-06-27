@@ -1,9 +1,6 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/polymer/lib/elements/dom-if';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/etools-prp-permissions';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
@@ -16,61 +13,38 @@ import {
   getReportTitle,
   getReportLink
 } from './js/pd-reports-report-title-functions';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdReportsReportTitle extends LocalizeMixin(
-  ProgressReportUtilsMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement)))
+@customElement('pd-reports-report-title')
+export class PdReportsReportTitle extends LocalizeMixin(
+  ProgressReportUtilsMixin(UtilsMixin(RoutingMixin(connect(store)(LitElement))))
 ) {
-  public static get template() {
-    return html`
-      <style>
-        .final-badge {
-          display: inline-block;
-          border-radius: 1px;
-          padding: 1px 6px;
-          font-size: 10px;
-          text-transform: uppercase;
-          background-color: var(--paper-grey-300);
-          margin-left: 5px;
-          font-weight: bold;
-        }
-        .link-mode-icon {
-          height: 15px;
-          margin-right: 2px;
-        }
-        a {
-          color: var(--primary-color);
-        }
-      </style>
-
-      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
-
-      <template is="dom-if" if="[[showLink]]" restamp="true">
-        <a href="[[_getReportLink(report, permissions)]]">
-          <template is="dom-if" if="[[displayLinkIcon]]" restamp="true">
-            <iron-icon class="link-mode-icon" icon="[[_getReportIcon(report, permissions)]]"></iron-icon>
-          </template>
-          [[_getReportTitle(report, localize)]]
-        </a>
-      </template>
-      <template is="dom-if" if="[[!showLink]]" restamp="true"> [[_getReportTitleFull(report, localize)]] </template>
-      <template is="dom-if" if="[[_isFinalReport(report)]]" restamp="true">
-        <div class="final-badge">final</div>
-      </template>
-    `;
-  }
+  static styles = css`
+    .final-badge {
+      display: inline-block;
+      border-radius: 1px;
+      padding: 1px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      background-color: var(--paper-grey-300);
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    .link-mode-icon {
+      height: 15px;
+      margin-right: 2px;
+    }
+    a {
+      color: var(--primary-color);
+    }
+  `;
 
   @property({type: Object})
-  permissions!: GenericObject;
+  permissions!: any;
 
   @property({type: Object})
-  report!: GenericObject;
+  report!: any;
 
   @property({type: Boolean})
   displayLink = false;
@@ -78,33 +52,64 @@ class PdReportsReportTitle extends LocalizeMixin(
   @property({type: Boolean})
   displayLinkIcon = false;
 
-  @property({type: Boolean, computed: '_shouldDisplayLink(displayLink, report, permissions)'})
-  showLink!: boolean;
+  @property({type: Boolean, attribute: false})
+  showLink = false;
 
-  _shouldDisplayLink(displayLink: string, report: GenericObject, permissions: GenericObject) {
+  render() {
+    return html`
+      <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
+
+      ${this.showLink
+        ? html`
+            <a href="${this._getReportLink(this.report, this.permissions)}">
+              ${this.displayLinkIcon
+                ? html`<iron-icon
+                    class="link-mode-icon"
+                    icon="${this._getReportIcon(this.report, this.permissions)}"
+                  ></iron-icon>`
+                : html``}
+              ${this._getReportTitle(this.report, this.localize)}
+            </a>
+          `
+        : html`${this._getReportTitleFull(this.report, this.localize)}`}
+      ${this._isFinalReport(this.report) ? html`<div class="final-badge">final</div>` : html``}
+    `;
+  }
+
+  updated(changedProperties: Map<string | number | symbol, unknown>) {
+    if (
+      changedProperties.has('displayLink') ||
+      changedProperties.has('report') ||
+      changedProperties.has('permissions')
+    ) {
+      this.showLink = !!this._shouldDisplayLink(this.displayLink, this.report, this.permissions);
+    }
+  }
+
+  _shouldDisplayLink(displayLink: any, report: any, permissions: any) {
     if (!permissions) {
-      return;
+      return false;
     }
     return shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
   }
 
-  _getReportTitleFull(report: GenericObject, localize: (x: string) => string) {
+  _getReportTitleFull(report: any, localize: (x: string) => string) {
     return report ? getReportTitleFull(report, localize) : '';
   }
 
-  _getReportTitle(report: GenericObject, localize: (x: string) => string) {
+  _getReportTitle(report: any, localize: (x: string) => string) {
     return getReportTitle(report, localize);
   }
 
-  _getReportLink(report: GenericObject, permissions: GenericObject) {
+  _getReportLink(report: any, permissions: any) {
     if (!permissions) {
-      return;
+      return '';
     }
     const suffix = this._getMode(report, permissions);
     return getReportLink(report, suffix, this.buildUrl, this._baseUrl);
   }
 
-  _getReportIcon(report: GenericObject, permissions: GenericObject) {
+  _getReportIcon(report: any, permissions: any) {
     if (!permissions) {
       return 'icons:visibility';
     }
@@ -112,7 +117,5 @@ class PdReportsReportTitle extends LocalizeMixin(
     return suffix === 'view' ? 'icons:visibility' : 'icons:create';
   }
 }
-
-window.customElements.define('pd-reports-report-title', PdReportsReportTitle);
 
 export {PdReportsReportTitle as PdReportsReportTitleEl};

@@ -1,10 +1,7 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/paper-button/paper-button.js';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -24,55 +21,16 @@ import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-rep
 import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
 import {RootState} from '../../typings/redux.types';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
-    return html`
-      ${buttonsStyles}
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-ajax
-        id="refreshReport"
-        url="[[refreshUrl]]"
-        body="[[refreshData]]"
-        method="post"
-        content-type="application/json"
-      >
-      </etools-prp-ajax>
-
-      <refresh-report-modal id="refresh" data="[[refreshData]]" refresh-url="[[refreshUrl]]"> </refresh-report-modal>
-
-      <etools-prp-toolbar query="{{query}}" report-id="{{reportId}}" location-id="{{locationId}}">
-        <download-button url="[[pdfExportUrl]]" tracker="PD Report Export Pdf">PDF</download-button>
-        <download-button url="[[xlsExportUrl]]" tracker="PD Report Export Xls">XLS</download-button>
-
-        <template is="dom-if" if="[[showImportButtons]]" restamp="true">
-          <upload-button url="[[importUrl]]" modal-title="Import Template">
-            [[localize('import_template')]]
-          </upload-button>
-          <download-button url="[[importTemplateUrl]]" tracker="Import template"
-            >[[localize('generate_uploader')]]</download-button
-          >
-          <template is="dom-if" if="[[showRefresh]]" restamp="true">
-            <paper-button class="btn-primary" on-tap="_refresh" disabled="[[busy]]" raised>
-              [[localize('refresh')]]
-            </paper-button>
-          </template>
-        </template>
-      </etools-prp-toolbar>
-    `;
-  }
+@customElement('pd-output-list-toolbar')
+export class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
 
   @property({type: String})
   query!: string;
@@ -80,87 +38,127 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
   @property({type: String})
   locationId!: string;
 
-  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
-  programmeDocument!: GenericObject;
-
-  @property({type: Boolean, computed: '_computeShowImportButtons(programmeDocument)'})
-  showImportButtons!: boolean;
-
-  @property({type: String, computed: '_computeImportTemplateUrl(locationId, reportId)'})
-  importTemplateUrl!: string;
-
-  @property({type: String, computed: '_computeImportUrl(locationId, reportId)'})
-  importUrl!: string;
-
-  @property({type: String, computed: '_computePdReportUrl(locationId, reportId)'})
-  pdReportUrl!: string;
-
-  @property({type: String, computed: "_appendQuery(pdReportUrl, query, 'export=pdf')"})
-  pdfExportUrl!: string;
-
-  @property({type: String, computed: "_appendQuery(pdReportUrl, query, 'export=xlsx')"})
-  xlsExportUrl!: string;
-
-  @property({type: Object, computed: '_programmeDocumentReportsCurrent(rootState)'})
-  currentReport!: GenericObject;
-
-  @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
-  currentUserRoles!: any[];
-
-  @property({type: Object, computed: '_computeRefreshData(reportId)'})
-  refreshData!: GenericObject;
-
-  @property({type: Boolean, computed: '_computeCanRefresh(currentReport, programmeDocument)'})
-  canRefresh = false;
-
-  @property({type: Boolean, computed: '_computeShowRefresh(canRefresh, currentUserRoles)'})
-  showRefresh = false;
-
   @property({type: String})
   reportId!: string;
 
   @property({type: String})
   refreshUrl = Endpoints.reportProgressReset();
 
-  _programmeDocumentReportsCurrent(rootState: RootState) {
-    return programmeDocumentReportsCurrent(rootState);
+  @property({type: Boolean})
+  showImportButtons = false;
+
+  @property({type: String})
+  importTemplateUrl!: string;
+
+  @property({type: String})
+  importUrl!: string;
+
+  @property({type: String})
+  pdReportUrl!: string;
+
+  @property({type: String})
+  pdfExportUrl?: string;
+
+  @property({type: String})
+  xlsExportUrl?: string;
+
+  @property({type: Object})
+  currentReport: any = null;
+
+  @property({type: Object})
+  refreshData: any = null;
+
+  @property({type: Boolean})
+  canRefresh = false;
+
+  @property({type: Boolean})
+  showRefresh = false;
+
+  @property({type: Array})
+  currentUserRoles: any[] = [];
+
+  stateChanged(state: RootState) {
+    this.programmeDocument = programmeDocumentReportsCurrent(state);
+    this.currentReport = programmeDocumentReportsCurrent(state);
+    this.currentUserRoles = state.userProfile?.profile?.prp_roles;
   }
 
-  _computeImportTemplateUrl(locationId: string, reportId: string) {
-    return computeImportTemplateUrl(locationId, reportId);
+  updated(changedProperties) {
+    if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
+      this.importTemplateUrl = computeImportTemplateUrl(this.locationId, this.reportId);
+      this.importUrl = computeImportUrl(this.locationId, this.reportId);
+      this.pdReportUrl = computePdReportUrl(this.locationId, this.reportId);
+    }
+
+    if (changedProperties.has('pdReportUrl') || changedProperties.has('query')) {
+      this.pdfExportUrl = this._appendQuery(this.pdReportUrl, this.query, 'export=pdf');
+      this.xlsExportUrl = this._appendQuery(this.pdReportUrl, this.query, 'export=xlsx');
+    }
+
+    if (changedProperties.has('reportId')) {
+      this.refreshData = computeRefreshData(this.reportId);
+    }
+
+    if (changedProperties.has('programmeDocument')) {
+      this.showImportButtons = computeShowImportButtons(this.programmeDocument);
+    }
+
+    if (changedProperties.has('currentReport') || changedProperties.has('programmeDocument')) {
+      this.canRefresh = computeCanRefresh(this.currentReport, this.programmeDocument);
+    }
+
+    if (changedProperties.has('programmeDocument') || changedProperties.has('canRefresh')) {
+      this.showRefresh = this.canRefresh && computeShowRefresh(this.currentUserRoles);
+    }
   }
 
-  _computeImportUrl(locationId: string, reportId: string) {
-    return computeImportUrl(locationId, reportId);
-  }
+  render() {
+    return html`
+      ${buttonsStyles}
 
-  _computeShowImportButtons(programmeDocument: GenericObject) {
-    return computeShowImportButtons(programmeDocument);
-  }
+      <etools-prp-ajax
+        id="refreshReport"
+        url="${this.refreshUrl}"
+        body="${JSON.stringify(this.refreshData)}"
+        method="post"
+        content-type="application/json"
+      >
+      </etools-prp-ajax>
 
-  _computePdReportUrl(locationId: string, reportId: string) {
-    return computePdReportUrl(locationId, reportId);
-  }
+      <refresh-report-modal id="refresh" data="${JSON.stringify(this.refreshData)}" refresh-url="${this.refreshUrl}">
+      </refresh-report-modal>
 
-  _computeRefreshData(reportId: string) {
-    return computeRefreshData(reportId);
-  }
+      <etools-prp-toolbar query="${this.query}" report-id="${this.reportId}" location-id="${this.locationId}">
+        <download-button url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
+        <download-button url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
 
-  _computeCanRefresh(report: GenericObject, programmeDocument: GenericObject) {
-    return computeCanRefresh(report, programmeDocument);
-  }
-
-  _computeShowRefresh(canRefresh: boolean, currentUserRoles: any[]) {
-    return canRefresh && computeShowRefresh(currentUserRoles);
+        ${this.showImportButtons
+          ? html`
+              <upload-button url="${this.importUrl}" modal-title="Import Template">
+                ${this.localize('import_template')}
+              </upload-button>
+              <download-button url="${this.importTemplateUrl}" tracker="Import template">
+                ${this.localize('generate_uploader')}
+              </download-button>
+              ${this.showRefresh
+                ? html`
+                    <paper-button class="btn-primary" @click="${this._refresh}" ?disabled="${this.busy}" raised>
+                      ${this.localize('refresh')}
+                    </paper-button>
+                  `
+                : ''}
+            `
+          : ''}
+      </etools-prp-toolbar>
+    `;
   }
 
   _refresh() {
-    (this.$.refresh as RefreshReportModalEl).open();
+    (this.shadowRoot?.getElementById('refresh') as RefreshReportModalEl)?.open();
   }
 
   _onFileUploaded(e: CustomEvent) {
     e.stopPropagation();
-
     window.location.reload();
   }
 
@@ -175,18 +173,14 @@ class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement
 
   connectedCallback() {
     super.connectedCallback();
-
     this._addEventListeners();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
     this._removeEventListeners();
-    (this.$.refresh as RefreshReportModalEl).close();
+    (this.shadowRoot?.getElementById('refresh') as RefreshReportModalEl)?.close();
   }
 }
-
-window.customElements.define('pd-output-list-toolbar', PdOutputListToolbar);
 
 export {PdOutputListToolbar as PdOutputListToolbarEl};

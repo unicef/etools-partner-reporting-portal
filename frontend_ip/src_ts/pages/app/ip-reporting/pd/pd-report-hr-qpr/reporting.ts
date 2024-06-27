@@ -1,16 +1,13 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '../../../../../elements/ip-reporting/pd-output-list';
-import '../../../../../elements/ip-reporting/pd-output-list-toolbar';
-import '../../../../../elements/ip-reporting/report-filters';
-import '../pd-sent-back';
+import {LitElement, html} from 'lit';
+import {customElement} from 'lit/decorators.js';
+import '../../../../../elements/ip-reporting/pd-output-list.js';
+import '../../../../../elements/ip-reporting/pd-output-list-toolbar.js';
+import '../../../../../elements/ip-reporting/report-filters.js';
+import '../pd-sent-back.js';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- */
-class PagePdReportReporting extends PolymerElement {
-  public static get template() {
+@customElement('page-pd-report-reporting')
+export class PagePdReportReporting extends LitElement {
+  render() {
     return html`
       <pd-sent-back></pd-sent-back>
       <report-filters></report-filters>
@@ -19,5 +16,3 @@ class PagePdReportReporting extends PolymerElement {
     `;
   }
 }
-
-window.customElements.define('page-pd-report-reporting', PagePdReportReporting);

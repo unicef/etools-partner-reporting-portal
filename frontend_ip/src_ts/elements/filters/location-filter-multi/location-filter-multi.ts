@@ -1,87 +1,92 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../../redux/store';
 import '../dropdown-filter/dropdown-filter-multi';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import Endpoints from '../../../endpoints';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- * @appliesMixin FilterDependenciesMixin
- */
-class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(ReduxConnectedElement)) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
+@customElement('location-filter-multi')
+export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
 
-      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
-
-      <dropdown-filter-multi
-        label="[[localize('location')]]"
-        option-label="name"
-        name="location"
-        value="[[value]]"
-        data="[[data]]"
-      >
-      </dropdown-filter-multi>
-    `;
-  }
-
-  @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
+  @property({type: String})
   locationsUrl = '';
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
+  @property({type: String})
+  locationId = '';
 
   @property({type: Array})
-  data!: any;
+  data: any[] = [];
 
   @property({type: Boolean})
   pending = false;
 
   @property({type: String})
-  value!: string;
+  value = '';
 
-  static get observers() {
-    return ['_fetchLocations(locationsUrl, params)'];
+  render() {
+    return html`
+      <etools-prp-ajax id="locations" .url="${this.locationsUrl}"></etools-prp-ajax>
+      <dropdown-filter-multi
+        .label="${this.localize('location')}"
+        option-label="name"
+        name="location"
+        .value="${this.value}"
+        .data="${this.data}"
+      >
+      </dropdown-filter-multi>
+    `;
   }
 
-  _computeLocationsUrl(locationId: string) {
+  updated(changedProperties) {
+    if (changedProperties.has('locationId')) {
+      this.locationsUrl = this._computeLocationsUrl(this.locationId);
+    }
+    if (changedProperties.has('locationsUrl')) {
+      this._fetchLocations(this.locationsUrl);
+    }
+  }
+
+  stateChanged(state) {
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+  }
+
+  _computeLocationsUrl(locationId) {
     return locationId ? Endpoints.locations(locationId) : '';
   }
 
-  _fetchLocations(url: string) {
+  _fetchLocations(url) {
     if (!url) {
       return;
     }
 
-    (this.$.locations as EtoolsPrpAjaxEl).abort();
-
-    (this.$.locations as EtoolsPrpAjaxEl)
+    const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
+    locationsAjax.abort();
+    locationsAjax
       .thunk()()
-      .then((res: any) => {
-        this.set('data', res.data);
+      .then((res) => {
+        this.data = res.data;
       })
-      // @ts-ignore
-      .catch((_err: GenericObject) => {
+      .catch((_err: any) => {
         // TODO: error handling
       });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    (this.$.locations as EtoolsPrpAjaxEl).abort();
+    const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
+    locationsAjax.abort();
   }
 }
 
-window.customElements.define('location-filter-multi', LocationFilterMulti);
+export {LocationFilterMulti as LocationFilterMultiEl};

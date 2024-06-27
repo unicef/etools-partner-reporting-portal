@@ -1,17 +1,21 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/iron-pages/iron-pages';
-import './pd-report-hr-qpr/reporting';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
+import '@polymer/iron-pages/iron-pages.js';
+import './pd-report-hr-qpr/reporting.js'; // Assuming this is the correct path to your component
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- */
-class PagePdReportHr extends UtilsMixin(PolymerElement) {
-  public static get template() {
+@customElement('page-pd-report-hr')
+export class PagePdReportHr extends UtilsMixin(LitElement) {
+  @property({type: String, attribute: true, reflect: true})
+  selectedTab = 'reporting';
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  render() {
     return html`
       <style>
         :host {
@@ -19,16 +23,11 @@ class PagePdReportHr extends UtilsMixin(PolymerElement) {
         }
       </style>
 
-      <iron-pages attr-for-selected="name" selected="{{selectedTab}}">
-        <template is="dom-if" if="[[_equals(selectedTab, 'reporting')]]" restamp="true">
-          <page-pd-report-reporting name="reporting"> </page-pd-report-reporting>
-        </template>
+      <iron-pages attr-for-selected="name" .selected="${this.selectedTab}">
+        <div name="reporting">
+          <page-pd-report-reporting></page-pd-report-reporting>
+        </div>
       </iron-pages>
     `;
   }
-
-  @property({type: String, notify: true})
-  selectedTab!: string;
 }
-
-window.customElements.define('page-pd-report-hr', PagePdReportHr);

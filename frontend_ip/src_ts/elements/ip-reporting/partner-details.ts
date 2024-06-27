@@ -1,126 +1,136 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/iron-icon/iron-icon';
-import '@polymer/iron-icons/communication-icons';
-import '@polymer/app-layout/app-grid/app-grid-style';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-loading/etools-loading';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
+import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-loading/etools-loading';
 import '../../etools-prp-common/elements/labelled-item';
 import {partnerLoading} from '../../redux/selectors/partner';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {computePartnerType} from './js/partner-details-functions';
 import {RootState} from '../../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PartnerDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  static get template() {
+@customElement('partner-details')
+export class PartnerDetails extends MatomoMixin(LocalizeMixin(UtilsMixin(connect(store)(LitElement)))) {
+  static styles = css`
+    :host {
+      display: block;
+      margin-bottom: 25px;
+    }
+
+    etools-content-panel {
+      /* Add your styles */
+    }
+
+    .app-grid {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .item {
+      /* Add your styles */
+    }
+
+    .field-value {
+      display: block;
+      word-wrap: break-word;
+    }
+
+    .field-value[has-icon] {
+      position: relative;
+      padding-left: 2em;
+    }
+
+    .field-value iron-icon {
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--paper-grey-600);
+    }
+  `;
+
+  @property({type: Object})
+  partner!: any;
+
+  @property({type: Boolean})
+  loading = false;
+
+  stateChanged(state: RootState) {
+    this.loading = partnerLoading(state);
+
+    if (this.partner != state.partner.current) {
+      this.partner = state.partner.current;
+    }
+  }
+
+  render() {
     return html`
-      <style include="app-grid-style">
-        :host {
-          display: block;
-          margin-bottom: 25px;
-
-          --app-grid-columns: 3;
-          --app-grid-gutter: 25px;
-          --app-grid-item-height: auto;
-        }
-
-        .app-grid {
-          padding: 0;
-          margin: 0;
-          list-style: none;
-        }
-
-        .field-value {
-          display: block;
-          word-wrap: break-word;
-        }
-
-        .field-value[has-icon] {
-          position: relative;
-          padding-left: 2em;
-        }
-
-        .field-value iron-icon {
-          position: absolute;
-          left: 0;
-          top: 0;
-          color: var(--paper-grey-600);
-        }
-      </style>
-
-      <etools-content-panel panel-title="[[localize('partner_details')]]">
-        <etools-loading active="[[loading]]"></etools-loading>
+      <etools-content-panel panel-title="${this.localize('partner_details')}">
+        <etools-loading ?active="${this.loading}"></etools-loading>
 
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="[[localize('full_name')]]">
-              <span class="field-value">[[_withDefault(partner.title)]]</span>
+            <labelled-item label="${this.localize('full_name')}">
+              <span class="field-value">${this._withDefault(this.partner?.title)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('short_name')]]">
-              <span class="field-value">[[_withDefault(partner.short_title)]]</span>
+            <labelled-item label="${this.localize('short_name')}">
+              <span class="field-value">${this._withDefault(this.partner?.short_title)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('alternate_name')]]">
-              <span class="field-value">[[_withDefault(partner.alternate_title)]]</span>
+            <labelled-item label="${this.localize('alternate_name')}">
+              <span class="field-value">${this._withDefault(this.partner?.alternate_title)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('vendor_number')]]">
-              <span class="field-value">[[_withDefault(partner.vendor_number)]]</span>
+            <labelled-item label="${this.localize('vendor_number')}">
+              <span class="field-value">${this._withDefault(this.partner?.vendor_number)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('partner_type')]]">
-              <span class="field-value">[[_computePartnerType(partner)]]</span>
+            <labelled-item label="${this.localize('partner_type')}">
+              <span class="field-value">${this._computePartnerType(this.partner)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('shared_partners')]]">
-              <span class="field-value">[[_withDefault(partner.shared_partner_display)]]</span>
+            <labelled-item label="${this.localize('shared_partners')}">
+              <span class="field-value">${this._withDefault(this.partner?.shared_partner_display)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('date_last_assessed')]]">
-              <span class="field-value">[[_withDefault(partner.core_values_assessment_date)]]</span>
+            <labelled-item label="${this.localize('date_last_assessed')}">
+              <span class="field-value">${this._withDefault(this.partner?.core_values_assessment_date)}</span>
             </labelled-item>
           </li>
         </ul>
 
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="[[localize('address')]]">
+            <labelled-item label="${this.localize('address')}">
               <span class="field-value" has-icon>
                 <iron-icon icon="communication:location-on"></iron-icon>
-                [[_withDefault(partner.street_address)]]
+                ${this._withDefault(this.partner?.street_address)}
               </span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('phone_number')]]">
+            <labelled-item label="${this.localize('phone_number')}">
               <span class="field-value" has-icon>
                 <iron-icon icon="communication:phone"></iron-icon>
-                [[_withDefault(partner.phone_number)]]
+                ${this._withDefault(this.partner?.phone_number)}
               </span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="[[localize('email_address')]]">
+            <labelled-item label="${this.localize('email_address')}">
               <span class="field-value" has-icon>
                 <iron-icon icon="communication:email"></iron-icon>
-                [[_withDefault(partner.email)]]
+                ${this._withDefault(this.partner?.email)}
               </span>
             </labelled-item>
           </li>
@@ -129,23 +139,11 @@ class PartnerDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     `;
   }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
-  partner!: GenericObject;
-
-  @property({type: Boolean, computed: '_partnerLoading(rootState)'})
-  loading!: boolean;
-
-  static get observers() {
-    return ['_getDataByKey(dataDict)'];
+  _partnerLoading(state: RootState): boolean {
+    return partnerLoading(state);
   }
 
-  _partnerLoading(rootState: RootState) {
-    return partnerLoading(rootState);
-  }
-
-  _computePartnerType(partner: GenericObject) {
+  _computePartnerType(partner: any): string {
     return computePartnerType(partner, this._withDefault);
   }
 }
-
-window.customElements.define('partner-details', PartnerDetails);

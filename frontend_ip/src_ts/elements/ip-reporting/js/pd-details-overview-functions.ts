@@ -1,11 +1,10 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 declare const dayjs: any;
 
-export function computeLoaded(pd: GenericObject) {
+export function computeLoaded(pd: any) {
   return !!pd.id;
 }
 
-export function hasAmendments(pd: GenericObject) {
+export function hasAmendments(pd: any) {
   return pd.amendments && !!pd.amendments.length;
 }
 

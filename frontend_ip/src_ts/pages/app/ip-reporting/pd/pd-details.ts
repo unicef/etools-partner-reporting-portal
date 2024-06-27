@@ -1,59 +1,60 @@
-import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/paper-tabs/paper-tab';
-import '@polymer/paper-tabs/paper-tabs';
-import '@polymer/iron-pages/iron-pages';
-import '../../../../etools-prp-common/elements/page-body';
-import '../../../../etools-prp-common/elements/page-header';
-import '../../../../etools-prp-common/elements/message-box';
-import '../../../../elements/ip-reporting/pd-details-overview';
-import '../../../../elements/ip-reporting/pd-details-reports';
-import '../../../../elements/ip-reporting/pd-details-calculation-methods';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles.js';
+import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments.js';
+import {IronPagesElement} from '@polymer/iron-pages/iron-pages.js';
+import '@polymer/paper-tabs/paper-tab.js';
+import '@polymer/paper-tabs/paper-tabs.js';
+import '@polymer/iron-pages/iron-pages.js';
+import '../../../../etools-prp-common/elements/page-body.js';
+import '../../../../etools-prp-common/elements/page-header.js';
+import '../../../../etools-prp-common/elements/message-box.js';
+import '../../../../elements/ip-reporting/pd-details-overview.js';
+import '../../../../elements/ip-reporting/pd-details-reports.js';
+import '../../../../elements/ip-reporting/pd-details-calculation-methods.js';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
+import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin.js';
+import {RootState} from '../../../../typings/redux.types.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../../../redux/store.js';
 
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
-import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
-import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments';
-import {RootState} from '../../../../typings/redux.types';
-import {IronPagesElement} from '@polymer/iron-pages/iron-pages';
+@customElement('page-ip-reporting-pd-details')
+export class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+    .header-content {
+      margin: 0.5em 0;
+    }
+  `;
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
- * @appliesMixin UtilsMixin
- */
-class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
+  @property({type: String})
+  pdTab = '';
+
+  @property({type: Object})
+  routeData: any = {};
+
+  @property({type: Object})
+  pd: any = {};
+
+  render() {
     return html`
       ${sharedStyles}
-      <style>
-        :host {
-          display: block;
-        }
+      <app-route .route="${this.route}" pattern="/:dashTab" .data="${this.routeData}"></app-route>
 
-        .header-content {
-          margin: 0.5em 0;
-        }
-      </style>
-
-      <app-route route="{{route}}" pattern="/:dashTab" data="{{routeData}}"> </app-route>
-
-      <page-header title="[[pd.title]]" back="pd?&status=Sig%2CAct%2CSus">
-        <template is="dom-if" if="[[_equals(pd.status, 'Suspended')]]" restamp="true">
-          <message-box slot="header-content" type="warning">
-            PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
-          </message-box>
-        </template>
+      <page-header title="${this.pd.title}" back="pd?&status=Sig%2CAct%2CSus">
+        ${this.pd?.status === 'Suspended'
+          ? html` <message-box slot="header-content" type="warning">
+              PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
+            </message-box>`
+          : html``}
 
         <div slot="tabs">
-          <paper-tabs selected="{{routeData.dashTab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
-            <paper-tab name="details">[[localize('details')]]</paper-tab>
-            <paper-tab name="reports">[[localize('reports')]]</paper-tab>
-            <paper-tab name="calculation-methods">[[localize('calculation_methods')]]</paper-tab>
+          <paper-tabs .selected="${this.routeData?.dashTab}" attr-for-selected="name" scrollable hide-scroll-buttons>
+            <paper-tab name="details">${this.localize('details')}</paper-tab>
+            <paper-tab name="reports">${this.localize('reports')}</paper-tab>
+            <paper-tab name="calculation-methods">${this.localize('calculation_methods')}</paper-tab>
           </paper-tabs>
         </div>
       </page-header>
@@ -62,47 +63,31 @@ class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedEl
         id="tabContent"
         attr-for-selected="name"
         fallback-selection="details"
-        on-iron-items-changed="_updateTabSelection"
+        @iron-items-changed="${this._updateTabSelection}"
       >
-        <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details"></pd-details-overview>
-        </template>
-
-        <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports"></pd-details-reports>
-        </template>
-
-        <template is="dom-if" if="[[_equals(pdTab, 'calculation-methods')]]" restamp="true">
-          <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods>
-        </template>
+        ${this.pdTab === 'details' ? html`<pd-details-overview name="details"></pd-details-overview>` : html``}
+        ${this.pdTab === 'reports' ? html`<pd-details-reports name="reports"></pd-details-reports>` : html``}
+        ${this.pdTab === 'calculation-methods'
+          ? html`<pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods>`
+          : html``}
       </iron-pages>
     `;
   }
 
-  @property({type: String})
-  pdTab!: string;
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    if (changedProperties.has('routeData')) {
+      this.pdTab = this.routeData.dashTab;
+    }
+  }
 
-  @property({type: Object})
-  routeData!: GenericObject;
-
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
-  pd: GenericObject = {};
-
-  public static get observers() {
-    return ['_updateUrlTab(routeData.dashTab)'];
+  stateChanged(state: RootState) {
+    if (this.state !== currentProgrammeDocument(state)) {
+      this.pd = currentProgrammeDocument(state);
+    }
   }
 
   _updateTabSelection() {
-    (this.$.tabContent as IronPagesElement).select(this.pdTab);
-  }
-
-  _updateUrlTab(dashTab: string) {
-    this.set('pdTab', dashTab);
-  }
-
-  _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState);
+    (this.shadowRoot!.getElementById('tabContent') as IronPagesElement).select(this.pdTab);
   }
 }
-
-window.customElements.define('page-ip-reporting-pd-details', PageIpReportingPdDetails);

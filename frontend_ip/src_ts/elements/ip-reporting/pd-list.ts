@@ -1,10 +1,7 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/iron-icon/iron-icon';
-import '@polymer/iron-icons/iron-icons';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-data-table/data-table-styles';
 import '@polymer/paper-tooltip/paper-tooltip';
@@ -21,178 +18,168 @@ import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../etools-prp-currency';
 import '../../etools-prp-common/elements/list-placeholder';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
+import {RootState} from '../../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin DataTableMixin
- * @appliesMixin PaginationMixin
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdList extends MatomoMixin(
-  LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement)))))
+@customElement('pd-list')
+export class PdList extends MatomoMixin(
+  LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(connect(store)(LitElement))))))
 ) {
-  public static get template() {
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    etools-content-panel::part(ecp-content) {
+      padding: 0;
+    }
+
+    .cell-reports {
+      text-align: right;
+      text-transform: uppercase;
+    }
+  `;
+
+  @property({type: Boolean})
+  loading = false;
+
+  @property({type: Array})
+  data: any[] = [];
+
+  @property({type: Number})
+  totalResults = 0;
+
+  stateChanged(state: RootState) {
+    if (this.loading !== state.programmeDocuments.loading) {
+      this.loading = state.programmeDocuments.loading;
+    }
+
+    if (this.data !== state.programmeDocuments.all) {
+      this.data = state.programmeDocuments.all;
+    }
+
+    if (this.totalResults !== state.programmeDocuments.count) {
+      this.totalResults = state.programmeDocuments.count;
+    }
+  }
+
+  render() {
     return html`
       ${tableStyles}
-      <style include="data-table-styles">
-        :host {
-          display: block;
-        }
-        etools-content-panel::part(ecp-content) {
-          padding: 0;
-        }
-        .cell-reports {
-          text-align: right;
-          text-transform: uppercase;
-        }
-      </style>
 
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-content-panel panel-title="[[localize('list_pds')]]">
+      <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+          label="${this.visibleRange[0]}-${this.visibleRange[1]} of ${this.totalResults} ${this.localize(
+            'results_to_show'
+          )}"
         >
           <etools-data-table-column field="reference_number" sortable>
-            <div class="table-column">[[localize('pd_ref_number')]]</div>
+            <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable>
-            <div class="table-column">[[localize('pd_ssfa_status')]]</div>
+            <div class="table-column">${this.localize('pd_ssfa_status')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="start_date" sortable>
-            <div class="table-column">[[localize('start_date')]]</div>
+            <div class="table-column">${this.localize('start_date')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="end_date" sortable>
-            <div class="table-column">[[localize('end_date')]]</div>
+            <div class="table-column">${this.localize('end_date')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="cso_contribution" sortable>
-            <div class="table-column">[[localize('cso_contribution')]]</div>
+            <div class="table-column">${this.localize('cso_contribution')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="total_unicef_cash" sortable>
-            <div class="table-column">[[localize('unicef_cash')]]</div>
+            <div class="table-column">${this.localize('unicef_cash')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="total_unicef_supplies" sortable>
-            <div class="table-column">[[localize('unicef_supplies')]]</div>
+            <div class="table-column">${this.localize('unicef_supplies')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="budget" sortable>
-            <div class="table-column">[[localize('planned_budget')]]</div>
+            <div class="table-column">${this.localize('planned_budget')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="funds_received_to_date" sortable>
-            <div class="table-column">[[localize('cash_transfers')]]</div>
+            <div class="table-column">${this.localize('cash_transfers')}</div>
           </etools-data-table-column>
           <etools-data-table-column></etools-data-table-column>
         </etools-data-table-header>
 
-        <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
-        >
-        </etools-data-table-footer>
+        ${this.data.map(
+          (pd) => html`
+            <etools-data-table-row no-collapse>
+              <div slot="row-data">
+                <div class="table-cell table-cell--text">
+                  <a
+                    @click="${this.trackAnalytics}"
+                    tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
+                    href="${this.getLinkUrl(pd.id, 'details')}"
+                  >
+                    ${this._withDefault(pd.reference_number)}
+                    <paper-tooltip>${pd.title}</paper-tooltip>
+                  </a>
+                </div>
+                <div class="table-cell table-cell--text">${this._withDefault(pd.status, '', this.localize)}</div>
+                <div class="table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>
+                <div class="table-cell table-cell--text">${this._withDefault(pd.end_date)}</div>
+                <div class="table-cell table-cell--text">
+                  <etools-prp-currency value="${pd.cso_contribution}" currency="${pd.cso_contribution_currency}">
+                  </etools-prp-currency>
+                </div>
+                <div class="table-cell table-cell--text">
+                  <etools-prp-currency value="${pd.total_unicef_cash}" currency="${pd.total_unicef_cash_currency}">
+                  </etools-prp-currency>
+                </div>
+                <div class="table-cell table-cell--text">
+                  <etools-prp-currency
+                    value="${pd.total_unicef_supplies}"
+                    currency="${pd.total_unicef_supplies_currency}"
+                  >
+                  </etools-prp-currency>
+                </div>
+                <div class="table-cell table-cell--text">
+                  <etools-prp-currency value="${pd.budget}" currency="${pd.budget_currency}"> </etools-prp-currency>
+                </div>
+                <div class="table-cell table-cell--text">
+                  <etools-prp-currency
+                    value="${pd.funds_received_to_date}"
+                    currency="${pd.funds_received_to_date_currency}"
+                  >
+                  </etools-prp-currency>
+                  (${this._computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)})
+                </div>
+                <div class="table-cell table-cell--text cell-reports">
+                  <a @click="${this.trackAnalytics}" tracker="Reports" href="${this.getLinkUrl(pd.id, 'reports')}">
+                    ${this.localize('reports')}
+                  </a>
+                </div>
+              </div>
+            </etools-data-table-row>
+          `
+        )}
 
-        <template id="list" is="dom-repeat" items="[[data]]" as="pd" initial-count="[[pageSize]]">
-          <etools-data-table-row no-collapse>
-            <div slot="row-data">
-              <div class="table-cell table-cell--text">
-                <a
-                  on-tap="trackAnalytics"
-                  tracker$="[[_getPdRefNumberTracker(pd.reference_number)]]"
-                  href="[[getLinkUrl(pd.id, 'details')]]"
-                >
-                  [[_withDefault(pd.reference_number)]]
-                  <paper-tooltip>[[pd.title]]</paper-tooltip>
-                </a>
-              </div>
-              <div class="table-cell table-cell--text">[[_withDefault(pd.status, '', localize)]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(pd.start_date)]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(pd.end_date)]]</div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency value="[[pd.cso_contribution]]" currency="[[pd.cso_contribution_currency]]">
-                </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency value="[[pd.total_unicef_cash]]" currency="[[pd.total_unicef_cash_currency]]">
-                </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency
-                  value="[[pd.total_unicef_supplies]]"
-                  currency="[[pd.total_unicef_supplies_currency]]"
-                >
-                </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency value="[[pd.budget]]" currency="[[pd.budget_currency]]"> </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency
-                  value="[[pd.funds_received_to_date]]"
-                  currency="[[pd.funds_received_to_date_currency]]"
-                >
-                </etools-prp-currency>
-                ([[_computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)]])
-              </div>
-              <div class="table-cell table-cell--text cell-reports">
-                <a on-tap="trackAnalytics" tracker="Reports" href="[[getLinkUrl(pd.id, 'reports')]]"
-                  >[[localize('reports')]]</a
-                >
-              </div>
-            </div>
-          </etools-data-table-row>
-        </template>
+        <list-placeholder .data="${this.data}" .loading="${this.loading}"> </list-placeholder>
 
-        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
-
-        <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
-        >
-        </etools-data-table-footer>
-
-        <etools-loading active="[[loading]]"></etools-loading>
+        <etools-loading ?active="${this.loading}"></etools-loading>
       </etools-content-panel>
     `;
   }
 
-  @property({type: Boolean, computed: 'getReduxStateValue(rootState.programmeDocuments.loading)'})
-  loading!: boolean;
-
-  @property({type: Array, computed: 'getReduxStateArray(rootState.programmeDocuments.all)'})
-  data!: any[];
-
-  @property({type: Number, computed: 'getReduxStateValue(rootState.programmeDocuments.count)'})
-  totalResults!: number;
-
-  _computeFundsReceivedToDateCurrency(percentage?: number) {
+  _computeFundsReceivedToDateCurrency(percentage) {
     if (percentage === null || percentage === -1) {
       return 'N/A';
     } else {
-      return percentage + '%';
+      return `${percentage}%`;
     }
   }
 
-  getLinkUrl(id: string, page: string) {
+  getLinkUrl(id, page) {
     return this.buildUrl(this._baseUrl, `pd/${id}/view/${page}`);
   }
 
-  _getPdRefNumberTracker(pdRefNumber: string) {
+  _getPdRefNumberTracker(pdRefNumber) {
     return `PD reference number: ${pdRefNumber}`;
   }
 }
-
-window.customElements.define('pd-list', PdList);
 
 export {PdList as PdListEl};

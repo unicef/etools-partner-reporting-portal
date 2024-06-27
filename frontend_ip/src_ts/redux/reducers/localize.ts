@@ -1,8 +1,7 @@
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Constants from '../../etools-prp-common/constants';
 import {combineReducers} from 'redux';
 
-let availableLangs: GenericObject;
+let availableLangs: any;
 const defaultLanguage = 'en';
 
 export class LocaLizeState {

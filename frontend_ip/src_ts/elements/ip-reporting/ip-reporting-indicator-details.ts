@@ -1,12 +1,7 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/polymer/lib/elements/dom-repeat';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@polymer/paper-tabs/paper-tab';
-import '@polymer/paper-tabs/paper-tabs';
-import '@polymer/iron-pages/iron-pages';
-import '@polymer/app-layout/app-grid/app-grid-style';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
@@ -15,36 +10,110 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/disaggregations/disaggregation-table';
 import '../../etools-prp-common/elements/list-placeholder';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import {
   computeParams,
   computeIndicatorReportsUrl,
   bucketByLocation,
   computeHidden
 } from './js/ip-reporting-indicator-details-functions';
+import {RootState} from '../../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  static get template() {
+@customElement('ip-reporting-indicator-details')
+export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    /* Insert component-specific styles here */
+  `;
+
+  @property({type: String})
+  indicatorDetailUrl = '';
+
+  @property({type: Number})
+  selected = 0;
+
+  @property({type: Boolean})
+  isOpen = false;
+
+  @property({type: Object})
+  indicator: any | null = null;
+
+  @property({type: Boolean})
+  loading = false;
+
+  @property({type: Array})
+  data: any[] = [];
+
+  @property({type: Object})
+  dataDict: any | null = null;
+
+  @property({type: Array})
+  locations: any[] = [];
+
+  @property({type: String})
+  appName?: string;
+
+  @property({type: Object})
+  params: any | null = null;
+
+  stateChanged(state: RootState) {
+    if (this.loading != state.indicators.loadingDetails) {
+      this.loading = state.indicators.loadingDetails;
+    }
+    if (this.dataDict != state.indicators.details) {
+      this.dataDict = state.indicators.details;
+    }
+
+    if (this.appName != state.app.current) {
+      this.appName = state.app.current;
+    }
+
+    if (this.locations != bucketByLocation(this.data)) {
+      this.locations = bucketByLocation(this.data);
+    }
+
+    this.params = computeParams(false);
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('indicator')) {
+      this.indicatorDetailUrl = computeIndicatorReportsUrl(this.indicator!);
+    }
+
+    if (changedProperties.has('dataDict') && this.dataDict) {
+      this.data = this.dataDict.details[this.indicator!.id];
+    }
+
+    if (changedProperties.has('data') || changedProperties.has('loading')) {
+      computeHidden(this.data, this.loading);
+    }
+
+    if (changedProperties.has('isOpen')) {
+      this._openChanged();
+    }
+  }
+
+  private _openChanged(): void {
+    if (this.isOpen) {
+      const ajaxElement = this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl;
+      const thunk = ajaxElement.thunk();
+      store.dispatch(fetchIndicatorDetails(thunk, this.indicator!.id));
+    } else {
+      (this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl).abort();
+    }
+  }
+
+  render() {
     return html`
       <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
         :host {
           display: block;
           width: 100%;
-
-          --paper-tabs: {
-            border-bottom: 1px solid var(--paper-grey-300);
-          }
-
-          --app-grid-columns: 2;
-          --app-grid-gutter: 15px;
-          --app-grid-item-height: auto;
         }
 
         .item {
@@ -94,157 +163,100 @@ class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(ReduxConnecte
         }
       </style>
 
-      <etools-prp-ajax id="indicatorDetail" url="[[indicatorDetailUrl]]" params="[[params]]"> </etools-prp-ajax>
+      <etools-prp-ajax id="indicatorDetail" url="${this.indicatorDetailUrl}" .params="${this.params}">
+      </etools-prp-ajax>
 
-      <template is="dom-if" if="[[loading]]">
-        <div class="loading-wrapper">
-          <etools-loading no-overlay></etools-loading>
-        </div>
-      </template>
+      ${
+        this.loading
+          ? html`
+              <div class="loading-wrapper">
+                <etools-loading no-overlay></etools-loading>
+              </div>
+            `
+          : ''
+      }
+      ${
+        computeHidden(this.data, true)
+          ? html`
+              <div class="report-meta app-grid">
+                ${this.data?.map(
+                  (report) => html`
+                    <div class="item">
+                      <dl>
+                        <dt>${this.localize('submitted')}:</dt>
+                        <dd>${report.submission_date}</dd>
+                      </dl>
+                      <dl>
+                        <dt>${this.localize('total_progress')}:</dt>
+                        <dd>
+                          ${report.display_type === 'number'
+                            ? html`<etools-prp-number value="${report.total.v}"></etools-prp-number>`
+                            : html`${this._formatIndicatorValue(report.display_type, report.total.c, 1)}`}
+                        </dd>
+                      </dl>
+                      <dl>
+                        <dt>${this.localize('progress_in_reporting_period')}:</dt>
+                        <dd class="reporting-period">${report.time_period_start} - ${report.time_period_end}</dd>
+                      </dl>
+                    </div>
+                  `
+                )}
+              </div>
+            `
+          : html``
+      }
 
-      <template is="dom-if" if="[[_computeHidden(data, 'true')]]">
-        <div class="report-meta app-grid">
-          <template is="dom-repeat" items="[[data]]" as="report">
-            <div class="item">
-              <dl>
-                <dt>[[localize('submitted')]]:</dt>
-                <dd>[[report.submission_date]]</dd>
-              </dl>
-              <dl>
-                <dt>[[localize('total_progress')]]:</dt>
-                <dd>
-                  <template is="dom-if" if="[[_equals(report.display_type, 'number')]]" restamp="true">
-                    <etools-prp-number value="[[report.total.v]]"></etools-prp-number>
-                  </template>
-                  <template is="dom-if" if="[[!_equals(report.display_type, 'number')]]" restamp="true">
-                    [[_formatIndicatorValue(report.display_type, report.total.c, 1)]]
-                  </template>
-                </dd>
-              </dl>
-              <dl>
-                <dt>[[localize('progress_in_reporting_period')]]:</dt>
-                <dd class="reporting-period">[[report.time_period_start]] - [[report.time_period_end]]</dd>
-              </dl>
-            </div>
-          </template>
-        </div>
-      </template>
-
-      <list-placeholder data="[[data]]" loading="[[loading]]" message="[[localize('no_report_data')]]">
+      <list-placeholder .data="${this.data}" .loading="${this.loading}" .message="${this.localize('no_report_data')}">
       </list-placeholder>
 
-      <template is="dom-if" if="[[_computeHidden(locations, 'true')]]">
-        <paper-tabs
-          selected="{{selected}}"
-          fallback-selection="location-[[locations.0.current.id]]"
-          attr-for-selected="name"
-          scrollable
-        >
-          <template is="dom-repeat" items="[[locations]]" as="location">
-            <paper-tab name="location-[[location.current.id]]"> [[location.name]] </paper-tab>
-          </template>
-        </paper-tabs>
+      ${
+        computeHidden(this.locations, true)
+          ? html`
+              <paper-tabs
+                .selected="${this.selected}"
+                .fallbackSelection="location-${this.locations[0]?.current.id}"
+                attr-for-selected="name"
+                scrollable
+              >
+                ${this.locations?.map(
+                  (location) => html` <paper-tab name="location-${location.current.id}"> ${location.name} </paper-tab>`
+                )}
+              </paper-tabs>
+            `
+          : html``
+      }
+
+        <iron-pages attr-for-selected="name" .selected="${this.selected}">
+          ${this.locations?.map(
+            (location) => html`<div name="location-${location.current.id}">
+              <div class="app-grid">
+                ${location.current
+                  ? html`
+                      <div class="item">
+                        <disaggregation-table
+                          .data="${JSON.stringify(location.current)}"
+                          .mapping="${JSON.stringify(location.reportInfo.current.disagg_lookup_map)}"
+                        >
+                        </disaggregation-table>
+                      </div>
+                    `
+                  : html``}
+                ${location.previous
+                  ? html`
+                      <div class="item">
+                        <disaggregation-table
+                          .data="${location.previous}"
+                          .mapping="${location.reportInfo.previous.disagg_lookup_map}"
+                        >
+                        </disaggregation-table>
+                      </div>
+                    `
+                  : html``}
+              </div>
+            </div>`
+          )}
+        </iron-pages>
       </template>
-
-      <iron-pages attr-for-selected="name" selected="{{selected}}">
-        <template is="dom-repeat" items="[[locations]]" as="location">
-          <div name="location-[[location.current.id]]">
-            <div class="app-grid">
-              <template is="dom-if" if="[[location.current]]">
-                <div class="item">
-                  <disaggregation-table
-                    data="[[location.current]]"
-                    mapping="[[location.reportInfo.current.disagg_lookup_map]]"
-                  >
-                  </disaggregation-table>
-                </div>
-              </template>
-
-              <template is="dom-if" if="[[location.previous]]">
-                <div class="item">
-                  <disaggregation-table
-                    data="[[location.previous]]"
-                    mapping="[[location.reportInfo.previous.disagg_lookup_map]]"
-                  >
-                  </disaggregation-table>
-                </div>
-              </template>
-            </div>
-          </div>
-        </template>
-      </iron-pages>
     `;
   }
-
-  @property({type: String, computed: '_computeIndicatorReportsUrl(indicator)'})
-  indicatorDetailUrl!: string;
-
-  @property({type: Number})
-  selected!: number;
-
-  @property({type: Boolean, observer: '_openChanged'})
-  isOpen!: boolean;
-
-  @property({type: Object})
-  indicator!: GenericObject;
-
-  @property({type: Boolean, computed: 'getReduxStateValue(rootState.indicators.loadingDetails)'})
-  loading!: boolean;
-
-  @property({type: Array})
-  data!: any[];
-
-  @property({type: Object, computed: 'getReduxStateObject(rootState.indicators.details)'})
-  dataDict!: GenericObject;
-
-  @property({type: Array, computed: '_bucketByLocation(data)'})
-  locations!: any;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
-  appName!: string;
-
-  @property({type: Object, computed: '_computeParams()'})
-  params!: GenericObject;
-
-  static get observers() {
-    return ['_getDataByKey(dataDict)'];
-  }
-
-  _computeParams() {
-    computeParams(false);
-  }
-
-  _computeIndicatorReportsUrl(indicator: GenericObject) {
-    return computeIndicatorReportsUrl(indicator);
-  }
-
-  _bucketByLocation(data: any[]) {
-    return bucketByLocation(data);
-  }
-
-  _getDataByKey(dataDict: GenericObject) {
-    if (dataDict.details) {
-      this.data = dataDict.details[this.indicator.id];
-    }
-  }
-
-  _computeHidden(data: any[], loading: boolean) {
-    return computeHidden(data, loading);
-  }
-
-  _openChanged() {
-    if (this.isOpen) {
-      const thunk = (this.$.indicatorDetail as EtoolsPrpAjaxEl).thunk();
-      this.reduxStore
-        .dispatch(fetchIndicatorDetails(thunk, this.indicator.id))
-        // @ts-ignore
-        .catch((_err) => {
-          //   // TODO: error handling.
-        });
-    } else {
-      (this.$.indicatorDetail as EtoolsPrpAjaxEl).abort();
-    }
-  }
 }
-
-window.customElements.define('ip-reporting-indicator-details', IpReportingIndicatorDetails);
