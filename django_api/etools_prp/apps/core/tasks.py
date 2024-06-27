@@ -181,6 +181,8 @@ def process_period_reports():
                         next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                             pd, idx, reporting_period, generate_from_date_qpr
                         )
+                        if not next_progress_report:
+                            continue
 
                         create_ir_and_ilds_for_pr(
                             pd,
@@ -213,6 +215,8 @@ def process_period_reports():
                         next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                             pd, idx, reporting_period, generate_from_date_hr
                         )
+                        if not next_progress_report:
+                            continue
 
                         create_ir_and_ilds_for_pr(
                             pd,
@@ -238,6 +242,8 @@ def process_period_reports():
                         next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                             pd, idx, reporting_period, generate_from_date_sr
                         )
+                        if not next_progress_report:
+                            continue
 
                         create_ir_and_ilds_for_pr(
                             pd,

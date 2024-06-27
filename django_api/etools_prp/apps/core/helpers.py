@@ -508,6 +508,7 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
         )
     except IntegrityError as exc:
         logger.exception(exc)
+        return None, start_date, end_date, due_date
 
     return next_progress_report, start_date, end_date, due_date
 

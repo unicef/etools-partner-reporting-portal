@@ -106,30 +106,45 @@ def save_person_and_user(person_data, create_user=False):
 def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     """
     Function that handles misaligned start/end dates from etools reporting requirements
+    1. see which are last dates (ReportingPeriodDates) that still align (start/end dates)
+    2. get first ReportingPeriodDates that is not aligned
+    3. check if there are any Progress Reports generated where the first start date is not aligned
+    3.1. if there are PRs, take all PRs that are not aligned and see if there's any data input by the partner user
+    3.2. if no PRs -> delete ReportingPeriodDates from the db
+    3.1.1 If there's no user input data -> delete the PR's and the ReportingPeriodDates
+    3.1.2 If there's user input data -> logger.exception () and skip the item in reporting_requirements
     :param business_area_code: workspace business_area_code
     :param pd: programme document
     :param reporting_reqs: the pd reporting requirements from etools API
     """
-    for report_req in reporting_reqs:
-        try:
-            reporting_period = pd.reporting_periods.get(
-                external_id=report_req['id'],
-                report_type=report_req['report_type'],
-                external_business_area_code=business_area_code)
-        except ReportingPeriodDates.DoesNotExist:
-            continue
+    pd_periods = pd.reporting_periods.filter(external_business_area_code=business_area_code)
+    report_type_set = {req['report_type'] for req in reporting_reqs}
 
-        if reporting_period.start_date.strftime('%Y-%m-%d') == report_req['start_date'] and \
-                reporting_period.end_date.strftime('%Y-%m-%d') == report_req['end_date']:
-            continue
+    # get all reporting periods that are not aligned
+    misaligned_periods = []
+    for report_type in report_type_set:
+        filtered_reqs = list(filter(lambda x: x['report_type'] == report_type, reporting_reqs))
+        for existing, actual in zip(
+                pd_periods.filter(report_type=report_type).order_by('start_date'),
+                sorted(filtered_reqs, key=lambda x: x['start_date'])):
 
-        # if start/end dates are not aligned for a ReportingPeriodDates obj, check the corresponding pd ProgressReports
+            if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
+                misaligned_periods.append(existing)
+
+    if not misaligned_periods:
+        return
+
+    for misaligned_period in misaligned_periods:
+        # check the corresponding pd ProgressReports
         try:
             progress_rep = pd.progress_reports.get(
-                start_date=reporting_period.start_date, end_date=reporting_period.end_date)
+                start_date=misaligned_period.start_date,
+                end_date=misaligned_period.end_date,
+                report_type=misaligned_period.report_type
+            )
         except ProgressReport.DoesNotExist:
-            # if no progress report found, delete ReportingPeriodDates obj from the db
-            reporting_period.delete()
+            # if no progress report found, delete ReportingPeriodDates objects from the db
+            misaligned_period.delete()
             continue
 
         # if there is any data input from the partner on the progress report
@@ -140,11 +155,10 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
                 IndicatorLocationData.objects.filter(indicator_report__progress_report=progress_rep).exclude(created=F('modified')).exists():
             # log exception and skip the report in reporting_requirements
             logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} with user input data. Skipping..')
-            report_req['skip'] = True
         else:
             # if there is no user input data, delete the Progress Report and the ReportingPeriodDates obj
             progress_rep.delete()
-            reporting_period.delete()
+            misaligned_period.delete()
 
 
 @shared_task
@@ -346,8 +360,6 @@ def process_programme_documents(fast=False, area=False):
                         reporting_requirements = item['reporting_requirements']
                         handle_reporting_dates(workspace.business_area_code, pd, reporting_requirements)
                         for reporting_requirement in reporting_requirements:
-                            if 'skip' in reporting_requirement and reporting_requirements['skip']:
-                                continue
                             reporting_requirement['programme_document'] = pd.id
                             reporting_requirement['external_business_area_code'] = workspace.business_area_code
                             process_model(
