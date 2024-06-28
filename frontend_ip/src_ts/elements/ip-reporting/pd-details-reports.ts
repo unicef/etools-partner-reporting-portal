@@ -59,7 +59,7 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
     }
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (changedProperties.has('locationId')) {
       this.pdReportsUrl = computePDReportsUrl(this.locationId);
     }

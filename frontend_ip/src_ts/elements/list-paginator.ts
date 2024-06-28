@@ -9,7 +9,7 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 @customElement('list-paginator')
 export class ListPaginator extends PaginationMixin(LitElement) {
   @property({type: Array})
-  data!: any[];
+  data: any[] = [];
 
   @property({type: Array})
   paginated!: any[];
@@ -21,7 +21,7 @@ export class ListPaginator extends PaginationMixin(LitElement) {
     `;
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (changedProperties.has('data') || changedProperties.has('pageSize') || changedProperties.has('pageNumber')) {
       this.paginated = this._computePaginated(this.data, this.pageSize, this.pageNumber);
       fireEvent(this, 'paginated-changed', {paginated: this.paginated});

@@ -7,7 +7,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {getReportName} from './js/pd-details-reporting-requirements-functions';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table';
+import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import '../../etools-prp-common/elements/list-placeholder';
 
 @customElement('pd-details-reporting-requirements')

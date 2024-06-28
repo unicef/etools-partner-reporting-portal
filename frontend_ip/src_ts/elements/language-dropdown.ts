@@ -32,7 +32,7 @@ export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
   availableLanguages!: any;
 
   @property({type: Array})
-  data!: any[];
+  data: any[] = [];
 
   @property({type: Number})
   selected = 0;
@@ -70,7 +70,7 @@ export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
     this.data = this._computeLanguages(this.availableLanguages);
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (changedProperties.has('data') || changedProperties.has('current')) {
       this.language = this._computeLanguage(this.data, this.language);
     }

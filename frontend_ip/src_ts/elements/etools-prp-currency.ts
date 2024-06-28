@@ -1,6 +1,6 @@
 import {LitElement, html} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
-import './etools-prp-number';
+import '../etools-prp-common/elements/etools-prp-number';
 
 @customElement('etools-prp-currency')
 export class EtoolsPrpCurrency extends LitElement {

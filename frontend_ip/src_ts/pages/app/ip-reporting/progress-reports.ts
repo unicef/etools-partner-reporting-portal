@@ -17,7 +17,7 @@ import {connect} from 'pwa-helpers';
 import {RootState} from '../../../typings/redux.types.js';
 
 @customElement('page-ip-progress-reports')
-class PageIpProgressReports extends LocalizeMixin(connect(store)(LitElement)) {
+export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;

@@ -2,8 +2,8 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-data-table/etools-data-table';
+import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
+import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-location';
 import '@polymer/iron-location/iron-query-params';
@@ -38,7 +38,7 @@ export class ListViewIndicators extends UtilsMixin(
   `;
 
   @property({type: Array})
-  data!: any[];
+  data: any[] = [];
 
   @property({type: Boolean})
   loading!: boolean;

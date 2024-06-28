@@ -13,14 +13,11 @@ import {pageNavStyles} from '../../styles/page-nav-styles';
 
 // TODO add: MatomoMixin
 @customElement('ip-reporting-nav')
-export class IpReportingNav extends MatomoMixin(
-  LocalizeMixin(RoutingMixin(PageNavMixin(UtilsMixin(connect(store)(LitElement)))))
+export class IpReportingNav extends RoutingMixin(
+  MatomoMixin(LocalizeMixin(PageNavMixin(UtilsMixin(connect(store)(LitElement)))))
 ) {
   @property({type: String})
   selected!: any;
-
-  @property({type: String})
-  _baseUrl = '';
 
   @property({type: Object})
   pdQuery = {status: String(['signed', 'active', 'suspended'])};
@@ -58,7 +55,7 @@ export class IpReportingNav extends MatomoMixin(
       <div class="nav-menu">
         <iron-selector .selected="${this.selected}" attr-for-selected="name" selectable="paper-item" role="navigation">
           <paper-item name="overview" class="nav-menu-item">
-            <a href="${this.overviewUrl}" @click="${this.trackAnalytics}" data-tracker="Overview">
+            <a href="${this.overviewUrl}" @click="${this.trackAnalytics}" tracker="Overview">
               <span><iron-icon icon="social:public" role="presentation"></iron-icon>${this.localize('overview')}</span>
             </a>
           </paper-item>
@@ -67,7 +64,7 @@ export class IpReportingNav extends MatomoMixin(
             <a
               href="${this._appendQuery(this.pdUrl, this.pdQuery)}"
               @click="${this.trackAnalytics}"
-              data-tracker="Programme Documents"
+              tracker="Programme Documents"
             >
               <span
                 ><iron-icon icon="description" role="presentation"></iron-icon>${this.localize(
@@ -81,7 +78,7 @@ export class IpReportingNav extends MatomoMixin(
             <a
               href="${this._appendQuery(this.progressReportsUrl, this.reportsQuery)}"
               @click="${this.trackAnalytics}"
-              data-tracker="Progress Reports"
+              tracker="Progress Reports"
             >
               <span
                 ><iron-icon icon="assignment" role="presentation"></iron-icon>${this.localize('progress_reports')}</span
@@ -93,7 +90,7 @@ export class IpReportingNav extends MatomoMixin(
             <a
               href="${this._appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
               @click="${this.trackAnalytics}"
-              data-tracker="Indicators"
+              tracker="Indicators"
             >
               <span><iron-icon icon="trending-up" role="presentation"></iron-icon>${this.localize('indicators')}</span>
             </a>

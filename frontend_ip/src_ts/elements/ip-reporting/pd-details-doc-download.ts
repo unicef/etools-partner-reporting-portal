@@ -49,7 +49,7 @@ export class PdDetailsDocDownload extends MatomoMixin(LocalizeMixin(UtilsMixin(c
     }
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (changedProperties.has('pd') || changedProperties.has('locationId')) {
       this.pdDocumentUrl = computeDocUrl(this.locationId, this.pd.id);
     }

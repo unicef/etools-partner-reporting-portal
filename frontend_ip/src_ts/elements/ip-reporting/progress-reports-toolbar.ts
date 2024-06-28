@@ -49,7 +49,7 @@ export class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(connect(sto
     }
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (changedProperties.has('totalResults') || changedProperties.has('params')) {
       this.canExport = this._canExport(this.totalResults, this.params);
     }
@@ -66,7 +66,7 @@ export class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(connect(sto
 
   _canExport(totalResults: number, queryParams: any) {
     const hasData = hasResults(totalResults);
-    const status = queryParams.status;
+    const status = queryParams?.status;
     const hasStatusSubmittedOrAccepted = status ? status.includes('Acc') || status.includes('Sub') : true;
     return hasData && hasStatusSubmittedOrAccepted;
   }

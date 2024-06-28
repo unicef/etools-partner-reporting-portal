@@ -64,20 +64,20 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
             class="item"
             label="${this.localize('pd_ref_and_title')}"
             name="pd_ref_title"
-            .value="${this.queryParams.pd_ref_title}"
+            .value="${this.queryParams?.pd_ref_title}"
           >
           </text-filter>
           <location-filter
             class="item"
-            .value="${this._withDefault(this.queryParams.location, '-1')}"
+            .value="${this._withDefault(this.queryParams?.location, '-1')}"
           ></location-filter>
           <dropdown-filter-multi
             class="item item-2-col"
             label="${this.localize('report_status')}"
             name="status"
-            .value="${this._withDefault(this.queryParams.status, '')}"
+            .value="${this._withDefault(this.queryParams?.status, '')}"
             .data="${this.statuses}"
-            ?disabled="${this._equals(this.queryParams.due, '1')}"
+            ?disabled="${this._equals(this.queryParams?.due, '1')}"
             hide-search
           >
           </dropdown-filter-multi>
@@ -85,7 +85,7 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
             class="item item-2-col"
             label="${this.localize('report_type')}"
             name="report_type"
-            .value="${this._withDefault(this.queryParams.report_type, '')}"
+            .value="${this._withDefault(this.queryParams?.report_type, '')}"
             .data="${this.types}"
             hide-search
           >

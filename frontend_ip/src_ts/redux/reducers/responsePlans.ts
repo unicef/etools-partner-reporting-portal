@@ -3,7 +3,7 @@ import Constants from '../../etools-prp-common/constants';
 
 export class ResponsePlansState {
   all = [];
-  current = null;
+  current: any = null;
   currentID = '';
 }
 

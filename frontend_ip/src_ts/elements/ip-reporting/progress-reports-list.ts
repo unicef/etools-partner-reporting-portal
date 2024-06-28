@@ -1,6 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
@@ -45,7 +45,7 @@ export class ProgressReportsList extends LocalizeMixin(
   loading!: boolean;
 
   @property({type: Array})
-  data!: any[];
+  data: any[] = [];
 
   @property({type: Number})
   totalResults!: number;
@@ -82,7 +82,7 @@ export class ProgressReportsList extends LocalizeMixin(
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
-          label="${this.visibleRange[0]}-${this.visibleRange[1]} of ${this.totalResults} ${this.localize(
+          label="${this.visibleRange?.[0]}-${this.visibleRange?.[1]} of ${this.totalResults} ${this.localize(
             'results_to_show'
           )}"
         >

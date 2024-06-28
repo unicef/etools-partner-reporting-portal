@@ -62,7 +62,7 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
 
   _handleChange(e) {
     if (e.detail.selectedItems && this.data) {
-      const newValue = e.detail.selectedItems.map((item) => item['id']).join(',');
+      const newValue = e.detail.selectedItems?.map((item) => item['id']).join(',');
       if (newValue !== this.value) {
         fireEvent(this, 'filter-changed', {
           name: this.name,

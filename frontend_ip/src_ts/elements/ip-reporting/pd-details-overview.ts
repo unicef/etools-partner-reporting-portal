@@ -11,7 +11,7 @@ import '@polymer/iron-icons/communication-icons';
 import '@polymer/iron-icon/iron-icon';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table';
+import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import './pd-details-reporting-requirements';
 import './pd-details-doc-download';
 import '../../etools-prp-common/elements/page-body';

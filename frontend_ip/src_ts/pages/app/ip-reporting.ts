@@ -15,8 +15,7 @@ import '@polymer/iron-overlay-behavior/iron-overlay-backdrop.js';
 
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin.js';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin.js';
-import {getDomainByEnv} from '../../etools-prp-common/config.js';
-import { Route } from '../../etools-prp-common/typings/globals.types.js';
+import {Route} from '../../etools-prp-common/typings/globals.types.js';
 
 @customElement('page-ip-reporting')
 export class PageIpReporting extends LocalizeMixin(UtilsMixin(LitElement)) {
@@ -64,7 +63,34 @@ export class PageIpReporting extends LocalizeMixin(UtilsMixin(LitElement)) {
       ${appThemeIpStyles}
       <page-title .title="${this.localize('ip_reporting')}"></page-title>
 
-      <app-route .route="${this.route}" pattern="/:page" .data="${this.routeData}" .tail="${this.subroute}">
+      <app-route
+        .route="${this.route}"
+        pattern="/:page"
+        .data="${this.routeData}"
+        .tail="${this.subroute}"
+        @route-changed=${(e) => {
+          console.log(e.detail);
+        }}
+        @tail-changed=${(e) => {
+          console.log(e.detail);
+          if (e.detail.value && JSON.stringify(this.subroute) !== JSON.stringify(e.detail.value)) {
+            this.subroute = e.detail.value;
+            console.log('C2>>', this.subroute);
+          }
+        }}
+        @data-changed=${(e) => {
+          console.log(e.detail);
+          if (
+            e.detail.value &&
+            e.detail.value.page &&
+            JSON.stringify(this.routeData) !== JSON.stringify(e.detail.value)
+          ) {
+            this.routeData = e.detail.value;
+            console.log('C1>>', this.routeData);
+            this._routePageChanged(this.routeData.page);
+          }
+        }}
+      >
       </app-route>
 
       <app-drawer-layout fullbleed responsive-width="0px">
@@ -115,9 +141,9 @@ export class PageIpReporting extends LocalizeMixin(UtilsMixin(LitElement)) {
   @property({type: Object})
   routeData!: {page: string};
 
-  updated(changedProperties){
-    if(changedProperties.has("routeData")){
-      this._routePageChanged(this.routeData.page);
+  updated(changedProperties) {
+    if (changedProperties.has('page')) {
+      this._pageChanged(this.page);
     }
   }
 
@@ -130,17 +156,45 @@ export class PageIpReporting extends LocalizeMixin(UtilsMixin(LitElement)) {
   }
 
   async _pageChanged(page: string) {
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
+    console.log('pagechanged>>>', page);
+    switch (page) {
+      case 'overview':
+        await import('../../../src/pages/app/ip-reporting/overview.js').catch((err: any) => {
+          console.log(err);
+          this._notFound();
+        });
+        break;
+      case 'indicators':
+        await import('../../../src/pages/app/ip-reporting/indicators.js').catch((err: any) => {
+          console.log(err);
+          this._notFound();
+        });
+        break;
+      case 'pd':
+        await import('../../../src/pages/app/ip-reporting/pd.js').catch((err: any) => {
+          console.log(err);
+          this._notFound();
+        });
+        break;
+      case 'progress-reports':
+        await import('../../../src/pages/app/ip-reporting/progress-reports.js').catch((err: any) => {
+          console.log(err);
+          this._notFound();
+        });
+        break;
+
+      default:
+        await import('../../../src/pages/app/ip-reporting/overview.js').catch((err: any) => {
+          console.log(err);
+          this._notFound();
+        });
+        break;
+    }
   }
 
   _notFound() {
     window.location.href = '/not-found';
   }
-
 }
 
 export {PageIpReporting as PageIpReportingEl};

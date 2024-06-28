@@ -2,7 +2,7 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
 import '@unicef-polymer/etools-data-table/etools-data-table.js';
-import '@unicef-polymer/etools-loading/etools-loading.js';
+import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-location/iron-location.js';
 import '@polymer/iron-location/iron-query-params.js';
 import '../../etools-prp-common/elements/report-status';

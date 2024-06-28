@@ -28,7 +28,7 @@ export class PdListToolbar extends UtilsMixin(LitElement) {
   @property({type: String, attribute: false})
   xlsxExportUrl?: string;
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (changedProperties.has('locationId')) {
       this.pdUrl = computePdUrl(this.locationId);
     }

@@ -76,7 +76,7 @@ export class PdReportsReportTitle extends LocalizeMixin(
     `;
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
+  updated(changedProperties) {
     if (
       changedProperties.has('displayLink') ||
       changedProperties.has('report') ||
