@@ -18,7 +18,7 @@ export function computeFormattedData(data: any) {
       });
     }
 
-    const items = curr.indicators?.map(function (indicator: any) {
+    const items = (curr.indicators || []).map(function (indicator: any) {
       return {
         type: 'data',
         data: Object.assign({}, indicator, {

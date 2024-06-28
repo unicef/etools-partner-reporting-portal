@@ -73,7 +73,7 @@ export class PdOutputList extends LocalizeMixin(connect(store)(LitElement)) {
               </div>
             `
           : html`
-              ${this.viewData.map(
+              ${(this.viewData || []).map(
                 (item) => html`
                   <pd-output
                     data="${item}"

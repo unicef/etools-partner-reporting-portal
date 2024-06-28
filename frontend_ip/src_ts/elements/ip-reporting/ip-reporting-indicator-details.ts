@@ -179,7 +179,7 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
         computeHidden(this.data, true)
           ? html`
               <div class="report-meta app-grid">
-                ${this.data?.map(
+                ${(this.data || []).map(
                   (report) => html`
                     <div class="item">
                       <dl>
@@ -218,7 +218,7 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
                 attr-for-selected="name"
                 scrollable
               >
-                ${this.locations?.map(
+                ${(this.locations || []).map(
                   (location) => html` <paper-tab name="location-${location.current.id}"> ${location.name} </paper-tab>`
                 )}
               </paper-tabs>
@@ -227,7 +227,7 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
       }
 
         <iron-pages attr-for-selected="name" .selected="${this.selected}">
-          ${this.locations?.map(
+          ${(this.locations || []).map(
             (location) => html`<div name="location-${location.current.id}">
               <div class="app-grid">
                 ${location.current
