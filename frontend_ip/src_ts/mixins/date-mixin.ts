@@ -1,6 +1,10 @@
 import {LitElement} from 'lit';
 import {Constructor} from '../etools-prp-common/typings/globals.types';
-declare const dayjs: any;
+import dayjs from 'dayjs';
+import dayJsUtc from 'dayjs/plugin/utc';
+import dayJsSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(dayJsUtc);
+dayjs.extend(dayJsSameOrBefore);
 
 /**
  * @polymer
@@ -65,7 +69,7 @@ function DateMixin<T extends Constructor<LitElement>>(baseClass: T) {
         if (firstDate.toString() !== 'Invalid Date' && secondDate.toString() !== 'Invalid Date') {
           const mFirstDate = dayjs.utc(firstDate);
           const mSecondDate = dayjs.utc(secondDate);
-          return mSecondDate.diff(mFirstDate, unit);
+          return mSecondDate.diff(mFirstDate, unit as any);
         }
       }
       return null;

@@ -3,7 +3,7 @@ var browserCapabilities = require('browser-capabilities'); // eslint-disable-lin
 const UAParser = require('ua-parser-js').UAParser; // eslint-disable-line
 
 const app = express();
-const basedir = __dirname + '/build/'; // eslint-disable-line
+const basedir = __dirname + '/src/'; // eslint-disable-line
 
 function getSourcesPath(request) {
   const userAgent = request.headers['user-agent'];

@@ -20,10 +20,11 @@ import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 import {RootState} from './typings/redux.types.js';
 import {connect} from 'pwa-helpers';
 import {store} from './redux/store.js';
-declare const dayjs: any;
-declare const dayjs_plugin_utc: any;
-
-dayjs.extend(dayjs_plugin_utc);
+import dayjs from 'dayjs';
+import dayJsUtc from 'dayjs/plugin/utc';
+import {initializeIcons} from '@unicef-polymer/etools-unicef/src/etools-icons/etools-icons';
+dayjs.extend(dayJsUtc);
+initializeIcons();
 
 @customElement('app-shell')
 export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect(store)(LitElement)))) {
@@ -172,31 +173,31 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
     let componentName = page === BASE_PATH ? 'app' : page;
     switch (componentName) {
       case 'app':
-        await import('../src/pages/app.js').catch((err: any) => {
+        await import('./pages/app.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       case 'unauthorized':
-        await import('../src/pages/unauthorized.js').catch((err: any) => {
+        await import('./pages/unauthorized.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       case 'not-found':
-        await import('../src/pages/not-found.js').catch((err: any) => {
+        await import('./pages/not-found.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       case 'login-token':
-        await import('../src/pages/login-token.js').catch((err: any) => {
+        await import('./pages/login-token.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       default:
-        await import('../src/pages/app.js').catch((err: any) => {
+        await import('./pages/app.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });

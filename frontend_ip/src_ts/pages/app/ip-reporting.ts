@@ -159,32 +159,32 @@ export class PageIpReporting extends LocalizeMixin(UtilsMixin(LitElement)) {
     console.log('pagechanged>>>', page);
     switch (page) {
       case 'overview':
-        await import('../../../src/pages/app/ip-reporting/overview.js').catch((err: any) => {
+        await import('./ip-reporting/overview.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       case 'indicators':
-        await import('../../../src/pages/app/ip-reporting/indicators.js').catch((err: any) => {
+        await import('./ip-reporting/indicators.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       case 'pd':
-        await import('../../../src/pages/app/ip-reporting/pd.js').catch((err: any) => {
+        await import('./ip-reporting/pd.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
       case 'progress-reports':
-        await import('../../../src/pages/app/ip-reporting/progress-reports.js').catch((err: any) => {
+        await import('./ip-reporting/progress-reports.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
         break;
 
       default:
-        await import('../../../src/pages/app/ip-reporting/overview.js').catch((err: any) => {
+        await import('./ip-reporting/overview.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });

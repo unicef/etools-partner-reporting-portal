@@ -7,7 +7,7 @@ import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import Settings from '../../../etools-prp-common/settings';
-declare const dayjs: any;
+import dayjs from 'dayjs';
 
 @customElement('date-filter')
 export class DateFilter extends FilterMixin(DateMixin(LitElement)) {

@@ -296,7 +296,7 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
 
     switch (page) {
       case 'ip-reporting':
-        import('../../src/pages/app/ip-reporting.js').catch((err: any) => {
+        import('./app/ip-reporting.js').catch((err: any) => {
           console.log(err);
           this._notFound();
         });
