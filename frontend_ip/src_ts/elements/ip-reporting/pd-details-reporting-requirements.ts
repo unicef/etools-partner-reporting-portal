@@ -53,7 +53,7 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
           <etools-data-table-column field=""> ${this.localize('reporting_period')} </etools-data-table-column>
         </etools-data-table-header>
 
-        ${this.data.map(
+        ${(this.data || []).map(
           (item, index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">

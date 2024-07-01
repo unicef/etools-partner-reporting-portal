@@ -105,7 +105,7 @@ export class PdList extends MatomoMixin(
           <etools-data-table-column></etools-data-table-column>
         </etools-data-table-header>
 
-        ${this.data.map(
+        ${(this.data || []).map(
           (pd) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">

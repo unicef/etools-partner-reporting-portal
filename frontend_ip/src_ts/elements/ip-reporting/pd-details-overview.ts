@@ -243,7 +243,7 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
                   <etools-data-table-column field=""> ${this.localize('signed_date')} </etools-data-table-column>
                 </etools-data-table-header>
 
-                ${this.pd.amendments.map(
+                ${(this.pd.amendments || []).map(
                   (amendment) => html`
                     <etools-data-table-row no-collapse>
                       <div slot="row-data">

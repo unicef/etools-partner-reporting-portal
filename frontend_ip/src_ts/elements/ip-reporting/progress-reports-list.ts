@@ -114,7 +114,7 @@ export class ProgressReportsList extends LocalizeMixin(
           @page-number-changed="${this._pageNumberChanged}"
         >
         </etools-data-table-footer>
-        ${this.data.map(
+        ${(this.data || []).map(
           (report: any) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">

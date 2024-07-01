@@ -18,7 +18,7 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 
 @customElement('page-ip-reporting-indicators')
-class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connect(store)(LitElement))) {
+export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connect(store)(LitElement))) {
   static styles = css`
     :host {
       display: block;
@@ -109,4 +109,4 @@ class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connect(store
   }
 }
 
-export {PageIpReportingIndicators};
+export {PageIpReportingIndicators as PageIpReportingIndicatorsEl};

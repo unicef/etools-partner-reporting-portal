@@ -116,7 +116,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
           </etools-data-table-column>
         </etools-data-table-header>
         <div class="wrapper">
-          ${this.formattedData?.map(
+          ${(this.formattedData || []).map(
             (item) => html`
               ${item.type === 'label'
                 ? html`

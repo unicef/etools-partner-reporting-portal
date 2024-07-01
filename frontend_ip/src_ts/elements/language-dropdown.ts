@@ -52,7 +52,7 @@ export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
           tracker="Language change"
           .selected="${this.selected}"
         >
-          ${this.data.map((item) => html` <paper-item>${item}</paper-item> `)}
+          ${(this.data || []).map((item) => html` <paper-item>${item}</paper-item> `)}
         </paper-listbox>
       </paper-dropdown-menu>
     `;
