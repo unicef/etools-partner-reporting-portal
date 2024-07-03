@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
+import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';

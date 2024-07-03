@@ -1,6 +1,7 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html, PropertyValues} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
+import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import {localizeSet} from '../redux/actions/localize';
@@ -8,86 +9,70 @@ import {store} from '../redux/store';
 
 @customElement('language-dropdown')
 export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
-  static styles = css`
-    :host {
-      display: block;
-      position: relative;
-      cursor: pointer;
-      /* Apply custom styles if needed */
-    }
-
-    paper-dropdown-menu {
-      /* Add your custom styles */
-    }
-
-    paper-item {
-      /* Add your custom styles */
-    }
-  `;
-
-  @property({type: String})
-  language!: string;
-
   @property({type: Object})
   availableLanguages!: any;
 
   @property({type: Array})
-  data: any[] = [];
-
-  @property({type: Number})
-  selected = 0;
+  languageOptions: any[] = [];
 
   @property({type: String})
-  current!: string;
+  currentLanguage!: string;
 
   defaultLanguage = 'en';
 
   render() {
     return html`
-      <paper-dropdown-menu label="${this.language}" noink no-label-float>
-        <paper-listbox
-          slot="dropdown-content"
-          class="dropdown-content"
-          @iron-select="${this._languageSelected}"
-          tracker="Language change"
-          .selected="${this.selected}"
-        >
-          ${(this.data || []).map((item) => html` <paper-item>${item}</paper-item> `)}
-        </paper-listbox>
-      </paper-dropdown-menu>
+    <style>
+    etools-dropdown {
+      --sl-input-color: var(--light-secondary-text-color);
+      --etools-icon-fill-color: var(--light-secondary-text-color);
+      --sl-input-border-color: var(--light-secondary-text-color);
+    }
+    </style>
+       <etools-dropdown
+        id="dpLanguage"
+        placeholder="&#8212;"
+        .selected="${this.currentLanguage}"
+        .options="${this.languageOptions}"
+        option-value="id"
+        option-label="name"
+        @etools-selected-item-changed="${this._languageSelected}"
+        trigger-value-change-event
+        hide-search
+      >
+      </etools-dropdown>   
     `;
   }
 
   stateChanged(state: any) {
-    if (this.current !== state.localize.language) {
-      this.current = state.localize.language;
+    if (this.currentLanguage !== state.localize.language) {
+      this.currentLanguage = state.localize.language;
     }
 
     if (this.availableLanguages !== state.localize.resources) {
       this.availableLanguages = state.localize.resources;
-    }
-
-    this.data = this._computeLanguages(this.availableLanguages);
+      this.languageOptions = this._computeLanguages(this.availableLanguages);
+    }    
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has('data') || changedProperties.has('current')) {
-      this.language = this._computeLanguage(this.data, this.language);
-    }
+  updated(changedProperties: PropertyValues) {
+    // if (changedProperties.has('data') || changedProperties.has('current')) {
+    //   this.language = this._computeLanguage(this.languageOptions, this.language);
+    // }
 
-    if (changedProperties.has('data') || changedProperties.has('language')) {
-      this.selected = this._computeSelected(this.data, this.language);
-      this._dispatchEvent('selected', this.selected);
-    }
+    // if (changedProperties.has('data') || changedProperties.has('language')) {
+    //   this.selected = this._computeSelected(this.languageOptions, this.language);
+    //   this._dispatchEvent('selected', this.selected);
+    // }
   }
 
   private _languageSelected(e: CustomEvent) {
-    const allLanguages = Object.keys(this.availableLanguages);
-    if (!allLanguages.includes(this.current)) {
-      this._storeSelectedLanguage(this.defaultLanguage);
+    if (!e.detail || e.detail.selectedItem == undefined) {
+      return;
     }
-    const newLanguage = e.detail.item.innerText; //Hack
-    if (newLanguage === this.current) {
+    debugger;
+    const newLanguage = e.detail.selectedItem.id;
+    if (newLanguage === this.currentLanguage) {
       return;
     }
     this.trackAnalytics(e);
@@ -101,19 +86,7 @@ export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
     store.dispatch(localizeSet(language));
   }
 
-  private _computeLanguage(data: any[], current: string): string {
-    return data.find((language) => language === current) || '';
-  }
-
-  private _computeSelected(data: any[], language: string): number {
-    return data.indexOf(language);
-  }
-
   private _computeLanguages(availableLanguages: any): any[] {
-    return Object.keys(availableLanguages);
-  }
-
-  private _dispatchEvent(propName: string, value: any) {
-    fireEvent(this, `${propName}-changed`, {value});
+    return Object.keys(availableLanguages).map((x) => ({id: x, name: x}));
   }
 }

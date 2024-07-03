@@ -1,6 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
-import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';

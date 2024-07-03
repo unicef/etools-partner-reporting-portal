@@ -2,7 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import '@polymer/paper-input/paper-input';
 import '@polymer/iron-icons/iron-icons';
-import '@unicef-polymer/etools-date-time/datepicker-lite';
+import '@unicef-polymer/etools-unicef/src/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
