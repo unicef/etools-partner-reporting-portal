@@ -114,7 +114,6 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   }
 
   stateChanged(state: RootState) {
-    console.log('Appshell, stateChanged', state);
     if (this.profile !== state.userProfile.profile) {
       this.profile = state.userProfile.profile;
     }
