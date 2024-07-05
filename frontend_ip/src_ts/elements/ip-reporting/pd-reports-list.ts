@@ -9,8 +9,9 @@ import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
-import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+//import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
+//import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
@@ -27,7 +28,7 @@ import {store} from '../../redux/store';
 
 @customElement('pd-reports-list')
 export class PdReportsList extends LocalizeMixin(
-  ProgressReportUtilsMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(connect(store)(LitElement))))))
+  PaginationMixin(ProgressReportUtilsMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))))
 ) {
   static styles = [
     css`
@@ -55,24 +56,29 @@ export class PdReportsList extends LocalizeMixin(
   @property({type: Array})
   data: any[] = [];
 
-  @property({type: Number})
-  totalResults = 0;
-
-  @property({type: Array})
-  visibleRange = [];
-
   stateChanged(state: RootState) {
     if (this.pdId !== state.programmeDocuments?.current) {
       this.pdId = state.programmeDocuments?.current;
     }
 
-    this.data = programmeDocumentReportsAll(state);
-    this.totalResults = programmeDocumentReportsCount(state);
+    this.data = programmeDocumentReportsAll(state);    
+    const totalResults = programmeDocumentReportsCount(state);
+    this.paginator = {...this.paginator, count: totalResults};
   }
 
   _getLink(report: any, permissions: any) {
     const suffix = this._getMode(report, permissions);
     return getLink(report, suffix, this.buildUrl, this._baseUrl);
+  }
+
+  pageSizeChange(e: CustomEvent) {
+    this.paginator = {...this.paginator, page_size: e.detail.value};
+    // this.updateListQueries();
+  }
+
+  pageNumberChange(e: CustomEvent) {
+    this.paginator = {...this.paginator, page: e.detail.value};
+    // this.updateListQueries();
   }
 
   render() {
@@ -91,7 +97,7 @@ export class PdReportsList extends LocalizeMixin(
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
-          label="${this.visibleRange?.[0]}-${this.visibleRange?.[1]} of ${this.totalResults} ${this.localize(
+          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator.count} ${this.localize(
             'results_to_show'
           )}"
         >
@@ -113,13 +119,12 @@ export class PdReportsList extends LocalizeMixin(
         </etools-data-table-header>
 
         <etools-data-table-footer
-          .pageSize=${this.pageSize}
-          .pageNumber=${this.pageNumber}
-          .totalResults=${this.totalResults}
-          .visibleRange=${this.visibleRange}
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
-          @page-size-changed=${this._pageSizeChanged}
-          @page-number-changed=${this._pageNumberChanged}
+          .pageSize=${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults"${this.paginator.count}"
+          .visibleRange"${this.paginator.visible_range}"
+          @page-size-changed=${this.pageSizeChanged}
+          @page-number-changed=${this.pageNumberChanged}
         ></etools-data-table-footer>
 
         ${(this.data || []).map(
@@ -142,14 +147,14 @@ export class PdReportsList extends LocalizeMixin(
 
         <list-placeholder .data=${this.data} .loading=${!this.loaded}></list-placeholder>
 
+      
         <etools-data-table-footer
-          .pageSize=${this.pageSize}
-          .pageNumber=${this.pageNumber}
-          .totalResults=${this.totalResults}
-          .visibleRange=${this.visibleRange}
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
-          @page-size-changed=${this._pageSizeChanged}
-          @page-number-changed=${this._pageNumberChanged}
+          .pageSize=${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults"${this.paginator.count}"
+          .visibleRange"${this.paginator.visible_range}"
+          @page-size-changed=${this.pageSizeChanged}
+          @page-number-changed=${this.pageNumberChanged}
         ></etools-data-table-footer>
 
         <etools-loading .active=${!this.loaded}></etools-loading>

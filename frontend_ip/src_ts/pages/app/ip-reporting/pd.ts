@@ -18,6 +18,7 @@ import {store} from '../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {connect} from 'pwa-helpers';
+import { EtoolsRouteDetails } from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 
 @customElement('page-ip-reporting-pd')
 class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -48,11 +49,20 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
   @property({type: Object})
   currentPD: any = {};
 
+  @property({type: Object})
+  routeDetails!: EtoolsRouteDetails;
+
   @property({type: Number})
   pdId!: any;
 
   @property({type: String})
   programmeDocumentDetailUrl = '';
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._handleInputChange = debounce(this._handleInputChange.bind(this), 100) as any;
+    this._getPdRecord = debounce(this._getPdRecord.bind(this), 100) as any;
+  }  
 
   render() {
     return html`
@@ -116,6 +126,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     }
 
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this.routeDetails = state.app.routeDetails;
       this.page = !state.app.routeDetails.params?.pdID ? 'pd-index' : 'pd-router';
     }
   }
@@ -140,20 +151,18 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     this.routeData = event.detail.value;
   }
 
-  _handleInputChange(programmeDocumentsUrl: string) {
+  _handleInputChange(programmeDocumentsUrl: string) {    
     if (!programmeDocumentsUrl) {
       return;
     }
 
-    if (this.subroute.path) {
-      return;
-    }
-
-    debounce(() => {
-      const elem = this.shadowRoot!.getElementById('programmeDocuments') as EtoolsPrpAjaxEl;
-      elem.abort();
-      store.dispatch(pdFetch(elem.thunk()));
-    }, 100);
+    // @dci need this to avoid re-getting data when not necessary ???
+    // if (this.routeDetails?.subRouteName) {
+    //   return;
+    // }
+    const elem = this.shadowRoot!.getElementById('programmeDocuments') as EtoolsPrpAjaxEl;
+    elem.abort();
+    store.dispatch(pdFetch(elem.thunk()));
   }
 
   _routePdIdChanged(pd_id) {
@@ -184,20 +193,18 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       return;
     }
 
-    debounce(() => {
-      const elem = this.shadowRoot!.getElementById('programmeDocumentDetail') as EtoolsPrpAjaxEl;
-      elem.abort();
+    const elem = this.shadowRoot!.getElementById('programmeDocumentDetail') as EtoolsPrpAjaxEl;
+    elem.abort();
 
-      elem
-        .thunk()()
-        .then((res) => {
-          store.dispatch(pdAdd(res.data));
-          store.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }, 10);
+    elem
+      .thunk()()
+      .then((res) => {
+        store.dispatch(pdAdd(res.data));
+        store.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   disconnectedCallback() {

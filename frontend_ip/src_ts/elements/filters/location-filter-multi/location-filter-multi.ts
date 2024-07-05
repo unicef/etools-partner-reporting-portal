@@ -8,6 +8,7 @@ import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-aj
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import Endpoints from '../../../endpoints';
+import { debounce } from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('location-filter-multi')
 export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(connect(store)(LitElement))) {
@@ -31,6 +32,11 @@ export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(c
 
   @property({type: String})
   value = '';
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchLocations = debounce(this._fetchLocations.bind(this), 100) as any;
+  }
 
   render() {
     return html`
@@ -69,7 +75,6 @@ export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(c
     if (!url) {
       return;
     }
-
     const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
     locationsAjax.abort();
     locationsAjax

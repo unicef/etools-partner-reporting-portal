@@ -70,7 +70,7 @@ export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
     if (!e.detail || e.detail.selectedItem == undefined) {
       return;
     }
-    debugger;
+
     const newLanguage = e.detail.selectedItem.id;
     if (newLanguage === this.currentLanguage) {
       return;

@@ -74,7 +74,7 @@ export class PdList extends MatomoMixin(
       <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
           no-collapse
-          label="${this.visibleRange?.[0]}-${this.visibleRange?.[1]} of ${this.totalResults} ${this.localize(
+          label="${this.visibleRange?.[0] || '0'}-${this.visibleRange?.[1] || '0'} of ${this.totalResults} ${this.localize(
             'results_to_show'
           )}"
         >
@@ -122,7 +122,7 @@ export class PdList extends MatomoMixin(
                     <paper-tooltip>${pd.title}</paper-tooltip>
                   </a>
                 </div>
-                <div class="table-cell table-cell--text">${this._withDefault(pd.status, '', this.localize)}</div>
+                <div class="table-cell table-cell--text">${this._withDefault(pd.status, '')}</div>
                 <div class="table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>
                 <div class="table-cell table-cell--text">${this._withDefault(pd.end_date)}</div>
                 <div class="table-cell table-cell--text">

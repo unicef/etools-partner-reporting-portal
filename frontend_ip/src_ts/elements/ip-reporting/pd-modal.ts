@@ -203,7 +203,7 @@ export class PdModal extends ModalMixin(UtilsMixin(LocalizeMixin(connect(store)(
   }
 
   _formatFocalPoint(items) {
-    return this._withDefault(this._commaSeparatedDictValues(items, 'name'), null, this.localize);
+    return this._withDefault(this._commaSeparatedDictValues(items, 'name'), null);
   }
 }
 

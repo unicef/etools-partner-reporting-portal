@@ -69,7 +69,7 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
   access: any[] = [];
 
   @property({type: Array})
-  workspaces?: any[] = [];
+  workspaces: any[] = [];
 
   @property({type: Boolean})
   userHasPrpRolesOrAccess = false;
@@ -117,6 +117,9 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
     if (changedProperties.has('language')) {
       this._languageChanged(this.language);
     }
+    if (changedProperties.has('_workspaceCode') || changedProperties.has('workspaces')) {    
+      this._handleWorkspaceChange(this._workspaceCode, this.workspaces);
+    }
   }
 
   stateChanged(state: RootState) {
@@ -143,7 +146,7 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
       this.access = state.userProfile.profile?.access;
     }
     if (this.workspaces !== state.workspaces?.all) {
-      this.workspaces = state.workspaces?.all;
+      this.workspaces = state.workspaces?.all || [];
     }
   }
 
@@ -254,11 +257,10 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
     return userPartner ? !!prpRoles.length || !!access.length : true;
   }
 
-  _handleWorkspaceChange(currentWorkspace: string, workspaces: any[]) {
+  _handleWorkspaceChange(currentWorkspace?: string, workspaces?: any[]) {
     if (!currentWorkspace || !workspaces || !workspaces.length) {
       return;
     }
-
     const currentWorkspaceData = workspaces.find((workspace) => workspace.code === currentWorkspace);
 
     if (!currentWorkspaceData) {
