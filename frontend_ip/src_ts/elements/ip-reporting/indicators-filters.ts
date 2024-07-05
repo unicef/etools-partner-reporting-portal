@@ -41,7 +41,12 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
       ${filterStyles}
 
       <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"></iron-query-params>
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
 
       <filter-list .filters="${this.filters}">
         <div class="app-grid">
@@ -55,17 +60,17 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
           >
           </dropdown-filter-multi>
 
-          <pd-dropdown-filter class="item item-2-col" .value="${this._withDefault(this.queryParams.pds, '')}">
+          <pd-dropdown-filter class="item item-2-col" .value="${this._withDefault(this.queryParams?.pds, '')}">
           </pd-dropdown-filter>
 
-          <location-filter class="item" .value="${this._withDefault(this.queryParams.location, '-1')}">
+          <location-filter class="item" .value="${this._withDefault(this.queryParams?.location, '-1')}">
           </location-filter>
 
           <text-filter
             class="item"
             label="${this.localize('indicator_title')}"
             name="blueprint__title"
-            .value="${this.queryParams.blueprint__title || ''}"
+            .value="${this.queryParams?.blueprint__title || ''}"
           >
           </text-filter>
         </div>

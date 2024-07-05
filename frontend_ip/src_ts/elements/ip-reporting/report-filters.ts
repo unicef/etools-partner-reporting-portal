@@ -39,20 +39,28 @@ export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitEl
     return html`
       ${filterStyles}
       <iron-location @query-changed="${this._onQueryChanged}"> </iron-location>
-      <iron-query-params .paramsString="${this.query}" @params-object-changed="${this._onParamsObjectChanged}">
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      >
       </iron-query-params>
 
       <filter-list .filters="${this.filters}">
         <div class="app-grid">
-          <reportable-filter class="item" .value="${this._withDefault(this.queryParams.llo, '-1')}"></reportable-filter>
+          <reportable-filter
+            class="item"
+            .value="${this._withDefault(this.queryParams?.llo, '-1')}"
+          ></reportable-filter>
           <report-location-filter
             class="item"
-            .value="${this._withDefault(this.queryParams.location, '-1')}"
+            .value="${this._withDefault(this.queryParams?.location, '-1')}"
           ></report-location-filter>
           <checkbox-filter
             class="incomplete"
             name="incomplete"
-            .value="${this._withDefault(this.queryParams.incomplete, '')}"
+            .value="${this._withDefault(this.queryParams?.incomplete, '')}"
           >
             <span class="checkbox-label">${this.localize('show_incomplete_only')}</span>
           </checkbox-filter>

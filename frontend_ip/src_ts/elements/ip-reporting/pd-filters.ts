@@ -48,7 +48,8 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
       <iron-query-params
         .paramsString="${this.query}"
         .paramsObject="${this.queryParams}"
-        @params-changed="${this._handleQueryParamsChange}"
+        @params-string-changed="${this._handleQueryParamsChange}"
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
       ></iron-query-params>
       <filter-list .filters="${this.filters}">
         <div class="app-grid">

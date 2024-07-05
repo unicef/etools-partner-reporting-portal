@@ -79,7 +79,7 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
       <iron-location .query="${this.query}"></iron-location>
       <iron-query-params
         .paramsString="${this.query}"
-        @params-changed="${this._handleQueryParamsChange}"
+        @params-string-changed="${this._handleQueryParamsChange}"
       ></iron-query-params>
       <etools-prp-ajax id="pdReports" .url="${this.pdReportsUrl}" .params="${this.pdReportsParams}"> </etools-prp-ajax>
       <page-body>

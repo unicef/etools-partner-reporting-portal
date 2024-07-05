@@ -57,7 +57,12 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
     return html`
       ${filterStyles}
       <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"></iron-query-params>
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
       <filter-list .filters="${this.filters}">
         <div class="app-grid">
           <text-filter

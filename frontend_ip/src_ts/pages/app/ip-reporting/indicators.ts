@@ -49,7 +49,12 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   render() {
     return html`
       <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"></iron-query-params>
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
       <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
       <page-header .title="${this.localize('indicators')}"></page-header>
       <page-body>

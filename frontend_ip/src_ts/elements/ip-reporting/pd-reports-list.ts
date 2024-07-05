@@ -58,6 +58,9 @@ export class PdReportsList extends LocalizeMixin(
   @property({type: Number})
   totalResults = 0;
 
+  @property({type: Array})
+  visibleRange = [];
+
   stateChanged(state: RootState) {
     if (this.pdId !== state.programmeDocuments?.current) {
       this.pdId = state.programmeDocuments?.current;
@@ -78,7 +81,12 @@ export class PdReportsList extends LocalizeMixin(
 
       <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
       <iron-location .query=${this.query}></iron-location>
-      <iron-query-params .paramsString=${this.query} .paramsObject=${this.queryParams}></iron-query-params>
+      <iron-query-params
+        .paramsString=${this.query}
+        .paramsObject=${this.queryParams}
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
 
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
@@ -109,6 +117,7 @@ export class PdReportsList extends LocalizeMixin(
           .pageNumber=${this.pageNumber}
           .totalResults=${this.totalResults}
           .visibleRange=${this.visibleRange}
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed=${this._pageSizeChanged}
           @page-number-changed=${this._pageNumberChanged}
         ></etools-data-table-footer>
@@ -138,6 +147,7 @@ export class PdReportsList extends LocalizeMixin(
           .pageNumber=${this.pageNumber}
           .totalResults=${this.totalResults}
           .visibleRange=${this.visibleRange}
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed=${this._pageSizeChanged}
           @page-number-changed=${this._pageNumberChanged}
         ></etools-data-table-footer>

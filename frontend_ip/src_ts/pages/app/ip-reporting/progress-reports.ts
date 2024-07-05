@@ -39,7 +39,8 @@ export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitEleme
       <iron-query-params
         .paramsString="${this.query}"
         .paramsObject="${this.queryParams}"
-        @params-object-changed="${this._onParamsObjectChanged}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
       ></iron-query-params>
       <etools-prp-ajax id="reports" .url="${this.reportsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
       <page-header .title="${this.localize('progress_reports')}"></page-header>

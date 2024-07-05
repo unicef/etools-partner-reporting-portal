@@ -63,7 +63,7 @@ export class ProgressReportsList extends LocalizeMixin(
   pageNumber!: number;
 
   @property({type: Array})
-  visibleRange!: number[];
+  visibleRange = [];
 
   stateChanged(state: RootState) {
     if (this.loading !== state.progressReports.loading) {
@@ -78,7 +78,12 @@ export class ProgressReportsList extends LocalizeMixin(
     return html`
       ${tableStyles}
       <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"></iron-query-params>
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
@@ -110,6 +115,7 @@ export class ProgressReportsList extends LocalizeMixin(
           .pageNumber="${this.pageNumber}"
           .totalResults="${this.totalResults}"
           .visibleRange="${this.visibleRange}"
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >

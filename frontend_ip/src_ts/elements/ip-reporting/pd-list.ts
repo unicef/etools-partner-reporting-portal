@@ -50,6 +50,9 @@ export class PdList extends MatomoMixin(
   @property({type: Number})
   totalResults = 0;
 
+  @property({type: Array})
+  visibleRange = [];
+
   stateChanged(state: RootState) {
     if (this.loading !== state.programmeDocuments.loading) {
       this.loading = state.programmeDocuments.loading;

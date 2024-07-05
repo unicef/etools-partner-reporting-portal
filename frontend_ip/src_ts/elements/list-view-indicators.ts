@@ -76,12 +76,20 @@ export class ListViewIndicators extends UtilsMixin(
   @property({type: Boolean})
   showProjectContextColumn!: boolean;
 
+  @property({type: Array})
+  visibleRange = [];
+
   render() {
     return html`
       ${tableStyles}
 
-      <iron-location query="${this.query}"></iron-location>
-      <iron-query-params params-string="${this.query}" params-object="${this.queryParams}"></iron-query-params>
+      <iron-location .query="${this.query}"></iron-location>
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
 
       <etools-prp-permissions permissions="${JSON.stringify(this.permissions)}"></etools-prp-permissions>
 
@@ -133,7 +141,8 @@ export class ListViewIndicators extends UtilsMixin(
           page-size="${this.pageSize}"
           page-number="${this.pageNumber}"
           total-results="${this.totalResults}"
-          .visible-range="${this.visibleRange}"
+          .visibleRange="${this.visibleRange}"
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value || [])}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >
@@ -157,6 +166,7 @@ export class ListViewIndicators extends UtilsMixin(
           page-number="${this.pageNumber}"
           total-results="${this.totalResults}"
           .visible-range="${this.visibleRange}"
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >

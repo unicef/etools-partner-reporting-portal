@@ -144,7 +144,12 @@ export class PageIpReportingPdReport extends LocalizeMixin(
 
       <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
       <iron-location .query=${this.query}></iron-location>
-      <iron-query-params .paramsString=${this.query} .paramsObject=${this.queryParams}></iron-query-params>
+      <iron-query-params
+        .paramsString=${this.query}
+        .paramsObject=${this.queryParams}
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      ></iron-query-params>
       <app-route .route=${this.route} pattern="/:report_id/:mode" .data=${this.routeData}></app-route>
       <etools-prp-ajax id="report" .url=${this.reportUrl} .params=${this.queryParams}></etools-prp-ajax>
       <etools-prp-ajax id="submit" .url=${this.submitUrl} method="post"></etools-prp-ajax>

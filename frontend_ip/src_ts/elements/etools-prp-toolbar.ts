@@ -106,7 +106,12 @@ export class EtoolsPrpToolbar extends connect(store)(LitElement) {
     return html`
       ${buttonsStyles}
       <iron-location .query=${this.query}></iron-location>
-      <iron-query-params .paramsString=${this.query} .paramsObject=${this.params}></iron-query-params>
+      <iron-query-params
+        .paramsString=${this.query}
+        .paramsObject=${this.params}
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.params = e.detail.value)}
+      ></iron-query-params>
       <div class="layout horizontal-reverse">
         <slot></slot>
       </div>

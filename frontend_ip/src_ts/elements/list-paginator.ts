@@ -17,7 +17,13 @@ export class ListPaginator extends PaginationMixin(LitElement) {
   render() {
     return html`
       <iron-location query="${this.query}"> </iron-location>
-      <iron-query-params .paramsString="${this.query}" .paramsObject="${this.queryParams}"> </iron-query-params>
+      <iron-query-params
+        .paramsString="${this.query}"
+        .paramsObject="${this.queryParams}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
+      >
+      </iron-query-params>
     `;
   }
 

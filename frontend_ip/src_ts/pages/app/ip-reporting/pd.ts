@@ -79,7 +79,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
       <iron-query-params
         .paramsString="${this.query}"
         .paramsObject="${this.queryParams}"
-        @params-object-changed="${this._onParamsObjectChanged}"
+        @params-string-changed=${(e) => (this.query = e.detail.value)}
+        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
       ></iron-query-params>
 
       ${this.page === 'pd-index'
