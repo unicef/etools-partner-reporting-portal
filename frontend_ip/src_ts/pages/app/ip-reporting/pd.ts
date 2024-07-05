@@ -53,6 +53,19 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
   @property({type: String})
   programmeDocumentDetailUrl = '';
 
+  /**
+   * 
+   * @returns 
+   * 
+   *  <app-route
+        .route="${this.route}"
+        pattern="/:pd_id"
+        .data="${this.routeData}"
+        .tail="${this.subroute}"
+        @data-changed="${this._onRouteDataChanged}"
+      ></app-route>
+   */
+
   render() {
     return html`
       <etools-prp-ajax id="programmeDocumentDetail" .url="${this.programmeDocumentDetailUrl}"></etools-prp-ajax>
@@ -61,29 +74,20 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
         .url="${this.programmeDocumentsUrl}"
         .params="${this.queryParams}"
       ></etools-prp-ajax>
+
       <iron-location .query="${this.query}" @query-changed="${this._onQueryChanged}"></iron-location>
       <iron-query-params
         .paramsString="${this.query}"
         .paramsObject="${this.queryParams}"
         @params-object-changed="${this._onParamsObjectChanged}"
       ></iron-query-params>
-      <app-route
-        .route="${this.route}"
-        pattern="/:pd_id"
-        .data="${this.routeData}"
-        .tail="${this.subroute}"
-        @data-changed="${this._onRouteDataChanged}"
-      ></app-route>
-      <iron-pages .selected="${this.page}" attr-for-selected="name">
-        ${this.page === 'pd-index'
-          ? html` <page-ip-reporting-pd-index name="pd-index" .route="${this.subroute}"></page-ip-reporting-pd-index> `
-          : ''}
-        ${this.page === 'pd-router'
-          ? html`
-              <page-ip-reporting-pd-router name="pd-router" .route="${this.subroute}"></page-ip-reporting-pd-router>
-            `
-          : ''}
-      </iron-pages>
+
+      ${this.page === 'pd-index'
+        ? html` <page-ip-reporting-pd-index name="pd-index" .route="${this.subroute}"></page-ip-reporting-pd-index> `
+        : ''}
+      ${this.page === 'pd-router'
+        ? html` <page-ip-reporting-pd-router name="pd-router" .route="${this.subroute}"></page-ip-reporting-pd-router> `
+        : ''}
     `;
   }
 
@@ -110,10 +114,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
 
     if (changedProperties.has('programmeDocumentDetailUrl')) {
       this._getPdRecord();
-    }
-
-    if (changedProperties.has('page')) {
-      this._pageChanged(this.page);
     }
   }
 
@@ -145,18 +145,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
 
   _onRouteDataChanged(event) {
     this.routeData = event.detail.value;
-  }
-
-  async _pageChanged(page: string) {
-    if (!page) {
-      return;
-    }
-
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
   }
 
   _handleInputChange(programmeDocumentsUrl: string) {

@@ -18,6 +18,9 @@ import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax.js'
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store.js';
 import {RootState} from '../typings/redux.types.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 
 @customElement('page-app')
 export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -92,33 +95,6 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
 
       <etools-prp-ajax id="currenciesData" .url="${this.currenciesUrl}"> </etools-prp-ajax>
 
-      <app-route
-        .route="${this.route}"
-        pattern="/:workspace_code/:app"
-        .data="${this.routeData}"
-        .tail="${this.subroute}"
-        @tail-changed=${(e) => {
-          if (
-            e.detail.value &&
-            e.detail.value.prefix &&
-            JSON.stringify(this.subroute) !== JSON.stringify(e.detail.value)
-          ) {
-            this.subroute = e.detail.value;
-          }
-        }}
-        @data-changed=${(e) => {
-          if (e.detail.value && JSON.stringify(this.routeData) !== JSON.stringify(e.detail.value)) {
-            const a = {...this.routeData};
-
-            this.routeData = e.detail.value;
-            if (!a.app || (e.detail.value.app && a.app !== e.detail.value.app)) {
-              this._routeAppChanged(this.routeData.app);
-            }
-          }
-        }}
-      >
-      </app-route>
-
       ${!this.userHasPrpRolesOrAccess
         ? html`<div class="no-groups-notification">
             <h3>${this.localize('account_created')}</h3>
@@ -126,11 +102,7 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
           </div>`
         : html``}
 
-      <iron-pages selected="${this.page}" attr-for-selected="name">
-        ${this._equals(this.page, 'ip-reporting')
-          ? html`<page-ip-reporting name="ip-reporting" .route="${this.subroute}"> </page-ip-reporting>`
-          : html``}
-      </iron-pages>
+      <page-ip-reporting name="ip-reporting"> </page-ip-reporting>
 
       <etools-toasts></etools-toasts>
     `;
@@ -142,24 +114,16 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
       this.userHasPrpRolesOrAccess = this._computeUserHasPrpRolesOrAccess(this.prpRoles, this.access, this.userPartner);
     }
 
-    if (changedProperties.has('page')) {
-      this._pageChanged(this.page);
-    }
-
-    if (changedProperties.has('routeData') || changedProperties.has('workspaces')) {
-      this._routeWorkspaceChanged(this.routeData?.workspace_code);
-    }
-
-    if (changedProperties.has('currentWorkspace') || changedProperties.has('workspaces')) {
-      this._routeWorkspaceChanged(this.currentWorkspace);
-    }
-
     if (changedProperties.has('language')) {
       this._languageChanged(this.language);
     }
   }
 
   stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this._routeAppChanged(state.app?.routeDetails);
+    }
+
     if (this._workspaceCode !== state.workspaces.current) {
       this._workspaceCode = state.workspaces.current;
     }
@@ -208,11 +172,11 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
   }
 
   _redirectToWorkspace(workspace_code: string) {
-    this.route = {...this.route, path: `/${workspace_code}/`};
+    EtoolsRouter.updateAppLocation(`/ip/${workspace_code}`);
   }
 
   _redirectToApp(app: string) {
-    this.route = {...this.route, path: `/${this.routeData.workspace_code}/${app}`};
+    EtoolsRouter.updateAppLocation(`/ip/${this._workspaceCode}/${app}`);
   }
 
   _handleWorkspacesAsync(e: CustomEvent) {
@@ -247,18 +211,19 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
     }
   }
 
-  private _routeAppChanged(app: string) {
+  private _routeAppChanged(routeDetails: EtoolsRouteDetails) {
     setTimeout(() => {
       const defaultApp = 'ip-reporting';
-      if (!this.routeData.workspace_code) {
+      if (!this._workspaceCode) {
         return;
       }
-      if (!app) {
+
+      if (!routeDetails.subRouteName) {
         this._redirectToApp(defaultApp);
       } else if (!this._app) {
-        store.dispatch(setApp(app));
-        this._fetchCurrencies(app);
-        this.page = app;
+        store.dispatch(setApp(routeDetails.subRouteName));
+        this._fetchCurrencies(routeDetails.subRouteName);
+        this.page = routeDetails.subRouteName;
       }
     });
   }
@@ -287,28 +252,6 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
 
   _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[], userPartner: string) {
     return userPartner ? !!prpRoles.length || !!access.length : true;
-  }
-
-  _pageChanged(page: string) {
-    if (page === 'pages') {
-      return;
-    }
-
-    switch (page) {
-      case 'ip-reporting':
-        import('./app/ip-reporting.js').catch((err: any) => {
-          console.log(err);
-          this._notFound();
-        });
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  _notFound() {
-    window.location.href = '/not-found';
   }
 
   _handleWorkspaceChange(currentWorkspace: string, workspaces: any[]) {
