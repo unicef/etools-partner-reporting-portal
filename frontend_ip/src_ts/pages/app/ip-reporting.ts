@@ -65,40 +65,6 @@ export class PageIpReporting extends LocalizeMixin(UtilsMixin(RoutingMixin(conne
   @property({type: String})
   page = '';
 
-  /** 
-   * 
-   * 
-   *       <app-route
-        .route="${this.route}"
-        pattern="/:page"
-        .data="${this.routeData}"
-        .tail="${this.subroute}"
-        @route-changed=${(e) => {
-          console.log('ipReportingRouteChanged', e.detail.value);
-        }}
-        @tail-changed=${(e) => {
-          console.log('ipReportingTailChanged', e.detail.value);
-          if (e.detail.value && JSON.stringify(this.subroute) !== JSON.stringify(e.detail.value)) {
-            this.subroute = {...e.detail.value};
-            console.log('C2>>', this.subroute);
-          }
-        }}
-        @data-changed=${(e) => {
-          console.log('ipReportingDataChanged', e.detail.value);
-          if (
-            e.detail.value &&
-            e.detail.value.page &&
-            JSON.stringify(this.routeData) !== JSON.stringify(e.detail.value)
-          ) {
-            this.routeData = {...e.detail.value};
-            console.log('C1>>', this.routeData);
-            this._routePageChanged(this.routeData.page);
-          }
-        }}
-      >
-      </app-route>
-  */
-
   render() {
     return html`
       ${appThemeIpStyles}

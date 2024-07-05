@@ -1,14 +1,17 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
-import {getDomainByEnv} from '../../../../etools-prp-common/config.js';
 import '@polymer/app-route/app-route.js';
 import '@polymer/iron-pages/iron-pages.js';
 import './pd-details.js';
 import './pd-report.js';
+import {RootState} from '../../../../typings/redux.types.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../../../redux/store.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 
 @customElement('page-ip-reporting-pd-router')
-class PageIpReportingPdRouter extends UtilsMixin(LitElement) {
+class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: String})
   page = '';
 
@@ -20,11 +23,6 @@ class PageIpReportingPdRouter extends UtilsMixin(LitElement) {
       display: block;
     }
   `;
-
-  /**
-   *   <app-route .route="${this.route}" pattern="/:tree" .data="${this.routeData}" .tail="${this.subroute}">
-      </app-route>
-   */
 
   render() {
     return html`
@@ -44,9 +42,9 @@ class PageIpReportingPdRouter extends UtilsMixin(LitElement) {
     `;
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has('routeData')) {
-      this._routeTreeChanged(this.routeData.tree);
+  stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this._routeTreeChanged(state.app.routeDetails.params?.pdPage);
     }
   }
 
@@ -65,20 +63,6 @@ class PageIpReportingPdRouter extends UtilsMixin(LitElement) {
         break;
     }
   }
-
-  // async _pageChanged(page) {
-  //   if (!page) {
-  //     return;
-  //   }
-
-  //   const resolvedPageUrl = `${getDomainByEnv()}/src/pages/app/ip-reporting/pd/${page}.js`;
-  //   try {
-  //     await import(resolvedPageUrl);
-  //   } catch (err) {
-  //     console.log(err);
-  //     this._notFound();
-  //   }
-  // }
 }
 
 export {PageIpReportingPdRouter};

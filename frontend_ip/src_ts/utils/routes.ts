@@ -117,7 +117,7 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
         queryParams: params.queryParams,
         params: {
           workspaceId: params.matchDetails[1],
-          id: params.matchDetails[3]
+          pdID: params.matchDetails[3]
         }
       };
     }
@@ -133,7 +133,7 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
         queryParams: params.queryParams,
         params: {
           workspaceId: params.matchDetails[1],
-          id: params.matchDetails[3],
+          pdID: params.matchDetails[3],
           mode: 'edit'
         }
       };
@@ -150,7 +150,7 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
         queryParams: params.queryParams,
         params: {
           workspaceId: params.matchDetails[1],
-          id: params.matchDetails[3],
+          pdID: params.matchDetails[3],
           mode: 'view',
           pdPage: params.matchDetails[4]
         }

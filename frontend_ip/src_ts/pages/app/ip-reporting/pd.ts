@@ -11,15 +11,16 @@ import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments.js';
 import {pdAdd, pdFetch, pdSetCount, pdSetCurrent} from '../../../redux/actions/pd.js';
-import {getDomainByEnv} from '../../../etools-prp-common/config.js';
 import './pd/pd-index.js';
 import './pd/pd-router.js';
 import {RootState} from '../../../typings/redux.types.js';
 import {store} from '../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {connect} from 'pwa-helpers';
 
 @customElement('page-ip-reporting-pd')
-class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
+class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     :host {
       display: block;
@@ -52,19 +53,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
 
   @property({type: String})
   programmeDocumentDetailUrl = '';
-
-  /**
-   * 
-   * @returns 
-   * 
-   *  <app-route
-        .route="${this.route}"
-        pattern="/:pd_id"
-        .data="${this.routeData}"
-        .tail="${this.subroute}"
-        @data-changed="${this._onRouteDataChanged}"
-      ></app-route>
-   */
 
   render() {
     return html`
@@ -125,6 +113,10 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
 
     if (this.locationId !== state.location.id) {
       this.locationId = state.location.id;
+    }
+
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this.page = !state.app.routeDetails.params?.pdID ? 'pd-index' : 'pd-router';
     }
   }
 
