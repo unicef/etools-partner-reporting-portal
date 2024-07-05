@@ -26,8 +26,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(LitElement)) {
     }
   `;
 
-  @property({type: Object})
-  query: any = {};
+  @property({type: String})
+  query = '';
 
   @property({type: Object})
   subroute: any = {};
