@@ -1,5 +1,5 @@
-import {LitElement, html, css} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {LitElement, html, css, PropertyValues} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import './utils/routes';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
@@ -28,6 +28,7 @@ import {handleUrlChange} from './redux/actions/app';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import cloneDeep from 'lodash-es/cloneDeep';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
+import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
 dayjs.extend(dayJsUtc);
 initializeIcons();
 
@@ -74,9 +75,15 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   @property({type: Object})
   reduxRouteDetails = {};
 
+  @state() hasLoadedStrings = false;
+
   constructor() {
     super();
     setPassiveTouchGestures(true);
+  }
+
+  protected shouldUpdate(props: PropertyValues) {
+    return this.hasLoadedStrings && super.shouldUpdate(props);
   }
 
   render() {
@@ -107,8 +114,13 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   }
 
   stateChanged(state: RootState) {
+    console.log('Appshell, stateChanged', state);
     if (this.profile !== state.userProfile.profile) {
       this.profile = state.userProfile.profile;
+    }
+
+    if (state.localize.resources && Object.keys(state.localize.resources).length) {
+      this.hasLoadedStrings = true;
     }
 
     if (state.app.routeDetails && !isJsonStrMatch(this.reduxRouteDetails, state.app.routeDetails)) {
@@ -116,11 +128,13 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
         this.page = state.app.routeDetails?.routeName || '';
         this.reduxRouteDetails = cloneDeep(state.app.routeDetails);
       } else {
-        // this._notFound();
+        EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
       }
-    } else {
-      EtoolsRouter.updateAppLocation('/ip/RWA/ip-reporting');
     }
+
+    // else {
+    //  EtoolsRouter.updateAppLocation('/ip/RWA/ip-reporting');
+    // }
   }
 
   canAccessPage(_routeName: string) {

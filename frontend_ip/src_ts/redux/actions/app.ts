@@ -56,9 +56,9 @@ const importSubRoutes = (routeDetails: EtoolsRouteDetails) => {
       break;
   }
 
-  imported?.then(() => {
-    console.log('Imported importSubRoutes', routeDetails.subRouteName);
-  });
+  // imported?.then(() => {
+  //   console.log('Imported importSubRoutes', routeDetails.subRouteName);
+  // });
 
   return imported;
 };
@@ -78,9 +78,9 @@ const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
       break;
   }
 
-  imported?.then(() => {
-    console.log('Imported importPdSubRoutes', routeDetails.subRouteName);
-  });
+  // imported?.then(() => {
+  //   console.log('Imported importPdSubRoutes', routeDetails.subRouteName);
+  // });
 
   return imported;
 };
@@ -96,9 +96,9 @@ const importPdRoutes = (routeDetails: EtoolsRouteDetails) => {
     imported = import('../../pages/app/ip-reporting/pd/pd-index.js');
   }
 
-  imported?.then(() => {
-    console.log('Imported importPdRoutes', routeDetails.subRouteName);
-  });
+  // imported?.then(() => {
+  //   console.log('Imported importPdRoutes', routeDetails.subRouteName);
+  // });
 
   return imported;
 };
@@ -126,9 +126,9 @@ const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
       break;
   }
 
-  imported?.then(() => {
-    console.log('Imported importSubSubRoutes', routeDetails.subSubRouteName);
-  });
+  // imported?.then(() => {
+  //   console.log('Imported importSubSubRoutes', routeDetails.subSubRouteName);
+  // });
 
   return imported;
 };
