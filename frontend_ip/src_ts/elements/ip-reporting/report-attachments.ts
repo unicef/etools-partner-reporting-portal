@@ -8,7 +8,7 @@ import {
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
 import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
-import '@unicef-polymer/etools-file/etools-file';
+import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
