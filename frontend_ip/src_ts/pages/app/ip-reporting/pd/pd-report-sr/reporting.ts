@@ -253,7 +253,7 @@ export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(st
         .catch((err) => {
           console.log(err);
         });
-    }, 250);
+    }, 250)();
   }
 
   _computeUpdateUrl(locationId, reportId) {

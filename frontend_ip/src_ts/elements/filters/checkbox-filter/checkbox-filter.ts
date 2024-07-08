@@ -50,7 +50,7 @@ export class CheckboxFilter extends UtilsMixin(FilterMixin(LitElement)) {
           value: newValue.toString()
         });
       }
-    }, 250);
+    }, 250)();
   }
 
   _computeChecked(value) {

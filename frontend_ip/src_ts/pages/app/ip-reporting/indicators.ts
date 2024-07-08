@@ -1,7 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '../../../etools-prp-common/elements/page-header.js';
 import '../../../etools-prp-common/elements/page-body.js';
 import '../../../etools-prp-common/elements/etools-prp-ajax.js';
@@ -16,6 +14,7 @@ import {store} from '../../../redux/store.js';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 
 @customElement('page-ip-reporting-indicators')
 export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connect(store)(LitElement))) {
@@ -40,21 +39,11 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   @property({type: String})
   indicatorsUrl = '';
 
-  @property({type: String})
-  query = '';
-
   @property({type: Object})
   queryParams = {};
 
   render() {
     return html`
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
       <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
       <page-header .title="${this.localize('indicators')}"></page-header>
       <page-body>
@@ -66,7 +55,14 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   }
 
   stateChanged(state) {
-    if (this.data !== state.indicators.all) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (state.indicators.all && !isJsonStrMatch(this.data, state.indicators.all)) {
       this.data = state.indicators.all;
     }
     if (this.loading !== state.indicators.loading) {
@@ -82,8 +78,9 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
+      console.log('this.indicatorsUrl', this.indicatorsUrl, this.queryParams);
       this._indicatorsAjax(this.queryParams);
     }
 
@@ -93,22 +90,21 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   }
 
   _computeIndicatorsUrl(workspaceId) {
-    return Endpoints.allPDIndicators(workspaceId);
+    return workspaceId ? Endpoints.allPDIndicators(workspaceId) : '';
   }
 
   _indicatorsAjax(queryParams) {
+    console.log('indicatorEl', queryParams);
     if (!Object.keys(queryParams).length) {
       return;
     }
 
     debounce(() => {
       const indicatorEl = this.shadowRoot!.getElementById('indicators') as EtoolsPrpAjaxEl;
-
       // Cancel the pending request, if any
       indicatorEl.abort();
-
       store.dispatch(fetchIndicators(indicatorEl.thunk()));
-    }, 100);
+    }, 100)();
   }
 
   disconnectedCallback() {

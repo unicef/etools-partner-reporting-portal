@@ -35,8 +35,8 @@ export const progressReportsFetch = function (progressReportsThunk: any) {
       .then(function (res: any) {
         const progressReportsData = res.data;
 
-        dispatch(progressReportsSet(progressReportsData.results));
-        dispatch(progressReportsSetCount(progressReportsData.count));
+        dispatch(progressReportsSet(progressReportsData?.results || []));
+        dispatch(progressReportsSetCount(progressReportsData?.count || 0));
         dispatch(progressReportsLoadingStop());
       })
       .catch(function (err: any) {

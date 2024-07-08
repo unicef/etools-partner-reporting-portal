@@ -37,7 +37,7 @@ class TextFilter extends FilterMixin(connect(store)(LitElement)) {
   }
 
   _filterValueChanged() {
-    this._debouncer = debounce(() => {
+    debounce(() => {
       const newValue = (this.shadowRoot!.getElementById('field') as PaperInputElement).value!.trim();
 
       if (newValue !== this.lastValue) {
@@ -46,7 +46,7 @@ class TextFilter extends FilterMixin(connect(store)(LitElement)) {
           value: newValue
         });
       }
-    }, 250);
+    }, 250)();
   }
 
   connectedCallback() {

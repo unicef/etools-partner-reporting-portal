@@ -5,8 +5,6 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
 import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
 import '@polymer/polymer/lib/elements/dom-if';
 import '@polymer/polymer/lib/elements/dom-repeat';
 import {tableStyles} from '../etools-prp-common/styles/table-styles';
@@ -20,6 +18,7 @@ import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import {store} from '../redux/store';
 import {RootState} from '../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('list-view-indicators')
 export class ListViewIndicators extends UtilsMixin(
@@ -82,15 +81,6 @@ export class ListViewIndicators extends UtilsMixin(
   render() {
     return html`
       ${tableStyles}
-
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
-
       <etools-prp-permissions permissions="${JSON.stringify(this.permissions)}"></etools-prp-permissions>
 
       <etools-content-panel panel-title="${this.localize('list_of_indicators')}">
@@ -165,7 +155,7 @@ export class ListViewIndicators extends UtilsMixin(
           page-size="${this.pageSize}"
           page-number="${this.pageNumber}"
           total-results="${this.totalResults}"
-          .visible-range="${this.visibleRange}"
+          .visibleRange="${this.visibleRange}"
           @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
@@ -187,6 +177,13 @@ export class ListViewIndicators extends UtilsMixin(
   }
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+  
     if (this.appName !== state.app.current) {
       this.appName = state.app.current;
     }

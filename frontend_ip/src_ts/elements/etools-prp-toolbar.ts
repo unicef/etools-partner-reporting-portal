@@ -1,11 +1,10 @@
 import {LitElement, html, css} from 'lit';
 import {property, customElement, state} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
 import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {store} from '../redux/store';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('etools-prp-toolbar')
 export class EtoolsPrpToolbar extends connect(store)(LitElement) {
@@ -52,6 +51,10 @@ export class EtoolsPrpToolbar extends connect(store)(LitElement) {
   params!: any;
 
   stateChanged(state: any) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.params, state.app?.routeDetails?.queryParams)) {
+      this.params = state.app?.routeDetails.queryParams;
+    }
+
     if (this._responsePlanId !== state.responsePlans.currentID) {
       this._responsePlanId = state.responsePlans.currentID;
     }
@@ -68,7 +71,7 @@ export class EtoolsPrpToolbar extends connect(store)(LitElement) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('_responsePlanId')) {
       this.responsePlanId = this._identity(this._responsePlanId);
       this._dispatchEvent('responsePlanId', this.responsePlanId);
@@ -107,13 +110,6 @@ export class EtoolsPrpToolbar extends connect(store)(LitElement) {
   render() {
     return html`
       ${buttonsStyles}
-      <iron-location .query=${this.query}></iron-location>
-      <iron-query-params
-        .paramsString=${this.query}
-        .paramsObject=${this.params}
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.params = e.detail.value)}
-      ></iron-query-params>
       <div class="layout horizontal-reverse">
         <slot></slot>
       </div>

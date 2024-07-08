@@ -409,7 +409,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
         .catch((_err: any) => {
           // TODO: error handling
         });
-    }, 100);
+    }, 100)();
   }
 
   _addEventListeners() {

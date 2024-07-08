@@ -636,7 +636,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
           });
           console.log(err);
         });
-    }, 250);
+    }, 250)();
   }
 
   _computeUpdateUrl(locationId: string, reportId: string) {

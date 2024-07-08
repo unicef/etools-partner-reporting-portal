@@ -2,8 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
 import '../../etools-prp-common/elements/filter-list';
 import '../filters/text-filter/text-filter';
 import '../filters/dropdown-filter/dropdown-filter-multi';
@@ -13,6 +11,8 @@ import '../filters/checkbox-filter/checkbox-filter';
 import {filterStyles} from '../../styles/filter-styles';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('indicators-filters')
 export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -32,21 +32,15 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
     }
   `;
 
-  @property({type: Object}) queryParams!: any;
+  @property({type: Object})
+  queryParams!: any;
 
-  @property({type: Array}) pd_statuses: {title: string; id: string}[] = [];
+  @property({type: Array})
+  pd_statuses: any[] = this._initStatuses();
 
   render() {
     return html`
       ${filterStyles}
-
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
 
       <filter-list .filters="${this.filters}">
         <div class="app-grid">
@@ -78,11 +72,17 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
     `;
   }
 
+  stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+  }
+
   updated(changedProperties) {
     super.updated(changedProperties);
-    if (changedProperties.has('resources')) {
-      this.pd_statuses = this._initStatuses();
-    }
   }
 
   private _initStatuses(): {title: string; id: string}[] {

@@ -1,8 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/paper-button/paper-button.js';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
@@ -11,6 +9,8 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
+import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-report-filters')
 export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -25,14 +25,11 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
     `
   ];
 
-  @property({type: String})
-  query!: string;
-
   @property({type: Object})
   queryParams: any = {};
 
   @property({type: Object, attribute: false})
-  filters: any = {};
+  filters: any[] = [];
 
   @property({type: Array})
   statuses: any[] = [];
@@ -52,15 +49,8 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
   render() {
     return html`
       ${filterStyles}
-      <iron-location .query=${this.query}></iron-location>
-      <iron-query-params
-        .paramsString=${this.query}
-        .paramsObject=${this.queryParams}
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
 
-      <filter-list .filters=${this.filters}>
+      <filter-list .filters=${this.filters} @filters-changed=${(e) => (this.filters = e.detail.value)}>
         <div class="app-grid">
           <dropdown-filter
             class="item"
@@ -74,9 +64,18 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
     `;
   }
 
+  stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+  }
+
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('resources')) {
       this.statuses = this._localizeStatuses();
     }

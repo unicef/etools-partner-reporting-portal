@@ -5,8 +5,6 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@unicef-polymer/etools-data-table/etools-data-table';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
@@ -23,6 +21,7 @@ import '@unicef-polymer/etools-data-table/data-table-styles';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('progress-reports-list')
 export class ProgressReportsList extends LocalizeMixin(
@@ -50,9 +49,6 @@ export class ProgressReportsList extends LocalizeMixin(
   @property({type: Number})
   totalResults!: number;
 
-  @property({type: String})
-  query!: string;
-
   @property({type: Object})
   queryParams!: any;
 
@@ -66,6 +62,13 @@ export class ProgressReportsList extends LocalizeMixin(
   visibleRange = [];
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.loading !== state.progressReports.loading) {
       this.loading = state.progressReports.loading;
     }
@@ -77,13 +80,6 @@ export class ProgressReportsList extends LocalizeMixin(
   render() {
     return html`
       ${tableStyles}
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse

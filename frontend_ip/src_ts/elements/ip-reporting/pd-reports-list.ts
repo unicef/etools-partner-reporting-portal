@@ -3,8 +3,6 @@ import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
 import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/elements/etools-prp-permissions';
@@ -25,6 +23,7 @@ import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {RootState} from '../../typings/redux.types';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-reports-list')
 export class PdReportsList extends LocalizeMixin(
@@ -45,7 +44,7 @@ export class PdReportsList extends LocalizeMixin(
   loaded = false;
 
   @property({type: Object})
-  filters: any = {};
+  filters: any[] = [];
 
   @property({type: Object})
   permissions: any = {};
@@ -57,11 +56,18 @@ export class PdReportsList extends LocalizeMixin(
   data: any[] = [];
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.pdId !== state.programmeDocuments?.current) {
       this.pdId = state.programmeDocuments?.current;
     }
 
-    this.data = programmeDocumentReportsAll(state);    
+    this.data = programmeDocumentReportsAll(state);
     const totalResults = programmeDocumentReportsCount(state);
     this.paginator = {...this.paginator, count: totalResults};
   }
@@ -86,20 +92,13 @@ export class PdReportsList extends LocalizeMixin(
       ${tableStyles}
 
       <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
-      <iron-location .query=${this.query}></iron-location>
-      <iron-query-params
-        .paramsString=${this.query}
-        .paramsObject=${this.queryParams}
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
 
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
-          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator.count} ${this.localize(
-            'results_to_show'
-          )}"
+          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${
+      this.paginator.count
+    } ${this.localize('results_to_show')}"
         >
           <etools-data-table-column>
             <div class="table-column">${this.localize('report_number')}</div>

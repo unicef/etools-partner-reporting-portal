@@ -226,36 +226,34 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
           : html``
       }
 
-        <iron-pages attr-for-selected="name" .selected="${this.selected}">
-          ${(this.locations || []).map(
-            (location) => html`<div name="location-${location.current.id}">
-              <div class="app-grid">
-                ${location.current
-                  ? html`
-                      <div class="item">
-                        <disaggregation-table
-                          .data="${JSON.stringify(location.current)}"
-                          .mapping="${JSON.stringify(location.reportInfo.current.disagg_lookup_map)}"
-                        >
-                        </disaggregation-table>
-                      </div>
-                    `
-                  : html``}
-                ${location.previous
-                  ? html`
-                      <div class="item">
-                        <disaggregation-table
-                          .data="${location.previous}"
-                          .mapping="${location.reportInfo.previous.disagg_lookup_map}"
-                        >
-                        </disaggregation-table>
-                      </div>
-                    `
-                  : html``}
-              </div>
-            </div>`
-          )}
-        </iron-pages>
+      ${(this.locations || []).map(
+        (location) => html`<div name="location-${location.current.id}">
+          <div class="app-grid">
+            ${location.current
+              ? html`
+                  <div class="item">
+                    <disaggregation-table
+                      .data="${JSON.stringify(location.current)}"
+                      .mapping="${JSON.stringify(location.reportInfo.current.disagg_lookup_map)}"
+                    >
+                    </disaggregation-table>
+                  </div>
+                `
+              : html``}
+            ${location.previous
+              ? html`
+                  <div class="item">
+                    <disaggregation-table
+                      .data="${location.previous}"
+                      .mapping="${location.reportInfo.previous.disagg_lookup_map}"
+                    >
+                    </disaggregation-table>
+                  </div>
+                `
+              : html``}
+          </div>
+        </div>`
+      )}
       </template>
     `;
   }

@@ -5,14 +5,14 @@ import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '../../etools-prp-common/elements/filter-list.js';
 import '../../elements/filters/text-filter/text-filter.js';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi.js';
 import '../../elements/filters/location-filter-multi/location-filter-multi.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-filters')
 export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
@@ -35,29 +35,21 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
   queryParams!: any;
 
   @property({type: Array})
-  statuses: any[] = [];
+  statuses: any[] = this._initStatuses();
 
   @property({type: Object})
-  filters: any = {};
+  filters: any[] = [];
 
   render() {
     return html`
       ${filterStyles}
-
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed="${this._handleQueryParamsChange}"
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
-      <filter-list .filters="${this.filters}">
+      <filter-list .filters="${this.filters}" @filters-changed=${(e) => (this.filters = e.detail.value)}>
         <div class="app-grid">
           <text-filter
             class="item"
             label="${this.localize('pd_ref_and_title')}"
             name="ref_title"
-            value="${this.queryParams?.ref_title || ''}"
+            .value="${this.queryParams?.ref_title || ''}"
             @value-changed="${this._handleFilterChange}"
           >
           </text-filter>
@@ -65,15 +57,15 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
             class="item filter-2-col"
             label="${this.localize('pd_ssfa_status')}"
             name="status"
-            value="${this._withDefault(this.queryParams?.status, '')}"
-            data="${this.statuses}"
+            .value="${this._withDefault(this.queryParams?.status, '')}"
+            .data="${this.statuses}"
             hide-search
             @value-changed="${this._handleFilterChange}"
           >
           </dropdown-filter-multi>
           <location-filter-multi
             class="item filter-2-col"
-            value="${this._withDefault(this.queryParams?.location, '')}"
+            .value="${this._withDefault(this.queryParams?.location, '')}"
             @value-changed="${this._handleFilterChange}"
           >
           </location-filter-multi>
@@ -81,12 +73,18 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
       </filter-list>
     `;
   }
-  
+
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('resources')) {
       this.statuses = this._initStatuses();
+    }
+  }
+
+  stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
     }
   }
 
@@ -103,12 +101,8 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
 
   private _handleFilterChange(event: CustomEvent) {
     const {name, value} = event.detail;
-    this.filters = {...this.filters, [name]: value};
-    fireEvent(this, 'filters-changed', this.filters);
-  }
-
-  private _handleQueryParamsChange(event: CustomEvent) {
-    this.queryParams = event.detail.value;
+    this.queryParams = {...this.queryParams, [name]: value};
+    fireEvent(this, 'filters-changed', this.queryParams);
   }
 }
 

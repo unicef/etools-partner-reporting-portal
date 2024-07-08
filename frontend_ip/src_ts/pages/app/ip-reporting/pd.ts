@@ -1,9 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@polymer/app-route/app-route.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import Endpoints from '../../../endpoints.js';
@@ -18,7 +15,7 @@ import {store} from '../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {connect} from 'pwa-helpers';
-import { EtoolsRouteDetails } from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
+import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 
 @customElement('page-ip-reporting-pd')
 class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -27,9 +24,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       display: block;
     }
   `;
-
-  @property({type: String})
-  query = '';
 
   @property({type: Object})
   subroute: any = {};
@@ -62,7 +56,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     super.connectedCallback();
     this._handleInputChange = debounce(this._handleInputChange.bind(this), 100) as any;
     this._getPdRecord = debounce(this._getPdRecord.bind(this), 100) as any;
-  }  
+  }
 
   render() {
     return html`
@@ -72,14 +66,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
         .url="${this.programmeDocumentsUrl}"
         .params="${this.queryParams}"
       ></etools-prp-ajax>
-
-      <iron-location .query="${this.query}" @query-changed="${this._onQueryChanged}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
 
       ${this.page === 'pd-index'
         ? html` <page-ip-reporting-pd-index name="pd-index" .route="${this.subroute}"></page-ip-reporting-pd-index> `
@@ -92,7 +78,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId')) {
       this.programmeDocumentsUrl = this._computeProgrammeDocumentsUrl(this.locationId);
     }
@@ -105,20 +91,19 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       this._handleInputChange(this.programmeDocumentsUrl);
     }
 
-    // if (changedProperties.has('routeData')) {
-    //   this._routePdIdChanged(this.routeData.pd_id);
-    // }
-
-    // if (changedProperties.has('route')) {
-    //   this._routePathChanged(this.route.path);
-    // }
-
     if (changedProperties.has('programmeDocumentDetailUrl')) {
       this._getPdRecord();
     }
   }
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.currentPD !== currentProgrammeDocument(state)) {
       this.currentPD = currentProgrammeDocument(state);
     }
@@ -153,7 +138,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     this.routeData = event.detail.value;
   }
 
-  _handleInputChange(programmeDocumentsUrl: string) {    
+  _handleInputChange(programmeDocumentsUrl: string) {
     if (!programmeDocumentsUrl) {
       return;
     }

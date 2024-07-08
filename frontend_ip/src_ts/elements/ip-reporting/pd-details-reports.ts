@@ -5,8 +5,6 @@ import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '../ip-reporting/pd-report-filters.js';
 import '../ip-reporting/pd-reports-toolbar.js';
 import '../ip-reporting/pd-reports-list.js';
@@ -15,6 +13,7 @@ import {pdReportsFetch} from '../../redux/actions/pdReports.js';
 import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions.js';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-details-reports')
 export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(LitElement))) {
@@ -23,9 +22,6 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
       display: block;
     }
   `;
-
-  @property({type: String})
-  query!: string;
 
   @property({type: Object})
   queryParams!: any;
@@ -46,6 +42,13 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
   pdReportsId!: string;
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.locationId !== state.location.id) {
       this.locationId = state.location.id;
     }
@@ -61,7 +64,7 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId')) {
       this.pdReportsUrl = computePDReportsUrl(this.locationId);
     }
@@ -78,11 +81,6 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
   render() {
     return html`
       ${tableStyles}
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        @params-string-changed="${this._handleQueryParamsChange}"
-      ></iron-query-params>
       <etools-prp-ajax id="pdReports" .url="${this.pdReportsUrl}" .params="${this.pdReportsParams}"> </etools-prp-ajax>
       <page-body>
         <pd-report-filters></pd-report-filters>
@@ -104,11 +102,6 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
       (this.shadowRoot!.getElementById('pdReports') as any as EtoolsPrpAjaxEl).abort();
 
       store.dispatch(pdReportsFetch(pdReportsThunk, this.pdId));
-    }, 250);
-  }
-
-  private _handleQueryParamsChange(event: CustomEvent) {
-    this.queryParams = event.detail.value;
-    this.pdReportsParams = computePDReportsParams(this.pdId, this.queryParams);
+    }, 250)();
   }
 }

@@ -1,7 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '../../../etools-prp-common/elements/page-header.js';
 import '../../../etools-prp-common/elements/page-body.js';
 import '../../../etools-prp-common/elements/etools-prp-ajax.js';
@@ -15,6 +13,7 @@ import {progressReportsFetch} from '../../../redux/actions/progressReports.js';
 import {store} from '../../../redux/store.js';
 import {connect} from 'pwa-helpers';
 import {RootState} from '../../../typings/redux.types.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 
 @customElement('page-ip-progress-reports')
 export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitElement)) {
@@ -35,13 +34,6 @@ export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitEleme
 
   render() {
     return html`
-      <iron-location .query="${this.query}" @query-changed="${this._onQueryChanged}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
       <etools-prp-ajax id="reports" .url="${this.reportsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
       <page-header .title="${this.localize('progress_reports')}"></page-header>
       <page-body>
@@ -54,36 +46,35 @@ export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitEleme
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('reportsUrl') || changedProperties.has('queryParams')) {
-      this._handleInputChange(this.reportsUrl, this.queryParams);
+      this._handleInputChange();
     }
 
     if (changedProperties.has('locationId')) {
-      this.reportsUrl = this._computeProgressReportsUrl(this.locationId);
+      this.reportsUrl = this._computeProgressReportsUrl();
     }
   }
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.locationId !== state.location.id) {
       this.locationId = state.location.id;
     }
   }
 
-  _onQueryChanged(event) {
-    this.query = event.detail.value;
+  _computeProgressReportsUrl() {
+    return this.locationIdlocationId ? Endpoints.progressReports(this.locationId) : '';
   }
 
-  _onParamsObjectChanged(event) {
-    this.queryParams = event.detail.value;
-  }
-
-  _computeProgressReportsUrl(locationId) {
-    return locationId ? Endpoints.progressReports(locationId) : '';
-  }
-
-  _handleInputChange(reportsUrl: string, queryParams: any) {
-    if (!reportsUrl || !queryParams || !Object.keys(queryParams).length) {
+  _handleInputChange() {
+    if (!this.reportsUrl || !this.queryParams || !Object.keys(this.queryParams).length) {
       return;
     }
 

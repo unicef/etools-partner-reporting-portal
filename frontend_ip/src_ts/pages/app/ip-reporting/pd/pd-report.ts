@@ -2,13 +2,10 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles.js';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/app-route/app-route.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-tabs/paper-tabs.js';
 import '@polymer/paper-tabs/paper-tab.js';
-import '@polymer/iron-pages/iron-pages.js';
 import '../../../../etools-prp-common/elements/etools-prp-ajax.js';
 import '../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../etools-prp-common/elements/page-header.js';
@@ -39,6 +36,7 @@ import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 
 @customElement('page-ip-reporting-pd-report')
 export class PageIpReportingPdReport extends LocalizeMixin(
@@ -143,13 +141,6 @@ export class PageIpReportingPdReport extends LocalizeMixin(
       ${sharedStyles} ${buttonsStyles}
 
       <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
-      <iron-location .query=${this.query}></iron-location>
-      <iron-query-params
-        .paramsString=${this.query}
-        .paramsObject=${this.queryParams}
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
       <app-route .route=${this.route} pattern="/:report_id/:mode" .data=${this.routeData}></app-route>
       <etools-prp-ajax id="report" .url=${this.reportUrl} .params=${this.queryParams}></etools-prp-ajax>
       <etools-prp-ajax id="submit" .url=${this.submitUrl} method="post"></etools-prp-ajax>
@@ -254,6 +245,13 @@ export class PageIpReportingPdReport extends LocalizeMixin(
   }
 
   stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.currentPd !== currentProgrammeDocument(state)) {
       this.currentPd = currentProgrammeDocument(state);
     }
@@ -381,7 +379,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
       const elem = this.shadowRoot!.querySelector('#report') as EtoolsPrpAjaxEl;
       elem.abort();
       store.dispatch(pdReportsFetchSingle(elem.thunk(), this.pdId));
-    }, 250);
+    }, 250)();
   }
 
   _computeHeadingPrefix(mode: string, localize: (x: string) => string) {

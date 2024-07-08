@@ -47,12 +47,12 @@ export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) 
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId')) {
       this.programmeDocumentsUrl = this._computeProgrammeDocumentsUrl(this.locationId);
     }
     if (changedProperties.has('programmeDocumentsUrl')) {
-      this._fetchPDs(this.programmeDocumentsUrl);
+      this._fetchPDs();
     }
   }
 
@@ -66,20 +66,23 @@ export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) 
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
-  _fetchPDs(url) {
-    if (!url) {
+  _fetchPDs() {
+    if (!this.programmeDocumentsUrl) {
       return;
     }
-
+    console.log('heey url', this.programmeDocumentsUrl);
+    console.log(this.shadowRoot?.getElementById('programmeDocuments'));
     const programmeDocumentsAjax = this.shadowRoot?.getElementById('programmeDocuments') as any as EtoolsPrpAjaxEl;
     programmeDocumentsAjax.abort();
     programmeDocumentsAjax
       .thunk()()
       .then((res) => {
-        this.data = res.data.results;
+        this.data = res.data?.results;
+        console.log('heey data', this.data);
       })
       .catch((_err: any) => {
         // TODO: error handling
+        console.log(_err);
       });
   }
 

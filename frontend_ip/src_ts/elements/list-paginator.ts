@@ -1,13 +1,15 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import PaginationMixin from '../etools-prp-common/mixins/pagination-mixin';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {RootState} from '../typings/redux.types';
+import {connect} from 'pwa-helpers';
+import {store} from '../redux/store';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('list-paginator')
-export class ListPaginator extends PaginationMixin(LitElement) {
+export class ListPaginator extends PaginationMixin(connect(store)(LitElement)) {
   @property({type: Array})
   data: any[] = [];
 
@@ -15,21 +17,21 @@ export class ListPaginator extends PaginationMixin(LitElement) {
   paginated!: any[];
 
   render() {
-    return html`
-      <iron-location query="${this.query}"> </iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      >
-      </iron-query-params>
-    `;
+    return html``;
+  }
+
+  stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
   }
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('data') || changedProperties.has('pageSize') || changedProperties.has('pageNumber')) {
       this.paginated = this._computePaginated(this.data, this.pageSize, this.pageNumber);
       fireEvent(this, 'paginated-changed', {paginated: this.paginated});

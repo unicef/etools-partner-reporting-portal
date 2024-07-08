@@ -2,7 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import '@polymer/app-route/app-route.js';
-import '@polymer/iron-pages/iron-pages.js';
 import './pd-details.js';
 import './pd-report.js';
 import {RootState} from '../../../../typings/redux.types.js';

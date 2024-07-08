@@ -96,49 +96,49 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
       <etools-data-table-row .detailsOpened=${this.detailsOpened} @opened-changed=${this.onDetailsOpenedChanged}>
         <div slot="row-data">
           <span class="table-cell table-cell--text self-center">
-            ${this._flagIndicator(this.indicator.target, this.indicator.baseline, this.isCustom)
+            ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
               ? html`<status-badge type="error"></status-badge>`
               : html``}
-            ${this.indicator.blueprint.title}
-            <paper-tooltip>${this.indicator.blueprint.title}</paper-tooltip>
+            ${this.indicator?.blueprint?.title}
+            <paper-tooltip>${this.indicator?.blueprint?.title}</paper-tooltip>
           </span>
-          ${this._equals(this.indicator.content_type_key, 'partner.partneractivityprojectcontext')
-            ? html`<span class="table-cell table-cell--text self-center">${this.indicator.content_object_title}</span>`
+          ${this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
+            ? html`<span class="table-cell table-cell--text self-center">${this.indicator?.content_object_title}</span>`
             : html``}
           <span class="table-cell table-cell--text self-center"
-            >${this.indicator.blueprint.calculation_formula_across_locations}</span
+            >${this.indicator?.blueprint?.calculation_formula_across_locations}</span
           >
           <span class="table-cell table-cell--text self-center"
-            >${this.indicator.blueprint.calculation_formula_across_periods}</span
+            >${this.indicator?.blueprint?.calculation_formula_across_periods}</span
           >
           <span class="table-cell table-cell--text self-center">
-            ${this._equals(this.indicator.blueprint.display_type, 'number')
-              ? html`<etools-prp-number .value="${this.indicator.baseline.v}"></etools-prp-number>`
-              : this._equals(this.indicator.blueprint.display_type, 'percentage')
-              ? html`<span><etools-prp-number .value="${this.indicator.baseline.v}"></etools-prp-number>%</span>`
-              : this._equals(this.indicator.blueprint.display_type, 'ratio')
+            ${this._equals(this.indicator?.blueprint?.display_type, 'number')
+              ? html`<etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>`
+              : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
+              ? html`<span><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>%</span>`
+              : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
               ? html`<span
-                  ><etools-prp-number .value="${this.indicator.baseline.v}"></etools-prp-number>
+                  ><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>
                   /
-                  <etools-prp-number .value="${this.indicator.baseline.d}"></etools-prp-number
+                  <etools-prp-number .value="${this.indicator?.baseline.d}"></etools-prp-number
                 ></span>`
               : html``}
           </span>
           <span class="table-cell table-cell--text self-center">
-            ${this._equals(this.indicator.blueprint.display_type, 'number')
-              ? html`<etools-prp-number .value="${this.indicator.target.v}"></etools-prp-number>`
-              : this._equals(this.indicator.blueprint.display_type, 'percentage')
-              ? html`<span><etools-prp-number .value="${this.indicator.target.v}"></etools-prp-number>%</span>`
-              : this._equals(this.indicator.blueprint.display_type, 'ratio')
+            ${this._equals(this.indicator?.blueprint?.display_type, 'number')
+              ? html`<etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>`
+              : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
+              ? html`<span><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>%</span>`
+              : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
               ? html`<span
-                  ><etools-prp-number .value="${this.indicator.target.v}"></etools-prp-number>
+                  ><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>
                   /
-                  <etools-prp-number .value="${this.indicator.target.d}"></etools-prp-number
+                  <etools-prp-number .value="${this.indicator?.target.d}"></etools-prp-number
                 ></span>`
               : html``}
           </span>
           <span class="table-cell table-cell--text self-center"
-            ><etools-prp-number .value=${this.indicator.achieved.c}></etools-prp-number
+            ><etools-prp-number .value=${this.indicator?.achieved.c}></etools-prp-number
           ></span>
           <span class="table-cell table-cell--text self-center flex-2">
             <div class="self-center flex-none">
@@ -147,13 +147,13 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
                 <dd class="flex-none">
                   ${this._equals(this.progressBarType, 'cluster')
                     ? html`<etools-prp-progress-bar-cluster
-                        .display-type=${this.indicator.blueprint.display_type}
-                        .number=${this.indicator.total_against_target}
+                        .display-type=${this.indicator?.blueprint?.display_type}
+                        .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar-cluster>`
                     : this._equals(this.progressBarType, 'default')
                     ? html`<etools-prp-progress-bar
-                        .display-type=${this.indicator.blueprint.display_type}
-                        .number=${this.indicator.total_against_target}
+                        .display-type=${this.indicator?.blueprint?.display_type}
+                        .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar>`
                     : html``}
                 </dd>
@@ -165,8 +165,8 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
                       <dt class="flex-none self-center">${this.localize('against_in_need')}:</dt>
                       <dd class="flex-none">
                         <etools-prp-progress-bar-alt
-                          .display-type=${this.indicator.blueprint.display_type}
-                          .number=${this.indicator.total_against_in_need}
+                          .display-type=${this.indicator?.blueprint?.display_type}
+                          .number=${this.indicator?.total_against_in_need}
                         ></etools-prp-progress-bar-alt>
                       </dd>
                     </dl>

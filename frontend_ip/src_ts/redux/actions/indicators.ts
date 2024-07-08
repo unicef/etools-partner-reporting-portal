@@ -35,9 +35,12 @@ export const fetchIndicators = function (indicatorsThunk: any) {
         dispatch(indicatorsLoadingStop());
       })
       .then(function (res: any) {
-        dispatch(setIndicators(res.data));
+        if (res?.data) {
+          dispatch(setIndicators(res?.data));
+          dispatch(setIndicatorsCount(res?.data));
+        }
         dispatch(indicatorsLoadingStop());
-        dispatch(setIndicatorsCount(res.data));
+       
       });
   };
 };

@@ -1,4 +1,4 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
@@ -6,8 +6,6 @@ import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
 import '@unicef-polymer/etools-data-table/data-table-styles';
 import '@polymer/paper-tooltip/paper-tooltip';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
@@ -24,10 +22,9 @@ import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('pd-list')
-export class PdList extends RoutingMixin(MatomoMixin(
-  LocalizeMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))))
+export class PdList extends RoutingMixin(
+  MatomoMixin(LocalizeMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))))
 ) {
-
   @property({type: Boolean})
   loading = false;
 
@@ -40,7 +37,7 @@ export class PdList extends RoutingMixin(MatomoMixin(
   @property({type: Array})
   visibleRange = [];
 
-  stateChanged(state: RootState) {    
+  stateChanged(state: RootState) {
     if (this.loading !== state.programmeDocuments?.loading) {
       this.loading = state.programmeDocuments.loading;
     }
@@ -56,12 +53,12 @@ export class PdList extends RoutingMixin(MatomoMixin(
     super.stateChanged(state);
   }
 
-  render() {   
+  render() {
     return html`
       ${tableStyles}
       <style>
-       :host {
-        display: block;
+        :host {
+          display: block;
         }
 
         etools-content-panel::part(ecp-content) {
@@ -72,13 +69,12 @@ export class PdList extends RoutingMixin(MatomoMixin(
           text-align: right;
           text-transform: uppercase;
         }
-      </style>    
+      </style>
       <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
           no-collapse
-          label="${this.visibleRange?.[0] || '0'}-${this.visibleRange?.[1] || '0'} of ${this.totalResults} ${this.localize(
-            'results_to_show'
-          )}"
+          label="${this.visibleRange?.[0] || '0'}-${this.visibleRange?.[1] || '0'} of ${this
+            .totalResults} ${this.localize('results_to_show')}"
         >
           <etools-data-table-column field="reference_number" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
@@ -156,7 +152,11 @@ export class PdList extends RoutingMixin(MatomoMixin(
                   (${this._computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)})
                 </div>
                 <div class="table-cell table-cell--text cell-reports">
-                  <a @click="${this.trackAnalytics}" tracker="Reports" href="${this.getLinkUrl(this._baseUrl, pd.id, 'reports')}">
+                  <a
+                    @click="${this.trackAnalytics}"
+                    tracker="Reports"
+                    href="${this.getLinkUrl(this._baseUrl, pd.id, 'reports')}"
+                  >
                     ${this.localize('reports')}
                   </a>
                 </div>

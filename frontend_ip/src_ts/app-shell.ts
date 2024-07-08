@@ -3,7 +3,6 @@ import {customElement, property, state} from 'lit/decorators.js';
 import './utils/routes';
 import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
-import '@polymer/iron-pages/iron-pages.js';
 import '@unicef-polymer/etools-piwik-analytics/etools-piwik-analytics.js';
 
 import LocalizeMixin from './etools-prp-common/mixins/localize-mixin.js';
@@ -37,10 +36,6 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   static styles = css`
     :host {
       display: block;
-      height: 100%;
-    }
-
-    iron-pages {
       height: 100%;
     }
   `;

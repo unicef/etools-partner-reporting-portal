@@ -31,7 +31,7 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
   @property({type: Array})
   selectedValues: string[] = [];
 
-  @property({type: String})
+  @property({type: String, attribute: 'option-label'})
   optionLabel = 'title';
 
   render() {
@@ -53,12 +53,12 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('value') || changedProperties.has('data')) {
       this._setSelectedValues(this.value, this.data);
     }
     if (changedProperties.has('data')) {
-      this._handleData(this.data);
+      this._handleData();
     }
   }
 
@@ -74,8 +74,8 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
     }
   }
 
-  _handleData(data: any[]) {
-    if (data) {
+  _handleData() {
+    if (this.data) {
       this._filterReady();
     } else if (this.name === 'location' || this.name === 'locs') {
       this._filterReady();
@@ -90,7 +90,7 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
 
   connectedCallback() {
     super.connectedCallback();
-    this._handleData(this.data);
+    this._handleData();
   }
 }
 

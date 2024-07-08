@@ -9,6 +9,8 @@ import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/report-location-filter/report-location-filter';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {RootState} from '../../typings/redux.types';
 
 @customElement('report-filters')
 export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -16,7 +18,7 @@ export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitEl
   queryParams: any = {};
 
   @property({type: Object})
-  filters: any = {};
+  filters: any[] = [];
 
   static styles = [
     css`
@@ -38,16 +40,8 @@ export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitEl
   render() {
     return html`
       ${filterStyles}
-      <iron-location @query-changed="${this._onQueryChanged}"> </iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      >
-      </iron-query-params>
 
-      <filter-list .filters="${this.filters}">
+      <filter-list .filters="${this.filters}" @filters-changed=${(e) => (this.filters = e.detail.value)}>
         <div class="app-grid">
           <reportable-filter
             class="item"
@@ -69,11 +63,12 @@ export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitEl
     `;
   }
 
-  _onQueryChanged(e: CustomEvent) {
-    this.query = e.detail.value;
-  }
-
-  _onParamsObjectChanged(e: CustomEvent) {
-    this.queryParams = e.detail.value;
+  stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
   }
 }

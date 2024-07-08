@@ -1,7 +1,5 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '@unicef-polymer/etools-unicef/src/etools-date-time/datepicker-lite';
 import {filterStyles} from '../../styles/filter-styles';
@@ -14,6 +12,8 @@ import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter/location-filter';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {RootState} from '../../typings/redux.types';
 
 @customElement('progress-reports-filters')
 export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -38,9 +38,6 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
     `
   ];
 
-  @property({type: String})
-  query!: string;
-
   @property({type: Object})
   queryParams!: any;
 
@@ -56,13 +53,6 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
   render() {
     return html`
       ${filterStyles}
-      <iron-location .query="${this.query}"></iron-location>
-      <iron-query-params
-        .paramsString="${this.query}"
-        .paramsObject="${this.queryParams}"
-        @params-string-changed=${(e) => (this.query = e.detail.value)}
-        @params-object-changed=${(e) => (this.queryParams = e.detail.value)}
-      ></iron-query-params>
       <filter-list .filters="${this.filters}">
         <div class="app-grid">
           <text-filter
@@ -100,9 +90,18 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
     `;
   }
 
+  stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+  }
+
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('resources')) {
       this.statuses = this._localizeStatuses();
       this.types = this._localizeTypes();

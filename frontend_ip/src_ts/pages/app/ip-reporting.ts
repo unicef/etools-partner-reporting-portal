@@ -5,7 +5,6 @@ import '@polymer/app-layout/app-drawer-layout/app-drawer-layout.js';
 import '@polymer/app-layout/app-drawer/app-drawer.js';
 import '@polymer/app-layout/app-header/app-header.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
-import '@polymer/iron-pages/iron-pages.js';
 import '../../elements/ip-reporting/nav.js';
 import '../../elements/ip-reporting/app-header.js';
 import '../../etools-prp-common/elements/page-title.js';
