@@ -46,6 +46,8 @@ export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) 
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId')) {
       this.programmeDocumentsUrl = this._computeProgrammeDocumentsUrl(this.locationId);
     }

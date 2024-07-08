@@ -5,7 +5,6 @@ import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import {getReportName} from './js/pd-details-reporting-requirements-functions';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table.js';
 import '../../etools-prp-common/elements/list-placeholder';
@@ -57,7 +56,7 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
           (item, index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell">${getReportName(item.report_type, index, this.localize)}</div>
+                <div class="table-cell">${this.getReportName(item.report_type, index)}</div>
                 <div class="table-cell table-cell--text">${item.due_date}</div>
                 <div class="table-cell table-cell--text">${item.start_date} - ${item.end_date}</div>
               </div>

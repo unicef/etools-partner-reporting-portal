@@ -84,6 +84,8 @@ export class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(connect(store)
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
       this.importTemplateUrl = computeImportTemplateUrl(this.locationId, this.reportId);
       this.importUrl = computeImportUrl(this.locationId, this.reportId);

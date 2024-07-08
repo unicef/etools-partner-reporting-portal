@@ -81,6 +81,8 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
       this._indicatorsAjax(this.queryParams);
     }

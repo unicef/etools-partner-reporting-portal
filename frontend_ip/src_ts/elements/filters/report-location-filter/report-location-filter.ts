@@ -46,6 +46,8 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
       this.locationsUrl = this._computeLocationsUrl(this.locationId, this.reportId);
     }

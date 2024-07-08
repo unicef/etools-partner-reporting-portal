@@ -194,6 +194,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
       this.updateUrl = this._computeUpdateUrl(this.locationId, this.reportId);
     }

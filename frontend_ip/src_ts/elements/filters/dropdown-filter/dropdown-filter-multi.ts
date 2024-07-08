@@ -52,6 +52,8 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('value') || changedProperties.has('data')) {
       this._setSelectedValues(this.value, this.data);
     }

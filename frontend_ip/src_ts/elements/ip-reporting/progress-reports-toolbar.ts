@@ -50,6 +50,8 @@ export class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(connect(sto
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('totalResults') || changedProperties.has('params')) {
       this.canExport = this._canExport(this.totalResults, this.params);
     }

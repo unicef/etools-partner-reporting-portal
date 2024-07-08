@@ -208,7 +208,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
                 : html``}
             `
           )}
-          <etools-loading active="${this.loading}"></etools-loading>
+          <etools-loading ?active="${this.loading}"></etools-loading>
         </div>
         ${this._canSave(this.permissions)
           ? html`<div class="buttons layout horizontal-reverse">
@@ -243,14 +243,22 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
   @property({type: String})
   indicatorsUrl!: string;
 
+  connectedCallback() {
+    super.connectedCallback();
+
+    this._fetchData = debounce(this._fetchData.bind(this), 300) as any;
+  }
+
+
   stateChanged(state: RootState) {
-    if (this.locationId !== state.location.id) {
+    if (state.location?.id && this.locationId !== state.location.id) {
       this.locationId = state.location.id;
     }
-    if (this.pdId !== state.programmeDocuments.current) {
+    if (state.programmeDocuments?.current && this.pdId !== state.programmeDocuments.current) {
       this.pdId = state.programmeDocuments.current;
     }
-    if (this.loading !== pdIndicatorsLoading(state)) {
+
+    if (this.loading != pdIndicatorsLoading(state)) {
       this.loading = pdIndicatorsLoading(state);
     }
     if (this.data !== pdIndicatorsAll(state)) {
@@ -259,6 +267,8 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId') || changedProperties.has('pdId')) {
       this.indicatorsUrl = computeIndicatorsUrl(this.locationId, this.pdId);
     }
@@ -282,17 +292,15 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
       return;
     }
 
-    debounce(() => {
-      const indicatorsEl = this.shadowRoot!.querySelector('#indicators') as any as EtoolsPrpAjaxEl;
-      indicatorsEl.abort();
+    const indicatorsEl = this.shadowRoot!.querySelector('#indicators') as any as EtoolsPrpAjaxEl;
+    indicatorsEl.abort();
 
-      store
-        .dispatch(pdIndicatorsFetch(indicatorsEl.thunk(), this.pdId))
-        // @ts-ignore
-        .catch(function (err) {
-          console.log(err);
-        });
-    }, 250);
+    store
+      .dispatch(pdIndicatorsFetch(indicatorsEl.thunk(), this.pdId))
+      // @ts-ignore
+      .catch(function (err) {
+        console.log(err);
+      });
   }
 
   _onValueChanged(e: CustomEvent) {

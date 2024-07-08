@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import {repeat} from 'lit/directives/repeat.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-loading/etools-loading';
 import '@unicef-polymer/etools-data-table/etools-data-table';
@@ -23,23 +24,9 @@ import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('pd-list')
-export class PdList extends MatomoMixin(
-  LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(connect(store)(LitElement))))))
+export class PdList extends RoutingMixin(MatomoMixin(
+  LocalizeMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))))
 ) {
-  static styles = css`
-    :host {
-      display: block;
-    }
-
-    etools-content-panel::part(ecp-content) {
-      padding: 0;
-    }
-
-    .cell-reports {
-      text-align: right;
-      text-transform: uppercase;
-    }
-  `;
 
   @property({type: Boolean})
   loading = false;
@@ -53,24 +40,39 @@ export class PdList extends MatomoMixin(
   @property({type: Array})
   visibleRange = [];
 
-  stateChanged(state: RootState) {
-    if (this.loading !== state.programmeDocuments.loading) {
+  stateChanged(state: RootState) {    
+    if (this.loading !== state.programmeDocuments?.loading) {
       this.loading = state.programmeDocuments.loading;
     }
 
-    if (this.data !== state.programmeDocuments.all) {
+    if (this.data !== state.programmeDocuments?.all) {
       this.data = state.programmeDocuments.all;
     }
 
-    if (this.totalResults !== state.programmeDocuments.count) {
+    if (this.totalResults !== state.programmeDocuments?.count) {
       this.totalResults = state.programmeDocuments.count;
     }
+
+    super.stateChanged(state);
   }
 
-  render() {
+  render() {   
     return html`
       ${tableStyles}
+      <style>
+       :host {
+        display: block;
+        }
 
+        etools-content-panel::part(ecp-content) {
+          padding: 0;
+        }
+
+        .cell-reports {
+          text-align: right;
+          text-transform: uppercase;
+        }
+      </style>    
       <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
           no-collapse
@@ -108,15 +110,17 @@ export class PdList extends MatomoMixin(
           <etools-data-table-column></etools-data-table-column>
         </etools-data-table-header>
 
-        ${(this.data || []).map(
-          (pd) => html`
+        ${repeat(
+          this.data || [],
+          (pd: any) => pd.id,
+          (pd, _index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="table-cell table-cell--text">
                   <a
                     @click="${this.trackAnalytics}"
                     tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
-                    href="${this.getLinkUrl(pd.id, 'details')}"
+                    href="${this.getLinkUrl(this._baseUrl, pd.id, 'details')}"
                   >
                     ${this._withDefault(pd.reference_number)}
                     <paper-tooltip>${pd.title}</paper-tooltip>
@@ -152,7 +156,7 @@ export class PdList extends MatomoMixin(
                   (${this._computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)})
                 </div>
                 <div class="table-cell table-cell--text cell-reports">
-                  <a @click="${this.trackAnalytics}" tracker="Reports" href="${this.getLinkUrl(pd.id, 'reports')}">
+                  <a @click="${this.trackAnalytics}" tracker="Reports" href="${this.getLinkUrl(this._baseUrl, pd.id, 'reports')}">
                     ${this.localize('reports')}
                   </a>
                 </div>
@@ -176,8 +180,9 @@ export class PdList extends MatomoMixin(
     }
   }
 
-  getLinkUrl(id, page) {
-    return this.buildUrl(this._baseUrl, `pd/${id}/view/${page}`);
+  getLinkUrl(baseUrl, id, page) {
+    console.log(`${baseUrl}.. ${id} .. ${page}`);
+    return this.buildUrl(baseUrl, `pd/${id}/view/${page}`);
   }
 
   _getPdRefNumberTracker(pdRefNumber) {

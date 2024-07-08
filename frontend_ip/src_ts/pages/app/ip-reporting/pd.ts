@@ -91,6 +91,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId')) {
       this.programmeDocumentsUrl = this._computeProgrammeDocumentsUrl(this.locationId);
     }
@@ -103,13 +105,13 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       this._handleInputChange(this.programmeDocumentsUrl);
     }
 
-    if (changedProperties.has('routeData')) {
-      this._routePdIdChanged(this.routeData.pd_id);
-    }
+    // if (changedProperties.has('routeData')) {
+    //   this._routePdIdChanged(this.routeData.pd_id);
+    // }
 
-    if (changedProperties.has('route')) {
-      this._routePathChanged(this.route.path);
-    }
+    // if (changedProperties.has('route')) {
+    //   this._routePathChanged(this.route.path);
+    // }
 
     if (changedProperties.has('programmeDocumentDetailUrl')) {
       this._getPdRecord();
@@ -127,7 +129,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
 
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
       this.routeDetails = state.app.routeDetails;
-      this.page = !state.app.routeDetails.params?.pdID ? 'pd-index' : 'pd-router';
+      this._routePdIdChanged(state.app.routeDetails.params?.pdID);
     }
   }
 
@@ -188,7 +190,8 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       return;
     }
 
-    const pdDataIsLoaded = this.rootState.programmeDocuments.all.find((x) => String(x.id) === String(this.pdId));
+    const rootState = store.getState();
+    const pdDataIsLoaded = rootState.programmeDocuments.all.find((x) => String(x.id) === String(this.pdId));
     if (pdDataIsLoaded) {
       return;
     }
@@ -200,7 +203,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       .thunk()()
       .then((res) => {
         store.dispatch(pdAdd(res.data));
-        store.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
+        store.dispatch(pdSetCount(++rootState.programmeDocuments.all.length));
       })
       .catch((err) => {
         console.log(err);

@@ -28,6 +28,8 @@ export class ListPaginator extends PaginationMixin(LitElement) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('data') || changedProperties.has('pageSize') || changedProperties.has('pageNumber')) {
       this.paginated = this._computePaginated(this.data, this.pageSize, this.pageNumber);
       fireEvent(this, 'paginated-changed', {paginated: this.paginated});

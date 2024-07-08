@@ -75,6 +75,8 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('resources')) {
       this.statuses = this._localizeStatuses();
     }

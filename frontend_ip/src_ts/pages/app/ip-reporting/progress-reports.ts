@@ -53,6 +53,8 @@ export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitEleme
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('reportsUrl') || changedProperties.has('queryParams')) {
       this._handleInputChange(this.reportsUrl, this.queryParams);
     }

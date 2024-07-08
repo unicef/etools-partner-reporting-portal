@@ -55,6 +55,8 @@ export class SearchableDropdownFilter extends FilterMixin(LitElement) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('data')) {
       this._handleData(this.data);
     }

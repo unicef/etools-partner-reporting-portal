@@ -29,6 +29,8 @@ export class EtoolsPrpLanguages extends connect(store)(LitElement) {
   }
 
   updated(changedProperties: any) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('_current')) {
       this.current = this._current;
     }

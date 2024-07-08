@@ -33,6 +33,8 @@ export class CheckboxFilter extends UtilsMixin(FilterMixin(LitElement)) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('value')) {
       this.checked = this._computeChecked(this.value);
     }

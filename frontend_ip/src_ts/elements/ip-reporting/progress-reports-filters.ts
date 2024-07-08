@@ -101,6 +101,8 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('resources')) {
       this.statuses = this._localizeStatuses();
       this.types = this._localizeTypes();

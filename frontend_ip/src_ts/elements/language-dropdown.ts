@@ -56,6 +56,7 @@ export class LanguageDropdown extends MatomoMixin(connect(store)(LitElement)) {
   }
 
   updated(changedProperties: PropertyValues) {
+    super.updated(changedProperties);
     // if (changedProperties.has('data') || changedProperties.has('current')) {
     //   this.language = this._computeLanguage(this.languageOptions, this.language);
     // }

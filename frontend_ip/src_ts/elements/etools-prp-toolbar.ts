@@ -67,6 +67,8 @@ export class EtoolsPrpToolbar extends connect(store)(LitElement) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('_responsePlanId')) {
       this.responsePlanId = this._identity(this._responsePlanId);
       this._dispatchEvent('responsePlanId', this.responsePlanId);

@@ -53,6 +53,8 @@ export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(c
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId')) {
       this.locationsUrl = this._computeLocationsUrl(this.locationId);
     }

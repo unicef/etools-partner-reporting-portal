@@ -83,6 +83,8 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
   }
   
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('resources')) {
       this.statuses = this._initStatuses();
     }

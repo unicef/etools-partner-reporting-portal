@@ -60,6 +60,8 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(Lit
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('locationId')) {
       this.pdReportsUrl = computePDReportsUrl(this.locationId);
     }

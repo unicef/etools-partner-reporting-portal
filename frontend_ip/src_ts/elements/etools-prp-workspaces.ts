@@ -35,6 +35,8 @@ export class EtoolsPrpWorkspaces extends connect(store)(LitElement) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('_current')) {
       this.current = this._current;
       this._dispatchEvent('current', this.current);

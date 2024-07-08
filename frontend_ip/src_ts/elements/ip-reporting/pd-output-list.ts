@@ -111,6 +111,8 @@ export class PdOutputList extends LocalizeMixin(connect(store)(LitElement)) {
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (changedProperties.has('data')) {
       this.viewData = computeViewData(this.data);
     }

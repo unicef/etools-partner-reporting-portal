@@ -22,6 +22,7 @@ import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import Settings from '../../etools-prp-common/settings';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import { isJsonStrMatch } from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-details-overview')
 export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
@@ -262,21 +263,21 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
 
           <pd-details-reporting-requirements
             title="${this.localize('qpr_short')}"
-            .data="${this.reportingRequirements.qpr}"
+            .data="${this.reportingRequirements?.qpr}"
             ?loading="${!this.loaded}"
           >
           </pd-details-reporting-requirements>
 
           <pd-details-reporting-requirements
             title="${this.localize('hr_short')}"
-            .data="${this.reportingRequirements.hr}"
+            .data="${this.reportingRequirements?.hr}"
             ?loading="${!this.loaded}"
           >
           </pd-details-reporting-requirements>
 
           <pd-details-reporting-requirements
             title="${this.localize('sr_short')}"
-            .data="${this.reportingRequirements.sr}"
+            .data="${this.reportingRequirements?.sr}"
             ?loading="${!this.loaded}"
           >
           </pd-details-reporting-requirements>
@@ -285,14 +286,19 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
     `;
   }
 
-  _stateChanged(state: RootState) {
-    this.pd = currentProgrammeDocument(state);
+  stateChanged(state: RootState) {
+    const pd = currentProgrammeDocument(state);
+    if (!isJsonStrMatch(pd, this.pd)) {
+      this.pd = pd;
+    }
     this.loaded = computeLoaded(this.pd);
   }
 
   updated(changedProperties) {
-    if (changedProperties.has('pd')) {
-      this.reportingRequirements = computeReportingRequirements(this.pd, Settings.dateFormat);
+    super.updated(changedProperties);
+    
+    if (changedProperties.has('pd') && this.pd && Object.keys(this.pd).length) {
+      this.reportingRequirements = computeReportingRequirements(this.pd.reporting_periods, Settings.dateFormat);
     }
   }
 

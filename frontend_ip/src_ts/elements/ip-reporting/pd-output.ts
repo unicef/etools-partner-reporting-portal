@@ -349,6 +349,8 @@ export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixi
   }
 
   updated(changedProperties) {
+    super.updated(changedProperties);
+    
     if (
       changedProperties.has('mode') ||
       changedProperties.has('overrideMode') ||
