@@ -14,6 +14,7 @@ import {store} from '../../../redux/store.js';
 import {connect} from 'pwa-helpers';
 import {RootState} from '../../../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 
 @customElement('page-ip-progress-reports')
 export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitElement)) {
@@ -70,7 +71,7 @@ export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitEleme
   }
 
   _computeProgressReportsUrl() {
-    return this.locationIdlocationId ? Endpoints.progressReports(this.locationId) : '';
+    return this.locationId ? Endpoints.progressReports(this.locationId) : '';
   }
 
   _handleInputChange() {
@@ -78,12 +79,14 @@ export class PageIpProgressReports extends LocalizeMixin(connect(store)(LitEleme
       return;
     }
 
-    const progressReports = this.shadowRoot!.getElementById('reports') as EtoolsPrpAjaxEl;
+    debounce(() => {
+      const progressReports = this.shadowRoot!.getElementById('reports') as EtoolsPrpAjaxEl;
 
-    // Cancel the pending request, if any
-    progressReports.abort();
+      // Cancel the pending request, if any
+      progressReports.abort();
 
-    store.dispatch(progressReportsFetch(progressReports.thunk()));
+      store.dispatch(progressReportsFetch(progressReports.thunk()));
+    }, 100)();
   }
 }
 export {PageIpProgressReports as PageIpProgressReportsEl};

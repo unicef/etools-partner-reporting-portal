@@ -1,6 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/app-route/app-route.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@unicef-polymer/etools-toasts/src/etools-toasts.js';
 

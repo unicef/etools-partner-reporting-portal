@@ -163,9 +163,6 @@ const loadPageComponents = (routeDetails: EtoolsRouteDetails) => (_dispatch: any
 
   if (imported) {
     imported
-      .then(() => {
-        console.log('loaded component for', routeDetails.routeName);
-      })
       .catch((err) => {
         console.log(err);
         EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));

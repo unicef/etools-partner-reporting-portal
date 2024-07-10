@@ -46,10 +46,10 @@ export class PdReportsReportTitle extends LocalizeMixin(
   @property({type: Object})
   report!: any;
 
-  @property({type: Boolean})
+  @property({type: Boolean, attribute: 'display-link'})
   displayLink = false;
 
-  @property({type: Boolean})
+  @property({type: Boolean, attribute: 'display-link-icon'})
   displayLinkIcon = false;
 
   @property({type: Boolean, attribute: false})
@@ -57,7 +57,10 @@ export class PdReportsReportTitle extends LocalizeMixin(
 
   render() {
     return html`
-      <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
       ${this.showLink
         ? html`
@@ -68,39 +71,40 @@ export class PdReportsReportTitle extends LocalizeMixin(
                     icon="${this._getReportIcon(this.report, this.permissions)}"
                   ></iron-icon>`
                 : html``}
-              ${this._getReportTitle(this.report, this.localize)}
+              ${this._getReportTitle(this.report)}
             </a>
           `
-        : html`${this._getReportTitleFull(this.report, this.localize)}`}
+        : html`${this._getReportTitleFull(this.report)}`}
       ${this._isFinalReport(this.report) ? html`<div class="final-badge">final</div>` : html``}
     `;
   }
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (
       changedProperties.has('displayLink') ||
       changedProperties.has('report') ||
       changedProperties.has('permissions')
     ) {
-      this.showLink = !!this._shouldDisplayLink(this.displayLink, this.report, this.permissions);
+      this.showLink = !!this._shouldDisplayLink();
     }
   }
 
-  _shouldDisplayLink(displayLink: any, report: any, permissions: any) {
-    if (!permissions) {
+  _shouldDisplayLink() {
+    if (!this.permissions) {
       return false;
     }
-    return shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
+
+    return shouldDisplayLink(this.displayLink, this.report, this.permissions, this._canNavigateToReport);
   }
 
-  _getReportTitleFull(report: any, localize: (x: string) => string) {
-    return report ? getReportTitleFull(report, localize) : '';
+  _getReportTitleFull(report: any) {
+    return report ? getReportTitleFull(report, this.localize.bind(this)) : '';
   }
 
-  _getReportTitle(report: any, localize: (x: string) => string) {
-    return getReportTitle(report, localize);
+  _getReportTitle(report: any) {
+    return getReportTitle(report, this.localize.bind(this));
   }
 
   _getReportLink(report: any, permissions: any) {

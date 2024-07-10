@@ -73,8 +73,13 @@ export class ProgressReportsList extends LocalizeMixin(
       this.loading = state.progressReports.loading;
     }
 
-    this.data = state.progressReports.all;
-    this.totalResults = state.progressReports.count;
+    if (state.progressReports.all && !isJsonStrMatch(this.data, state.progressReports.all)) {
+      this.data = state.progressReports.all;
+    }
+
+    if (this.totalResults !== state.progressReports.count) {
+      this.totalResults = state.progressReports.count;
+    }
   }
 
   render() {
@@ -145,6 +150,7 @@ export class ProgressReportsList extends LocalizeMixin(
           .pageNumber="${this.pageNumber}"
           .totalResults="${this.totalResults}"
           .visibleRange="${this.visibleRange}"
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >

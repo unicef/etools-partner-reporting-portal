@@ -88,8 +88,8 @@ export class AuthorizedOfficerModal extends LocalizeMixin(
 
       <etools-prp-ajax
         id="submit"
-        url="${this.submitUrl}"
-        body="${JSON.stringify(this.postBody)}"
+        .url="${this.submitUrl}"
+        .body="${this.postBody}"
         content-type="application/json"
         method="post"
       >

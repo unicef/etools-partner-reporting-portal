@@ -92,7 +92,11 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
   render() {
     return html`
       ${buttonsStyles} ${tableStyles}
-      <etools-prp-permissions permissions="${this.permissions}"> </etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      >
+      </etools-prp-permissions>
       <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}"> </etools-prp-ajax>
       <etools-prp-ajax
         id="update"

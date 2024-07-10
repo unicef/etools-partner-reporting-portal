@@ -7,6 +7,7 @@ import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
+import {debounce} from 'lodash-es';
 
 @customElement('location-filter')
 export class LocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
@@ -42,6 +43,11 @@ export class LocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
     `;
   }
 
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchLocations = debounce(this._fetchLocations.bind(this), 100) as any;
+  }
+
   stateChanged(state) {
     if (this.locationId !== state.location.id) {
       this.locationId = state.location.id;
@@ -50,26 +56,27 @@ export class LocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId')) {
-      this.locationsUrl = this._computeLocationsUrl(this.locationId);
+      this.locationsUrl = this._computeLocationsUrl();
     }
     if (changedProperties.has('locationsUrl')) {
-      this._fetchLocations(this.locationsUrl);
+      this._fetchLocations();
     }
   }
 
-  _computeLocationsUrl(locationId) {
-    return locationId ? Endpoints.locations(locationId) : '';
+  _computeLocationsUrl() {
+    return this.locationId ? Endpoints.locations(this.locationId) : '';
   }
 
-  _fetchLocations(url) {
-    if (!url) {
+  _fetchLocations() {
+    if (!this.locationsUrl) {
       return;
     }
 
     const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
     locationsAjax.abort();
+
     locationsAjax
       .thunk()()
       .then((res) => {

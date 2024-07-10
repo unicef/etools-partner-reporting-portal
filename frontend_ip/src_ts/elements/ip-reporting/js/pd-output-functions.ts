@@ -1,6 +1,6 @@
 import Endpoints from '../../../endpoints';
 
-export function calculationFormulaAcrossPeriods(indicator: any, localize: (x: string) => string) {
+export function calculationFormulaAcrossPeriods(indicator: any, localize: any) {
   const localized =
     indicator.reportable.blueprint.display_type === 'ratio'
       ? localize('latest')

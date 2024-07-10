@@ -17,6 +17,9 @@ import {
   computeHidden
 } from './js/ip-reporting-indicator-details-functions';
 import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {debounce} from 'lodash-es';
+import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -59,20 +62,20 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
   @property({type: Object})
   params: any | null = null;
 
+  @property({type: Object})
+  tabs: any[] = [];
+
   stateChanged(state: RootState) {
-    if (this.loading != state.indicators.loadingDetails) {
+    if (this.loading !== state.indicators.loadingDetails) {
       this.loading = state.indicators.loadingDetails;
     }
-    if (this.dataDict != state.indicators.details) {
+
+    if (state.indicators.details && !isJsonStrMatch(this.dataDict, state.indicators.details)) {
       this.dataDict = state.indicators.details;
     }
 
-    if (this.appName != state.app.current) {
+    if (this.appName !== state.app.current) {
       this.appName = state.app.current;
-    }
-
-    if (this.locations != bucketByLocation(this.data)) {
-      this.locations = bucketByLocation(this.data);
     }
 
     this.params = computeParams(false);
@@ -85,8 +88,21 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
       this.indicatorDetailUrl = computeIndicatorReportsUrl(this.indicator!);
     }
 
-    if (changedProperties.has('dataDict') && this.dataDict) {
-      this.data = this.dataDict.details[this.indicator!.id];
+    if (changedProperties.has('dataDict') && this.dataDict?.details?.[this.indicator!.id]) {
+      this.data = this.dataDict.details?.[this.indicator!.id];
+    }
+
+    if (changedProperties.has('data')) {
+      if (!isJsonStrMatch(this.locations, bucketByLocation(this.data))) {
+        this.locations = bucketByLocation(this.data);
+        this.tabs = this.locations.map((location: any) => ({
+          tab: location.current.id,
+          tabLabel: location.name,
+          hidden: false
+        }));
+        this.selected = this.locations[0]?.current.id;
+        console.log(this.locations);
+      }
     }
 
     if (changedProperties.has('data') || changedProperties.has('loading')) {
@@ -100,9 +116,10 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
 
   private _openChanged(): void {
     if (this.isOpen) {
-      const ajaxElement = this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl;
-      const thunk = ajaxElement.thunk();
-      store.dispatch(fetchIndicatorDetails(thunk, this.indicator!.id));
+      debounce(() => {
+        const ajaxElement = this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl;
+        store.dispatch(fetchIndicatorDetails(ajaxElement.thunk(), this.indicator!.id));
+      }, 100)();
     } else {
       (this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl).abort();
     }
@@ -166,75 +183,66 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
       <etools-prp-ajax id="indicatorDetail" url="${this.indicatorDetailUrl}" .params="${this.params}">
       </etools-prp-ajax>
 
-      ${
-        this.loading
-          ? html`
-              <div class="loading-wrapper">
-                <etools-loading no-overlay></etools-loading>
-              </div>
-            `
-          : ''
-      }
-      ${
-        computeHidden(this.data, true)
-          ? html`
-              <div class="report-meta app-grid">
-                ${(this.data || []).map(
-                  (report) => html`
-                    <div class="item">
-                      <dl>
-                        <dt>${this.localize('submitted')}:</dt>
-                        <dd>${report.submission_date}</dd>
-                      </dl>
-                      <dl>
-                        <dt>${this.localize('total_progress')}:</dt>
-                        <dd>
-                          ${report.display_type === 'number'
-                            ? html`<etools-prp-number value="${report.total.v}"></etools-prp-number>`
-                            : html`${this._formatIndicatorValue(report.display_type, report.total.c, 1)}`}
-                        </dd>
-                      </dl>
-                      <dl>
-                        <dt>${this.localize('progress_in_reporting_period')}:</dt>
-                        <dd class="reporting-period">${report.time_period_start} - ${report.time_period_end}</dd>
-                      </dl>
-                    </div>
-                  `
-                )}
-              </div>
-            `
-          : html``
-      }
+      ${this.loading
+        ? html`
+            <div class="loading-wrapper">
+              <etools-loading no-overlay></etools-loading>
+            </div>
+          `
+        : ''}
+      ${computeHidden(this.data, this.loading)
+        ? html`
+            <div class="report-meta app-grid">
+              ${(this.data || []).map(
+                (report) => html`
+                  <div class="item">
+                    <dl>
+                      <dt>${this.localize('submitted')}:</dt>
+                      <dd>${report.submission_date}</dd>
+                    </dl>
+                    <dl>
+                      <dt>${this.localize('total_progress')}:</dt>
+                      <dd>
+                        ${report.display_type === 'number'
+                          ? html`<etools-prp-number value="${report.total.v}"></etools-prp-number>`
+                          : html`${this._formatIndicatorValue(report.display_type, report.total.c, 1)}`}
+                      </dd>
+                    </dl>
+                    <dl>
+                      <dt>${this.localize('progress_in_reporting_period')}:</dt>
+                      <dd class="reporting-period">${report.time_period_start} - ${report.time_period_end}</dd>
+                    </dl>
+                  </div>
+                `
+              )}
+            </div>
+          `
+        : html``}
 
       <list-placeholder .data="${this.data}" .loading="${this.loading}" .message="${this.localize('no_report_data')}">
       </list-placeholder>
 
-      ${
-        computeHidden(this.locations, true)
-          ? html`
-              <paper-tabs
-                .selected="${this.selected}"
-                .fallbackSelection="location-${this.locations[0]?.current.id}"
-                attr-for-selected="name"
-                scrollable
-              >
-                ${(this.locations || []).map(
-                  (location) => html` <paper-tab name="location-${location.current.id}"> ${location.name} </paper-tab>`
-                )}
-              </paper-tabs>
-            `
-          : html``
-      }
-
+      ${computeHidden(this.locations, this.loading)
+        ? html`<etools-tabs-lit
+            id="tabs"
+            slot="tabs"
+            .tabs="${this.tabs}"
+            @sl-tab-show="${({detail}: any) => (this.selected = detail.name)}"
+            .activeTab="${this.selected}"
+          ></etools-tabs-lit> `
+        : html``}
       ${(this.locations || []).map(
-        (location) => html`<div name="location-${location.current.id}">
+        (location) => html` <div
+          name="location-${location.current.id}"
+          ?hidden="${this.selected.toString() !== location.current.id.toString()}"
+        >
           <div class="app-grid">
             ${location.current
               ? html`
                   <div class="item">
                     <disaggregation-table
-                      .data="${JSON.stringify(location.current)}"
-                      .mapping="${JSON.stringify(location.reportInfo.current.disagg_lookup_map)}"
+                      .data="${location.current}"
+                      .mapping="${location.reportInfo.current.disagg_lookup_map}"
                     >
                     </disaggregation-table>
                   </div>
@@ -254,7 +262,6 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
           </div>
         </div>`
       )}
-      </template>
     `;
   }
 }

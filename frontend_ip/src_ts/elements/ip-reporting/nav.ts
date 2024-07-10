@@ -50,7 +50,11 @@ export class IpReportingNav extends RoutingMixin(
         }
       </style>
 
-      <etools-prp-permissions .permissions="${this.permissions}"> </etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      >
+      </etools-prp-permissions>
 
       <div class="nav-menu">
         <iron-selector .selected="${this.selected}" attr-for-selected="name" selectable="paper-item" role="navigation">

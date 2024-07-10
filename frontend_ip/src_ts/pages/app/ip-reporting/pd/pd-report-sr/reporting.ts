@@ -157,7 +157,10 @@ export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(st
     return html`
       <pd-sent-back></pd-sent-back>
 
-      <etools-prp-permissions .permissions="${this.permissions}"></etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
       <etools-prp-ajax
         id="update"

@@ -45,10 +45,10 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
   filters!: any;
 
   @property({type: Array, attribute: false})
-  statuses!: any[];
+  statuses: any[] = this._localizeStatuses();
 
   @property({type: Array, attribute: false})
-  types!: any[];
+  types: any[] = this._localizeTypes();
 
   render() {
     return html`
@@ -101,11 +101,6 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
 
   updated(changedProperties) {
     super.updated(changedProperties);
-
-    if (changedProperties.has('resources')) {
-      this.statuses = this._localizeStatuses();
-      this.types = this._localizeTypes();
-    }
   }
 
   _localizeStatuses() {

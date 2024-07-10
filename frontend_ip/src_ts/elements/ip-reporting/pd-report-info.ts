@@ -212,7 +212,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
 
   render() {
     return html`
-      <etools-prp-permissions .permissions="${this.permissions}"> </etools-prp-permissions>
+      <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
+      (this.permissions = e.detail.value)}"> </etools-prp-permissions>
 
       <etools-prp-ajax
         id="update"

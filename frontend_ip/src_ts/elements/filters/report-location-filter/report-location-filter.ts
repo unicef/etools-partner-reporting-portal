@@ -47,9 +47,9 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
-      this.locationsUrl = this._computeLocationsUrl(this.locationId, this.reportId);
+      this.locationsUrl = this._computeLocationsUrl();
     }
     if (changedProperties.has('locationsUrl')) {
       this._fetchLocations();
@@ -66,11 +66,15 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
     }
   }
 
-  _computeLocationsUrl(locationId, reportId) {
-    return Endpoints.indicatorDataLocation(locationId, reportId);
+  _computeLocationsUrl() {
+    return this.locationId && this.reportId ? Endpoints.indicatorDataLocation(this.locationId, this.reportId) : '';
   }
 
   _fetchLocations() {
+    if (!this.locationsUrl) {
+      return;
+    }
+
     const thunk = (this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl).thunk();
     (this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl).abort();
     thunk()

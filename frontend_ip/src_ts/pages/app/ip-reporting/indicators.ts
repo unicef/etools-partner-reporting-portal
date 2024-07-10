@@ -65,6 +65,7 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
     if (state.indicators.all && !isJsonStrMatch(this.data, state.indicators.all)) {
       this.data = state.indicators.all;
     }
+
     if (this.loading !== state.indicators.loading) {
       this.loading = state.indicators.loading;
     }
@@ -80,7 +81,6 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
     super.updated(changedProperties);
 
     if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
-      console.log('this.indicatorsUrl', this.indicatorsUrl, this.queryParams);
       this._indicatorsAjax(this.queryParams);
     }
 
@@ -94,7 +94,6 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   }
 
   _indicatorsAjax(queryParams) {
-    console.log('indicatorEl', queryParams);
     if (!Object.keys(queryParams).length) {
       return;
     }

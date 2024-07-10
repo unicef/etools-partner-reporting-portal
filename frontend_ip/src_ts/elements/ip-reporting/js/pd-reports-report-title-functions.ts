@@ -1,8 +1,13 @@
-export function shouldDisplayLink(displayLink: string, report: any, permissions: any, fn: (x?: any, y?: any) => boolean) {
+export function shouldDisplayLink(
+  displayLink: boolean,
+  report: any,
+  permissions: any,
+  fn: (x?: any, y?: any) => boolean
+) {
   return displayLink && fn(permissions, report);
 }
 
-export function getReportTitleFull(report: any, localize: (x: string) => string) {
+export function getReportTitleFull(report: any, localize: any) {
   let title = '';
   if (report.report_type === 'QPR') {
     title += localize('qpr_short') + report.report_number + ' ' + localize('qpr_long');
@@ -14,7 +19,7 @@ export function getReportTitleFull(report: any, localize: (x: string) => string)
   return title;
 }
 
-export function getReportTitle(report: any, localize: (x: string) => string) {
+export function getReportTitle(report: any, localize: any) {
   let title = '';
   if (report.report_type === 'QPR') {
     title += localize('qpr_short') + report.report_number;

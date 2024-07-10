@@ -48,8 +48,8 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
             class="item item-2-col"
             label="${this.localize('pd_status')}"
             name="pd_statuses"
-            value="${this._withDefault(this.queryParams?.pd_statuses, '')}"
-            data="${JSON.stringify(this.pd_statuses)}"
+            .value="${this._withDefault(this.queryParams?.pd_statuses, '')}"
+            .data="${this.pd_statuses}"
             hide-search
           >
           </dropdown-filter-multi>

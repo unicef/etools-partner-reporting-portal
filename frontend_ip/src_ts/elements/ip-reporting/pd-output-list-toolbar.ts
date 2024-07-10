@@ -120,14 +120,14 @@ export class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(connect(store)
 
       <etools-prp-ajax
         id="refreshReport"
-        url="${this.refreshUrl}"
-        body="${JSON.stringify(this.refreshData)}"
+        .url="${this.refreshUrl}"
+        .body="${this.refreshData}"
         method="post"
         content-type="application/json"
       >
       </etools-prp-ajax>
 
-      <refresh-report-modal id="refresh" data="${JSON.stringify(this.refreshData)}" refresh-url="${this.refreshUrl}">
+      <refresh-report-modal id="refresh" .data="${this.refreshData}" .refreshUrl="${this.refreshUrl}">
       </refresh-report-modal>
 
       <etools-prp-toolbar query="${this.query}" report-id="${this.reportId}" location-id="${this.locationId}">

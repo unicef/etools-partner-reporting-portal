@@ -4,7 +4,6 @@ import {
   EtoolsRouteDetails
 } from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces';
 import {Environment} from '@unicef-polymer/etools-utils/dist/singleton/environment';
-import {workspaceId} from '../redux/selectors/workspace';
 
 const routeParamRegex = '([^\\/?#=+]+)';
 
@@ -157,5 +156,3 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
       };
     }
   );
-
-console.log(EtoolsRouter);

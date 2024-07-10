@@ -2,7 +2,6 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles.js';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles.js';
-import '@polymer/app-route/app-route.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-tabs/paper-tabs.js';
 import '@polymer/paper-tabs/paper-tab.js';
@@ -140,8 +139,10 @@ export class PageIpReportingPdReport extends LocalizeMixin(
     return html`
       ${sharedStyles} ${buttonsStyles}
 
-      <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
-      <app-route .route=${this.route} pattern="/:report_id/:mode" .data=${this.routeData}></app-route>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
       <etools-prp-ajax id="report" .url=${this.reportUrl} .params=${this.queryParams}></etools-prp-ajax>
       <etools-prp-ajax id="submit" .url=${this.submitUrl} method="post"></etools-prp-ajax>
 
@@ -382,7 +383,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
     }, 250)();
   }
 
-  _computeHeadingPrefix(mode: string, localize: (x: string) => string) {
+  _computeHeadingPrefix(mode: string, localize: any) {
     switch (mode) {
       case 'view':
         return localize('report_for');

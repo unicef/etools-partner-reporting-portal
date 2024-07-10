@@ -224,7 +224,7 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
               <labelled-item label="${this.localize('disbursements')}">
                 <span class="field-value">${this.pd.funds_received_to_date} ${this.pd.cso_contribution_currency}</span>
                 <etools-prp-progress-bar
-                  number="${this._computeFunds(this.pd.funds_received_to_date_percentage)}"
+                  .number="${this._computeFunds(this.pd.funds_received_to_date_percentage)}"
                 ></etools-prp-progress-bar>
               </labelled-item>
             </li>

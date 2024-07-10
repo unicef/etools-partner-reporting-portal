@@ -10,12 +10,14 @@ import { tableStyles } from '../etools-prp-common/styles/table-styles';
 import { sharedStyles } from '../etools-prp-common/styles/shared-styles';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
-import { store } from '../redux/store';
+import '../elements/ip-reporting/ip-reporting-indicator-details';
+
+import {store} from '../redux/store';
 import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import { RootState } from '../typings/redux.types';
-import { fireEvent } from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {RootState} from '../typings/redux.types';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('list-view-single-indicator')
 export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))) {
@@ -85,13 +87,19 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
   @property({type: Boolean})
   isCustom!: boolean;
 
+  @property({type: Boolean})
+  canEdit!: boolean;
+
   @property({type: String})
   type = '';
 
   render() {
     return html`
       ${tableStyles} ${sharedStyles}
-      <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
       <etools-data-table-row .detailsOpened=${this.detailsOpened} @opened-changed=${this.onDetailsOpenedChanged}>
         <div slot="row-data">
@@ -147,12 +155,12 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
                 <dd class="flex-none">
                   ${this._equals(this.progressBarType, 'cluster')
                     ? html`<etools-prp-progress-bar-cluster
-                        .display-type=${this.indicator?.blueprint?.display_type}
+                        .displayType=${this.indicator?.blueprint?.display_type}
                         .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar-cluster>`
                     : this._equals(this.progressBarType, 'default')
                     ? html`<etools-prp-progress-bar
-                        .display-type=${this.indicator?.blueprint?.display_type}
+                        .displayType=${this.indicator?.blueprint?.display_type}
                         .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar>`
                     : html``}
@@ -165,7 +173,7 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
                       <dt class="flex-none self-center">${this.localize('against_in_need')}:</dt>
                       <dd class="flex-none">
                         <etools-prp-progress-bar-alt
-                          .display-type=${this.indicator?.blueprint?.display_type}
+                          .displayType=${this.indicator?.blueprint?.display_type}
                           .number=${this.indicator?.total_against_in_need}
                         ></etools-prp-progress-bar-alt>
                       </dd>

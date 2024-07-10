@@ -33,7 +33,9 @@ import {store} from '../../redux/store';
 import { RootState } from '../../typings/redux.types';
 
 @customElement('pd-output')
-export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))))) {
+export class PdOutput extends LocalizeMixin(
+  RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))))
+) {
   static styles = css`
     :host {
       display: block;
@@ -156,7 +158,11 @@ export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixi
 
   render() {
     return html`
-      <etools-prp-permissions .permissions="${this.permissions}"> </etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      >
+      </etools-prp-permissions>
 
       <etools-prp-ajax
         id="update"
@@ -168,7 +174,7 @@ export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixi
       </etools-prp-ajax>
 
       <div class="header">
-        <labelled-item label="${this.localize('title')}">${this.data.title}</labelled-item>
+        <labelled-item label="${this.localize('title')}">${this.data?.title}</labelled-item>
 
         ${this.showMeta
           ? html`
@@ -309,7 +315,7 @@ export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixi
               <indicator-details
                 report-is-qpr=${this._computeReportIsQpr(this.currentReport, indicator)}
                 report-status=${this.currentReport.status}
-                reportable-id=${this.data.id}
+                reportable-id=${this.data?.id}
                 indicator-name=${indicator.reportable.blueprint.title}
                 indicator-id=${indicator.parent_ir_id ? indicator.parent_ir_id : indicator.id}
                 indicator-status=${indicator.report_status}
@@ -350,7 +356,7 @@ export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixi
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (
       changedProperties.has('mode') ||
       changedProperties.has('overrideMode') ||
@@ -401,7 +407,7 @@ export class PdOutput extends LocalizeMixin(RoutingMixin(ProgressReportUtilsMixi
     this.removeEventListener('reportable-meta-changed', this._updateMeta as any);
   }
 
-  _calculationFormulaAcrossPeriods(indicator: any, localize: (x: string) => string) {
+  _calculationFormulaAcrossPeriods(indicator: any, localize: any) {
     return calculationFormulaAcrossPeriods(indicator, localize);
   }
 

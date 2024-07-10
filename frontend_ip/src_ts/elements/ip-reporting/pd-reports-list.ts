@@ -91,7 +91,8 @@ export class PdReportsList extends LocalizeMixin(
     return html`
       ${tableStyles}
 
-      <etools-prp-permissions .permissions=${this.permissions}></etools-prp-permissions>
+      <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
+      (this.permissions = e.detail.value)}"></etools-prp-permissions>
 
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header

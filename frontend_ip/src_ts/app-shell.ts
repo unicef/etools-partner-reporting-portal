@@ -1,8 +1,6 @@
 import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import './utils/routes';
-import '@polymer/app-route/app-location.js';
-import '@polymer/app-route/app-route.js';
 import '@unicef-polymer/etools-piwik-analytics/etools-piwik-analytics.js';
 
 import LocalizeMixin from './etools-prp-common/mixins/localize-mixin.js';

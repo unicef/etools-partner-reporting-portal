@@ -81,7 +81,10 @@ export class ListViewIndicators extends UtilsMixin(
   render() {
     return html`
       ${tableStyles}
-      <etools-prp-permissions permissions="${JSON.stringify(this.permissions)}"></etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
       <etools-content-panel panel-title="${this.localize('list_of_indicators')}">
         <etools-data-table-header
@@ -128,11 +131,11 @@ export class ListViewIndicators extends UtilsMixin(
         </etools-data-table-header>
 
         <etools-data-table-footer
-          page-size="${this.pageSize}"
-          page-number="${this.pageNumber}"
-          total-results="${this.totalResults}"
+          .pageSize="${this.pageSize}"
+          .pageNumber="${this.pageNumber}"
+          .totalResults="${this.totalResults}"
           .visibleRange="${this.visibleRange}"
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value || [])}"
+          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >
@@ -141,7 +144,7 @@ export class ListViewIndicators extends UtilsMixin(
         ${this.data?.map(
           (indicator) => html`
             <list-view-single-indicator
-              indicator="${indicator}"
+              .indicator="${indicator}"
               .isCustom="${this.isCustom}"
               .canEdit="${this.canEdit}"
               .type="${this.type}"
@@ -152,9 +155,9 @@ export class ListViewIndicators extends UtilsMixin(
         <list-placeholder .data="${this.data}"></list-placeholder>
 
         <etools-data-table-footer
-          page-size="${this.pageSize}"
-          page-number="${this.pageNumber}"
-          total-results="${this.totalResults}"
+          .pageSize="${this.pageSize}"
+          .pageNumber="${this.pageNumber}"
+          .totalResults="${this.totalResults}"
           .visibleRange="${this.visibleRange}"
           @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
           @page-size-changed="${this._pageSizeChanged}"

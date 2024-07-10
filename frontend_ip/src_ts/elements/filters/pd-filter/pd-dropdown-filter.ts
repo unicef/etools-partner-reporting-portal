@@ -7,6 +7,7 @@ import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('pd-dropdown-filter')
 export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) {
@@ -45,6 +46,11 @@ export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) 
     `;
   }
 
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchPDs = debounce(this._fetchPDs.bind(this), 100) as any;
+  }
+
   updated(changedProperties) {
     super.updated(changedProperties);
 
@@ -70,15 +76,13 @@ export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) 
     if (!this.programmeDocumentsUrl) {
       return;
     }
-    console.log('heey url', this.programmeDocumentsUrl);
-    console.log(this.shadowRoot?.getElementById('programmeDocuments'));
+
     const programmeDocumentsAjax = this.shadowRoot?.getElementById('programmeDocuments') as any as EtoolsPrpAjaxEl;
     programmeDocumentsAjax.abort();
     programmeDocumentsAjax
       .thunk()()
       .then((res) => {
         this.data = res.data?.results;
-        console.log('heey data', this.data);
       })
       .catch((_err: any) => {
         // TODO: error handling

@@ -1,6 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/app-route/app-route.js';
 import '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import Endpoints from '../../../endpoints.js';

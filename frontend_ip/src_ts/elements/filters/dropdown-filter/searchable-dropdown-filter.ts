@@ -30,7 +30,7 @@ export class SearchableDropdownFilter extends FilterMixin(LitElement) {
   @property({type: String})
   label = '';
 
-  @property({type: String})
+  @property({type: String, attribute: 'option-label'})
   optionLabel = 'title';
 
   @property({type: Array})
@@ -42,11 +42,10 @@ export class SearchableDropdownFilter extends FilterMixin(LitElement) {
         id="field"
         .label="${this.label}"
         .options="${this.data}"
-        option-value="id"
+        .optionValue="${'id'}"
         .optionLabel="${this.optionLabel}"
         .selected="${this.value}"
-        .disabled="${this.disabled}"
-        .selectedItem="${this.selectedItem}"
+        .disabled="${this.disabled}""
         trigger-value-change-event
         @etools-selected-item-changed="${this._handleDropdownChange}"
       >
@@ -56,14 +55,14 @@ export class SearchableDropdownFilter extends FilterMixin(LitElement) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('data')) {
       this._handleData(this.data);
     }
   }
 
   _handleDropdownChange(event) {
-    if (event.detail.selectedItem) {
+    if (event.detail.selectedItem && Object.keys(event.detail.selectedItem).length) {
       setTimeout(() => {
         fireEvent(this, 'filter-changed', {
           name: this.name,
