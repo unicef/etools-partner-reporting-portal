@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-currency-amount-input/etools-currency-amount-input';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import '@polymer/paper-input/paper-input';

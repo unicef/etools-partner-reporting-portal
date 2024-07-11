@@ -9,7 +9,7 @@ import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 
 import '@polymer/iron-icons/communication-icons';
 import '@polymer/iron-icon/iron-icon';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -56,34 +56,6 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
         display: block;
         margin-bottom: 25px;
 
-        --app-grid-columns: 6;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
-
-        --header-title: {
-          display: none;
-        }
-
-        --data-table-header: {
-          height: auto;
-        }
-      }
-
-      :host etools-content-panel {
-        margin-bottom: 25px;
-      }
-
-      .app-grid {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
-
-      .item-2-col {
-        grid-column: span var(--app-grid-expandible-item-columns);
-      }
-
       .field-value {
         display: block;
         word-wrap: break-word;
@@ -100,15 +72,10 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
         top: 0;
         color: var(--paper-grey-600);
       }
-
-      etools-content-panel.amendments::part(ecp-content) {
-        padding: 0px;
+      page-body > * {
+        display: block;
+        margin-bottom: 25px;
       }
-
-      etools-content-panel.reporting-requirements::part(ecp-content) {
-        padding: 0px;
-      }
-
       pd-details-reporting-requirements:not(:last-of-type) {
         margin-bottom: 50px;
       }

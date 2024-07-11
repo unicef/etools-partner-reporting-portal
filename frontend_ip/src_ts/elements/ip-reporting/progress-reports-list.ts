@@ -1,6 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
@@ -96,13 +96,13 @@ export class ProgressReportsList extends LocalizeMixin(
             'results_to_show'
           )}"
         >
-          <etools-data-table-column field="programme_document__reference_number" class="col-3" sortable>
+          <etools-data-table-column field="programme_document__reference_number" class="col-2" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
           <etools-data-table-column class="col-2">
             <div class="table-column">${this.localize('report_number')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="status" sortable class="col-1">
+          <etools-data-table-column field="status" sortable class="col-2">
             <div class="table-column">${this.localize('report_status')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="due_date" sortable class="col-2">
@@ -129,7 +129,7 @@ export class ProgressReportsList extends LocalizeMixin(
           (report: any) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="col-data col-3 table-cell table-cell--text">
+                <div class="col-data col-2 truncate table-cell table-cell--text">
                   <span>
                     ${this._withDefault(report.programme_document?.reference_number, '-')}
                     <paper-tooltip>${report.programme_document?.title}</paper-tooltip>
@@ -138,7 +138,7 @@ export class ProgressReportsList extends LocalizeMixin(
                 <div class="col-data col-2 table-cell table-cell--text">
                   <pd-reports-report-title display-link display-link-icon .report="${report}"></pd-reports-report-title>
                 </div>
-                <div class="col-data col-1 table-cell table-cell--text">
+                <div class="col-data col-2 table-cell table-cell--text">
                   <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>

@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '../../../../../etools-prp-common/elements/labelled-item.js';

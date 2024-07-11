@@ -5,7 +5,7 @@ import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
-import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../ip-reporting/pd-output';
 // import '../../etools-prp-common/styles/iron-flex-styles.js'; // Ensure you have iron-flex-styles imported properly

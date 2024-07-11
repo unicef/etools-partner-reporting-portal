@@ -64,7 +64,6 @@
     "@polymer/polymer": "^3.5.1",
     "@shoelace-style/shoelace": "2.10.0",
     "@types/lodash-es": "^4.17.6",
-    "@unicef-polymer/etools-content-panel": "^5.1.0",
     "@unicef-polymer/etools-currency-amount-input": "^4.0.4",
     "@unicef-polymer/etools-data-table": "^7.0.0",
     "@unicef-polymer/etools-date-time": "^3.1.3",
