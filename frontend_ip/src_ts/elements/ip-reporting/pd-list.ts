@@ -73,6 +73,12 @@ export class PdList extends RoutingMixin(
           text-align: right;
           text-transform: uppercase;
         }
+        .truncate {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 100%;
+        }
       </style>
       <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
@@ -116,7 +122,7 @@ export class PdList extends RoutingMixin(
           (pd, _index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div class="col-data col-2 table-cell table-cell--text truncate">
                   <a
                     @click="${this.trackAnalytics}"
                     tracker="${this._getPdRefNumberTracker(pd.reference_number)}"

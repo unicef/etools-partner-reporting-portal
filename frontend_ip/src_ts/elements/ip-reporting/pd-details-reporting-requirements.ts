@@ -8,11 +8,12 @@ import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/list-placeholder';
 
 @customElement('pd-details-reporting-requirements')
 export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
-  static styles = css`
+  static styles = [layoutStyles, css`   
     :host {
       display: block;
 
@@ -29,7 +30,7 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
       padding: 0 24px;
       margin: 0;
     }
-  `;
+  `];
 
   @property({type: Array})
   data: any[] = [];
@@ -48,18 +49,18 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
         <h3>${this.title}</h3>
 
         <etools-data-table-header no-collapse no-title>
-          <etools-data-table-column field=""> ${this.localize('report_number')} </etools-data-table-column>
-          <etools-data-table-column field=""> ${this.localize('due_date')} </etools-data-table-column>
-          <etools-data-table-column field=""> ${this.localize('reporting_period')} </etools-data-table-column>
+          <etools-data-table-column class="col-4" field=""> ${this.localize('report_number')} </etools-data-table-column>
+          <etools-data-table-column class="col-4" field=""> ${this.localize('due_date')} </etools-data-table-column>
+          <etools-data-table-column class="col-4" field=""> ${this.localize('reporting_period')} </etools-data-table-column>
         </etools-data-table-header>
 
         ${(this.data || []).map(
           (item, index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell">${this.getReportName(item.report_type, index)}</div>
-                <div class="table-cell table-cell--text">${item.due_date}</div>
-                <div class="table-cell table-cell--text">${item.start_date} - ${item.end_date}</div>
+                <div class="col-data col-4 table-cell">${this.getReportName(item.report_type, index)}</div>
+                <div class="col-data col-4 table-cell table-cell--text">${item.due_date}</div>
+                <div class="col-data col-4 table-cell table-cell--text">${item.start_date} - ${item.end_date}</div>
               </div>
             </etools-data-table-row>
           `
