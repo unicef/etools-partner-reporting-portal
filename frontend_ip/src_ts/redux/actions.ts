@@ -76,7 +76,8 @@ export const setWorkspaces = function (workspaces: any) {
 export const setWorkspace = function (newWorkspace: any) {
   return {
     type: Constants.SET_WORKSPACE,
-    workspace: newWorkspace
+    workspace: newWorkspace,
+    app: 'ip-reporting'
   };
 };
 

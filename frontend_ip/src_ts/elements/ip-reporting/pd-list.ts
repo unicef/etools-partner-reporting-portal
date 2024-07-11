@@ -2,14 +2,15 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table';
-import '@unicef-polymer/etools-data-table/data-table-styles';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@polymer/paper-tooltip/paper-tooltip';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
@@ -53,10 +54,13 @@ export class PdList extends RoutingMixin(
     super.stateChanged(state);
   }
 
+  static styles = [layoutStyles]
+
   render() {
     return html`
       ${tableStyles}
       <style>
+        ${dataTableStylesLit}
         :host {
           display: block;
         }
@@ -76,34 +80,34 @@ export class PdList extends RoutingMixin(
           label="${this.visibleRange?.[0] || '0'}-${this.visibleRange?.[1] || '0'} of ${this
             .totalResults} ${this.localize('results_to_show')}"
         >
-          <etools-data-table-column field="reference_number" sortable>
+          <etools-data-table-column field="reference_number" class="col-2" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="status" sortable>
+          <etools-data-table-column field="status" sortable class="col-1">
             <div class="table-column">${this.localize('pd_ssfa_status')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="start_date" sortable>
+          <etools-data-table-column field="start_date" sortable class="col-1">
             <div class="table-column">${this.localize('start_date')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="end_date" sortable>
+          <etools-data-table-column field="end_date" sortable class="col-1">
             <div class="table-column">${this.localize('end_date')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="cso_contribution" sortable>
+          <etools-data-table-column field="cso_contribution" sortable class="col-1">
             <div class="table-column">${this.localize('cso_contribution')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="total_unicef_cash" sortable>
+          <etools-data-table-column field="total_unicef_cash" sortable class="col-1">
             <div class="table-column">${this.localize('unicef_cash')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="total_unicef_supplies" sortable>
+          <etools-data-table-column field="total_unicef_supplies" sortable class="col-1">
             <div class="table-column">${this.localize('unicef_supplies')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="budget" sortable>
+          <etools-data-table-column field="budget" sortable class="col-1">
             <div class="table-column">${this.localize('planned_budget')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="funds_received_to_date" sortable>
+          <etools-data-table-column field="funds_received_to_date" sortable class="col-2">
             <div class="table-column">${this.localize('cash_transfers')}</div>
           </etools-data-table-column>
-          <etools-data-table-column></etools-data-table-column>
+          <etools-data-table-column class="col-1"></etools-data-table-column>
         </etools-data-table-header>
 
         ${repeat(
@@ -112,7 +116,7 @@ export class PdList extends RoutingMixin(
           (pd, _index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-2 table-cell table-cell--text">
                   <a
                     @click="${this.trackAnalytics}"
                     tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
@@ -122,28 +126,28 @@ export class PdList extends RoutingMixin(
                     <paper-tooltip>${pd.title}</paper-tooltip>
                   </a>
                 </div>
-                <div class="table-cell table-cell--text">${this._withDefault(pd.status, '')}</div>
-                <div class="table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>
-                <div class="table-cell table-cell--text">${this._withDefault(pd.end_date)}</div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.status, '')}</div>
+                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>
+                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.end_date)}</div>
+                <div class="col-data col-1 table-cell table-cell--text">
                   <etools-prp-currency value="${pd.cso_contribution}" currency="${pd.cso_contribution_currency}">
                   </etools-prp-currency>
                 </div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-1 table-cell table-cell--text">
                   <etools-prp-currency value="${pd.total_unicef_cash}" currency="${pd.total_unicef_cash_currency}">
                   </etools-prp-currency>
                 </div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-1 table-cell table-cell--text">
                   <etools-prp-currency
                     value="${pd.total_unicef_supplies}"
                     currency="${pd.total_unicef_supplies_currency}"
                   >
                   </etools-prp-currency>
                 </div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-1 table-cell table-cell--text">
                   <etools-prp-currency value="${pd.budget}" currency="${pd.budget_currency}"> </etools-prp-currency>
                 </div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-2 table-cell table-cell--text">
                   <etools-prp-currency
                     value="${pd.funds_received_to_date}"
                     currency="${pd.funds_received_to_date_currency}"
@@ -151,7 +155,7 @@ export class PdList extends RoutingMixin(
                   </etools-prp-currency>
                   (${this._computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)})
                 </div>
-                <div class="table-cell table-cell--text cell-reports">
+                <div class="col-data col-1 table-cell table-cell--text cell-reports">
                   <a
                     @click="${this.trackAnalytics}"
                     tracker="Reports"

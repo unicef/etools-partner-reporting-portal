@@ -1,7 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/etools-prp-permissions';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
@@ -13,12 +12,11 @@ import {
   getReportTitle,
   getReportLink
 } from './js/pd-reports-report-title-functions';
-import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import { buildUrl } from '../../etools-prp-common/utils/util';
 
 @customElement('pd-reports-report-title')
 export class PdReportsReportTitle extends LocalizeMixin(
-  ProgressReportUtilsMixin(UtilsMixin(RoutingMixin(connect(store)(LitElement))))
+  ProgressReportUtilsMixin(UtilsMixin(LitElement))
 ) {
   static styles = css`
     .final-badge {
@@ -46,6 +44,9 @@ export class PdReportsReportTitle extends LocalizeMixin(
   @property({type: Object})
   report!: any;
 
+  @property({type: String})
+  baseUrl!: string
+
   @property({type: Boolean, attribute: 'display-link'})
   displayLink = false;
 
@@ -64,7 +65,7 @@ export class PdReportsReportTitle extends LocalizeMixin(
 
       ${this.showLink
         ? html`
-            <a href="${this._getReportLink(this.report, this.permissions)}">
+            <a href="${this._getReportLink(this.report, this.permissions, this.baseUrl)}">
               ${this.displayLinkIcon
                 ? html`<iron-icon
                     class="link-mode-icon"
@@ -107,12 +108,12 @@ export class PdReportsReportTitle extends LocalizeMixin(
     return getReportTitle(report, this.localize.bind(this));
   }
 
-  _getReportLink(report: any, permissions: any) {
-    if (!permissions) {
+  _getReportLink(report: any, permissions: any, baseUrl: any) {
+    if (!permissions || !report || !baseUrl) {
       return '';
     }
     const suffix = this._getMode(report, permissions);
-    return getReportLink(report, suffix, this.buildUrl, this._baseUrl);
+    return getReportLink(report, suffix, buildUrl, baseUrl);
   }
 
   _getReportIcon(report: any, permissions: any) {

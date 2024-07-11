@@ -1,18 +1,18 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
-import '@unicef-polymer/etools-data-table/etools-data-table.js';
-import '@unicef-polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
-//import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-//import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
+import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {
   programmeDocumentReportsAll,
@@ -27,9 +27,10 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('pd-reports-list')
 export class PdReportsList extends LocalizeMixin(
-  PaginationMixin(ProgressReportUtilsMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))))
+  PaginationMixin(DataTableMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))))
 ) {
   static styles = [
+    layoutStyles,
     css`
       :host {
         display: block;
@@ -40,8 +41,8 @@ export class PdReportsList extends LocalizeMixin(
     `
   ];
 
-  @property({type: Boolean})
-  loaded = false;
+  @property({type: Boolean, reflect: true})
+  loading = true;
 
   @property({type: Object})
   filters: any[] = [];
@@ -52,10 +53,15 @@ export class PdReportsList extends LocalizeMixin(
   @property({type: String})
   pdId!: string;
 
+  @property({type: String})
+  baseUrl!: string
+
   @property({type: Array})
   data: any[] = [];
 
   stateChanged(state: RootState) {
+    super.stateChanged(state);
+
     if (
       state.app?.routeDetails?.queryParams &&
       !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
@@ -67,9 +73,19 @@ export class PdReportsList extends LocalizeMixin(
       this.pdId = state.programmeDocuments?.current;
     }
 
+    if(state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
+    }
+
     this.data = programmeDocumentReportsAll(state);
-    const totalResults = programmeDocumentReportsCount(state);
-    this.paginator = {...this.paginator, count: totalResults};
+    if(this.data) {
+      const totalResults = programmeDocumentReportsCount(state);
+      if (typeof totalResults !== 'undefined') {
+        this.paginator = {...this.paginator, count: totalResults};
+        this.loading = false;
+        this.requestUpdate();
+      }
+    }
   }
 
   _getLink(report: any, permissions: any) {
@@ -77,75 +93,59 @@ export class PdReportsList extends LocalizeMixin(
     return getLink(report, suffix, this.buildUrl, this._baseUrl);
   }
 
-  pageSizeChange(e: CustomEvent) {
-    this.paginator = {...this.paginator, page_size: e.detail.value};
-    // this.updateListQueries();
-  }
-
-  pageNumberChange(e: CustomEvent) {
-    this.paginator = {...this.paginator, page: e.detail.value};
-    // this.updateListQueries();
-  }
-
   render() {
     return html`
-      ${tableStyles}
+      ${tableStyles} 
+      <style> ${dataTableStylesLit} </style>     
 
       <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
       (this.permissions = e.detail.value)}"></etools-prp-permissions>
 
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
+        <etools-loading ?active="${this.loading}"></etools-loading>
+
         <etools-data-table-header
           no-collapse
           label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${
       this.paginator.count
     } ${this.localize('results_to_show')}"
         >
-          <etools-data-table-column>
+          <etools-data-table-column class="col-3">
             <div class="table-column">${this.localize('report_number')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="status" sortable>
+          <etools-data-table-column field="status" sortable class="col-2">
             <div class="table-column">${this.localize('report_status')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="due_date" sortable>
+          <etools-data-table-column field="due_date" sortable class="col-2">
             <div class="table-column">${this.localize('due_date')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="date_of_submission" sortable>
+          <etools-data-table-column field="date_of_submission" sortable class="col-2">
             <div class="table-column">${this.localize('date_of_submission')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="reporting_period" sortable>
+          <etools-data-table-column field="reporting_period" sortable class="col-3">
             <div class="table-column">${this.localize('reporting_period')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
 
-        <etools-data-table-footer
-          .pageSize=${this.paginator.page_size}"
-          .pageNumber="${this.paginator.page}"
-          .totalResults"${this.paginator.count}"
-          .visibleRange"${this.paginator.visible_range}"
-          @page-size-changed=${this.pageSizeChanged}
-          @page-number-changed=${this.pageNumberChanged}
-        ></etools-data-table-footer>
 
         ${(this.data || []).map(
           (report: any) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell table-cell--text cell-reports">
-                  <pd-reports-report-title .displayLink=${true} .report=${report}></pd-reports-report-title>
+                <div class="col-data col-3 table-cell table-cell--text cell-reports">
+                  <pd-reports-report-title .displayLink="${true}" .report="${report}" .baseUrl="${this.baseUrl}"></pd-reports-report-title>
                 </div>
-                <div class="table-cell table-cell--text">
-                  <report-status .status=${report.status} .reportType=${report.report_type}></report-status>
+                <div class="col-data col-2 table-cell table-cell--text">
+                  <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
-                <div class="table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
-                <div class="table-cell table-cell--text">${this._withDefault(report.submission_date)}</div>
-                <div class="table-cell table-cell--text">${this._withDefault(report.reporting_period)}</div>
+                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
+                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.submission_date)}</div>
+                <div class="col-data col-3 table-cell table-cell--text">${this._withDefault(report.reporting_period)}</div>
               </div>
-            </etools-data-table-row>
-          `
+            </etools-data-table-row>          `
         )}
 
-        <list-placeholder .data=${this.data} .loading=${!this.loaded}></list-placeholder>
+        <list-placeholder .data="${this.data}" ?loading="${this.loading}"></list-placeholder>
 
       
         <etools-data-table-footer
@@ -153,11 +153,10 @@ export class PdReportsList extends LocalizeMixin(
           .pageNumber="${this.paginator.page}"
           .totalResults"${this.paginator.count}"
           .visibleRange"${this.paginator.visible_range}"
-          @page-size-changed=${this.pageSizeChanged}
-          @page-number-changed=${this.pageNumberChanged}
+          @page-size-changed="${this._pageSizeChanged}"
+          @page-number-changed="${this._pageNumberChanged}"
         ></etools-data-table-footer>
-
-        <etools-loading .active=${!this.loaded}></etools-loading>
+        
       </etools-content-panel>
     `;
   }

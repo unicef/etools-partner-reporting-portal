@@ -1,23 +1,25 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
-import '@unicef-polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
-import '@unicef-polymer/etools-data-table/etools-data-table';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import './pd-reports-report-title';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+//import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
+import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import '@unicef-polymer/etools-data-table/data-table-styles';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
@@ -30,6 +32,7 @@ export class ProgressReportsList extends LocalizeMixin(
   )
 ) {
   static styles = [
+    layoutStyles,
     css`
       :host {
         display: block;
@@ -85,6 +88,7 @@ export class ProgressReportsList extends LocalizeMixin(
   render() {
     return html`
       ${tableStyles}
+      <style> ${dataTableStylesLit} </style>
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
@@ -92,22 +96,22 @@ export class ProgressReportsList extends LocalizeMixin(
             'results_to_show'
           )}"
         >
-          <etools-data-table-column field="programme_document__reference_number" sortable>
+          <etools-data-table-column field="programme_document__reference_number" class="col-3" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
-          <etools-data-table-column>
+          <etools-data-table-column class="col-2">
             <div class="table-column">${this.localize('report_number')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="status" sortable>
+          <etools-data-table-column field="status" sortable class="col-1">
             <div class="table-column">${this.localize('report_status')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="due_date" sortable>
+          <etools-data-table-column field="due_date" sortable class="col-2">
             <div class="table-column">${this.localize('due_date')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="submission_date" sortable>
+          <etools-data-table-column field="submission_date" sortable class="col-2">
             <div class="table-column">${this.localize('date_of_submission')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="start_date" sortable>
+          <etools-data-table-column field="start_date" sortable class="col-2">
             <div class="table-column">${this.localize('reporting_period')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
@@ -125,21 +129,21 @@ export class ProgressReportsList extends LocalizeMixin(
           (report: any) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-3 table-cell table-cell--text">
                   <span>
                     ${this._withDefault(report.programme_document?.reference_number, '-')}
                     <paper-tooltip>${report.programme_document?.title}</paper-tooltip>
                   </span>
                 </div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-2 table-cell table-cell--text">
                   <pd-reports-report-title display-link display-link-icon .report="${report}"></pd-reports-report-title>
                 </div>
-                <div class="table-cell table-cell--text">
+                <div class="col-data col-1 table-cell table-cell--text">
                   <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
-                <div class="table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
-                <div class="table-cell table-cell--text">${this._withDefault(report.submission_date, '-')}</div>
-                <div class="table-cell table-cell--text">${this._withDefault(report.reporting_period, '-')}</div>
+                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
+                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.submission_date, '-')}</div>
+                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.reporting_period, '-')}</div>
               </div>
             </etools-data-table-row>
           `

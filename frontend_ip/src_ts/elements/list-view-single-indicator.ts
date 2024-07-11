@@ -2,7 +2,9 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { connect } from 'pwa-helpers';
 import { PaperButtonElement } from '@polymer/paper-button/paper-button';
-import '@unicef-polymer/etools-data-table/etools-data-table';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-icons/iron-icons';
@@ -17,11 +19,11 @@ import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('list-view-single-indicator')
 export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))) {
   static styles = css`
+    ${layoutStyles}
     :host {
       display: block;
       --etools-prp-progress-bar-height: 14px;
@@ -96,14 +98,15 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
   render() {
     return html`
       ${tableStyles} ${sharedStyles}
+      <style> ${dataTableStylesLit} </style>
       <etools-prp-permissions
         .permissions="${this.permissions}"
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       ></etools-prp-permissions>
 
-      <etools-data-table-row .detailsOpened=${this.detailsOpened} @opened-changed=${this.onDetailsOpenedChanged}>
-        <div slot="row-data">
-          <span class="table-cell table-cell--text self-center">
+      <etools-data-table-row>
+        <div slot="row-data" class="layout-horizontal editable-row">
+          <span class="col-data col-2 table-cell table-cell--text self-center">
             ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
               ? html`<status-badge type="error"></status-badge>`
               : html``}
@@ -111,15 +114,15 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
             <paper-tooltip>${this.indicator?.blueprint?.title}</paper-tooltip>
           </span>
           ${this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
-            ? html`<span class="table-cell table-cell--text self-center">${this.indicator?.content_object_title}</span>`
+            ? html`<span class="col-data col-1 table-cell table-cell--text self-center">${this.indicator?.content_object_title}</span>`
             : html``}
-          <span class="table-cell table-cell--text self-center"
+          <span class="col-data col-2 table-cell table-cell--text self-center"
             >${this.indicator?.blueprint?.calculation_formula_across_locations}</span
           >
-          <span class="table-cell table-cell--text self-center"
+          <span class="col-data col-2 table-cell table-cell--text self-center"
             >${this.indicator?.blueprint?.calculation_formula_across_periods}</span
           >
-          <span class="table-cell table-cell--text self-center">
+          <span class="col-data col-1 table-cell table-cell--text self-center">
             ${this._equals(this.indicator?.blueprint?.display_type, 'number')
               ? html`<etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>`
               : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
@@ -132,7 +135,7 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
                 ></span>`
               : html``}
           </span>
-          <span class="table-cell table-cell--text self-center">
+          <span class="col-data col-1 table-cell table-cell--text self-center">
             ${this._equals(this.indicator?.blueprint?.display_type, 'number')
               ? html`<etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>`
               : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
@@ -145,10 +148,10 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
                 ></span>`
               : html``}
           </span>
-          <span class="table-cell table-cell--text self-center"
+          <span class="col-data col-1 table-cell table-cell--text self-center"
             ><etools-prp-number .value=${this.indicator?.achieved.c}></etools-prp-number
           ></span>
-          <span class="table-cell table-cell--text self-center flex-2">
+          <span class="col-data col-2 table-cell table-cell--text self-center flex-2">
             <div class="self-center flex-none">
               <dl class="indicator-progress layout horizontal">
                 <dt class="flex-none self-center">${this.localize('against_target')}</dt>
@@ -274,8 +277,8 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
     return !indicator.locations.length && type !== 'ca';
   }
 
-  onDetailsOpenedChanged(event: CustomEvent) {
-    this.detailsOpened = event.detail.opened;
-    fireEvent(this, 'details-opened-changed', {row: event.target, detailsOpened: event.detail.opened});
-  }
+  // onDetailsOpenedChanged(event: CustomEvent) {
+  //   this.detailsOpened = event.detail.opened;
+  //   fireEvent(this, 'details-opened-changed', {row: event.target, detailsOpened: event.detail.opened});
+  // }
 }

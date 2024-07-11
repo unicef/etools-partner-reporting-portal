@@ -10,8 +10,9 @@ import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '@polymer/iron-icons/communication-icons';
 import '@polymer/iron-icon/iron-icon';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table.js';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import './pd-details-reporting-requirements';
 import './pd-details-doc-download';
 import '../../etools-prp-common/elements/page-body';
@@ -49,7 +50,7 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
   reportingRequirements: any = {};
 
   static styles = [
-    css`
+    css`     
       :host {
         display: block;
         margin-bottom: 25px;
@@ -116,6 +117,7 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
   render() {
     return html`
       ${tableStyles}
+      <style>${dataTableStylesLit}</style>
       <page-body>
         <etools-content-panel panel-title="${this.localize('partnership_info')}">
           <etools-loading ?active="${!this.loaded}"></etools-loading>

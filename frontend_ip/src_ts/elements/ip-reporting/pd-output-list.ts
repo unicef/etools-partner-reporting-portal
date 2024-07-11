@@ -4,7 +4,7 @@ import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
-import '@unicef-polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../ip-reporting/pd-output';

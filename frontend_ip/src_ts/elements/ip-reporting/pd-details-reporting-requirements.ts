@@ -5,8 +5,9 @@ import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table.js';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import '../../etools-prp-common/elements/list-placeholder';
 
 @customElement('pd-details-reporting-requirements')
@@ -42,8 +43,8 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
   render() {
     return html`
       ${tableStyles}
-
-      <section>
+      <style> ${dataTableStylesLit} </style>
+      <section> 
         <h3>${this.title}</h3>
 
         <etools-data-table-header no-collapse no-title>

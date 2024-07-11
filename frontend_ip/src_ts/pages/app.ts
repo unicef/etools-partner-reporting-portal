@@ -214,7 +214,7 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
 
   private _routeAppChanged(routeDetails: EtoolsRouteDetails) {
     setTimeout(() => {
-      const defaultApp = 'ip-reporting';
+      const defaultApp = 'ip-reporting';     
       if (!this._workspaceCode) {
         return;
       }

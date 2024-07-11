@@ -6,8 +6,9 @@ import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
 import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table.js';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
@@ -91,7 +92,9 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
 
   render() {
     return html`
-      ${buttonsStyles} ${tableStyles}
+      ${buttonsStyles} ${tableStyles} 
+      <style> ${dataTableStylesLit} </style>
+
       <etools-prp-permissions
         .permissions="${this.permissions}"
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"

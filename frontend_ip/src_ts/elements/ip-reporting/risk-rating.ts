@@ -6,7 +6,7 @@ import {partnerLoading} from '../../redux/selectors/partner';
 import {RootState} from '../../typings/redux.types';
 import '../../etools-prp-common/elements/labelled-item';
 import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 
