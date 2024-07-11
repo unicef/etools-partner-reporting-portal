@@ -9,6 +9,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
@@ -48,6 +49,7 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 @customElement('pd-details-calculation-methods')
 export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement)))) {
   static styles = [
+    layoutStyles,
     css`
       :host {
         display: block;
@@ -112,13 +114,13 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
       <page-body>
         <calculation-methods-info-bar></calculation-methods-info-bar>
         <etools-data-table-header no-collapse>
-          <etools-data-table-column>
+          <etools-data-table-column class="col-4">
             <div class="table-column">${this.localize('indicators_for_pd')}</div>
           </etools-data-table-column>
-          <etools-data-table-column>
+          <etools-data-table-column class="col-4">
             <div class="table-column">${this.localize('calculation_method_across_locations')}</div>
           </etools-data-table-column>
-          <etools-data-table-column>
+          <etools-data-table-column class="col-4">
             <div class="table-column">${this.localize('calculation_method_across_reporting')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
@@ -145,8 +147,8 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
                 ? html`
                     <etools-data-table-row no-collapse>
                       <div slot="row-data">
-                        <div class="table-cell">${item.data?.title}</div>
-                        <div class="table-cell">
+                        <div class="col-data col-4 table-cell">${item.data?.title}</div>
+                        <div class="col-data col-4 table-cell">
                           ${this._canEdit(item, this.permissions)
                             ? html`
                                 <paper-radio-group
@@ -178,7 +180,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
                               `
                             : html` ${item.data.calculation_formula_across_locations} `}
                         </div>
-                        <div class="table-cell">
+                        <div class="col-data col-4 table-cell">
                           ${this._canEdit(item, this.permissions)
                             ? html`
                                 <paper-radio-group
