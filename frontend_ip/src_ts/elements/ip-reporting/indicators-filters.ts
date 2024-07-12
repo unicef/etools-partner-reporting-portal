@@ -8,6 +8,7 @@ import '../filters/dropdown-filter/dropdown-filter-multi';
 import '../filters/location-filter/location-filter';
 import '../filters/pd-filter/pd-dropdown-filter';
 import '../filters/checkbox-filter/checkbox-filter';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
@@ -16,21 +17,17 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('indicators-filters')
 export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
-  static styles = css`
-    :host {
-      display: block;
-      background: white;
-      --app-grid-columns: 4;
-      --app-grid-item-height: auto;
-      --app-grid-expandible-item-columns: 2;
-    }
-    .item-2-col {
-      @apply --app-grid-expandible-item;
-    }
-    checkbox-filter {
-      margin-top: 2em;
-    }
-  `;
+  static get styles() { 
+    return [layoutStyles, css`
+      :host {
+        display: block;
+        background: white;
+      }
+      checkbox-filter {
+        margin-top: 2em;
+      }    
+    `]
+  };
 
   @property({type: Object})
   queryParams!: any;
@@ -43,9 +40,9 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
       ${filterStyles}
 
       <filter-list .filters="${this.filters}">
-        <div class="app-grid">
+        <div class="row">
           <dropdown-filter-multi
-            class="item item-2-col"
+            class="col-md-6 col-12"
             label="${this.localize('pd_status')}"
             name="pd_statuses"
             .value="${this._withDefault(this.queryParams?.pd_statuses, '')}"
@@ -54,14 +51,14 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
           >
           </dropdown-filter-multi>
 
-          <pd-dropdown-filter class="item item-2-col" .value="${this._withDefault(this.queryParams?.pds, '')}">
+          <pd-dropdown-filter class="col-md-6 col-12" .value="${this._withDefault(this.queryParams?.pds, '')}">
           </pd-dropdown-filter>
 
-          <location-filter class="item" .value="${this._withDefault(this.queryParams?.location, '-1')}">
+          <location-filter class="col-md-3 col-12" .value="${this._withDefault(this.queryParams?.location, '-1')}">
           </location-filter>
 
           <text-filter
-            class="item"
+            class="col-md-3 col-12"
             label="${this.localize('indicator_title')}"
             name="blueprint__title"
             .value="${this.queryParams?.blueprint__title || ''}"

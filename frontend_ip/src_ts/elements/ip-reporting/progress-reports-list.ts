@@ -49,9 +49,6 @@ export class ProgressReportsList extends LocalizeMixin(
   @property({type: Array})
   data: any[] = [];
 
-  @property({type: Number})
-  totalResults!: number;
-
   @property({type: Object})
   queryParams!: any;
 
@@ -60,9 +57,6 @@ export class ProgressReportsList extends LocalizeMixin(
 
   @property({type: Number})
   pageNumber!: number;
-
-  @property({type: Array})
-  visibleRange = [];
 
   stateChanged(state: RootState) {
     if (
@@ -80,8 +74,8 @@ export class ProgressReportsList extends LocalizeMixin(
       this.data = state.progressReports.all;
     }
 
-    if (this.totalResults !== state.progressReports.count) {
-      this.totalResults = state.progressReports.count;
+    if (state.progressReports?.count && this.totalResults !== state.progressReports.count) {
+      this.paginator = {...this.paginator, count: state.progressReports.count};
     }
   }
 
@@ -92,10 +86,7 @@ export class ProgressReportsList extends LocalizeMixin(
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
-          label="${this.visibleRange?.[0]}-${this.visibleRange?.[1]} of ${this.totalResults} ${this.localize(
-            'results_to_show'
-          )}"
-        >
+          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator.count} ${this.localize('results_to_show')}">
           <etools-data-table-column field="programme_document__reference_number" class="col-2" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
@@ -115,12 +106,13 @@ export class ProgressReportsList extends LocalizeMixin(
             <div class="table-column">${this.localize('reporting_period')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
+
         <etools-data-table-footer
-          .pageSize="${this.pageSize}"
-          .pageNumber="${this.pageNumber}"
-          .totalResults="${this.totalResults}"
-          .visibleRange="${this.visibleRange}"
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
+          .pageSize="${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >
@@ -143,18 +135,19 @@ export class ProgressReportsList extends LocalizeMixin(
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
                 <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.submission_date, '-')}</div>
-                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.reporting_period, '-')}</div>
+                <div class="col-data col-2 table-cell table-cell--text truncate">${this._withDefault(report.reporting_period, '-')}</div>
               </div>
             </etools-data-table-row>
           `
         )}
         <list-placeholder .data="${this.data}" .loading="${this.loading}"></list-placeholder>
+
         <etools-data-table-footer
-          .pageSize="${this.pageSize}"
-          .pageNumber="${this.pageNumber}"
-          .totalResults="${this.totalResults}"
-          .visibleRange="${this.visibleRange}"
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
+          .pageSize="${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >

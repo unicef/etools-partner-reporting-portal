@@ -1,6 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/app-layout/app-grid/app-grid-style';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@unicef-polymer/etools-unicef/src/etools-date-time/datepicker-lite';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
@@ -17,26 +17,18 @@ import {RootState} from '../../typings/redux.types';
 
 @customElement('progress-reports-filters')
 export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
-  static styles = [
-    css`
-      :host {
-        display: block;
-        background: white;
-
-        --app-grid-columns: 4;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 2;
-      }
-
-      .item-2-col {
-        @apply --app-grid-expandible-item;
-      }
-
-      checkbox-filter {
-        margin-top: 2em;
-      }
-    `
-  ];
+  static get styles() { 
+    return [layoutStyles,
+      css`
+        :host {
+          display: block;
+          background: white;
+        }      
+        checkbox-filter {
+          margin-top: 2em;
+        }
+        `]
+    };
 
   @property({type: Object})
   queryParams!: any;
@@ -54,20 +46,20 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
     return html`
       ${filterStyles}
       <filter-list .filters="${this.filters}">
-        <div class="app-grid">
+        <div class="row">
           <text-filter
-            class="item"
+            class="col-md-3 col-12"
             label="${this.localize('pd_ref_and_title')}"
             name="pd_ref_title"
             .value="${this.queryParams?.pd_ref_title}"
           >
           </text-filter>
           <location-filter
-            class="item"
+            class="col-md-3 col-12"
             .value="${this._withDefault(this.queryParams?.location, '-1')}"
           ></location-filter>
           <dropdown-filter-multi
-            class="item item-2-col"
+            class="col-md-6 col-12"
             label="${this.localize('report_status')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
@@ -77,7 +69,7 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
           >
           </dropdown-filter-multi>
           <dropdown-filter-multi
-            class="item item-2-col"
+            class="col-md-6 col-12"
             label="${this.localize('report_type')}"
             name="report_type"
             .value="${this._withDefault(this.queryParams?.report_type, '')}"

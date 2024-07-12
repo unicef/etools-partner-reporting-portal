@@ -128,7 +128,7 @@ export class ListViewIndicators extends UtilsMixin(
           .pageNumber="${this.paginator.page}"
           .totalResults="${this.paginator.count}"
           .visibleRange="${this.paginator.visible_range}"
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
+          @visible-range-changed="${this.visibleRangeChanged}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >
@@ -152,7 +152,7 @@ export class ListViewIndicators extends UtilsMixin(
           .pageNumber="${this.paginator.page}"
           .totalResults="${this.paginator.count}"
           .visibleRange="${this.paginator.visible_range}"
-          @visible-range-changed="${(e) => (this.visibleRange = e.detail.value)}"
+          @visible-range-changed="${this.visibleRangeChanged}"
           @page-size-changed="${this._pageSizeChanged}"
           @page-number-changed="${this._pageNumberChanged}"
         >

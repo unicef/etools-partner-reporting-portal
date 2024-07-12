@@ -5,7 +5,7 @@ import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/filter-list.js';
 import '../../elements/filters/text-filter/text-filter.js';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi.js';
@@ -16,20 +16,9 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('pd-filters')
 export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
-  static styles = css`
-    :host {
-      display: block;
-      background: white;
-
-      --app-grid-columns: 5;
-      --app-grid-item-height: auto;
-      --app-grid-expandible-item-columns: 2;
-    }
-
-    .filter-2-col {
-      @apply --app-grid-expandible-item;
-    }
-  `;
+  static get styles() { 
+    return [layoutStyles]
+  };
 
   @property({type: Object})
   queryParams!: any;
@@ -44,9 +33,9 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
     return html`
       ${filterStyles}
       <filter-list .filters="${this.filters}" @filters-changed=${(e) => (this.filters = e.detail.value)}>
-        <div class="app-grid">
+        <div class="row">
           <text-filter
-            class="item"
+            class="col-lg-2 col-12"
             label="${this.localize('pd_ref_and_title')}"
             name="ref_title"
             .value="${this.queryParams?.ref_title || ''}"
@@ -54,7 +43,7 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
           >
           </text-filter>
           <dropdown-filter-multi
-            class="item filter-2-col"
+            class="col-lg-5 col-12"
             label="${this.localize('pd_ssfa_status')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
@@ -64,7 +53,7 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
           >
           </dropdown-filter-multi>
           <location-filter-multi
-            class="item filter-2-col"
+            class="col-lg-5 col-12"
             .value="${this._withDefault(this.queryParams?.location, '')}"
             @value-changed="${this._handleFilterChange}"
           >

@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@polymer/paper-button/paper-button.js';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
@@ -14,16 +14,9 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('pd-report-filters')
 export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
-  static styles = [
-    css`
-      :host {
-        display: block;
-        background: white;
-        --app-grid-columns: 3;
-        --app-grid-item-height: auto;
-      }
-    `
-  ];
+  static get styles() { 
+    return [layoutStyles]
+  };
 
   @property({type: Object})
   queryParams: any = {};
@@ -51,9 +44,9 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
       ${filterStyles}
 
       <filter-list .filters=${this.filters} @filters-changed=${(e) => (this.filters = e.detail.value)}>
-        <div class="app-grid">
+        <div class="row">
           <dropdown-filter
-            class="item"
+            class="col-md-4 col-12"
             .label=${this.localize('status')}
             name="status"
             .value=${this._withDefault(this.queryParams?.status, '-1')}
@@ -73,12 +66,10 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
     }
   }
 
-  updated(changedProperties) {
+  firstUpdated(changedProperties) {
     super.updated(changedProperties);
 
-    if (changedProperties.has('resources')) {
-      this.statuses = this._localizeStatuses();
-    }
+    this.statuses = this._localizeStatuses();
   }
 }
 

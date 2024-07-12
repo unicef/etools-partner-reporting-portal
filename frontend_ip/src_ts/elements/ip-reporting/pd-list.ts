@@ -32,29 +32,25 @@ export class PdList extends RoutingMixin(
   @property({type: Array})
   data: any[] = [];
 
-  @property({type: Number})
-  totalResults = 0;
-
-  @property({type: Array})
-  visibleRange = [];
-
   stateChanged(state: RootState) {
     if (this.loading !== state.programmeDocuments?.loading) {
       this.loading = state.programmeDocuments.loading;
     }
 
-    if (this.data !== state.programmeDocuments?.all) {
+    if (state.programmeDocuments?.all && this.data !== state.programmeDocuments?.all) {
       this.data = state.programmeDocuments.all;
     }
 
-    if (this.totalResults !== state.programmeDocuments?.count) {
-      this.totalResults = state.programmeDocuments.count;
+    if (state.programmeDocuments?.count && this.totalResults !== state.programmeDocuments?.count) {      
+      this.paginator = {...this.paginator, count: state.programmeDocuments.count};
     }
 
     super.stateChanged(state);
   }
 
-  static styles = [layoutStyles]
+  static get styles() { 
+    return [layoutStyles]
+  }
 
   render() {
     return html`
@@ -77,8 +73,7 @@ export class PdList extends RoutingMixin(
       <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
           no-collapse
-          label="${this.visibleRange?.[0] || '0'}-${this.visibleRange?.[1] || '0'} of ${this
-            .totalResults} ${this.localize('results_to_show')}"
+          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator.count} ${this.localize('results_to_show')}"
         >
           <etools-data-table-column field="reference_number" class="col-2" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>

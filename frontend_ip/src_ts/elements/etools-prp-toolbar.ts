@@ -2,17 +2,21 @@ import {LitElement, html, css} from 'lit';
 import {property, customElement, state} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {buttonsStyles} from '../etools-prp-common/styles/buttons-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {store} from '../redux/store';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('etools-prp-toolbar')
 export class EtoolsPrpToolbar extends connect(store)(LitElement) {
-  static styles = [
+  static styles = [layoutStyles,
     css`
       :host {
         display: block;
         margin: 25px 0;
+      }
+      .reverse {
+        flex-direction: row-reverse;
       }
     `
   ];
@@ -110,7 +114,7 @@ export class EtoolsPrpToolbar extends connect(store)(LitElement) {
   render() {
     return html`
       ${buttonsStyles}
-      <div class="layout horizontal-reverse">
+      <div class="layout-horizontal reverse">
         <slot></slot>
       </div>
     `;
