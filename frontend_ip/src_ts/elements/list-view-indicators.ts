@@ -7,8 +7,6 @@ import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
-import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/polymer/lib/elements/dom-repeat';
 import {tableStyles} from '../etools-prp-common/styles/table-styles';
 import DataTableMixin from '../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
