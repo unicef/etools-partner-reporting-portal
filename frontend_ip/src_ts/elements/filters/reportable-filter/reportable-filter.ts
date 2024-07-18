@@ -7,7 +7,7 @@ import {llosAll} from '../../../redux/selectors/llos';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {RootState} from '../../../typings/redux.types';
 
-@customElement('reportable-filters')
+@customElement('reportable-filter')
 export class ReportableFilters extends LocalizeMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
@@ -39,9 +39,9 @@ export class ReportableFilters extends LocalizeMixin(connect(store)(LitElement))
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('data')) {
-      this.options = this._computeOptions(this.data);
+      this.options = this._computeOptions();
     }
   }
 
@@ -49,8 +49,8 @@ export class ReportableFilters extends LocalizeMixin(connect(store)(LitElement))
     this.data = llosAll(state);
   }
 
-  _computeOptions(data: any) {
-    const other = data.map((item: any) => {
+  _computeOptions() {
+    const other = this.data?.map((item: any) => {
       return {
         id: String(item.id),
         title: item.title

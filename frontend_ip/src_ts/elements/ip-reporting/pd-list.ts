@@ -41,23 +41,22 @@ export class PdList extends RoutingMixin(
       this.data = state.programmeDocuments.all;
     }
 
-    if (state.programmeDocuments?.count && this.totalResults !== state.programmeDocuments?.count) {      
+    if (state.programmeDocuments?.count && this.totalResults !== state.programmeDocuments?.count) {
       this.paginator = {...this.paginator, count: state.programmeDocuments.count};
     }
 
     super.stateChanged(state);
   }
 
-  static get styles() { 
-    return [layoutStyles]
+  static get styles() {
+    return [layoutStyles];
   }
 
   render() {
     return html`
       ${tableStyles}
       <style>
-        ${dataTableStylesLit}
-        :host {
+        ${dataTableStylesLit} :host {
           display: block;
         }
 
@@ -73,7 +72,8 @@ export class PdList extends RoutingMixin(
       <etools-content-panel panel-title="${this.localize('list_pds')}">
         <etools-data-table-header
           no-collapse
-          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator.count} ${this.localize('results_to_show')}"
+          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
+            .count} ${this.localize('results_to_show')}"
         >
           <etools-data-table-column field="reference_number" class="col-2" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
@@ -180,7 +180,6 @@ export class PdList extends RoutingMixin(
   }
 
   getLinkUrl(baseUrl, id, page) {
-    console.log(`${baseUrl}.. ${id} .. ${page}`);
     return this.buildUrl(baseUrl, `pd/${id}/view/${page}`);
   }
 

@@ -20,7 +20,7 @@ export class LocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
   @property({type: String})
   locationsUrl = '';
 
-  @property({type: String})
+  @property({type: String, reflect: true})
   locationId = '';
 
   @property({type: String})

@@ -76,10 +76,10 @@ export class PdOutputList extends LocalizeMixin(connect(store)(LitElement)) {
               ${(this.viewData || []).map(
                 (item) => html`
                   <pd-output
-                    data="${item}"
-                    current-pd="${this.currentPd}"
-                    override-mode="${this.overrideMode}"
-                    workspace-id="${this.workspaceId}"
+                    .data="${item}"
+                    .currentPd="${this.currentPd}"
+                    .overrideMode="${this.overrideMode}"
+                    .workspaceId="${this.workspaceId}"
                   ></pd-output>
                 `
               )}

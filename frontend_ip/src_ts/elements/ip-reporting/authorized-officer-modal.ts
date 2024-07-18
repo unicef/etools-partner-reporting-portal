@@ -80,6 +80,9 @@ export class AuthorizedOfficerModal extends LocalizeMixin(
   @property({type: String})
   submitUrl = '';
 
+  @property({type: Boolean})
+  opened = false;
+
   render() {
     return html`
       ${buttonsStyles} ${modalStyles}
@@ -95,7 +98,7 @@ export class AuthorizedOfficerModal extends LocalizeMixin(
       >
       </etools-prp-ajax>
 
-      <paper-dialog modal opened="${this.opened}">
+      <paper-dialog modal .opened="${this.opened}">
         <div class="header layout horizontal justified">
           <h2>${this.localize('select_authorized_officer')}</h2>
           <paper-icon-button class="self-center" @click="${this.close}" icon="icons:close"> </paper-icon-button>

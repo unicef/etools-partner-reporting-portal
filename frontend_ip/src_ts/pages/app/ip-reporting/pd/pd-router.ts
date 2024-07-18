@@ -42,7 +42,7 @@ class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
 
   stateChanged(state: RootState) {
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
-      this._routeTreeChanged(state.app.routeDetails.params?.pdPage);
+      this._routeTreeChanged(state.app.routeDetails.params?.pdRoute);
     }
   }
 

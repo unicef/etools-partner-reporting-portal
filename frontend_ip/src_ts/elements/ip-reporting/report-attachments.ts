@@ -371,7 +371,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
 
           attachments.forEach((item: any) => {
             if (attachment.id !== null && item.id === attachment.id) {
-              this.set(attachmentPropertyName, [item]);
+              this.attachmentPropertyName = [item];
               return;
             }
           });
@@ -387,7 +387,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
             });
 
             if (duplicates.length === 1) {
-              this.set(attachmentPropertyName, [duplicates[0]]);
+              this.attachmentPropertyName = [duplicates[0]];
             } else if (duplicates.length > 1) {
               let correctedItem;
 
@@ -399,7 +399,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
               });
 
               if (correctedItem) {
-                this.set(attachmentPropertyName, [correctedItem]);
+                this.attachmentPropertyName = [correctedItem];
               }
             }
           }

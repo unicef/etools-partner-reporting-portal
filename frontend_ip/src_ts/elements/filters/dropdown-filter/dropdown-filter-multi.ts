@@ -39,8 +39,8 @@ class DropdownFilterMulti extends FilterMixin(LitElement) {
       <etools-dropdown-multi
         label="${this.label}"
         .options="${this.data}"
-        option-value="id"
-        option-label="${this.optionLabel}"
+        .optionValue="${'id'}"
+        .optionLabel="${this.optionLabel}"
         .selectedValues="${this.selectedValues}"
         trigger-value-change-event
         @etools-selected-items-changed="${this._handleChange}"

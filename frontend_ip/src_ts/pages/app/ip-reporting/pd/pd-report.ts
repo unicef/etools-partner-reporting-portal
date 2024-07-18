@@ -150,7 +150,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
         <reporting-period slot="above-title" .range=${this.currentReport.reporting_period}></reporting-period>
         <pd-reports-report-title slot="above-title" .report=${this.currentReport}></pd-reports-report-title>
         <paper-button class="btn-primary" slot="in-title" role="button" @click=${this._showPdDetails}>
-          ${this.currentReport.programme_document.reference_number}
+          ${this.currentReport.programme_document?.reference_number}
         </paper-button>
 
         ${this._equals(this.currentPd.status, 'Suspended')
@@ -193,7 +193,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons
-            @selected-changed=${this._selectedTabChanged}
+            @selected-changed=${(e) => (this.selectedTab = e.detail.value)}
           >
             ${this._equals(this.currentReport.report_type, 'HR')
               ? html`<paper-tab name="reporting">${this.localize('reporting_on_indicators')}</paper-tab>`
@@ -214,20 +214,20 @@ export class PageIpReportingPdReport extends LocalizeMixin(
       <page-body>
         ${this._equals(this.currentReport.report_type, 'HR')
           ? html`<page-pd-report-hr
-              selected-tab="${this.selectedTab}"
-              report="${this.currentReport}"
+              .selectedTab="${this.selectedTab}"
+              .report="${this.currentReport}"
             ></page-pd-report-hr>`
           : html``}
         ${this._equals(this.currentReport.report_type, 'QPR')
           ? html`<page-pd-report-qpr
-              selected-tab="${this.selectedTab}"
-              report="${this.currentReport}"
+              .selectedTab="${this.selectedTab}"
+              .report="${this.currentReport}"
             ></page-pd-report-qpr>`
           : html``}
         ${this._equals(this.currentReport.report_type, 'SR')
           ? html`<page-pd-report-sr
-              selected-tab="${this.selectedTab}"
-              report="${this.currentReport}"
+              .selectedTab="${this.selectedTab}"
+              .report="${this.currentReport}"
             ></page-pd-report-sr>`
           : html``}
       </page-body>
@@ -236,10 +236,10 @@ export class PageIpReportingPdReport extends LocalizeMixin(
       <error-modal id="error"></error-modal>
       <authorized-officer-modal
         id="officer"
-        pd-id="${this.pdId}"
-        report-id="${this.reportId}"
-        data="${this.currentReport}"
-        submit-url="${this.submitUrl}"
+        .pdId="${this.pdId}"
+        .reportId="${this.reportId}"
+        .data="${this.currentReport}"
+        .submitUrl="${this.submitUrl}"
       >
       </authorized-officer-modal>
     `;
@@ -253,11 +253,15 @@ export class PageIpReportingPdReport extends LocalizeMixin(
       this.queryParams = state.app?.routeDetails.queryParams;
     }
 
-    if (this.currentPd !== currentProgrammeDocument(state)) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeData, state.app.routeDetails?.params)) {
+      this.routeData = state.app.routeDetails?.params;
+    }
+
+    if (!isJsonStrMatch(this.currentPd, currentProgrammeDocument(state))) {
       this.currentPd = currentProgrammeDocument(state);
     }
 
-    if (this.currentReport !== programmeDocumentReportsCurrent(state)) {
+    if (!isJsonStrMatch(this.currentReport, programmeDocumentReportsCurrent(state))) {
       this.currentReport = programmeDocumentReportsCurrent(state);
     }
 
@@ -284,7 +288,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
     }
 
     if (changedProperties.has('routeData')) {
-      this._onReportChanged(this.routeData.report_id, this.routeData.mode);
+      this._onReportChanged(this.routeData.reportId, this.routeData.mode);
     }
 
     if (changedProperties.has('currentReport') || changedProperties.has('routeData')) {
@@ -305,7 +309,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
     }
 
     if (changedProperties.has('mode') || changedProperties.has('localize')) {
-      this.headingPrefix = this._computeHeadingPrefix(this.mode, this.localize);
+      this.headingPrefix = this._computeHeadingPrefix(this.mode);
     }
 
     if (changedProperties.has('pdId')) {
@@ -383,13 +387,13 @@ export class PageIpReportingPdReport extends LocalizeMixin(
     }, 250)();
   }
 
-  _computeHeadingPrefix(mode: string, localize: any) {
+  _computeHeadingPrefix(mode: string) {
     switch (mode) {
       case 'view':
-        return localize('report_for');
+        return this.localize('report_for');
 
       case 'edit':
-        return localize('enter_data_for');
+        return this.localize('enter_data_for');
 
       default:
         return '';

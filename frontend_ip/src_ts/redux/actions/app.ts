@@ -65,8 +65,8 @@ const importSubRoutes = (routeDetails: EtoolsRouteDetails) => {
 
 const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
-
-  switch (routeDetails.params?.pdPage) {
+  console.log(routeDetails.params?.pdRoute);
+  switch (routeDetails.params?.pdRoute) {
     case 'details':
       imported = import('../../pages/app/ip-reporting/pd/pd-details.js');
       break;
@@ -79,7 +79,7 @@ const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
   }
 
   // imported?.then(() => {
-  //   console.log('Imported importPdSubRoutes', routeDetails.subRouteName);
+  //   console.log('Imported importPdSubRoutes', routeDetails.subRouteName, routeDetails.params?.pdRoute);
   // });
 
   return imported;
@@ -88,7 +88,7 @@ const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
 const importPdRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
 
-  if (routeDetails.params?.id) {
+  if (routeDetails.params?.pdID) {
     imported = import('../../pages/app/ip-reporting/pd/pd-router.js').then(() => {
       importPdSubRoutes(routeDetails);
     });

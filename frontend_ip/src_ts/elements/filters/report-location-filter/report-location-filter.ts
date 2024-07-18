@@ -7,6 +7,7 @@ import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('report-location-filter')
 export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
@@ -45,6 +46,11 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
     `;
   }
 
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchLocations = debounce(this._fetchLocations.bind(this), 100) as any;
+  }
+
   updated(changedProperties) {
     super.updated(changedProperties);
 
@@ -62,7 +68,7 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
     }
 
     if (this.reportId !== state.programmeDocumentReports.current.id) {
-      this.reportId = state.location.id;
+      this.reportId = state.programmeDocumentReports.current.id;
     }
   }
 
@@ -75,9 +81,10 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
       return;
     }
 
-    const thunk = (this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl).thunk();
-    (this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl).abort();
-    thunk()
+    const elem = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
+    elem.abort();
+    elem
+      .thunk()()
       .then((res: any) => {
         this.options = [{id: '-1', name: 'All'}].concat(res.data || []);
       })

@@ -31,6 +31,7 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import { RootState } from '../../typings/redux.types';
+import {debounce} from 'lodash-es';
 
 @customElement('pd-output')
 export class PdOutput extends LocalizeMixin(
@@ -197,7 +198,7 @@ export class PdOutput extends LocalizeMixin(
               <div
                 class="indicator-toggle flex-none layout horizontal center-center"
                 type=${this._computeToggleType(indicator.is_related_to_cluster_reporting)}
-                @click=${this._toggle.bind(this)}
+                @click=${() => this._toggle(index)}
                 toggles=${index}
                 role="button"
                 aria-expanded=${indicator.opened}
@@ -242,12 +243,12 @@ export class PdOutput extends LocalizeMixin(
                           <b
                             >${this._toLowerCaseLocalized(
                               indicator.reportable.blueprint.calculation_formula_across_locations,
-                              this.localize
+                              this.localize.bind(this)
                             )}</b
                           >
-                          (${this._toLowerCaseLocalized('across_locations', this.localize)}),
-                          <b>${this._calculationFormulaAcrossPeriods(indicator, this.localize)}</b>
-                          (${this._toLowerCaseLocalized('across_reporting_periods', this.localize)})
+                          (${this._toLowerCaseLocalized('across_locations', this.localize.bind(this))}),
+                          <b>${this._calculationFormulaAcrossPeriods(indicator, this.localize.bind(this))}</b>
+                          (${this._toLowerCaseLocalized('across_reporting_periods', this.localize.bind(this))})
                         </dt>
                       </dl>
                     </div>
@@ -411,10 +412,9 @@ export class PdOutput extends LocalizeMixin(
     return calculationFormulaAcrossPeriods(indicator, localize);
   }
 
-  _toggle(e: CustomEvent) {
-    const node = toggle(e) as any;
-
-    (this.shadowRoot!.querySelector('#collapse-' + node!.toggles) as any).toggle();
+  _toggle(index) {
+    console.log('hello, ', this.shadowRoot!.querySelector('#collapse-' + index));
+    (this.shadowRoot!.querySelector('#collapse-' + index) as any).toggle();
   }
 
   _computeCompleteIndicator(complete: boolean, indicatorId: string, disaggregationsByIndicator: any) {
@@ -457,7 +457,7 @@ export class PdOutput extends LocalizeMixin(
   _updateMeta(e: CustomEvent) {
     e.stopPropagation();
     const data = e.detail;
-    this.set('reportableMeta', data);
+    this.reportableMeta = data;
 
     const updateElement = this.shadowRoot!.querySelector('#update') as any as EtoolsPrpAjaxEl;
     updateElement.abort();

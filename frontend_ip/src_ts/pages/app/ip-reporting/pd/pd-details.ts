@@ -85,8 +85,8 @@ export class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(connect(s
       this.pd = currentProgrammeDocument(state);
     }
     if (state.app.routeDetails.params) {
-      if(!isJsonStrMatch(this.activeTab, state.app.routeDetails.params.pdPage)) {
-        this.activeTab = String(state.app.routeDetails.params.pdPage);
+      if (!isJsonStrMatch(this.activeTab, state.app.routeDetails.params.activeTab)) {
+        this.activeTab = String(state.app.routeDetails.params.activeTab);
       }
       if(!isJsonStrMatch(this.pagePath, state.app.routeDetails.path)) {
         this.pagePath = state.app.routeDetails.path;

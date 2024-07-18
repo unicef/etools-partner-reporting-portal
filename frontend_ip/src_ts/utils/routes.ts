@@ -139,7 +139,9 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
     }
   )
   .addRoute(
-    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/pd\\/${routeParamRegex}/view/${routeParamRegex}$`),
+    new RegExp(
+      `^${routeParamRegex}\\/${routeParamRegex}\\/pd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$`
+    ),
     (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
       return {
         routeName: 'app',
@@ -150,8 +152,29 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
         params: {
           workspaceId: params.matchDetails[1],
           pdID: params.matchDetails[3],
-          mode: 'view',
-          pdPage: params.matchDetails[4]
+          pdRoute: params.matchDetails[4],
+          activeTab: params.matchDetails[5]
+        }
+      };
+    }
+  )
+  .addRoute(
+    new RegExp(
+      `^${routeParamRegex}\\/${routeParamRegex}\\/pd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$`
+    ),
+    (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
+      return {
+        routeName: 'app',
+        subRouteName: params.matchDetails[2],
+        subSubRouteName: 'pd',
+        path: params.matchDetails[0],
+        queryParams: params.queryParams,
+        params: {
+          workspaceId: params.matchDetails[1],
+          pdID: params.matchDetails[3],
+          pdRoute: params.matchDetails[4],
+          mode: params.matchDetails[6],
+          reportId: params.matchDetails[5]
         }
       };
     }
