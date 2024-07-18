@@ -413,7 +413,6 @@ export class PdOutput extends LocalizeMixin(
   }
 
   _toggle(index) {
-    console.log('hello, ', this.shadowRoot!.querySelector('#collapse-' + index));
     (this.shadowRoot!.querySelector('#collapse-' + index) as any).toggle();
   }
 

@@ -17,7 +17,6 @@ export function toggle(e: CustomEvent) {
   let node = e.target as any;
 
   while (node && typeof node.toggles === 'undefined') {
-    console.log('parrent', node);
     node = node.parentNode;
   }
   return node;

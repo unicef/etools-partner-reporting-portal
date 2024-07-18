@@ -598,7 +598,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
     }
 
     this.localData = {...data};
-    console.log('');
     return data;
   }
 

@@ -11,7 +11,7 @@ EtoolsRouter.init({
   baseUrl: Environment.basePath,
   redirectPaths: {
     notFound: '/not-found',
-    default: '/ip/'
+    default: '/'
   },
   redirectedPathsToSubpageLists: []
 });
@@ -64,6 +64,18 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
     };
   })
   .addRoute(new RegExp(`^${routeParamRegex}$`), (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
+    return {
+      routeName: 'app',
+      subRouteName: null,
+      path: params.matchDetails[0],
+      queryParams: null,
+      params: {
+        workspaceId: params.matchDetails[1]
+      }
+    };
+  })
+
+  .addRoute(new RegExp(`^$`), (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
     return {
       routeName: 'app',
       subRouteName: null,

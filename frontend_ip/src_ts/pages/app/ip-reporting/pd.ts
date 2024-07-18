@@ -158,7 +158,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     }
 
     this.page = pd_id ? 'pd-router' : 'pd-index';
-    console.log('this.page', this.page);
   }
 
   _routePathChanged(path) {

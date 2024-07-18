@@ -12,12 +12,12 @@ function getSourcesPath(request) {
 
   clientCapabilities = new Set(clientCapabilities); // eslint-disable-line
   if (clientCapabilities.has('modules')) {
-    return basedir + 'esm-bundled/';
+    return basedir;
   } else {
     if (isEdge) {
-      return basedir + 'esm-bundled/';
+      return basedir;
     } else {
-      return basedir + 'es6-bundled/';
+      return basedir;
     }
   }
 }
@@ -32,7 +32,10 @@ app.get(/.*service-worker\.js/, function (req, res) {
 
 app.use((req, res) => {
   // handles app access using a different state path than index (otherwise it will not return any file)
-  res.sendFile(getSourcesPath(req) + 'index.html');
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header('Expires', '-1');
+  res.header('Pragma', 'no-cache');
+  res.sendFile(getSourcesPath(req, 'index.html'));
 });
 
 app.listen(8082);

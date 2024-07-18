@@ -1,94 +1,206 @@
-import {LitElement, html, css} from 'lit';
-import {property, customElement} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-toolbar.js';
+import '@unicef-polymer/etools-unicef/src/etools-profile-dropdown/etools-profile-dropdown';
+import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown.js';
+import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button.js';
+import '@unicef-polymer/etools-modules-common/dist/components/dropdowns/languages-dropdown';
+import '@unicef-polymer/etools-modules-common/dist/components/dropdowns/countries-dropdown';
+import '@unicef-polymer/etools-modules-common/dist/components/dropdowns/organizations-dropdown';
+import {LitElement, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+
 import {store} from '../../redux/store';
-import {etoolsLogo} from '../../etools-prp-common/elements/etools-logo';
-import '../../etools-prp-common/elements/app-switcher';
-import '../../etools-prp-common/elements/workspace-dropdown';
-import '../organization-dropdown';
-import '../language-dropdown';
-import '../../etools-prp-common/elements/user-profile/profile-dropdown';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import isEmpty from 'lodash-es/isEmpty';
+import {translate, get as getTranslation} from 'lit-translate';
+import {AnyObject, EtoolsUser} from '@unicef-polymer/etools-types';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
+import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
+import EndpointsCommon from '../../etools-prp-common/endpoints';
+import {Environment} from '@unicef-polymer/etools-utils/dist/singleton/environment';
+import {RootState} from '../../typings/redux.types';
+import {localizeSet} from '../../redux/actions/localize';
+import {connect} from 'pwa-helpers';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
+/**
+ * page header element
+ * @LitElement
+ * @customElement
+ */
 @customElement('ip-reporting-app-header')
-export class IpReportingAppHeader extends connect(store)(LitElement) {
-  static styles = css`
-    :host {
-      display: block;
-      position: relative;
-      z-index: 102;
-      height: 65px;
-    }
+export class PageHeader extends connect(store)(LitElement) {
+  @property({type: Object})
+  profile!: EtoolsUser;
 
-    app-header {
-      background: var(--theme-page-header-background-color);
-      position: fixed;
-      left: 225px;
-      right: 0px;
-    }
-
-    app-toolbar {
-      display: flex;
-      justify-content: space-between;
-      padding-left: 0;
-    }
-
-    .wrapper {
-      display: flex;
-      align-items: center;
-    }
-
-    .app-switcher-container {
-      width: 64px;
-      height: 100%;
-      margin-right: 0.75em;
-      border-right: 1px solid rgba(255, 255, 255, 0.3);
-      display: flex;
-      align-items: center;
-    }
-  `;
+  @property({type: Object})
+  profileDropdownData: any | null = null;
 
   @property({type: Array})
-  languages: any[] = [];
-
-  @property({type: String})
-  language = '';
+  offices: any[] = [];
 
   @property({type: Array})
-  workspaces: any[] = [];
+  sections: any[] = [];
+
+  @property({type: Array})
+  users: any[] = [];
+
+  @property({type: Array})
+  profileDrOffices: any[] = [];
+
+  @property({type: Array})
+  profileDrSections: any[] = [];
+
+  @property({type: Array})
+  profileDrUsers: any[] = [];
+
+  @property({type: Array})
+  editableFields: string[] = ['office', 'section', 'job_title', 'phone_number', 'oic', 'supervisor'];
 
   @property({type: String})
-  workspace = '';
+  activeLanguage?: string;
 
-  render() {
+  @property({type: Array})
+  availableLanguages: any[] = [];
+
+  public render() {
+    // main template
+    // language=HTML
     return html`
-      <app-header-layout fullbleed>
-        <app-header fixed>
-          <app-toolbar>
-            <div class="wrapper">
-              <div class="app-switcher-container">
-                <app-switcher></app-switcher>
-              </div>
-              ${etoolsLogo}
-            </div>
-
-            <div class="wrapper">
-              <language-dropdown .data="${this.languages}" .current="${this.language}"></language-dropdown>
-              <workspace-dropdown .data="${this.workspaces}" .current="${this.workspace}"></workspace-dropdown>
-              <organization-dropdown></organization-dropdown>
-              <profile-dropdown></profile-dropdown>
-            </div>
-          </app-toolbar>
-        </app-header>
-      </app-header-layout>
+      <app-toolbar
+        sticky
+        class="content-align"
+        @menu-button-clicked="${this.menuBtnClicked}"
+        .profile=${this.profile}
+        responsive-width="850.9px"
+        sticky
+      >
+        <div slot="dropdowns">
+          <languages-dropdown
+            .profile="${this.profile}"
+            .availableLanguages="${this.availableLanguages}"
+            .activeLanguage="${this.activeLanguage}"
+            @user-language-changed="${(e: any) => {
+              // store.dispatch(updateUserData(e.detail.user));
+              // store.dispatch(setActiveLanguage(e.detail.language));
+              localStorage.setItem('defaultLanguage', e.detail.language);
+              store.dispatch(localizeSet(e.detail.language));
+              window.location.reload();
+            }}"
+          ></languages-dropdown>
+          <countries-dropdown
+            id="countries"
+            .profile="${this.profile}"
+            countries-profile-key="${'workspaces_available'}"
+            country-profile-key="${'workspace'}"
+            option-label="title"
+            .changeCountryEndpoint="${{url: EndpointsCommon.changeWorkspace()}}"
+            @country-changed="${() => {
+              EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
+              document.location.assign(window.location.origin + Environment.basePath);
+            }}"
+          >
+          </countries-dropdown>
+          <organizations-dropdown
+            .profile="${this.profile}"
+            organizations-profile-key="${'partners_available'}"
+            organization-profile-key="${'partner'}"
+            option-label="title"
+            .changeOrganizationEndpoint="${{url: EndpointsCommon.changeOrganization()}}"
+            @organization-changed="${() => {
+              EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
+              document.location.assign(window.location.origin + Environment.basePath);
+            }}"
+          ></organizations-dropdown>
+        </div>
+        <div slot="icons">
+          <etools-profile-dropdown
+            title=${translate('GENERAL.PROFILEANDSIGNOUT')}
+            .sections="${this.profileDrSections}"
+            .offices="${this.profileDrOffices}"
+            .users="${this.profileDrUsers}"
+            .profile="${this.profile ? {...this.profile} : {}}"
+            @save-profile="${this.handleSaveProfile}"
+            @sign-out="${this._signOut}"
+          >
+          </etools-profile-dropdown>
+        </div>
+      </app-toolbar>
     `;
   }
 
-  stateChanged(state) {
-    if (this.languages !== state.localize.resources) {
-      this.languages = state.localize.resources;
+  public connectedCallback() {
+    super.connectedCallback();
+  }
+
+  public stateChanged(state: RootState) {
+    if (state?.userProfile?.profile && !isJsonStrMatch(this.profile, state?.userProfile?.profile)) {
+      this.profile = state.userProfile.profile!;
     }
-    if (this.language !== state.localize.language) {
-      this.language = state.localize.language;
+
+    if (this.activeLanguage !== state.localize.language) {
+      this.activeLanguage = state.localize.language;
     }
+
+    if (state.localize.resources && !isJsonStrMatch(this.availableLanguages, state.localize.resources)) {
+      this.availableLanguages = Object.keys(state.localize.resources).map((x) => ({value: x, display_name: x}));
+    }
+  }
+
+  public handleSaveProfile(e: any) {
+    const modifiedFields = this._getModifiedFields(this.profile, e.detail.profile);
+    if (isEmpty(modifiedFields)) {
+      // empty profile means no changes found
+      this.showSaveNotification();
+      return;
+    }
+    this.profileSaveLoadingMsgDisplay();
+    // updateCurrentUser(modifiedFields)
+    //   .then(() => {
+    //     this.showSaveNotification();
+    //   })
+    //   .catch(() => {
+    //     this.showSaveNotification(getTranslation('PROFILE_DATA_NOT_SAVED'));
+    //   })
+    //   .then(() => {
+    //     this.profileSaveLoadingMsgDisplay(false);
+    //   });
+  }
+
+  protected profileSaveLoadingMsgDisplay(show = true) {
+    fireEvent(this, 'global-loading', {
+      active: show,
+      loadingSource: 'profile-save'
+    });
+  }
+
+  protected showSaveNotification(msg?: string) {
+    fireEvent(this, 'toast', {
+      text: msg ? msg : getTranslation('ALL_DATA_SAVED')
+    });
+  }
+
+  protected _getModifiedFields(originalData: any, newData: any) {
+    const modifiedFields: AnyObject = {};
+    this.editableFields.forEach(function (field: any) {
+      if (originalData[field] !== newData[field]) {
+        modifiedFields[field] = newData[field];
+      }
+    });
+
+    return modifiedFields;
+  }
+
+  public menuBtnClicked() {
+    fireEvent(this, 'change-drawer-state');
+  }
+
+  protected _signOut() {
+    // this._clearDexieDbs();
+    this.clearLocalStorage();
+    window.location.href = window.location.origin + '/social/unicef-logout/';
+  }
+
+  protected clearLocalStorage() {
+    localStorage.clear();
   }
 }

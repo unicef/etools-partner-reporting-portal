@@ -15,9 +15,7 @@ import {
 import { buildUrl } from '../../etools-prp-common/utils/util';
 
 @customElement('pd-reports-report-title')
-export class PdReportsReportTitle extends LocalizeMixin(
-  ProgressReportUtilsMixin(UtilsMixin(LitElement))
-) {
+export class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
   static styles = css`
     .final-badge {
       display: inline-block;
@@ -45,7 +43,7 @@ export class PdReportsReportTitle extends LocalizeMixin(
   report!: any;
 
   @property({type: String})
-  baseUrl!: string
+  baseUrl!: string;
 
   @property({type: Boolean, attribute: 'display-link'})
   displayLink = false;
@@ -53,7 +51,7 @@ export class PdReportsReportTitle extends LocalizeMixin(
   @property({type: Boolean, attribute: 'display-link-icon'})
   displayLinkIcon = false;
 
-  @property({type: Boolean, attribute: false})
+  @property({type: Boolean, attribute: 'show-link'})
   showLink = false;
 
   render() {

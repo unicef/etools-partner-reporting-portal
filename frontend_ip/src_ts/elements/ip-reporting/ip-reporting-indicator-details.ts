@@ -101,7 +101,6 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
           hidden: false
         }));
         this.selected = this.locations[0]?.current.id;
-        console.log(this.locations);
       }
     }
 

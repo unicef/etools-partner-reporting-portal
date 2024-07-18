@@ -65,7 +65,7 @@ const importSubRoutes = (routeDetails: EtoolsRouteDetails) => {
 
 const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
-  console.log(routeDetails.params?.pdRoute);
+
   switch (routeDetails.params?.pdRoute) {
     case 'details':
       imported = import('../../pages/app/ip-reporting/pd/pd-details.js');
@@ -182,7 +182,7 @@ export const handleUrlChange = (path: string) => (dispatch: any, getState: any) 
   // @ts-ignore
   if (
     path === Environment.basePath &&
-    Environment.basePath !== EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT)
+    Environment.basePath !== EtoolsRouter.prepareLocationPath(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT))
   ) {
     EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
     return;

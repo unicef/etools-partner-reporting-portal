@@ -26,7 +26,10 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import cloneDeep from 'lodash-es/cloneDeep';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
+import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
 dayjs.extend(dayJsUtc);
+
+setBasePath('/ip/');
 initializeIcons();
 
 @customElement('app-shell')
@@ -48,7 +51,7 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   subroute: any = {};
 
   @property({type: String})
-  page = '';
+  page?: string;
 
   @property({type: Boolean})
   authenticated = false;
@@ -107,7 +110,7 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   }
 
   stateChanged(state: RootState) {
-    if (this.profile !== state.userProfile.profile) {
+    if (state.userProfile.profile && !isJsonStrMatch(this.profile, state.userProfile.profile)) {
       this.profile = state.userProfile.profile;
     }
 
@@ -117,16 +120,12 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
 
     if (state.app.routeDetails && !isJsonStrMatch(this.reduxRouteDetails, state.app.routeDetails)) {
       if (this.canAccessPage(state.app.routeDetails.routeName)) {
-        this.page = state.app.routeDetails?.routeName || '';
+        this.page = state.app.routeDetails?.routeName || 'app';
         this.reduxRouteDetails = cloneDeep(state.app.routeDetails);
       } else {
         EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
       }
     }
-
-    // else {
-    //  EtoolsRouter.updateAppLocation('/ip/RWA/ip-reporting');
-    // }
   }
 
   canAccessPage(_routeName: string) {

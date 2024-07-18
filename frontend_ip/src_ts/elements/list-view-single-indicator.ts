@@ -19,6 +19,7 @@ import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
 import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('list-view-single-indicator')
 export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))) {
@@ -98,7 +99,9 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
   render() {
     return html`
       ${tableStyles} ${sharedStyles}
-      <style> ${dataTableStylesLit} </style>
+      <style>
+        ${dataTableStylesLit}
+      </style>
       <etools-prp-permissions
         .permissions="${this.permissions}"
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
@@ -114,7 +117,9 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
             <paper-tooltip>${this.indicator?.blueprint?.title}</paper-tooltip>
           </span>
           ${this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
-            ? html`<span class="col-data col-1 table-cell table-cell--text self-center">${this.indicator?.content_object_title}</span>`
+            ? html`<span class="col-data col-1 table-cell table-cell--text self-center"
+                >${this.indicator?.content_object_title}</span
+              >`
             : html``}
           <span class="col-data col-2 table-cell table-cell--text self-center"
             >${this.indicator?.blueprint?.calculation_formula_across_locations}</span

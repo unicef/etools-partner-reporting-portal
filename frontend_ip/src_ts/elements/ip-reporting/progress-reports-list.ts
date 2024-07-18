@@ -58,6 +58,9 @@ export class ProgressReportsList extends LocalizeMixin(
   @property({type: Number})
   pageNumber!: number;
 
+  @property({type: String})
+  baseUrl!: string;
+
   stateChanged(state: RootState) {
     if (
       state.app?.routeDetails?.queryParams &&
@@ -77,16 +80,24 @@ export class ProgressReportsList extends LocalizeMixin(
     if (state.progressReports?.count && this.totalResults !== state.progressReports.count) {
       this.paginator = {...this.paginator, count: state.progressReports.count};
     }
+
+    if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
+    }
   }
 
   render() {
     return html`
       ${tableStyles}
-      <style> ${dataTableStylesLit} </style>
+      <style>
+        ${dataTableStylesLit}
+      </style>
       <etools-content-panel panel-title="${this.localize('list_of_reports')}">
         <etools-data-table-header
           no-collapse
-          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator.count} ${this.localize('results_to_show')}">
+          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
+            .count} ${this.localize('results_to_show')}"
+        >
           <etools-data-table-column field="programme_document__reference_number" class="col-2" sortable>
             <div class="table-column">${this.localize('pd_ref_number')}</div>
           </etools-data-table-column>
@@ -128,14 +139,23 @@ export class ProgressReportsList extends LocalizeMixin(
                   </span>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">
-                  <pd-reports-report-title display-link display-link-icon .report="${report}"></pd-reports-report-title>
+                  <pd-reports-report-title
+                    display-link
+                    display-link-icon
+                    .report="${report}"
+                    .baseUrl="${this.baseUrl}"
+                  ></pd-reports-report-title>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">
                   <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
-                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.submission_date, '-')}</div>
-                <div class="col-data col-2 table-cell table-cell--text truncate">${this._withDefault(report.reporting_period, '-')}</div>
+                <div class="col-data col-2 table-cell table-cell--text">
+                  ${this._withDefault(report.submission_date, '-')}
+                </div>
+                <div class="col-data col-2 table-cell table-cell--text truncate">
+                  ${this._withDefault(report.reporting_period, '-')}
+                </div>
               </div>
             </etools-data-table-row>
           `

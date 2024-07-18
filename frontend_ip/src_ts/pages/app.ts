@@ -19,6 +19,7 @@ import {RootState} from '../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
+import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 
 @customElement('page-app')
 export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -99,8 +100,7 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
             <p>${this.localize('please_wait_business_days')}</p>
           </div>`
         : html``}
-
-      <page-ip-reporting name="ip-reporting"> </page-ip-reporting>
+      ${this.page === 'ip-reporting' ? html`<page-ip-reporting name="ip-reporting"> </page-ip-reporting>` : html``}
 
       <etools-toasts></etools-toasts>
     `;
@@ -115,35 +115,49 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
     if (changedProperties.has('language')) {
       this._languageChanged(this.language);
     }
-    if (changedProperties.has('_workspaceCode') || changedProperties.has('workspaces')) {    
+
+    if (changedProperties.has('_workspaceCode') || changedProperties.has('workspaces')) {
       this._handleWorkspaceChange(this._workspaceCode, this.workspaces);
+      this._routeWorkspaceChanged(this.routeDetails.params?.workspaceId);
     }
   }
 
   stateChanged(state: RootState) {
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      if (state.app.routeDetails.routeName !== 'app') {
+        return;
+      }
+
+      this.routeDetails = state.app.routeDetails;
+      this._routeWorkspaceChanged(this.routeDetails.params?.workspaceId);
       this._routeAppChanged(state.app?.routeDetails);
     }
 
     if (this._workspaceCode !== state.workspaces.current) {
       this._workspaceCode = state.workspaces.current;
     }
+
     if (this._language !== state.localize.language) {
       this._language = state.localize.language;
     }
+
     if (this._app !== state.app.current) {
       this._app = state.app.current;
     }
-    if (this.userPartner !== state.userProfile.profile?.partner) {
+
+    if (state.userProfile.profile?.partner && !isJsonStrMatch(this.userPartner, state.userProfile.profile?.partner)) {
       this.userPartner = state.userProfile.profile?.partner;
     }
-    if (this.prpRoles !== state.userProfile.profile?.prp_roles) {
+
+    if (state.userProfile.profile?.prp_roles && !isJsonStrMatch(this.prpRoles, state.userProfile.profile?.prp_roles)) {
       this.prpRoles = state.userProfile.profile?.prp_roles;
     }
-    if (this.access !== state.userProfile.profile?.access) {
+
+    if (state.userProfile.profile?.access && !isJsonStrMatch(this.access, state.userProfile.profile?.access)) {
       this.access = state.userProfile.profile?.access;
     }
-    if (this.workspaces !== state.workspaces?.all) {
+
+    if (state.workspaces?.all && !isJsonStrMatch(this.workspaces, state.workspaces?.all)) {
       this.workspaces = state.workspaces?.all || [];
     }
   }
@@ -173,11 +187,11 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
   }
 
   _redirectToWorkspace(workspace_code: string) {
-    EtoolsRouter.updateAppLocation(`/ip/${workspace_code}`);
+    EtoolsRouter.updateAppLocation(`/${workspace_code}/`);
   }
 
   _redirectToApp(app: string) {
-    EtoolsRouter.updateAppLocation(`/ip/${this._workspaceCode}/${app}`);
+    EtoolsRouter.updateAppLocation(`/${this._workspaceCode}/${app}`);
   }
 
   _handleWorkspacesAsync(e: CustomEvent) {
@@ -202,31 +216,32 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
       if ((this.workspaces && this.workspaces.length) || this._workspaceCode) {
         // Default to first
         this._redirectToWorkspace(this._workspaceCode ? this._workspaceCode : this.workspaces?.[0]?.code);
-      } else {
-        // Wait until workspaces are available, then pick one & redirect
-        // this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
-        // this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
       }
     } else if (!this._workspaceCode) {
       store.dispatch(setWorkspace(workspaceCodeFromUrl));
+    } else if (this._workspaceCode && this._workspaceCode !== workspaceCodeFromUrl) {
+      this._redirectToWorkspace(this._workspaceCode);
     }
   }
 
   private _routeAppChanged(routeDetails: EtoolsRouteDetails) {
-    setTimeout(() => {
-      const defaultApp = 'ip-reporting';     
-      if (!this._workspaceCode) {
+    const defaultApp = 'ip-reporting';
+
+    if (!this._workspaceCode) {
+      return;
+    }
+
+    if (!routeDetails.subRouteName) {
+      this._redirectToApp(defaultApp);
+    } else if (!this._app) {
+      if (routeDetails.subRouteName !== 'ip-reporting') {
+        EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
         return;
       }
-
-      if (!routeDetails.subRouteName) {
-        this._redirectToApp(defaultApp);
-      } else if (!this._app) {
-        store.dispatch(setApp(routeDetails.subRouteName));
-        this._fetchCurrencies(routeDetails.subRouteName);
-        this.page = routeDetails.subRouteName;
-      }
-    });
+      this.page = routeDetails.subRouteName;
+      store.dispatch(setApp(routeDetails.subRouteName));
+      this._fetchCurrencies(routeDetails.subRouteName);
+    }
   }
 
   private _languageChanged(_language: string) {
