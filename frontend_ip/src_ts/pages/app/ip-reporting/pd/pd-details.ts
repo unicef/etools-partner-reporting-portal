@@ -16,25 +16,26 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import { isJsonStrMatch } from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import { EtoolsRouter } from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {translate} from 'lit-translate';
 
 const DETAILS = 'details';
 const REPORTS = 'reports';
 const CALCULATION_METHODS = 'calculation_methods';
 
-const NAVIGATION_TABS: PageTab[] = [  
+const NAVIGATION_TABS: PageTab[] = [
   {
-     tab: DETAILS,
-     tabLabel: DETAILS,
-     hidden: false
+    tab: DETAILS,
+    tabLabel: translate('DETAILS') as any as string,
+    hidden: false
   },
   {
     tab: REPORTS,
-    tabLabel: REPORTS,
+    tabLabel: translate('REPORTS') as any as string,
     hidden: false
   },
   {
     tab: CALCULATION_METHODS,
-    tabLabel: CALCULATION_METHODS,
+    tabLabel: translate('CALCULATION_METHODS') as any as string,
     hidden: false
   }
 ];

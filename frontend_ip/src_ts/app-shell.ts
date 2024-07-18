@@ -27,7 +27,22 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
 import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
+import {registerTranslateConfig, translate, use} from 'lit-translate';
+
 dayjs.extend(dayJsUtc);
+
+function fetchLangFiles(lang: string) {
+  return Promise.allSettled([fetch(`assets/i18n/${lang}.json`).then((res: any) => res.json())]).then(
+    (response: any) => {
+      return response[0].value;
+    }
+  );
+}
+
+const translationConfig = registerTranslateConfig({
+  empty: (key) => `${key && key[0].toUpperCase() + key.slice(1).toLowerCase()}`,
+  loader: (lang: string) => fetchLangFiles(lang)
+});
 
 setBasePath('/ip/');
 initializeIcons();
@@ -114,8 +129,13 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
       this.profile = state.userProfile.profile;
     }
 
-    if (state.localize.resources && Object.keys(state.localize.resources).length) {
-      this.hasLoadedStrings = true;
+    if (
+      state.localize.resources &&
+      Object.keys(state.localize.resources).length &&
+      this.selectedLanguage !== state.localize.language
+    ) {
+      this.selectedLanguage = state.localize.language;
+      this.loadLocalization();
     }
 
     if (state.app.routeDetails && !isJsonStrMatch(this.reduxRouteDetails, state.app.routeDetails)) {
@@ -126,6 +146,24 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
         EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
       }
     }
+  }
+
+  async loadLocalization() {
+    this.waitForTranslationsToLoad().then(async () => {
+      await use(this.selectedLanguage);
+      this.hasLoadedStrings = true;
+    });
+  }
+
+  waitForTranslationsToLoad() {
+    return new Promise((resolve) => {
+      const translationsCheck = setInterval(() => {
+        if (translationConfig) {
+          clearInterval(translationsCheck);
+          resolve(true);
+        }
+      }, 50);
+    });
   }
 
   canAccessPage(_routeName: string) {
