@@ -10,12 +10,11 @@ import '../../../../elements/ip-reporting/pd-details-overview.js';
 import '../../../../elements/ip-reporting/pd-details-reports.js';
 import '../../../../elements/ip-reporting/pd-details-calculation-methods.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
-import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
-import { isJsonStrMatch } from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
-import { EtoolsRouter } from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {translate} from 'lit-translate';
 
 const DETAILS = 'details';
@@ -41,7 +40,7 @@ const NAVIGATION_TABS: PageTab[] = [
 ];
 
 @customElement('page-ip-reporting-pd-details')
-export class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PageIpReportingPdDetails extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -67,14 +66,13 @@ export class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(connect(s
             </message-box>`
           : html``}
 
-          <etools-tabs-lit
-              id="tabs"
-              slot="tabs"
-              .tabs="${this.pageTabs}"
-              @sl-tab-show="${({detail}: any) => this.onTabSelect(detail.name)}"
-              .activeTab="${this.activeTab}"
-          ></etools-tabs-lit>
-
+        <etools-tabs-lit
+          id="tabs"
+          slot="tabs"
+          .tabs="${this.pageTabs}"
+          @sl-tab-show="${({detail}: any) => this.onTabSelect(detail.name)}"
+          .activeTab="${this.activeTab}"
+        ></etools-tabs-lit>
       </page-header>
 
       ${this.getTabElement()}
@@ -89,13 +87,12 @@ export class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(connect(s
       if (!isJsonStrMatch(this.activeTab, state.app.routeDetails.params.activeTab)) {
         this.activeTab = String(state.app.routeDetails.params.activeTab);
       }
-      if(!isJsonStrMatch(this.pagePath, state.app.routeDetails.path)) {
+      if (!isJsonStrMatch(this.pagePath, state.app.routeDetails.path)) {
         this.pagePath = state.app.routeDetails.path;
       }
     }
   }
 
-  
   onTabSelect(newTabName: string): void {
     if (this.activeTab === newTabName) {
       return;
@@ -110,7 +107,7 @@ export class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(connect(s
       case REPORTS:
         return html` <pd-details-reports name="reports"></pd-details-reports> `;
       case CALCULATION_METHODS:
-          return html` <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods> `;
+        return html` <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods> `;
       default:
         return html` Tab Not Found `;
     }

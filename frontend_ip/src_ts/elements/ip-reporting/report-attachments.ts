@@ -12,7 +12,7 @@ import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
@@ -20,10 +20,9 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
  * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
  */
 @customElement('report-attachments')
-export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
+export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -87,7 +86,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
   @property({type: String})
   reportId!: string;
 
-  stateChanged(state: RootState){
+  stateChanged(state: RootState) {
     if (this.pending !== this._programmeDocumentReportsAttachmentsPending(state)) {
       this.pending = this._programmeDocumentReportsAttachmentsPending(state);
     }
@@ -143,7 +142,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
             <etools-file
               id="faceAttachmentComponent"
               .files=${this.faceAttachment}
-              label="${this.localize('face')}"
+              label="${translate('FACE')}"
               ?disabled=${this.pending}
               ?readonly=${this.readonly}
               use-delete-events
@@ -156,7 +155,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
         <etools-file
           id="otherOneAttachmentComponent"
           .files=${this.otherOneAttachment}
-          label="${this.localize('other')} #1"
+          label="${translate('OTHER')} #1"
           ?disabled=${this.pending}
           ?readonly=${this.readonly}
           use-delete-events
@@ -168,7 +167,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
         <etools-file
           id="otherTwoAttachmentComponent"
           .files=${this.otherTwoAttachment}
-          label="${this.localize('other')} #2"
+          label="${translate('OTHER')} #2"
           ?disabled=${this.pending}
           ?readonly=${this.readonly}
           use-delete-events
@@ -181,7 +180,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
             <etools-file
               id="otherThreeAttachmentComponent"
               .files=${this.otherThreeAttachment}
-              label="${this.localize('other')} #3"
+              label="${translate('OTHER')} #3"
               ?disabled=${this.pending}
               ?readonly=${this.readonly}
               use-delete-events
@@ -254,7 +253,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
-            text: this.localize('file_deleted'),
+            text: translate('FILE_DELETED'),
             showCloseBtn: true
           });
 
@@ -359,7 +358,7 @@ export class ReportAttachments extends UtilsMixin(LocalizeMixin(connect(store)(L
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
-            text: this.localize('file_uploaded'),
+            text: translate('FILE_UPLOADED'),
             showCloseBtn: true
           });
           this.faceLoading = false;

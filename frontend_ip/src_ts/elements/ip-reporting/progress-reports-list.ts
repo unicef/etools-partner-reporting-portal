@@ -18,7 +18,7 @@ import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/p
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
@@ -26,10 +26,8 @@ import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('progress-reports-list')
-export class ProgressReportsList extends LocalizeMixin(
-  SortingMixin(
-    ProgressReportUtilsMixin(RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement))))))
-  )
+export class ProgressReportsList extends SortingMixin(
+  ProgressReportUtilsMixin(RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement))))))
 ) {
   static styles = [
     layoutStyles,
@@ -92,29 +90,29 @@ export class ProgressReportsList extends LocalizeMixin(
       <style>
         ${dataTableStylesLit}
       </style>
-      <etools-content-panel panel-title="${this.localize('list_of_reports')}">
+      <etools-content-panel panel-title="${translate('LIST_OF_REPORTS')}">
         <etools-data-table-header
           no-collapse
           label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
-            .count} ${this.localize('results_to_show')}"
+            .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column field="programme_document__reference_number" class="col-2" sortable>
-            <div class="table-column">${this.localize('pd_ref_number')}</div>
+            <div class="table-column">${translate('PD_REF_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column class="col-2">
-            <div class="table-column">${this.localize('report_number')}</div>
+            <div class="table-column">${translate('REPORT_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable class="col-2">
-            <div class="table-column">${this.localize('report_status')}</div>
+            <div class="table-column">${translate('REPORT_STATUS')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="due_date" sortable class="col-2">
-            <div class="table-column">${this.localize('due_date')}</div>
+            <div class="table-column">${translate('DUE_DATE')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="submission_date" sortable class="col-2">
-            <div class="table-column">${this.localize('date_of_submission')}</div>
+            <div class="table-column">${translate('DATE_OF_SUBMISSION')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="start_date" sortable class="col-2">
-            <div class="table-column">${this.localize('reporting_period')}</div>
+            <div class="table-column">${translate('REPORTING_PERIOD')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
 

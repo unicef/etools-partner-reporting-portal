@@ -9,16 +9,16 @@ import '../etools-prp-common/elements/etools-logo.js';
 import '../etools-prp-common/elements/etools-prp-ajax.js';
 import Endpoints from '../endpoints.js';
 import ResponsiveMixin from '../etools-prp-common/mixins/responsive-mixin.js';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin.js';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax.js';
 import '../etools-prp-common/elements/page-title.js';
 import {BASE_PATH} from '../etools-prp-common/config.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store.js';
 import {appThemeIpStyles} from '../styles/app-theme-ip-styles.js';
+import {translate} from 'lit-translate';
 
 @customElement('page-login')
-export class PageLogin extends ResponsiveMixin(LocalizeMixin(connect(store)(LitElement))) {
+export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -124,7 +124,7 @@ export class PageLogin extends ResponsiveMixin(LocalizeMixin(connect(store)(LitE
   render() {
     return html`
       ${appThemeIpStyles}
-      <page-title title="${this.localize('sign_in')}"></page-title>
+      <page-title title="${translate('SIGN_IN')}"></page-title>
 
       <iron-media-query
         query="${this.desktopLayoutQuery}"

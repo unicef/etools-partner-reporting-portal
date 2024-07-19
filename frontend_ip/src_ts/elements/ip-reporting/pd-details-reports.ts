@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../ip-reporting/pd-report-filters.js';
 import '../ip-reporting/pd-reports-toolbar.js';
@@ -16,7 +16,7 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-details-reports')
-export class PdDetailsReport extends connect(store)(UtilsMixin(LocalizeMixin(LitElement))) {
+export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
   static styles = css`
     :host {
       display: block;

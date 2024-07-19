@@ -4,12 +4,12 @@ import '../../../etools-prp-common/elements/page-header.js';
 import '../../../etools-prp-common/elements/page-body.js';
 import '../../../elements/ip-reporting/partner-details.js';
 import '../../../elements/ip-reporting/risk-rating.js';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin.js';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from '../../../redux/store.js';
+import {translate} from 'lit-translate';
 
 @customElement('page-ip-reporting-overview')
-export class PageIpReportingOverview extends LocalizeMixin(connect(store)(LitElement)) {
+export class PageIpReportingOverview extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -18,7 +18,7 @@ export class PageIpReportingOverview extends LocalizeMixin(connect(store)(LitEle
 
   render() {
     return html`
-      <page-header .title="${this.localize('overview')}"></page-header>
+      <page-header .title="${translate('OVERVIEW')}"></page-header>
       <page-body>
         <partner-details></partner-details>
         <risk-rating></risk-rating>

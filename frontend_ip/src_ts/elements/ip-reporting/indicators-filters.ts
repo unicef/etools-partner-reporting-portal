@@ -10,24 +10,27 @@ import '../filters/pd-filter/pd-dropdown-filter';
 import '../filters/checkbox-filter/checkbox-filter';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('indicators-filters')
-export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
-  static get styles() { 
-    return [layoutStyles, css`
-      :host {
-        display: block;
-        background: white;
-      }
-      checkbox-filter {
-        margin-top: 2em;
-      }    
-    `]
-  };
+export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
+  static get styles() {
+    return [
+      layoutStyles,
+      css`
+        :host {
+          display: block;
+          background: white;
+        }
+        checkbox-filter {
+          margin-top: 2em;
+        }
+      `
+    ];
+  }
 
   @property({type: Object})
   queryParams!: any;
@@ -43,7 +46,7 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
         <div class="row">
           <dropdown-filter-multi
             class="col-md-6 col-12"
-            label="${this.localize('pd_status')}"
+            label="${translate('PD_STATUS')}"
             name="pd_statuses"
             .value="${this._withDefault(this.queryParams?.pd_statuses, '')}"
             .data="${this.pd_statuses}"
@@ -59,7 +62,7 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
 
           <text-filter
             class="col-md-3 col-12"
-            label="${this.localize('indicator_title')}"
+            label="${translate('INDICATOR_TITLE')}"
             name="blueprint__title"
             .value="${this.queryParams?.blueprint__title || ''}"
           >
@@ -84,12 +87,12 @@ export class IndicatorsFilters extends LocalizeMixin(UtilsMixin(connect(store)(L
 
   private _initStatuses(): {title: string; id: string}[] {
     return [
-      {title: this.localize('signed'), id: 'signed'},
-      {title: this.localize('active'), id: 'active'},
-      {title: this.localize('suspended'), id: 'suspended'},
-      {title: this.localize('ended'), id: 'ended'},
-      {title: this.localize('closed'), id: 'closed'},
-      {title: this.localize('terminated'), id: 'terminated'}
+      {title: translate('SIGNED'), id: 'signed'},
+      {title: translate('ACTIVE'), id: 'active'},
+      {title: translate('SUSPENDED'), id: 'suspended'},
+      {title: translate('ENDED'), id: 'ended'},
+      {title: translate('CLOSED'), id: 'closed'},
+      {title: translate('TERMINATED'), id: 'terminated'}
     ];
   }
 }

@@ -3,6 +3,7 @@ import Constants from '../../etools-prp-common/constants';
 
 export class AppState {
   current: string | undefined = undefined;
+  activeLanguage: string = 'en';
   routeDetails: EtoolsRouteDetails = {} as EtoolsRouteDetails;
 }
 

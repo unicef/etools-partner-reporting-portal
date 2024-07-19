@@ -5,7 +5,7 @@ import '@polymer/paper-button/paper-button.js';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/dropdown-filter/dropdown-filter';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
@@ -13,10 +13,10 @@ import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-report-filters')
-export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
-  static get styles() { 
-    return [layoutStyles]
-  };
+export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
+  static get styles() {
+    return [layoutStyles];
+  }
 
   @property({type: Object})
   queryParams: any = {};
@@ -29,13 +29,13 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
 
   _localizeStatuses() {
     return [
-      {title: this.localize('overdue'), id: 'Ove'},
-      {title: this.localize('sent_back'), id: 'Sen'},
-      {title: this.localize('due'), id: 'Due'},
-      {title: this.localize('all'), id: '-1'},
-      {title: this.localize('submitted'), id: 'Sub'},
-      {title: this.localize('accepted'), id: 'Acc'},
-      {title: this.localize('not_yet_due'), id: 'Not'}
+      {title: translate('OVERDUE'), id: 'Ove'},
+      {title: translate('SENT_BACK'), id: 'Sen'},
+      {title: translate('DUE'), id: 'Due'},
+      {title: translate('ALL'), id: '-1'},
+      {title: translate('SUBMITTED'), id: 'Sub'},
+      {title: translate('ACCEPTED'), id: 'Acc'},
+      {title: translate('NOT_YET_DUE'), id: 'Not'}
     ];
   }
 
@@ -47,7 +47,7 @@ export class PdReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(Lit
         <div class="row">
           <dropdown-filter
             class="col-md-4 col-12"
-            .label=${this.localize('status')}
+            .label=${translate('STATUS')}
             name="status"
             .value=${this._withDefault(this.queryParams?.status, '-1')}
             .data=${this.statuses}

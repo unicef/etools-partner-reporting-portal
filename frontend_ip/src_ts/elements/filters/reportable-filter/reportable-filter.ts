@@ -4,11 +4,11 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import '../dropdown-filter/searchable-dropdown-filter';
 import {llosAll} from '../../../redux/selectors/llos';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {RootState} from '../../../typings/redux.types';
 
 @customElement('reportable-filter')
-export class ReportableFilters extends LocalizeMixin(connect(store)(LitElement)) {
+export class ReportableFilters extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -28,7 +28,7 @@ export class ReportableFilters extends LocalizeMixin(connect(store)(LitElement))
     return html`
       <searchable-dropdown-filter
         class="item"
-        .label="${this.localize('pd_output')}"
+        .label="${translate('PD_OUTPUT')}"
         name="llo"
         .value="${this.value}"
         .data="${this.options}"

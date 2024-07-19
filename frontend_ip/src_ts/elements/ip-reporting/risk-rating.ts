@@ -8,10 +8,10 @@ import '../../etools-prp-common/elements/labelled-item';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 
 @customElement('risk-rating')
-export class RiskRating extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
+export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -43,32 +43,32 @@ export class RiskRating extends UtilsMixin(LocalizeMixin(connect(store)(LitEleme
 
   render() {
     return html`
-      <etools-content-panel panel-title="${this.localize('capacity_assessment')}">
+      <etools-content-panel panel-title="${translate('CAPACITY_ASSESSMENT')}">
         <etools-loading ?active="${this.loading}"></etools-loading>
 
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="${this.localize('financial_risk_rating')}">
+            <labelled-item label="${translate('FINANCIAL_RISK_RATING')}">
               <span class="field-value">${this._withDefault(this.partner.rating)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('type_of_assessment')}">
+            <labelled-item label="${translate('TYPE_OF_ASSESSMENT')}">
               <span class="field-value">${this._withDefault(this.partner.type_of_assessment)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('risk_rating_last_date_assessment')}">
+            <labelled-item label="${translate('RISK_RATING_LAST_DATE_ASSESSMENT')}">
               <span class="field-value">${this._withDefault(this.partner.last_assessment_date)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('sea_risk_rating')}">
+            <labelled-item label="${translate('SEA_RISK_RATING')}">
               <span class="field-value">${this._withDefault(this.partner.sea_risk_rating_name)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('psea_risk_rating_date_of_assessment')}">
+            <labelled-item label="${translate('PSEA_RISK_RATING_DATE_OF_ASSESSMENT')}">
               <span class="field-value">${this._withDefault(this.partner.psea_assessment_date)}</span>
             </labelled-item>
           </li>

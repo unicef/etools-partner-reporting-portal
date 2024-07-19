@@ -2,7 +2,7 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@polymer/paper-tooltip/paper-tooltip';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/download-button';
 import {computePdReportsUrl, hasResults} from './js/progress-reports-toolbar-functions';
@@ -11,7 +11,7 @@ import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('progress-reports-toolbar')
-export class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class ProgressReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -51,7 +51,7 @@ export class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(connect(sto
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('totalResults') || changedProperties.has('params')) {
       this.canExport = this._canExport(this.totalResults, this.params);
     }
@@ -82,13 +82,13 @@ export class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(connect(sto
                 PDF
               </download-button>
               <paper-tooltip for="btnDownloadPdf" fit-to-visible-bounds>
-                ${this.localize('progress_reports_export_status')}
+                ${translate('PROGRESS_REPORTS_EXPORT_STATUS')}
               </paper-tooltip>
               <download-button id="btnDownloadXLS" .url="${this.xlsExportUrl}" tracker="Progress Reports Export Xls">
                 XLS
               </download-button>
               <paper-tooltip for="btnDownloadXLS" fit-to-visible-bounds>
-                ${this.localize('progress_reports_export_status')}
+                ${translate('PROGRESS_REPORTS_EXPORT_STATUS')}
               </paper-tooltip>
             `
           : html``}

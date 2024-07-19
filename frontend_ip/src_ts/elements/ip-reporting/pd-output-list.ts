@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
@@ -14,7 +14,7 @@ import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('pd-output-list')
-export class PdOutputList extends LocalizeMixin(connect(store)(LitElement)) {
+export class PdOutputList extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -63,7 +63,7 @@ export class PdOutputList extends LocalizeMixin(connect(store)(LitElement)) {
 
   render() {
     return html`
-      <etools-content-panel panel-title="${this.localize('pd_output_results')}">
+      <etools-content-panel panel-title="${translate('PD_OUTPUT_RESULTS')}">
         ${this.loading
           ? html`
               <div class="loader layout horizontal center-center">
@@ -112,7 +112,7 @@ export class PdOutputList extends LocalizeMixin(connect(store)(LitElement)) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('data')) {
       this.viewData = computeViewData(this.data);
     }

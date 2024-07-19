@@ -8,12 +8,12 @@ import '../../elements/filters/reportable-filter/reportable-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/report-location-filter/report-location-filter';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('report-filters')
-export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class ReportFilters extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   queryParams: any = {};
 
@@ -56,7 +56,7 @@ export class ReportFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitEl
             name="incomplete"
             .value="${this._withDefault(this.queryParams?.incomplete, '')}"
           >
-            <span class="checkbox-label">${this.localize('show_incomplete_only')}</span>
+            <span class="checkbox-label">${translate('SHOW_INCOMPLETE_ONLY')}</span>
           </checkbox-filter>
         </div>
       </filter-list>

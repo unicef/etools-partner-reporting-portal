@@ -11,7 +11,6 @@ import '../../../../../elements/ip-reporting/report-attachments.js';
 import '../pd-sent-back.js';
 
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin.js';
-import LocalizeMixin from '../../../../../etools-prp-common/mixins/localize-mixin.js';
 import Endpoints from '../../../../../endpoints.js';
 
 import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo.js';
@@ -21,10 +20,11 @@ import {RootState} from '../../../../../typings/redux.types.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {store} from '../../../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
-import { connect } from 'pwa-helpers';
+import {connect} from 'pwa-helpers';
+import {translate} from 'lit-translate';
 
 @customElement('page-pd-report-sr-reporting')
-export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -173,13 +173,13 @@ export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(st
       <etools-content-panel no-header>
         <div class="app-grid">
           <div class="row">
-            <labelled-item label="${this.localize('description')}">
+            <labelled-item label="${translate('DESCRIPTION')}">
               <span class="value">${this.srDescription}</span>
             </labelled-item>
           </div>
 
           <div class="row">
-            <labelled-item label="${this.localize('narrative')}">
+            <labelled-item label="${translate('NARRATIVE')}">
               ${this.computedMode === 'view'
                 ? html` <span class="value">${this._withDefault(this.data.narrative)}</span> `
                 : html`
@@ -199,7 +199,7 @@ export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(st
             ${this.computedMode !== 'view'
               ? html`
                   <paper-button class="btn-primary" id="toggle-button" @click="${this._handleInput}" raised>
-                    ${this.localize('save')}
+                    ${translate('SAVE')}
                   </paper-button>
                 `
               : html``}
@@ -249,7 +249,7 @@ export class PagePdReportSrReporting extends LocalizeMixin(UtilsMixin(connect(st
         .dispatch(pdReportsUpdate(elem.thunk(), this.pdId, this.reportId))
         .then(() => {
           fireEvent(this, 'toast', {
-            text: this.localize('changes_saved'),
+            text: translate('CHANGES_SAVED'),
             showCloseBtn: true
           });
         })

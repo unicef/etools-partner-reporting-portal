@@ -2,11 +2,11 @@ import {html, css, LitElement} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('dropdown-filter')
-export class DropdownFilter extends LocalizeMixin(FilterMixin(LitElement)) {
+export class DropdownFilter extends FilterMixin(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -44,7 +44,7 @@ export class DropdownFilter extends LocalizeMixin(FilterMixin(LitElement)) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('data')) {
       this._handleData(this.data);
     }

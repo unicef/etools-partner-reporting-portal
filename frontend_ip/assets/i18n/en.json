@@ -482,5 +482,6 @@
     "UNSATISFIED": "Unsatisfied",
     "NEUTRAL": "Neutral",
     "SATISFIED": "Satisfied",
-    "VERY_SATISFIED": "Very Satisfied"
+    "VERY_SATISFIED": "Very Satisfied",
+    "COMMUNITY_CHANNELS": "Community Channels"
 }

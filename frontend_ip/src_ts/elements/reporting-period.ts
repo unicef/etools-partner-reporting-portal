@@ -1,12 +1,12 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store';
 
 @customElement('reporting-period')
-export class ReportingPeriod extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class ReportingPeriod extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: inline-block;
@@ -27,6 +27,6 @@ export class ReportingPeriod extends LocalizeMixin(UtilsMixin(connect(store)(Lit
   range = '';
 
   render() {
-    return html` ${this.localize('reporting_period')}: <span class="range">${this._withDefault(this.range)}</span> `;
+    return html` ${translate('REPORTING_PERIOD')}: <span class="range">${this._withDefault(this.range)}</span> `;
   }
 }

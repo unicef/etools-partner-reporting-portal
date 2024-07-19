@@ -30,17 +30,15 @@ import Endpoints from '../../../../endpoints.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
 import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin.js';
-import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin.js';
 import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax.js';
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {translate} from 'lit-translate';
 
 @customElement('page-ip-reporting-pd-report')
-export class PageIpReportingPdReport extends LocalizeMixin(
-  RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement)))
-) {
+export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
   static styles = [
     css`
       :host {
@@ -171,7 +169,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
           ${this.canSubmit
             ? html`
                 <paper-button class="btn-primary" @click=${this._submit} ?disabled=${this.busy} raised>
-                  ${this.localize('submit')}
+                  ${translate('SUBMIT')}
                 </paper-button>
               `
             : html``}
@@ -180,9 +178,9 @@ export class PageIpReportingPdReport extends LocalizeMixin(
         <div slot="toolbar">
           ${this.submittedOnBehalf
             ? html`
-                <p>${this.localize('submitted_by')}: ${this.currentReport.submitting_user}</p>
-                <p>${this.localize('on_behalf_of')}: ${this.currentReport.submitted_by}</p>
-                <p>${this.localize('date_of_submission')}: ${this.currentReport.submission_date}</p>
+                <p>${translate('SUBMITTED_BY')}: ${this.currentReport.submitting_user}</p>
+                <p>${translate('ON_BEHALF_OF')}: ${this.currentReport.submitted_by}</p>
+                <p>${translate('DATE_OF_SUBMISSION')}: ${this.currentReport.submission_date}</p>
               `
             : html``}
         </div>
@@ -196,16 +194,16 @@ export class PageIpReportingPdReport extends LocalizeMixin(
             @selected-changed=${(e) => (this.selectedTab = e.detail.value)}
           >
             ${this._equals(this.currentReport.report_type, 'HR')
-              ? html`<paper-tab name="reporting">${this.localize('reporting_on_indicators')}</paper-tab>`
+              ? html`<paper-tab name="reporting">${translate('REPORTING_ON_INDICATORS')}</paper-tab>`
               : html``}
             ${this._equals(this.currentReport.report_type, 'QPR')
               ? html`
-                  <paper-tab name="reporting">${this.localize('reporting_on_results')}</paper-tab>
-                  <paper-tab name="info">${this.localize('other_info')}</paper-tab>
+                  <paper-tab name="reporting">${translate('REPORTING_ON_RESULTS')}</paper-tab>
+                  <paper-tab name="info">${translate('OTHER_INFO')}</paper-tab>
                 `
               : html``}
             ${this._equals(this.currentReport.report_type, 'SR')
-              ? html`<paper-tab name="reporting">${this.localize('reporting_on_data')}</paper-tab>`
+              ? html`<paper-tab name="reporting">${translate('REPORTING_ON_DATA')}</paper-tab>`
               : html``}
           </paper-tabs>
         </div>
@@ -308,7 +306,7 @@ export class PageIpReportingPdReport extends LocalizeMixin(
       this.reportUrl = this._computeReportUrl(this.locationId, this.reportId, this.pdId);
     }
 
-    if (changedProperties.has('mode') || changedProperties.has('localize')) {
+    if (changedProperties.has('mode')) {
       this.headingPrefix = this._computeHeadingPrefix(this.mode);
     }
 
@@ -390,10 +388,10 @@ export class PageIpReportingPdReport extends LocalizeMixin(
   _computeHeadingPrefix(mode: string) {
     switch (mode) {
       case 'view':
-        return this.localize('report_for');
+        return translate('REPORT_FOR') as any as string;
 
       case 'edit':
-        return this.localize('enter_data_for');
+        return translate('ENTER_DATA_FOR') as any as string;
 
       default:
         return '';
@@ -477,17 +475,17 @@ export class PageIpReportingPdReport extends LocalizeMixin(
         this.busy = false;
 
         if (authorizedError.length > 0) {
-          return (this.shadowRoot!.getElementById('officer') as AuthorizedOfficerModalEl).open();
+          return (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).open();
         }
-        return (this.shadowRoot!.getElementById('error') as ErrorModalEl).open(res.data.non_field_errors);
+        return (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).open(res.data.non_field_errors);
       });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    (this.shadowRoot!.getElementById('report') as EtoolsPrpAjaxEl).abort();
-    (this.shadowRoot!.getElementById('error') as ErrorModalEl).close();
-    (this.shadowRoot!.getElementById('officer') as AuthorizedOfficerModalEl).close();
+    (this.shadowRoot!.getElementById('report') as any as EtoolsPrpAjaxEl).abort();
+    (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).close();
+    (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).close();
   }
 }

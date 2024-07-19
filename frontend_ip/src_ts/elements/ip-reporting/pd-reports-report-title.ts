@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icon/iron-icon';
 import {
@@ -12,10 +12,10 @@ import {
   getReportTitle,
   getReportLink
 } from './js/pd-reports-report-title-functions';
-import { buildUrl } from '../../etools-prp-common/utils/util';
+import {buildUrl} from '../../etools-prp-common/utils/util';
 
 @customElement('pd-reports-report-title')
-export class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
+export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(LitElement)) {
   static styles = css`
     .final-badge {
       display: inline-block;
@@ -99,11 +99,11 @@ export class PdReportsReportTitle extends LocalizeMixin(ProgressReportUtilsMixin
   }
 
   _getReportTitleFull(report: any) {
-    return report ? getReportTitleFull(report, this.localize.bind(this)) : '';
+    return report ? getReportTitleFull(report) : '';
   }
 
   _getReportTitle(report: any) {
-    return getReportTitle(report, this.localize.bind(this));
+    return getReportTitle(report);
   }
 
   _getReportLink(report: any, permissions: any, baseUrl: any) {

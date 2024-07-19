@@ -18,9 +18,10 @@ import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router
 import EndpointsCommon from '../../etools-prp-common/endpoints';
 import {Environment} from '@unicef-polymer/etools-utils/dist/singleton/environment';
 import {RootState} from '../../typings/redux.types';
-import {localizeSet} from '../../redux/actions/localize';
 import {connect} from 'pwa-helpers';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import Constants from '../../etools-prp-common/constants';
+import {setActiveLanguage} from '../../redux/actions/active-language';
 
 /**
  * page header element
@@ -59,9 +60,6 @@ export class PageHeader extends connect(store)(LitElement) {
   @property({type: String})
   activeLanguage?: string;
 
-  @property({type: Array})
-  availableLanguages: any[] = [];
-
   public render() {
     // main template
     // language=HTML
@@ -77,13 +75,13 @@ export class PageHeader extends connect(store)(LitElement) {
         <div slot="dropdowns">
           <languages-dropdown
             .profile="${this.profile}"
-            .availableLanguages="${this.availableLanguages}"
+            .availableLanguages="${Constants.LANGUAGES}"
             .activeLanguage="${this.activeLanguage}"
             @user-language-changed="${(e: any) => {
               // store.dispatch(updateUserData(e.detail.user));
               // store.dispatch(setActiveLanguage(e.detail.language));
               localStorage.setItem('defaultLanguage', e.detail.language);
-              store.dispatch(localizeSet(e.detail.language));
+              store.dispatch(setActiveLanguage(e.detail.language));
               window.location.reload();
             }}"
           ></languages-dropdown>
@@ -137,12 +135,8 @@ export class PageHeader extends connect(store)(LitElement) {
       this.profile = state.userProfile.profile!;
     }
 
-    if (this.activeLanguage !== state.localize.language) {
-      this.activeLanguage = state.localize.language;
-    }
-
-    if (state.localize.resources && !isJsonStrMatch(this.availableLanguages, state.localize.resources)) {
-      this.availableLanguages = Object.keys(state.localize.resources).map((x) => ({value: x, display_name: x}));
+    if (this.activeLanguage !== state.activeLanguage.activeLanguage) {
+      this.activeLanguage = state.activeLanguage.activeLanguage;
     }
   }
 

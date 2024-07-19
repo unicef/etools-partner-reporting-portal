@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../../etools-prp-common/elements/labelled-item';
@@ -22,7 +22,7 @@ import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 
 @customElement('ip-reporting-indicator-details')
-export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -196,11 +196,11 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
                 (report) => html`
                   <div class="item">
                     <dl>
-                      <dt>${this.localize('submitted')}:</dt>
+                      <dt>${translate('SUBMITTED')}:</dt>
                       <dd>${report.submission_date}</dd>
                     </dl>
                     <dl>
-                      <dt>${this.localize('total_progress')}:</dt>
+                      <dt>${translate('TOTAL_PROGRESS')}:</dt>
                       <dd>
                         ${report.display_type === 'number'
                           ? html`<etools-prp-number value="${report.total.v}"></etools-prp-number>`
@@ -208,7 +208,7 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
                       </dd>
                     </dl>
                     <dl>
-                      <dt>${this.localize('progress_in_reporting_period')}:</dt>
+                      <dt>${translate('PROGRESS_IN_REPORTING_PERIOD')}:</dt>
                       <dd class="reporting-period">${report.time_period_start} - ${report.time_period_end}</dd>
                     </dl>
                   </div>
@@ -218,7 +218,7 @@ export class IpReportingIndicatorDetails extends LocalizeMixin(UtilsMixin(connec
           `
         : html``}
 
-      <list-placeholder .data="${this.data}" .loading="${this.loading}" .message="${this.localize('no_report_data')}">
+      <list-placeholder .data="${this.data}" .loading="${this.loading}" .message="${translate('NO_REPORT_DATA')}">
       </list-placeholder>
 
       ${computeHidden(this.locations, this.loading)

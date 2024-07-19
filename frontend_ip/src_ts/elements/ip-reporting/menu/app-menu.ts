@@ -11,7 +11,7 @@ import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import PageNavMixin from '../../../etools-prp-common/mixins/page-nav-mixin';
 import {RootState} from '../../../typings/redux.types';
 
@@ -21,9 +21,7 @@ import {RootState} from '../../../typings/redux.types';
  * @customElement
  */
 @customElement('app-menu')
-export class AppMenu extends RoutingMixin(
-  MatomoMixin(LocalizeMixin(PageNavMixin(UtilsMixin(connect(store)(LitElement)))))
-) {
+export class AppMenu extends RoutingMixin(MatomoMixin(PageNavMixin(UtilsMixin(connect(store)(LitElement))))) {
   static get styles() {
     return [navMenuStyles];
   }
@@ -62,10 +60,10 @@ export class AppMenu extends RoutingMixin(
             @click="${this.trackAnalytics}"
             tracker="Overview"
           >
-            <sl-tooltip for="overview-icon" placement="right" content="${this.localize('overview')}">
+            <sl-tooltip for="overview-icon" placement="right" content="${translate('OVERVIEW')}">
               <etools-icon id="overview-icon" name="globe"></etools-icon>
             </sl-tooltip>
-            <div class="name">${this.localize('overview')}</div>
+            <div class="name">${translate('OVERVIEW')}</div>
           </a>
 
           <a
@@ -74,14 +72,10 @@ export class AppMenu extends RoutingMixin(
             @click="${this.trackAnalytics}"
             tracker="Programme Documents"
           >
-            <sl-tooltip
-              for="programme_documents-icon"
-              placement="right"
-              content="${this.localize('programme_documents')}"
-            >
+            <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('PROGRAMME_DOCUMENTS')}">
               <etools-icon id="programme_documents-icon" name="description"></etools-icon>
             </sl-tooltip>
-            <div class="name">${this.localize('programme_documents')}</div>
+            <div class="name">${translate('PROGRAMME_DOCUMENTS')}</div>
           </a>
 
           <a
@@ -90,10 +84,10 @@ export class AppMenu extends RoutingMixin(
             @click="${this.trackAnalytics}"
             tracker="Progress Reports"
           >
-            <sl-tooltip for="progress_reports-icon" placement="right" content="${this.localize('progress_reports')}">
+            <sl-tooltip for="progress_reports-icon" placement="right" content="${translate('PROGRESS_REPORTS')}">
               <etools-icon id="progress_reports-icon" name="assignment"></etools-icon>
             </sl-tooltip>
-            <div class="name">${this.localize('progress_reports')}</div>
+            <div class="name">${translate('PROGRESS_REPORTS')}</div>
           </a>
 
           <a
@@ -102,24 +96,24 @@ export class AppMenu extends RoutingMixin(
             @click="${this.trackAnalytics}"
             tracker="Indicators"
           >
-            <sl-tooltip for="indicators-icon" placement="right" content="${this.localize('indicators')}">
+            <sl-tooltip for="indicators-icon" placement="right" content="${translate('INDICATORS')}">
               <etools-icon id="indicators-icon" name="trending-up"></etools-icon>
             </sl-tooltip>
-            <div class="name">${this.localize('indicators')}</div>
+            <div class="name">${translate('INDICATORS')}</div>
           </a>
 
           <hr />
 
           <a class="nav-menu-item" href="${this.getAMPUrl()}" target="_blank">
-            <sl-tooltip for="amp-icon" placement="right" content="${this.localize('amp')}">
+            <sl-tooltip for="amp-icon" placement="right" content="${translate('AMP')}">
               <etools-icon id="amp-icon" name="people"></etools-icon>
             </sl-tooltip>
-            <div class="name">${this.localize('amp')}</div>
+            <div class="name">${translate('AMP')}</div>
           </a>
         </div>
 
         <div class="nav-menu-item section-title">
-          <span>${this.localize('community_channels')}</span>
+          <span>${translate('COMMUNITY_CHANNELS')}</span>
         </div>
 
         <a
@@ -129,10 +123,10 @@ export class AppMenu extends RoutingMixin(
           @click="${this.trackAnalytics}"
           tracker="Knowledge base"
         >
-          <sl-tooltip for="knoledge-icon" placement="right" content="${this.localize('knowledge_base')}">
+          <sl-tooltip for="knoledge-icon" placement="right" content="${translate('KNOWLEDGE_BASE')}">
             <etools-icon id="knoledge-icon" name="maps:local-library"></etools-icon>
           </sl-tooltip>
-          <div class="name">${this.localize('knowledge_base')}</div>
+          <div class="name">${translate('KNOWLEDGE_BASE')}</div>
         </a>
       </div>
     `;

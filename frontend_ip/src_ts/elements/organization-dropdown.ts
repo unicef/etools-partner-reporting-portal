@@ -5,14 +5,14 @@ import '../etools-prp-common/elements/etools-prp-ajax';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {store} from '../redux/store';
 import Endpoints from '../etools-prp-common/endpoints';
 import {RootState} from '../typings/redux.types';
 import {BASE_PATH} from '../etools-prp-common/config';
 
 @customElement('organization-dropdown')
-export class OrganizationDropdown extends LocalizeMixin(connect(store)(LitElement)) {
+export class OrganizationDropdown extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -106,7 +106,7 @@ export class OrganizationDropdown extends LocalizeMixin(connect(store)(LitElemen
   private checkMustSelectOrganization(user: any | undefined) {
     if (user && user.id && !user.partner) {
       setTimeout(() => {
-        fireEvent(this, 'toast', {text: this.localize('select_organization')});
+        fireEvent(this, 'toast', {text: translate('SELECT_ORGANIZATION')});
       }, 2000);
       return 'warning';
     }
@@ -152,7 +152,7 @@ export class OrganizationDropdown extends LocalizeMixin(connect(store)(LitElemen
         id="organizationSelector"
         class="${this.checkMustSelectOrganization(this.user)}"
         .selected="${this.currentOrganizationId}"
-        placeholder="${this.localize('select_organization')}"
+        placeholder="${translate('SELECT_ORGANIZATION')}"
         .options="${this.organizations}"
         option-label="title"
         option-value="id"

@@ -23,11 +23,11 @@ import '../../elements/etools-prp-currency';
 import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import Settings from '../../etools-prp-common/settings';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import { isJsonStrMatch } from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {translate} from 'lit-translate';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-details-overview')
-export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
+export class PdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   pd: any = {};
 
@@ -50,7 +50,8 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
   @property({type: Object})
   reportingRequirements: any = {};
 
-  static styles = [layoutStyles,
+  static styles = [
+    layoutStyles,
     css`     
       :host {
         display: block;
@@ -85,74 +86,75 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
   render() {
     return html`
       ${tableStyles}
-      <style>${dataTableStylesLit}</style>
+      <style>
+        ${dataTableStylesLit}
+      </style>
       <page-body>
-        <etools-content-panel panel-title="${this.localize('partnership_info')}">
+        <etools-content-panel panel-title="${translate('PARTNERSHIP_INFO')}">
           <etools-loading ?active="${!this.loaded}"></etools-loading>
           <div class="row padding-v">
             <div class="item col-4">
-              <labelled-item label="${this.localize('agreement')}">
+              <labelled-item label="${translate('AGREEMENT')}">
                 <span class="field-value">${this._withDefault(this.pd.agreement)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
-              <labelled-item label="${this.localize('document_type')}">
+              <labelled-item label="${translate('DOCUMENT_TYPE')}">
                 <span class="field-value">${this._withDefault(this.pd.document_type_display)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
-              <labelled-item label="${this.localize('reference_number')}">
+              <labelled-item label="${translate('REFERENCE_NUMBER')}">
                 <span class="field-value">${this._withDefault(this.pd.reference_number)}</span>
               </labelled-item>
             </div>
           </div>
-          <div  class="row padding-v">
+          <div class="row padding-v">
             <div class="item col-12">
-              <labelled-item label="${this.localize('title')}">
+              <labelled-item label="${translate('TITLE')}">
                 <span class="field-value">${this._withDefault(this.pd.title)}</span>
               </labelled-item>
             </div>
           </div>
           <div class="row padding-v">
             <div class="item col-4">
-              <labelled-item label="${this.localize('unicef_offices')}">
+              <labelled-item label="${translate('UNICEF_OFFICES')}">
                 <span class="field-value">${this._withDefault(this.pd.unicef_office)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
-              <labelled-item label="${this.localize('unicef_points')}">
+              <labelled-item label="${translate('UNICEF_POINTS')}">
                 <span class="field-value">${this._formatFocalPoint(this.pd.unicef_focal_point)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
-              <labelled-item label="${this.localize('partner_points')}">
+              <labelled-item label="${translate('PARTNER_POINTS')}">
                 <span class="field-value">${this._formatFocalPoint(this.pd.partner_focal_point)}</span>
               </labelled-item>
             </div>
           </div>
-                     
         </etools-content-panel>
 
-        <etools-content-panel panel-title="${this.localize('pd_ssfa_details')}">
+        <etools-content-panel panel-title="${translate('PD_SSFA_DETAILS')}">
           <etools-loading ?active="${!this.loaded}"></etools-loading>
-         <div class="row padding-v">
+          <div class="row padding-v">
             <div class="col-2">
-              <labelled-item label="${this.localize('pd_ssfa_document')}">
+              <labelled-item label="${translate('PD_SSFA_DOCUMENT')}">
                 <pd-details-doc-download></pd-details-doc-download>
               </labelled-item>
             </div>
-             <div class="col-2">
-              <labelled-item label="${this.localize('start_date')}">
+            <div class="col-2">
+              <labelled-item label="${translate('START_DATE')}">
                 <span class="field-value">${this._withDefault(this.pd.start_date)}</span>
               </labelled-item>
             </div>
             <div class="col-2">
-              <labelled-item label="${this.localize('end_date')}">
+              <labelled-item label="${translate('END_DATE')}">
                 <span class="field-value">${this._withDefault(this.pd.end_date)}</span>
               </labelled-item>
             </div>
             <div class="col-2">
-              <labelled-item label="${this.localize('cso_contribution')}">
+              <labelled-item label="${translate('CSO_CONTRIBUTION')}">
                 <span class="field-value">
                   <etools-prp-currency
                     value="${this.pd.cso_contribution}"
@@ -162,7 +164,7 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
               </labelled-item>
             </div>
             <div class="col-2">
-              <labelled-item label="${this.localize('total_unicef_cash')}">
+              <labelled-item label="${translate('TOTAL_UNICEF_CASH')}">
                 <span class="field-value">
                   <etools-prp-currency
                     value="${this.pd.total_unicef_cash}"
@@ -171,8 +173,8 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
                 </span>
               </labelled-item>
             </div>
-             <div class="col-2">
-              <labelled-item label="${this.localize('total_unicef_supplies')}">
+            <div class="col-2">
+              <labelled-item label="${translate('TOTAL_UNICEF_SUPPLIES')}">
                 <span class="field-value">
                   <etools-prp-currency
                     value="${this.pd.total_unicef_supplies}"
@@ -183,8 +185,8 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
             </div>
           </div>
           <div class="row padding-v">
-           <div class="col-2">
-              <labelled-item label="${this.localize('total_budget')}">
+            <div class="col-2">
+              <labelled-item label="${translate('TOTAL_BUDGET')}">
                 <span class="field-value">
                   <etools-prp-currency
                     value="${this.pd.budget}"
@@ -193,8 +195,8 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
                 </span>
               </labelled-item>
             </div>
-           <div class="col-10">
-              <labelled-item label="${this.localize('disbursements')}">
+            <div class="col-10">
+              <labelled-item label="${translate('DISBURSEMENTS')}">
                 <span class="field-value">${this.pd.funds_received_to_date} ${this.pd.cso_contribution_currency}</span>
                 <etools-prp-progress-bar
                   .number="${this._computeFunds(this.pd.funds_received_to_date_percentage)}"
@@ -203,22 +205,26 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
             </div>
           </div>
           <div class="row padding-v">
-           <div class="col-12">
-            <labelled-item label="${this.localize('locations')}">
-              <span class="field-value">${this._commaSeparatedDictValues(this.pd.locations, 'name')}</span>
-            </labelled-item>
-           </div> 
+            <div class="col-12">
+              <labelled-item label="${translate('LOCATIONS')}">
+                <span class="field-value">${this._commaSeparatedDictValues(this.pd.locations, 'name')}</span>
+              </labelled-item>
+            </div>
           </div>
         </etools-content-panel>
 
         ${hasAmendments(this.pd)
           ? html`
-              <etools-content-panel panel-title="${this.localize('amendments')}" class="amendments">
+              <etools-content-panel panel-title="${translate('AMENDMENTS')}" class="amendments">
                 <etools-loading ?active="${!this.loaded}"></etools-loading>
 
                 <etools-data-table-header no-collapse no-title>
-                  <etools-data-table-column class="col-6" field=""> ${this.localize('amendment_types')} </etools-data-table-column>
-                  <etools-data-table-column class="col-6" field=""> ${this.localize('signed_date')} </etools-data-table-column>
+                  <etools-data-table-column class="col-6" field="">
+                    ${translate('AMENDMENT_TYPES')}
+                  </etools-data-table-column>
+                  <etools-data-table-column class="col-6" field="">
+                    ${translate('SIGNED_DATE')}
+                  </etools-data-table-column>
                 </etools-data-table-header>
 
                 ${(this.pd.amendments || []).map(
@@ -235,25 +241,25 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
             `
           : ''}
 
-        <etools-content-panel panel-title="${this.localize('reporting_requirements')}" class="reporting-requirements">
+        <etools-content-panel panel-title="${translate('REPORTING_REQUIREMENTS')}" class="reporting-requirements">
           <etools-loading ?active="${!this.loaded}"></etools-loading>
 
           <pd-details-reporting-requirements
-            title="${this.localize('qpr_short')}"
+            title="${translate('QPR_SHORT')}"
             .data="${this.reportingRequirements?.qpr}"
             ?loading="${!this.loaded}"
           >
           </pd-details-reporting-requirements>
 
           <pd-details-reporting-requirements
-            title="${this.localize('hr_short')}"
+            title="${translate('HR_SHORT')}"
             .data="${this.reportingRequirements?.hr}"
             ?loading="${!this.loaded}"
           >
           </pd-details-reporting-requirements>
 
           <pd-details-reporting-requirements
-            title="${this.localize('sr_short')}"
+            title="${translate('SR_SHORT')}"
             .data="${this.reportingRequirements?.sr}"
             ?loading="${!this.loaded}"
           >
@@ -273,7 +279,7 @@ export class PdDetailsOverview extends UtilsMixin(LocalizeMixin(connect(store)(L
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('pd') && this.pd && Object.keys(this.pd).length) {
       this.reportingRequirements = computeReportingRequirements(this.pd.reporting_periods, Settings.dateFormat);
     }

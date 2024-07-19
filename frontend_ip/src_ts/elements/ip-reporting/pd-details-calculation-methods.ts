@@ -12,7 +12,7 @@ import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
@@ -43,11 +43,10 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
  * @appliesMixin DataTableMixin
  */
 @customElement('pd-details-calculation-methods')
-export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = [
     layoutStyles,
     css`
@@ -94,8 +93,10 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
 
   render() {
     return html`
-      ${buttonsStyles} ${tableStyles} 
-      <style> ${dataTableStylesLit} </style>
+      ${buttonsStyles} ${tableStyles}
+      <style>
+        ${dataTableStylesLit}
+      </style>
 
       <etools-prp-permissions
         .permissions="${this.permissions}"
@@ -115,13 +116,13 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
         <calculation-methods-info-bar></calculation-methods-info-bar>
         <etools-data-table-header no-collapse>
           <etools-data-table-column class="col-4">
-            <div class="table-column">${this.localize('indicators_for_pd')}</div>
+            <div class="table-column">${translate('INDICATORS_FOR_PD')}</div>
           </etools-data-table-column>
           <etools-data-table-column class="col-4">
-            <div class="table-column">${this.localize('calculation_method_across_locations')}</div>
+            <div class="table-column">${translate('CALCULATION_METHOD_ACROSS_LOCATIONS')}</div>
           </etools-data-table-column>
           <etools-data-table-column class="col-4">
-            <div class="table-column">${this.localize('calculation_method_across_reporting')}</div>
+            <div class="table-column">${translate('CALCULATION_METHOD_ACROSS_REPORTING')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
         <div class="wrapper">
@@ -139,7 +140,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
                 ? html`
                     <etools-data-table-row class="pd-output" no-collapse>
                       <div slot="row-data">
-                        <div class="table-cell table-cell--text missing-indicator">${this.localize(item.text)}</div>
+                        <div class="table-cell table-cell--text missing-indicator">${translate(item.text)}</div>
                       </div>
                     </etools-data-table-row>
                   `
@@ -162,19 +163,19 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
                                     name="sum"
                                     ?disabled="${computeDisabled(item.data?.display_type)}"
                                   >
-                                    ${this.localize('sum')}
+                                    ${translate('SUM')}
                                   </paper-radio-button>
                                   <paper-radio-button
                                     name="max"
                                     ?disabled="${computeDisabled(item.data?.display_type)}"
                                   >
-                                    ${this.localize('max')}
+                                    ${translate('MAX')}
                                   </paper-radio-button>
                                   <paper-radio-button
                                     name="avg"
                                     ?disabled="${computeDisabled(item.data?.display_type)}"
                                   >
-                                    ${this.localize('avg')}
+                                    ${translate('AVG')}
                                   </paper-radio-button>
                                 </paper-radio-group>
                               `
@@ -192,20 +193,20 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
                                   ?disabled="${computeDisabled(item.data)}"
                                 >
                                   <paper-radio-button name="sum" ?disabled="${computeDisabled(item.data.display_type)}">
-                                    ${this.localize('sum')}
+                                    ${translate('SUM')}
                                   </paper-radio-button>
                                   <paper-radio-button name="max" ?disabled="${computeDisabled(item.data.display_type)}">
-                                    ${this.localize('max')}
+                                    ${translate('MAX')}
                                   </paper-radio-button>
                                   <paper-radio-button name="avg" ?disabled="${computeDisabled(item.data.display_type)}">
-                                    ${this.localize('avg')}
+                                    ${translate('AVG')}
                                   </paper-radio-button>
                                   <paper-radio-button
                                     name="latest"
                                     ?hidden="${!this._hasTypeRatioOrPercentage(item.data)}"
                                     ?disabled="${computeDisabled(item.data.display_type)}"
                                   >
-                                    ${this.localize('latest')}
+                                    ${translate('LATEST')}
                                   </paper-radio-button>
                                 </paper-radio-group>
                               `
@@ -222,7 +223,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
         ${this._canSave(this.permissions)
           ? html`<div class="buttons layout horizontal-reverse">
               <paper-button @click="${this._save}" class="btn-primary" ?disabled="${this.loading}" raised>
-                ${this.localize('save')}
+                ${translate('SAVE')}
               </paper-button>
             </div>`
           : html``}
@@ -258,7 +259,6 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
     this._fetchData = debounce(this._fetchData.bind(this), 300) as any;
   }
 
-
   stateChanged(state: RootState) {
     if (state.location?.id && this.locationId !== state.location.id) {
       this.locationId = state.location.id;
@@ -277,7 +277,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId') || changedProperties.has('pdId')) {
       this.indicatorsUrl = computeIndicatorsUrl(this.locationId, this.pdId);
     }
@@ -333,7 +333,7 @@ export class PdDetailsCalculationMethods extends LocalizeMixin(DataTableMixin(Ut
       })
       .then(() =>
         fireEvent(this, 'toast', {
-          text: this.localize('changes_saved'),
+          text: translate('CHANGES_SAVED'),
           showCloseBtn: true
         })
       )

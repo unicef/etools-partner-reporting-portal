@@ -3,7 +3,6 @@ import {customElement, property, state} from 'lit/decorators.js';
 import './utils/routes';
 import '@unicef-polymer/etools-piwik-analytics/etools-piwik-analytics.js';
 
-import LocalizeMixin from './etools-prp-common/mixins/localize-mixin.js';
 import UtilsMixin from './etools-prp-common/mixins/utils-mixin.js';
 import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin.js';
 import Endpoints from './endpoints.js';
@@ -13,7 +12,6 @@ import './etools-prp-common/elements/etools-prp-auth.js';
 import {EtoolsPrpAjaxEl} from './etools-prp-common/elements/etools-prp-ajax.js';
 import {reset, userLogout} from './redux/actions.js';
 import {BASE_PATH} from './etools-prp-common/config.js';
-import {locales} from './locales.js';
 import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 import {RootState} from './typings/redux.types.js';
 import {connect, installRouter} from 'pwa-helpers';
@@ -27,7 +25,8 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
 import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
-import {registerTranslateConfig, translate, use} from 'lit-translate';
+import {registerTranslateConfig, use} from 'lit-translate';
+import {setActiveLanguage} from './redux/actions/active-language';
 
 dayjs.extend(dayJsUtc);
 
@@ -48,7 +47,7 @@ setBasePath('/ip/');
 initializeIcons();
 
 @customElement('app-shell')
-export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     :host {
       display: block;
@@ -125,16 +124,14 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
   }
 
   stateChanged(state: RootState) {
+    this.setCurrentLanguage(state);
+
     if (state.userProfile.profile && !isJsonStrMatch(this.profile, state.userProfile.profile)) {
       this.profile = state.userProfile.profile;
     }
 
-    if (
-      state.localize.resources &&
-      Object.keys(state.localize.resources).length &&
-      this.selectedLanguage !== state.localize.language
-    ) {
-      this.selectedLanguage = state.localize.language;
+    if (this.selectedLanguage !== state.activeLanguage.activeLanguage) {
+      this.selectedLanguage = state.activeLanguage.activeLanguage;
       this.loadLocalization();
     }
 
@@ -148,6 +145,21 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
     }
   }
 
+  setCurrentLanguage(state: RootState) {
+    let currentLanguage = localStorage.getItem('defaultLanguage');
+
+    if (!state.activeLanguage.activeLanguage) {
+      if (!currentLanguage) {
+        currentLanguage = navigator.language.split('-')[0];
+      }
+
+      if (!currentLanguage) {
+        currentLanguage = 'en';
+      }
+
+      store.dispatch(setActiveLanguage(currentLanguage));
+    }
+  }
   async loadLocalization() {
     this.waitForTranslationsToLoad().then(async () => {
       await use(this.selectedLanguage);
@@ -194,7 +206,6 @@ export class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(connect
 
   connectedCallback() {
     super.connectedCallback();
-    this.dispatchResources(locales);
     this._addEventListeners();
 
     installRouter((location) =>

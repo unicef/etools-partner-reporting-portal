@@ -15,14 +15,14 @@ import '../etools-prp-common/elements/status-badge';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
 
 import {store} from '../redux/store';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('list-view-single-indicator')
-export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -159,7 +159,7 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
           <span class="col-data col-2 table-cell table-cell--text self-center flex-2">
             <div class="self-center flex-none">
               <dl class="indicator-progress layout horizontal">
-                <dt class="flex-none self-center">${this.localize('against_target')}</dt>
+                <dt class="flex-none self-center">${translate('AGAINST_TARGET')}</dt>
                 <dd class="flex-none">
                   ${this._equals(this.progressBarType, 'cluster')
                     ? html`<etools-prp-progress-bar-cluster
@@ -178,7 +178,7 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
               ${this.isClusterApp
                 ? html`
                     <dl class="indicator-progress layout horizontal">
-                      <dt class="flex-none self-center">${this.localize('against_in_need')}:</dt>
+                      <dt class="flex-none self-center">${translate('AGAINST_IN_NEED')}:</dt>
                       <dd class="flex-none">
                         <etools-prp-progress-bar-alt
                           .displayType=${this.indicator?.blueprint?.display_type}
@@ -195,7 +195,7 @@ export class ListViewSingleIndicator extends LocalizeMixin(RoutingMixin(UtilsMix
             ? html`
                 <span class="table-cell table-cell--text table-cell--action self-center">
                   <paper-button class="button-link" @click=${this._openModal} data-modal-type="edit"
-                    >${this.localize('edit')}
+                    >${translate('EDIT')}
                     ${this._showLocationsWarning(this.indicator, this.type)
                       ? html`<iron-icon
                           class="locations-warning"

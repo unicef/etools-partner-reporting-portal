@@ -4,7 +4,7 @@ import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styl
 import '@unicef-polymer/etools-unicef/src/etools-date-time/datepicker-lite';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
@@ -16,19 +16,21 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {RootState} from '../../typings/redux.types';
 
 @customElement('progress-reports-filters')
-export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
-  static get styles() { 
-    return [layoutStyles,
+export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement)) {
+  static get styles() {
+    return [
+      layoutStyles,
       css`
         :host {
           display: block;
           background: white;
-        }      
+        }
         checkbox-filter {
           margin-top: 2em;
         }
-        `]
-    };
+      `
+    ];
+  }
 
   @property({type: Object})
   queryParams!: any;
@@ -49,7 +51,7 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
         <div class="row">
           <text-filter
             class="col-md-3 col-12"
-            label="${this.localize('pd_ref_and_title')}"
+            label="${translate('PD_REF_AND_TITLE')}"
             name="pd_ref_title"
             .value="${this.queryParams?.pd_ref_title}"
           >
@@ -60,7 +62,7 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
           ></location-filter>
           <dropdown-filter-multi
             class="col-md-6 col-12"
-            label="${this.localize('report_status')}"
+            label="${translate('REPORT_STATUS')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
             .data="${this.statuses}"
@@ -70,7 +72,7 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
           </dropdown-filter-multi>
           <dropdown-filter-multi
             class="col-md-6 col-12"
-            label="${this.localize('report_type')}"
+            label="${translate('REPORT_TYPE')}"
             name="report_type"
             .value="${this._withDefault(this.queryParams?.report_type, '')}"
             .data="${this.types}"
@@ -97,20 +99,20 @@ export class ProgressReportsFilters extends LocalizeMixin(UtilsMixin(connect(sto
 
   _localizeStatuses() {
     return [
-      {title: this.localize('overdue'), id: 'Ove'},
-      {title: this.localize('sent_back'), id: 'Sen'},
-      {title: this.localize('due'), id: 'Due'},
-      {title: this.localize('submitted'), id: 'Sub'},
-      {title: this.localize('accepted'), id: 'Acc'},
-      {title: this.localize('not_yet_due'), id: 'Not'}
+      {title: translate('OVERDUE'), id: 'Ove'},
+      {title: translate('SENT_BACK'), id: 'Sen'},
+      {title: translate('DUE'), id: 'Due'},
+      {title: translate('SUBMITTED'), id: 'Sub'},
+      {title: translate('ACCEPTED'), id: 'Acc'},
+      {title: translate('NOT_YET_DUE'), id: 'Not'}
     ];
   }
 
   _localizeTypes() {
     return [
-      {title: this.localize('qpr'), id: 'QPR'},
-      {title: this.localize('hr'), id: 'HR'},
-      {title: this.localize('sr'), id: 'SR'}
+      {title: translate('QPR'), id: 'QPR'},
+      {title: translate('HR'), id: 'HR'},
+      {title: translate('SR'), id: 'SR'}
     ];
   }
 }

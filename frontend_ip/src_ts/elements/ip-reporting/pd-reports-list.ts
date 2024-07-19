@@ -12,7 +12,7 @@ import './pd-reports-report-title';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {
   programmeDocumentReportsAll,
@@ -26,8 +26,8 @@ import {store} from '../../redux/store';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-reports-list')
-export class PdReportsList extends LocalizeMixin(
-  PaginationMixin(DataTableMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))))
+export class PdReportsList extends PaginationMixin(
+  DataTableMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))))
 ) {
   static styles = [
     layoutStyles,
@@ -54,7 +54,7 @@ export class PdReportsList extends LocalizeMixin(
   pdId!: string;
 
   @property({type: String})
-  baseUrl!: string
+  baseUrl!: string;
 
   @property({type: Array})
   data: any[] = [];
@@ -73,12 +73,12 @@ export class PdReportsList extends LocalizeMixin(
       this.pdId = state.programmeDocuments?.current;
     }
 
-    if(state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
+    if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
       this.baseUrl = state.workspaces.baseUrl;
     }
 
     this.data = programmeDocumentReportsAll(state);
-    if(this.data) {
+    if (this.data) {
       const totalResults = programmeDocumentReportsCount(state);
       if (typeof totalResults !== 'undefined') {
         this.paginator = {...this.paginator, count: totalResults};
@@ -101,29 +101,29 @@ export class PdReportsList extends LocalizeMixin(
       <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
       (this.permissions = e.detail.value)}"></etools-prp-permissions>
 
-      <etools-content-panel panel-title="${this.localize('list_of_reports')}">
+      <etools-content-panel panel-title="${translate('LIST_OF_REPORTS')}">
         <etools-loading ?active="${this.loading}"></etools-loading>
 
         <etools-data-table-header
           no-collapse
           label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${
       this.paginator.count
-    } ${this.localize('results_to_show')}"
+    } ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column class="col-3">
-            <div class="table-column">${this.localize('report_number')}</div>
+            <div class="table-column">${translate('REPORT_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable class="col-2">
-            <div class="table-column">${this.localize('report_status')}</div>
+            <div class="table-column">${translate('REPORT_STATUS')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="due_date" sortable class="col-2">
-            <div class="table-column">${this.localize('due_date')}</div>
+            <div class="table-column">${translate('DUE_DATE')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="date_of_submission" sortable class="col-2">
-            <div class="table-column">${this.localize('date_of_submission')}</div>
+            <div class="table-column">${translate('DATE_OF_SUBMISSION')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="reporting_period" sortable class="col-3">
-            <div class="table-column">${this.localize('reporting_period')}</div>
+            <div class="table-column">${translate('REPORTING_PERIOD')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
 
@@ -133,16 +133,25 @@ export class PdReportsList extends LocalizeMixin(
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="col-data col-3 table-cell table-cell--text cell-reports">
-                  <pd-reports-report-title .displayLink="${true}" .report="${report}" .baseUrl="${this.baseUrl}"></pd-reports-report-title>
+                  <pd-reports-report-title
+                    .displayLink="${true}"
+                    .report="${report}"
+                    .baseUrl="${this.baseUrl}"
+                  ></pd-reports-report-title>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">
                   <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
-                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.submission_date)}</div>
-                <div class="col-data col-3 table-cell table-cell--text">${this._withDefault(report.reporting_period)}</div>
+                <div class="col-data col-2 table-cell table-cell--text">
+                  ${this._withDefault(report.submission_date)}
+                </div>
+                <div class="col-data col-3 table-cell table-cell--text">
+                  ${this._withDefault(report.reporting_period)}
+                </div>
               </div>
-            </etools-data-table-row>          `
+            </etools-data-table-row>
+          `
         )}
 
         <list-placeholder .data="${this.data}" ?loading="${this.loading}"></list-placeholder>

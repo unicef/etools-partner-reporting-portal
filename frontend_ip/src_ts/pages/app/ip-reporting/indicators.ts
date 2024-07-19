@@ -8,16 +8,16 @@ import '../../../elements/ip-reporting/indicators-toolbar.js';
 import '../../../elements/list-view-indicators.js';
 import Endpoints from '../../../endpoints.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin.js';
 import {fetchIndicators} from '../../../redux/actions/indicators.js';
 import {store} from '../../../redux/store.js';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {translate} from 'lit-translate';
 
 @customElement('page-ip-reporting-indicators')
-export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connect(store)(LitElement))) {
+export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -45,7 +45,7 @@ export class PageIpReportingIndicators extends LocalizeMixin(SortingMixin(connec
   render() {
     return html`
       <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
-      <page-header .title="${this.localize('indicators')}"></page-header>
+      <page-header .title="${translate('INDICATORS')}"></page-header>
       <page-body>
         <indicators-filters></indicators-filters>
         <indicators-toolbar></indicators-toolbar>

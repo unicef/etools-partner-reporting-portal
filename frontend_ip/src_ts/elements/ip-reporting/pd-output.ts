@@ -9,12 +9,11 @@ import '@polymer/paper-tooltip/paper-tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {
   computeReportableUrl,
   computeCompleteIndicator,
   computeIcon,
-  toggle,
   calculationFormulaAcrossPeriods
 } from './js/pd-output-functions';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -30,13 +29,10 @@ import '../../etools-prp-common/elements/indicator-details';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
-import { RootState } from '../../typings/redux.types';
-import {debounce} from 'lodash-es';
+import {RootState} from '../../typings/redux.types';
 
 @customElement('pd-output')
-export class PdOutput extends LocalizeMixin(
-  RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))))
-) {
+export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))) {
   static styles = css`
     :host {
       display: block;
@@ -175,7 +171,7 @@ export class PdOutput extends LocalizeMixin(
       </etools-prp-ajax>
 
       <div class="header">
-        <labelled-item label="${this.localize('title')}">${this.data?.title}</labelled-item>
+        <labelled-item label="${translate('TITLE')}">${this.data?.title}</labelled-item>
 
         ${this.showMeta
           ? html`
@@ -234,21 +230,20 @@ export class PdOutput extends LocalizeMixin(
                       <dl class="layout horizontal">
                         <dt>
                           <a href=${this.calculationMethodUrl}>
-                            ${this.localize('calculation_methods')}
-                            <paper-tooltip>${this.localize('to_learn_more')}</paper-tooltip>
+                            ${translate('CALCULATION_METHODS')}
+                            <paper-tooltip>${translate('TO_LEARN_MORE')}</paper-tooltip>
                           </a>
                           :
                         </dt>
                         <dt>
                           <b
                             >${this._toLowerCaseLocalized(
-                              indicator.reportable.blueprint.calculation_formula_across_locations,
-                              this.localize.bind(this)
+                              indicator.reportable.blueprint.calculation_formula_across_locations
                             )}</b
                           >
-                          (${this._toLowerCaseLocalized('across_locations', this.localize.bind(this))}),
-                          <b>${this._calculationFormulaAcrossPeriods(indicator, this.localize.bind(this))}</b>
-                          (${this._toLowerCaseLocalized('across_reporting_periods', this.localize.bind(this))})
+                          (${this._toLowerCaseLocalized('across_locations')}),
+                          <b>${this._calculationFormulaAcrossPeriods(indicator)}</b>
+                          (${this._toLowerCaseLocalized('across_reporting_periods')})
                         </dt>
                       </dl>
                     </div>
@@ -256,7 +251,7 @@ export class PdOutput extends LocalizeMixin(
                 </div>
                 <div class="indicator-header__target flex-none layout vertical center-justified">
                   <dl class="layout horizontal justified">
-                    <dt class="flex-4">${this.localize('target')}:</dt>
+                    <dt class="flex-4">${translate('TARGET')}:</dt>
                     <dd class="flex">
                       ${this._equals(indicator.reportable.blueprint.display_type, 'number')
                         ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
@@ -268,7 +263,7 @@ export class PdOutput extends LocalizeMixin(
                     </dd>
                   </dl>
                   <dl class="layout horizontal justified">
-                    <dt class="flex-4">${this.localize('total_cumulative_progress_from_qpr')}:</dt>
+                    <dt class="flex-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
                     ${this._equals(indicator.reportable.blueprint.display_type, 'number')
                       ? html`
                           <dd class="flex">
@@ -286,7 +281,7 @@ export class PdOutput extends LocalizeMixin(
                         `}
                   </dl>
                   <dl class="layout horizontal justified">
-                    <dt class="flex-4">${this.localize('achievement_in_reporting_period')}:</dt>
+                    <dt class="flex-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
                     ${this._equals(indicator.reportable.blueprint.display_type, 'number')
                       ? html`
                           <dd class="flex">
@@ -408,8 +403,8 @@ export class PdOutput extends LocalizeMixin(
     this.removeEventListener('reportable-meta-changed', this._updateMeta as any);
   }
 
-  _calculationFormulaAcrossPeriods(indicator: any, localize: any) {
-    return calculationFormulaAcrossPeriods(indicator, localize);
+  _calculationFormulaAcrossPeriods(indicator: any) {
+    return calculationFormulaAcrossPeriods(indicator);
   }
 
   _toggle(index) {
@@ -466,7 +461,7 @@ export class PdOutput extends LocalizeMixin(
       // @ts-ignore
       .then(() => {
         fireEvent(this, 'toast', {
-          text: this.localize('changes_saved'),
+          text: translate('CHANGES_SAVED'),
           showCloseBtn: true
         });
       })

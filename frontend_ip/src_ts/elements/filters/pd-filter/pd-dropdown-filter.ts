@@ -6,11 +6,11 @@ import '../dropdown-filter/dropdown-filter-multi';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('pd-dropdown-filter')
-export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) {
+export class PDDropdownFilter extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -37,7 +37,7 @@ export class PDDropdownFilter extends LocalizeMixin(connect(store)(LitElement)) 
       <etools-prp-ajax id="programmeDocuments" .url="${this.programmeDocumentsUrl}"></etools-prp-ajax>
       <dropdown-filter-multi
         class="item"
-        .label="${this.localize('pd_title')}"
+        .label="${translate('PD_TITLE')}"
         name="pds"
         .value="${this.value}"
         .data="${this.data}"

@@ -4,7 +4,7 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '../../etools-prp-common/elements/labelled-item';
@@ -13,7 +13,7 @@ import {computePartnerType} from './js/partner-details-functions';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('partner-details')
-export class PartnerDetails extends MatomoMixin(LocalizeMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     :host {
       display: block;
@@ -68,42 +68,42 @@ export class PartnerDetails extends MatomoMixin(LocalizeMixin(UtilsMixin(connect
 
   render() {
     return html`
-      <etools-content-panel panel-title="${this.localize('partner_details')}">
+      <etools-content-panel panel-title="${translate('PARTNER_DETAILS')}">
         <etools-loading ?active="${this.loading}"></etools-loading>
 
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="${this.localize('full_name')}">
+            <labelled-item label="${translate('FULL_NAME')}">
               <span class="field-value">${this._withDefault(this.partner?.title)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('short_name')}">
+            <labelled-item label="${translate('SHORT_NAME')}">
               <span class="field-value">${this._withDefault(this.partner?.short_title)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('alternate_name')}">
+            <labelled-item label="${translate('ALTERNATE_NAME')}">
               <span class="field-value">${this._withDefault(this.partner?.alternate_title)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('vendor_number')}">
+            <labelled-item label="${translate('VENDOR_NUMBER')}">
               <span class="field-value">${this._withDefault(this.partner?.vendor_number)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('partner_type')}">
+            <labelled-item label="${translate('PARTNER_TYPE')}">
               <span class="field-value">${this._computePartnerType(this.partner)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('shared_partners')}">
+            <labelled-item label="${translate('SHARED_PARTNERS')}">
               <span class="field-value">${this._withDefault(this.partner?.shared_partner_display)}</span>
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('date_last_assessed')}">
+            <labelled-item label="${translate('DATE_LAST_ASSESSED')}">
               <span class="field-value">${this._withDefault(this.partner?.core_values_assessment_date)}</span>
             </labelled-item>
           </li>
@@ -111,7 +111,7 @@ export class PartnerDetails extends MatomoMixin(LocalizeMixin(UtilsMixin(connect
 
         <ul class="app-grid">
           <li class="item">
-            <labelled-item label="${this.localize('address')}">
+            <labelled-item label="${translate('ADDRESS')}">
               <span class="field-value" has-icon>
                 <iron-icon icon="communication:location-on"></iron-icon>
                 ${this._withDefault(this.partner?.street_address)}
@@ -119,7 +119,7 @@ export class PartnerDetails extends MatomoMixin(LocalizeMixin(UtilsMixin(connect
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('phone_number')}">
+            <labelled-item label="${translate('PHONE_NUMBER')}">
               <span class="field-value" has-icon>
                 <iron-icon icon="communication:phone"></iron-icon>
                 ${this._withDefault(this.partner?.phone_number)}
@@ -127,7 +127,7 @@ export class PartnerDetails extends MatomoMixin(LocalizeMixin(UtilsMixin(connect
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="${this.localize('email_address')}">
+            <labelled-item label="${translate('EMAIL_ADDRESS')}">
               <span class="field-value" has-icon>
                 <iron-icon icon="communication:email"></iron-icon>
                 ${this._withDefault(this.partner?.email)}

@@ -5,12 +5,12 @@ import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../elements/ip-reporting/pd-filters.js';
 import '../../../../elements/ip-reporting/pd-list-toolbar.js';
 import '../../../../elements/ip-reporting/pd-list.js';
-import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store';
 
 @customElement('page-ip-reporting-pd-index')
-export class PageIpReportingPdIndex extends LocalizeMixin(connect(store)(LitElement)) {
+export class PageIpReportingPdIndex extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -19,7 +19,7 @@ export class PageIpReportingPdIndex extends LocalizeMixin(connect(store)(LitElem
 
   render() {
     return html`
-      <page-header title="${this.localize('programme_documents')}"></page-header>
+      <page-header title="${translate('PROGRAMME_DOCUMENTS')}"></page-header>
 
       <page-body>
         <pd-filters></pd-filters>

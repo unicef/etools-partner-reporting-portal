@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -25,7 +25,7 @@ import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 
 @customElement('pd-output-list-toolbar')
-export class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -85,7 +85,7 @@ export class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(connect(store)
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
       this.importTemplateUrl = computeImportTemplateUrl(this.locationId, this.reportId);
       this.importUrl = computeImportUrl(this.locationId, this.reportId);
@@ -137,15 +137,15 @@ export class PdOutputListToolbar extends LocalizeMixin(UtilsMixin(connect(store)
         ${this.showImportButtons
           ? html`
               <upload-button url="${this.importUrl}" modal-title="Import Template">
-                ${this.localize('import_template')}
+                ${translate('IMPORT_TEMPLATE')}
               </upload-button>
               <download-button url="${this.importTemplateUrl}" tracker="Import template">
-                ${this.localize('generate_uploader')}
+                ${translate('GENERATE_UPLOADER')}
               </download-button>
               ${this.showRefresh
                 ? html`
                     <paper-button class="btn-primary" @click="${this._refresh}" ?disabled="${this.busy}" raised>
-                      ${this.localize('refresh')}
+                      ${translate('REFRESH')}
                     </paper-button>
                   `
                 : ''}

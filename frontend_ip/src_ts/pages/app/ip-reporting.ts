@@ -13,7 +13,6 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-overlay-behavior/iron-overlay-backdrop.js';
 
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin.js';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin.js';
 import {Route} from '../../etools-prp-common/typings/globals.types.js';
 import {RootState} from '../../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
@@ -26,10 +25,11 @@ import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY} from '../../etools-prp-common/config.js';
 import {appDrawerStyles} from '../../elements/ip-reporting/menu/styles/app-drawer-styles.js';
+import {translate} from 'lit-translate';
 // import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 
 @customElement('page-ip-reporting')
-export class PageIpReporting extends LocalizeMixin(UtilsMixin(RoutingMixin(connect(store)(LitElement)))) {
+export class PageIpReporting extends UtilsMixin(RoutingMixin(connect(store)(LitElement))) {
   static styles = [
     css`
       ${appDrawerStyles}
@@ -95,7 +95,7 @@ export class PageIpReporting extends LocalizeMixin(UtilsMixin(RoutingMixin(conne
   render() {
     return html`
       ${appThemeIpStyles}
-      <page-title .title="${this.localize('ip_reporting')}"></page-title>
+      <page-title .title="${translate('IP_REPORTING')}"></page-title>
 
      <app-drawer-layout
         id="layout"

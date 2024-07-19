@@ -5,13 +5,13 @@ import {store} from '../../../redux/store';
 import '../dropdown-filter/dropdown-filter-multi';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import Endpoints from '../../../endpoints';
-import { debounce } from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('location-filter-multi')
-export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(connect(store)(LitElement))) {
+export class LocationFilterMulti extends FilterDependenciesMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -42,7 +42,7 @@ export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(c
     return html`
       <etools-prp-ajax id="locations" .url="${this.locationsUrl}"></etools-prp-ajax>
       <dropdown-filter-multi
-        .label="${this.localize('location')}"
+        .label="${translate('LOCATION')}"
         option-label="name"
         name="location"
         .value="${this.value}"
@@ -54,7 +54,7 @@ export class LocationFilterMulti extends LocalizeMixin(FilterDependenciesMixin(c
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId')) {
       this.locationsUrl = this._computeLocationsUrl(this.locationId);
     }

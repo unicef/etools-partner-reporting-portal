@@ -7,13 +7,13 @@ import '../etools-prp-common/elements/page-body';
 import '../etools-prp-common/elements/user-profile/profile-dropdown';
 import {BASE_PATH} from '../etools-prp-common/config';
 import Endpoints from '../endpoints';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('page-unauthorized')
-export class PageUnauthorized extends LocalizeMixin(connect(store)(LitElement)) {
+export class PageUnauthorized extends connect(store)(LitElement) {
   @property({type: Boolean})
   loading = true;
 
@@ -61,7 +61,7 @@ export class PageUnauthorized extends LocalizeMixin(connect(store)(LitElement)) 
         <div class="item">
           <span class="sign-out-button" @click="${this._logout}">
             <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
-            ${this.localize('sign_out')}
+            ${translate('SIGN_OUT')}
           </span>
         </div>
 

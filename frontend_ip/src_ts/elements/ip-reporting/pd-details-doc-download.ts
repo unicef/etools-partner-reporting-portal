@@ -4,7 +4,7 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
@@ -12,7 +12,7 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {RootState} from '../../typings/redux.types';
 
 @customElement('pd-details-doc-download')
-export class PdDetailsDocDownload extends MatomoMixin(LocalizeMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     .spinner-size {
       width: 19px;
@@ -51,7 +51,7 @@ export class PdDetailsDocDownload extends MatomoMixin(LocalizeMixin(UtilsMixin(c
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('pd') || changedProperties.has('locationId')) {
       this.pdDocumentUrl = computeDocUrl(this.locationId, this.pd.id);
     }
@@ -82,7 +82,7 @@ export class PdDetailsDocDownload extends MatomoMixin(LocalizeMixin(UtilsMixin(c
       if (res.status !== 200 || !res.data.signed_pd_document_file) {
         // Fire Toast with error
         fireEvent(this, 'toast', {
-          text: this.localize('an_error_occurred'),
+          text: translate('AN_ERROR_OCCURRED'),
           showCloseBtn: true
         });
         console.error(res);

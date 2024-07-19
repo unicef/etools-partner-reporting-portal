@@ -8,7 +8,7 @@ import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@polymer/paper-tooltip/paper-tooltip';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
@@ -24,7 +24,7 @@ import {RootState} from '../../typings/redux.types';
 
 @customElement('pd-list')
 export class PdList extends RoutingMixin(
-  MatomoMixin(LocalizeMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))))
+  MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement)))))
 ) {
   @property({type: Boolean})
   loading = false;
@@ -69,38 +69,38 @@ export class PdList extends RoutingMixin(
           text-transform: uppercase;
         }
       </style>
-      <etools-content-panel panel-title="${this.localize('list_pds')}">
+      <etools-content-panel panel-title="${translate('LIST_PDS')}">
         <etools-data-table-header
           no-collapse
           label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
-            .count} ${this.localize('results_to_show')}"
+            .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column field="reference_number" class="col-2" sortable>
-            <div class="table-column">${this.localize('pd_ref_number')}</div>
+            <div class="table-column">${translate('PD_REF_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable class="col-1">
-            <div class="table-column">${this.localize('pd_ssfa_status')}</div>
+            <div class="table-column">${translate('PD_SSFA_STATUS')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="start_date" sortable class="col-1">
-            <div class="table-column">${this.localize('start_date')}</div>
+            <div class="table-column">${translate('START_DATE')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="end_date" sortable class="col-1">
-            <div class="table-column">${this.localize('end_date')}</div>
+            <div class="table-column">${translate('END_DATE')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="cso_contribution" sortable class="col-1">
-            <div class="table-column">${this.localize('cso_contribution')}</div>
+            <div class="table-column">${translate('CSO_CONTRIBUTION')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="total_unicef_cash" sortable class="col-1">
-            <div class="table-column">${this.localize('unicef_cash')}</div>
+            <div class="table-column">${translate('UNICEF_CASH')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="total_unicef_supplies" sortable class="col-1">
-            <div class="table-column">${this.localize('unicef_supplies')}</div>
+            <div class="table-column">${translate('UNICEF_SUPPLIES')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="budget" sortable class="col-1">
-            <div class="table-column">${this.localize('planned_budget')}</div>
+            <div class="table-column">${translate('PLANNED_BUDGET')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="funds_received_to_date" sortable class="col-2">
-            <div class="table-column">${this.localize('cash_transfers')}</div>
+            <div class="table-column">${translate('CASH_TRANSFERS')}</div>
           </etools-data-table-column>
           <etools-data-table-column class="col-1"></etools-data-table-column>
         </etools-data-table-header>
@@ -156,7 +156,7 @@ export class PdList extends RoutingMixin(
                     tracker="Reports"
                     href="${this.getLinkUrl(this._baseUrl, pd.id, 'reports')}"
                   >
-                    ${this.localize('reports')}
+                    ${translate('REPORTS')}
                   </a>
                 </div>
               </div>

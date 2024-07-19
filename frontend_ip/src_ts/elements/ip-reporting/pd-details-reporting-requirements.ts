@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
@@ -12,25 +12,28 @@ import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styl
 import '../../etools-prp-common/elements/list-placeholder';
 
 @customElement('pd-details-reporting-requirements')
-export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
-  static styles = [layoutStyles, css`   
-    :host {
-      display: block;
+export class PdDetailsReportingRequirements extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = [
+    layoutStyles,
+    css`
+      :host {
+        display: block;
 
-      --header-title: {
-        display: none;
+        --header-title: {
+          display: none;
+        }
+
+        --data-table-header: {
+          height: auto;
+        }
       }
 
-      --data-table-header: {
-        height: auto;
+      h3 {
+        padding: 0 24px;
+        margin: 0;
       }
-    }
-
-    h3 {
-      padding: 0 24px;
-      margin: 0;
-    }
-  `];
+    `
+  ];
 
   @property({type: Array})
   data: any[] = [];
@@ -44,14 +47,16 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
   render() {
     return html`
       ${tableStyles}
-      <style> ${dataTableStylesLit} </style>
-      <section> 
+      <style>
+        ${dataTableStylesLit}
+      </style>
+      <section>
         <h3>${this.title}</h3>
 
         <etools-data-table-header no-collapse no-title>
-          <etools-data-table-column class="col-4" field=""> ${this.localize('report_number')} </etools-data-table-column>
-          <etools-data-table-column class="col-4" field=""> ${this.localize('due_date')} </etools-data-table-column>
-          <etools-data-table-column class="col-4" field=""> ${this.localize('reporting_period')} </etools-data-table-column>
+          <etools-data-table-column class="col-4" field=""> ${translate('REPORT_NUMBER')} </etools-data-table-column>
+          <etools-data-table-column class="col-4" field=""> ${translate('DUE_DATE')} </etools-data-table-column>
+          <etools-data-table-column class="col-4" field=""> ${translate('REPORTING_PERIOD')} </etools-data-table-column>
         </etools-data-table-header>
 
         ${(this.data || []).map(
@@ -69,7 +74,7 @@ export class PdDetailsReportingRequirements extends UtilsMixin(LocalizeMixin(con
         <list-placeholder
           .data="${this.data}"
           .loading="${this.loading}"
-          message="${this.localize('no_report_data')}"
+          message="${translate('NO_REPORT_DATA')}"
         ></list-placeholder>
       </section>
     `;

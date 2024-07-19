@@ -482,5 +482,6 @@
     "UNSATISFIED": "Неудовлетворённый",
     "NEUTRAL": "Нейтральный",
     "SATISFIED": "Довольный",
-    "VERY_SATISFIED": "Очень доволен"
+    "VERY_SATISFIED": "Очень доволен",
+    "COMMUNITY_CHANNELS": "Каналы сообщества"
 }

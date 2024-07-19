@@ -6,11 +6,11 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('report-location-filter')
-export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
+export class ReportLocationFilter extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -36,7 +36,7 @@ export class ReportLocationFilter extends LocalizeMixin(connect(store)(LitElemen
     return html`
       <etools-prp-ajax id="locations" .url="${this.locationsUrl}"> </etools-prp-ajax>
       <searchable-dropdown-filter
-        .label="${this.localize('location')}"
+        .label="${translate('LOCATION')}"
         name="location"
         option-label="name"
         .value="${this.value}"

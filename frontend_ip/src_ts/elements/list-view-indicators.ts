@@ -10,7 +10,7 @@ import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import {tableStyles} from '../etools-prp-common/styles/table-styles';
 import DataTableMixin from '../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import './list-view-single-indicator';
 import '../etools-prp-common/elements/list-placeholder';
@@ -21,9 +21,7 @@ import {RootState} from '../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('list-view-indicators')
-export class ListViewIndicators extends UtilsMixin(
-  DataTableMixin(PaginationMixin(LocalizeMixin(connect(store)(LitElement))))
-) {
+export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(connect(store)(LitElement)))) {
   static styles = css`
     ${layoutStyles},
     :host {
@@ -70,54 +68,55 @@ export class ListViewIndicators extends UtilsMixin(
   render() {
     return html`
       ${tableStyles}
-      <style> ${dataTableStylesLit} </style>
+      <style>
+        ${dataTableStylesLit}
+      </style>
 
       <etools-prp-permissions
         .permissions="${this.permissions}"
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       ></etools-prp-permissions>
 
-      <etools-content-panel panel-title="${this.localize('list_of_indicators')}">
+      <etools-content-panel panel-title="${translate('LIST_OF_INDICATORS')}">
         <etools-data-table-header
           id="listHeader"
-          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator.count} ${this.localize(
-            'results_to_show'
-          )}"
+          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
+            .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column field="indicator" class="col-2">
-            <div class="table-column">${this.localize('indicator')}</div>
+            <div class="table-column">${translate('INDICATOR')}</div>
           </etools-data-table-column>
 
           ${this.showProjectContextColumn
             ? html`
                 <etools-data-table-column field="content_object_title" class="col-1">
-                  <div class="table-column">${this.localize('project_context')}</div>
+                  <div class="table-column">${translate('PROJECT_CONTEXT')}</div>
                 </etools-data-table-column>
               `
             : ''}
 
           <etools-data-table-column field="blueprint.calculation_formula_across_locations" class="col-2">
-            <div class="table-column">${this.localize('calc_across_locations')}</div>
+            <div class="table-column">${translate('CALC_ACROSS_LOCATIONS')}</div>
           </etools-data-table-column>
 
           <etools-data-table-column field="blueprint.calculation_formula_across_periods" class="col-2">
-            <div class="table-column">${this.localize('calc_across_periods')}</div>
+            <div class="table-column">${translate('CALC_ACROSS_PERIODS')}</div>
           </etools-data-table-column>
 
           <etools-data-table-column field="baseline" class="col-1">
-            <div class="table-column">${this.localize('baseline')}</div>
+            <div class="table-column">${translate('BASELINE')}</div>
           </etools-data-table-column>
 
           <etools-data-table-column field="target" class="col-1">
-            <div class="table-column">${this.localize('target')}</div>
+            <div class="table-column">${translate('TARGET')}</div>
           </etools-data-table-column>
 
           <etools-data-table-column field="achieved" class="col-1">
-            <div class="table-column">${this.localize('achieved')}</div>
+            <div class="table-column">${translate('ACHIEVED')}</div>
           </etools-data-table-column>
 
           <etools-data-table-column field="progress_percentage" sortable class="col-2">
-            <div class="table-column">${this.localize('current_progress')}</div>
+            <div class="table-column">${translate('CURRENT_PROGRESS')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
 
@@ -177,7 +176,7 @@ export class ListViewIndicators extends UtilsMixin(
     ) {
       this.queryParams = state.app?.routeDetails.queryParams;
     }
-  
+
     if (this.appName !== state.app.current) {
       this.appName = state.app.current;
     }

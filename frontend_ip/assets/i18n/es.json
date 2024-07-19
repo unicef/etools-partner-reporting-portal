@@ -482,5 +482,6 @@
     "UNSATISFIED": "Insatisfecho",
     "NEUTRAL": "Neutral",
     "SATISFIED": "Satisfecho",
-    "VERY_SATISFIED": "Muy satisfecho"
+    "VERY_SATISFIED": "Muy satisfecho",
+    "COMMUNITY_CHANNELS": "Canales comunitarios"
 }

@@ -15,7 +15,7 @@ import '../../etools-prp-common/elements/filter-list';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
@@ -31,10 +31,9 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
  */
 @customElement('pd-report-info')
-export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = [
     css`
       :host {
@@ -229,7 +228,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
       <etools-content-panel panel-title="Other info" ?no-header="${this.noHeader}">
         <div class="app-grid">
           <div class="row">
-            <labelled-item label="${this.localize('non_financial_contribution_during_reporting_period')}">
+            <labelled-item label="${translate('NON_FINANCIAL_CONTRIBUTION_DURING_REPORTING_PERIOD')}">
               ${
                 this._equals(this.computedMode, 'view')
                   ? html`<span class="value">${this._withDefault(this.data.partner_contribution_to_date)}</span>`
@@ -247,7 +246,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
           </div>
 
           <div class="row">
-            <span class="item-label">${this.localize('financial_contribution_during_reporting_period')}</span>
+            <span class="item-label">${translate('FINANCIAL_CONTRIBUTION_DURING_REPORTING_PERIOD')}</span>
             <div class="currency-row">
               <div class="currency-ammount">
                 <etools-currency-amount-input
@@ -277,7 +276,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
           </div>
 
           <div class="row">
-            <labelled-item label="${this.localize('challenges_bottlenecks')}">
+            <labelled-item label="${translate('CHALLENGES_BOTTLENECKS')}">
               ${
                 this._equals(this.computedMode, 'view')
                   ? html`
@@ -297,7 +296,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
           </div>
 
           <div class="row">
-            <labelled-item label="${this.localize('proposed_way_forward')}">
+            <labelled-item label="${translate('PROPOSED_WAY_FORWARD')}">
               ${
                 this._equals(this.computedMode, 'view')
                   ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
@@ -311,7 +310,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                       ></paper-input>
 
                       ${this.showFaceMessage
-                        ? html` <div class="face-form-message">${this.localize('face_form_submitted')}</div> `
+                        ? html` <div class="face-form-message">${translate('FACE_FORM_SUBMITTED')}</div> `
                         : html``}
                     `
               }
@@ -322,13 +321,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
             this._isFinalReport(this.currentReport)
               ? html`
                   <div class="row">
-                    <labelled-item label="${this.localize('release_cash_in_time')}">
+                    <labelled-item label="${translate('RELEASE_CASH_IN_TIME')}">
                       <paper-radio-group .selected="${this.localData?.final_review.release_cash_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('yes')}
+                          ${translate('YES')}
                         </paper-radio-button>
                         <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('no')}
+                          ${translate('NO')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -343,7 +342,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="release_cash_in_time_comment"
                               .value="${this.localData?.final_review.release_cash_in_time_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -352,13 +351,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                   </div>
 
                   <div class="row">
-                    <labelled-item label="${this.localize('release_supplies_in_time')}">
+                    <labelled-item label="${translate('RELEASE_SUPPLIES_IN_TIME')}">
                       <paper-radio-group .selected="${this.localData?.final_review.release_supplies_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('yes')}
+                          ${translate('YES')}
                         </paper-radio-button>
                         <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('no')}
+                          ${translate('NO')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -373,7 +372,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="release_supplies_in_time_comment"
                               .value="${this.localData?.final_review.release_supplies_in_time_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -382,13 +381,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                   </div>
 
                   <div class="row">
-                    <labelled-item label="${this.localize('feedback_face_form_in_time')}">
+                    <labelled-item label="${translate('FEEDBACK_FACE_FORM_IN_TIME')}">
                       <paper-radio-group .selected="${this.localData?.final_review.feedback_face_form_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('yes')}
+                          ${translate('YES')}
                         </paper-radio-button>
                         <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('no')}
+                          ${translate('NO')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -403,7 +402,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="feedback_face_form_in_time_comment"
                               .value="${this.localData?.final_review.feedback_face_form_in_time_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -412,13 +411,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                   </div>
 
                   <div class="row">
-                    <labelled-item label="${this.localize('respond_requests_in_time')}">
+                    <labelled-item label="${translate('RESPOND_REQUESTS_IN_TIME')}">
                       <paper-radio-group .selected="${this.localData?.final_review.respond_requests_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('yes')}
+                          ${translate('YES')}
                         </paper-radio-button>
                         <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('no')}
+                          ${translate('NO')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -433,7 +432,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="respond_requests_in_time_comment"
                               .value="${this.localData?.final_review.respond_requests_in_time_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -442,13 +441,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                   </div>
 
                   <div class="row">
-                    <labelled-item label="${this.localize('implemented_as_planned')}">
+                    <labelled-item label="${translate('IMPLEMENTED_AS_PLANNED')}">
                       <paper-radio-group .selected="${this.localData?.final_review.implemented_as_planned_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('yes')}
+                          ${translate('YES')}
                         </paper-radio-button>
                         <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('no')}
+                          ${translate('NO')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -463,7 +462,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="implemented_as_planned_comment"
                               .value="${this.localData?.final_review.implemented_as_planned_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -472,13 +471,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                   </div>
 
                   <div class="row">
-                    <labelled-item label="${this.localize('action_to_address')}">
+                    <labelled-item label="${translate('ACTION_TO_ADDRESS')}">
                       <paper-radio-group .selected="${this.localData?.final_review.action_to_address_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('yes')}
+                          ${translate('YES')}
                         </paper-radio-button>
                         <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('no')}
+                          ${translate('NO')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -493,7 +492,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="action_to_address_comment"
                               .value="${this.localData?.final_review.action_to_address_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -502,28 +501,28 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                   </div>
 
                   <div class="row">
-                    <labelled-item label="${this.localize('overall_satisfaction')}">
+                    <labelled-item label="${translate('OVERALL_SATISFACTION')}">
                       <paper-radio-group .selected="${this.localData?.final_review.overall_satisfaction_choice}">
                         <paper-radio-button
                           name="very_unsatisfied"
                           ?disabled="${this._equals(this.computedMode, 'view')}"
                         >
-                          ${this.localize('very_unsatisfied')}
+                          ${translate('VERY_UNSATISFIED')}
                         </paper-radio-button>
                         <paper-radio-button name="unsatisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('unsatisfied')}
+                          ${translate('UNSATISFIED')}
                         </paper-radio-button>
                         <paper-radio-button name="neutral" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('neutral')}
+                          ${translate('NEUTRAL')}
                         </paper-radio-button>
                         <paper-radio-button name="satisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${this.localize('satisfied')}
+                          ${translate('SATISFIED')}
                         </paper-radio-button>
                         <paper-radio-button
                           name="very_satisfied"
                           ?disabled="${this._equals(this.computedMode, 'view')}"
                         >
-                          ${this.localize('very_satisfied')}
+                          ${translate('VERY_SATISFIED')}
                         </paper-radio-button>
                       </paper-radio-group>
 
@@ -538,7 +537,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
                               id="overall_satisfaction_comment"
                               .value="${this.localData?.final_review.overall_satisfaction_comment}"
                               no-label-float
-                              placeholder="${this.localize('comments')}"
+                              placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
                             ></paper-input>
@@ -553,7 +552,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
             !this._equals(this.computedMode, 'view')
               ? html`
                   <paper-button class="btn-primary" id="toggle-button" @tap="${this._handleInput}" raised>
-                    ${this.localize('save')}
+                    ${translate('SAVE')}
                   </paper-button>
                 `
               : html``
@@ -627,14 +626,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(LocalizeMixin(UtilsMi
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
-            text: this.localize('changes_saved'),
+            text: translate('CHANGES_SAVED'),
             showCloseBtn: true
           });
         })
         // @ts-ignore
         .catch((err) => {
           fireEvent(this, 'toast', {
-            text: formatServerErrorAsText(err, this.localize('an_error_occurred')),
+            text: formatServerErrorAsText(err, translate('AN_ERROR_OCCURRED') as any as string),
             showCloseBtn: true
           });
           console.log(err);

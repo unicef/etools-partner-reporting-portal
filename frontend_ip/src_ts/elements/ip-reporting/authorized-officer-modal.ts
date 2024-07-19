@@ -10,7 +10,6 @@ import {ErrorModalEl} from '../../etools-prp-common/elements/error-modal';
 import '../../etools-prp-common/elements/app-switcher';
 import '../../etools-prp-common/elements/workspace-dropdown';
 import '../organization-dropdown';
-import '../language-dropdown';
 import '../../etools-prp-common/elements/user-profile/profile-dropdown';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
@@ -20,12 +19,10 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import {RootState} from '../../typings/redux.types';
 import {waitForIronOverlayToClose} from '../../etools-prp-common/utils/util';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 
 @customElement('authorized-officer-modal')
-export class AuthorizedOfficerModal extends LocalizeMixin(
-  ModalMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement))))
-) {
+export class AuthorizedOfficerModal extends ModalMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))) {
   static styles = css`
     :host {
       display: block;
@@ -100,18 +97,18 @@ export class AuthorizedOfficerModal extends LocalizeMixin(
 
       <paper-dialog modal .opened="${this.opened}">
         <div class="header layout horizontal justified">
-          <h2>${this.localize('select_authorized_officer')}</h2>
+          <h2>${translate('SELECT_AUTHORIZED_OFFICER')}</h2>
           <paper-icon-button class="self-center" @click="${this.close}" icon="icons:close"> </paper-icon-button>
         </div>
 
         <paper-dialog-scrollable>
           <div class="dialog-content">
-            <h3>${this.localize('could_not_be_submitted')}</h3>
+            <h3>${translate('COULD_NOT_BE_SUBMITTED')}</h3>
             <etools-dropdown
               id="officerDropdown"
               class="validate"
-              label="${this.localize('authorized_officer')}"
-              placeholder="${this.localize('select')}"
+              label="${translate('AUTHORIZED_OFFICER')}"
+              placeholder="${translate('SELECT')}"
               .options="${this.currentAuthorizedPartners}"
               option-value="value"
               option-label="title"
@@ -126,10 +123,10 @@ export class AuthorizedOfficerModal extends LocalizeMixin(
 
         <div class="buttons layout horizontal-reverse">
           <paper-button class="btn-primary" @click="${this._save}" ?disabled="${this.busy}" raised>
-            ${this.localize('submit')}
+            ${translate('SUBMIT')}
           </paper-button>
           <paper-button class="btn-primary" @click="${this._cancel}" ?disabled="${this.busy}">
-            ${this.localize('cancel')}
+            ${translate('CANCEL')}
           </paper-button>
         </div>
       </paper-dialog>

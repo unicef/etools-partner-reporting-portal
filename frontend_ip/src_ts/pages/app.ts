@@ -5,7 +5,6 @@ import '@unicef-polymer/etools-toasts/src/etools-toasts.js';
 
 import '../elements/etools-prp-workspaces.js';
 import '../etools-prp-common/elements/etools-prp-ajax.js';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin.js';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../endpoints.js';
 import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions.js';
@@ -20,9 +19,10 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
+import {translate} from 'lit-translate';
 
 @customElement('page-app')
-export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -96,8 +96,8 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
 
       ${!this.userHasPrpRolesOrAccess
         ? html`<div class="no-groups-notification">
-            <h3>${this.localize('account_created')}</h3>
-            <p>${this.localize('please_wait_business_days')}</p>
+            <h3>${translate('ACCOUNT_CREATED')}</h3>
+            <p>${translate('PLEASE_WAIT_BUSINESS_DAYS')}</p>
           </div>`
         : html``}
       ${this.page === 'ip-reporting' ? html`<page-ip-reporting name="ip-reporting"> </page-ip-reporting>` : html``}
@@ -137,8 +137,8 @@ export class PageApp extends LocalizeMixin(UtilsMixin(connect(store)(LitElement)
       this._workspaceCode = state.workspaces.current;
     }
 
-    if (this._language !== state.localize.language) {
-      this._language = state.localize.language;
+    if (this._language !== state.activeLanguage.activeLanguage) {
+      this._language = state.activeLanguage.activeLanguage;
     }
 
     if (this._app !== state.app.current) {

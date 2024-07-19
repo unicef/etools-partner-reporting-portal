@@ -4,7 +4,7 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/filter-list.js';
 import '../../elements/filters/text-filter/text-filter.js';
@@ -15,10 +15,10 @@ import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-filters')
-export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElement))) {
-  static get styles() { 
-    return [layoutStyles]
-  };
+export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
+  static get styles() {
+    return [layoutStyles];
+  }
 
   @property({type: Object})
   queryParams!: any;
@@ -36,7 +36,7 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
         <div class="row">
           <text-filter
             class="col-lg-2 col-12"
-            label="${this.localize('pd_ref_and_title')}"
+            label="${translate('PD_REF_AND_TITLE')}"
             name="ref_title"
             .value="${this.queryParams?.ref_title || ''}"
             @value-changed="${this._handleFilterChange}"
@@ -44,7 +44,7 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
           </text-filter>
           <dropdown-filter-multi
             class="col-lg-5 col-12"
-            label="${this.localize('pd_ssfa_status')}"
+            label="${translate('PD_SSFA_STATUS')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
             .data="${this.statuses}"
@@ -79,12 +79,12 @@ export class PdFilters extends UtilsMixin(LocalizeMixin(connect(store)(LitElemen
 
   private _initStatuses() {
     return [
-      {title: this.localize('signed'), id: 'signed'},
-      {title: this.localize('active'), id: 'active'},
-      {title: this.localize('suspended'), id: 'suspended'},
-      {title: this.localize('ended'), id: 'ended'},
-      {title: this.localize('closed'), id: 'closed'},
-      {title: this.localize('terminated'), id: 'terminated'}
+      {title: translate('SIGNED'), id: 'signed'},
+      {title: translate('ACTIVE'), id: 'active'},
+      {title: translate('SUSPENDED'), id: 'suspended'},
+      {title: translate('ENDED'), id: 'ended'},
+      {title: translate('CLOSED'), id: 'closed'},
+      {title: translate('TERMINATED'), id: 'terminated'}
     ];
   }
 

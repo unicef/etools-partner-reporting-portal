@@ -4,13 +4,13 @@ import '../dropdown-filter/searchable-dropdown-filter';
 import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import {debounce} from 'lodash-es';
 
 @customElement('location-filter')
-export class LocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
+export class LocationFilter extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -33,7 +33,7 @@ export class LocationFilter extends LocalizeMixin(connect(store)(LitElement)) {
     return html`
       <etools-prp-ajax id="locations" .url="${this.locationsUrl}"></etools-prp-ajax>
       <searchable-dropdown-filter
-        .label="${this.localize('location')}"
+        .label="${translate('LOCATION')}"
         option-label="name"
         name="location"
         .value="${this.value}"
