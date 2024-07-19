@@ -1018,7 +1018,7 @@ class ImportRealmSerializer(serializers.Serializer):
 
 class ImportUserRealmsSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
-    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=True)
+    realms = serializers.ListSerializer(child=ImportRealmSerializer(), allow_empty=True)
 
     class Meta:
         model = get_user_model()
