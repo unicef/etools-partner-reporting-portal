@@ -27,7 +27,6 @@ from etools_prp.apps.indicator.serializers import (
 from etools_prp.apps.partner.models import Partner
 
 from ..core.models import Realm
-from ..utils.serializers import OptionalElementsListSerializer
 from .models import (
     FinalReview,
     LowerLevelOutput,
