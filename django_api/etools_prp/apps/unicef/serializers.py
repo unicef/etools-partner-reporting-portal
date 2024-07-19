@@ -1077,6 +1077,8 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         validated_data['username'] = validated_data['email']
 
         realms = validated_data.pop('realms')
+        if not realms:
+            raise ValidationError('Cannot create a user without realms.')
 
         first_realm = realms[0]
         validated_data['workspace_id'] = first_realm['country'].id
