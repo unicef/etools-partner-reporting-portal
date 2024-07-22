@@ -12,7 +12,7 @@ import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
@@ -253,7 +253,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
-            text: translate('FILE_DELETED'),
+            text: getTranslation('FILE_DELETED'),
             showCloseBtn: true
           });
 
@@ -358,7 +358,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
-            text: translate('FILE_UPLOADED'),
+            text: getTranslation('FILE_UPLOADED'),
             showCloseBtn: true
           });
           this.faceLoading = false;

@@ -21,7 +21,7 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {store} from '../../../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {connect} from 'pwa-helpers';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 
 @customElement('page-pd-report-sr-reporting')
 export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
@@ -249,7 +249,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
         .dispatch(pdReportsUpdate(elem.thunk(), this.pdId, this.reportId))
         .then(() => {
           fireEvent(this, 'toast', {
-            text: translate('CHANGES_SAVED'),
+            text: getTranslation('CHANGES_SAVED'),
             showCloseBtn: true
           });
         })

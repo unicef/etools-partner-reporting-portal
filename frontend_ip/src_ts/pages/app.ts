@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/paper-toast/paper-toast.js';
-import '@unicef-polymer/etools-toasts/src/etools-toasts.js';
+import '@unicef-polymer/etools-unicef/src/etools-toasts/etools-toasts';
 
 import '../elements/etools-prp-workspaces.js';
 import '../etools-prp-common/elements/etools-prp-ajax.js';

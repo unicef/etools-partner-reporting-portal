@@ -4,7 +4,7 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {get as getTranslation} from 'lit-translate';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
@@ -82,7 +82,7 @@ export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(
       if (res.status !== 200 || !res.data.signed_pd_document_file) {
         // Fire Toast with error
         fireEvent(this, 'toast', {
-          text: translate('AN_ERROR_OCCURRED'),
+          text: getTranslation('AN_ERROR_OCCURRED'),
           showCloseBtn: true
         });
         console.error(res);

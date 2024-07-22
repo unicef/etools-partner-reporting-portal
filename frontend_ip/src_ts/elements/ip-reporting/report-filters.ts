@@ -3,6 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/reportable-filter/reportable-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
@@ -20,19 +21,11 @@ export class ReportFilters extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   filters: any[] = [];
 
-  static styles = [
+  static styles = [layoutStyles,
     css`
       :host {
         display: block;
         background: white;
-
-        --app-grid-columns: 4;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
-      }
-
-      .incomplete {
-        grid-column: span var(--app-grid-expandible-item-columns);
       }
     `
   ];
@@ -42,22 +35,29 @@ export class ReportFilters extends UtilsMixin(connect(store)(LitElement)) {
       ${filterStyles}
 
       <filter-list .filters="${this.filters}" @filters-changed=${(e) => (this.filters = e.detail.value)}>
-        <div class="app-grid">
-          <reportable-filter
-            class="item"
-            .value="${this._withDefault(this.queryParams?.llo, '-1')}"
-          ></reportable-filter>
-          <report-location-filter
-            class="item"
-            .value="${this._withDefault(this.queryParams?.location, '-1')}"
-          ></report-location-filter>
-          <checkbox-filter
-            class="incomplete"
-            name="incomplete"
-            .value="${this._withDefault(this.queryParams?.incomplete, '')}"
-          >
-            <span class="checkbox-label">${translate('SHOW_INCOMPLETE_ONLY')}</span>
-          </checkbox-filter>
+        <div class="row">
+          <div class="col-md-4 col-12">
+            <reportable-filter
+              class="item"
+              .value="${this._withDefault(this.queryParams?.llo, '-1')}"
+            ></reportable-filter>
+          </div>
+          <div class="col-md-4 col-12">
+            <report-location-filter
+              class="item"
+              .value="${this._withDefault(this.queryParams?.location, '-1')}"
+            ></report-location-filter>
+          </div>
+        </div>
+        <div class="row padding-v">
+          <div class="col-12">
+            <checkbox-filter
+              name="incomplete"
+              .value="${this._withDefault(this.queryParams?.incomplete, '')}"
+            >
+              <span class="checkbox-label">${translate('SHOW_INCOMPLETE_ONLY')}</span>
+            </checkbox-filter>
+          </div>
         </div>
       </filter-list>
     `;

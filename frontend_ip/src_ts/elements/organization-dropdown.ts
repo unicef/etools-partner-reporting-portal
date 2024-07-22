@@ -5,7 +5,7 @@ import '../etools-prp-common/elements/etools-prp-ajax';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import {store} from '../redux/store';
 import Endpoints from '../etools-prp-common/endpoints';
 import {RootState} from '../typings/redux.types';
@@ -106,7 +106,7 @@ export class OrganizationDropdown extends connect(store)(LitElement) {
   private checkMustSelectOrganization(user: any | undefined) {
     if (user && user.id && !user.partner) {
       setTimeout(() => {
-        fireEvent(this, 'toast', {text: translate('SELECT_ORGANIZATION')});
+        fireEvent(this, 'toast', {text: getTranslation('SELECT_ORGANIZATION')});
       }, 2000);
       return 'warning';
     }

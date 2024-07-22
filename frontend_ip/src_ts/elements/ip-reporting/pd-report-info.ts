@@ -15,7 +15,7 @@ import '../../etools-prp-common/elements/filter-list';
 import '../../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
@@ -322,7 +322,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
               ? html`
                   <div class="row">
                     <labelled-item label="${translate('RELEASE_CASH_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.release_cash_in_time_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.release_cash_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </paper-radio-button>
@@ -334,13 +334,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.release_cash_in_time_comment)}
+                              ${this._withDefault(this.data?.final_review?.release_cash_in_time_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="release_cash_in_time_comment"
-                              .value="${this.localData?.final_review.release_cash_in_time_comment}"
+                              .value="${this.localData?.final_review?.release_cash_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -352,7 +352,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
                   <div class="row">
                     <labelled-item label="${translate('RELEASE_SUPPLIES_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.release_supplies_in_time_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.release_supplies_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </paper-radio-button>
@@ -364,13 +364,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.release_supplies_in_time_comment)}
+                              ${this._withDefault(this.data?.final_review?.release_supplies_in_time_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="release_supplies_in_time_comment"
-                              .value="${this.localData?.final_review.release_supplies_in_time_comment}"
+                              .value="${this.localData?.final_review?.release_supplies_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -382,7 +382,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
                   <div class="row">
                     <labelled-item label="${translate('FEEDBACK_FACE_FORM_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.feedback_face_form_in_time_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.feedback_face_form_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </paper-radio-button>
@@ -394,13 +394,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.feedback_face_form_in_time_comment)}
+                              ${this._withDefault(this.data?.final_review?.feedback_face_form_in_time_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="feedback_face_form_in_time_comment"
-                              .value="${this.localData?.final_review.feedback_face_form_in_time_comment}"
+                              .value="${this.localData?.final_review?.feedback_face_form_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -412,7 +412,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
                   <div class="row">
                     <labelled-item label="${translate('RESPOND_REQUESTS_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.respond_requests_in_time_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.respond_requests_in_time_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </paper-radio-button>
@@ -424,13 +424,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.respond_requests_in_time_comment)}
+                              ${this._withDefault(this.data?.final_review?.respond_requests_in_time_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="respond_requests_in_time_comment"
-                              .value="${this.localData?.final_review.respond_requests_in_time_comment}"
+                              .value="${this.localData?.final_review?.respond_requests_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -442,7 +442,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
                   <div class="row">
                     <labelled-item label="${translate('IMPLEMENTED_AS_PLANNED')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.implemented_as_planned_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.implemented_as_planned_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </paper-radio-button>
@@ -454,13 +454,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.implemented_as_planned_comment)}
+                              ${this._withDefault(this.data?.final_review?.implemented_as_planned_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="implemented_as_planned_comment"
-                              .value="${this.localData?.final_review.implemented_as_planned_comment}"
+                              .value="${this.localData?.final_review?.implemented_as_planned_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -472,7 +472,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
                   <div class="row">
                     <labelled-item label="${translate('ACTION_TO_ADDRESS')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.action_to_address_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.action_to_address_choice}">
                         <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </paper-radio-button>
@@ -484,13 +484,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.action_to_address_comment)}
+                              ${this._withDefault(this.data?.final_review?.action_to_address_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="action_to_address_comment"
-                              .value="${this.localData?.final_review.action_to_address_comment}"
+                              .value="${this.localData?.final_review?.action_to_address_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -502,7 +502,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
                   <div class="row">
                     <labelled-item label="${translate('OVERALL_SATISFACTION')}">
-                      <paper-radio-group .selected="${this.localData?.final_review.overall_satisfaction_choice}">
+                      <paper-radio-group .selected="${this.localData?.final_review?.overall_satisfaction_choice}">
                         <paper-radio-button
                           name="very_unsatisfied"
                           ?disabled="${this._equals(this.computedMode, 'view')}"
@@ -529,13 +529,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       ${this._equals(this.computedMode, 'view')
                         ? html`
                             <div class="value">
-                              ${this._withDefault(this.data.final_review.overall_satisfaction_comment)}
+                              ${this._withDefault(this.data?.final_review?.overall_satisfaction_comment)}
                             </div>
                           `
                         : html`
                             <paper-input
                               id="overall_satisfaction_comment"
-                              .value="${this.localData?.final_review.overall_satisfaction_comment}"
+                              .value="${this.localData?.final_review?.overall_satisfaction_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -626,14 +626,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
-            text: translate('CHANGES_SAVED'),
+            text: getTranslation('CHANGES_SAVED'),
             showCloseBtn: true
           });
         })
         // @ts-ignore
         .catch((err) => {
           fireEvent(this, 'toast', {
-            text: formatServerErrorAsText(err, translate('AN_ERROR_OCCURRED') as any as string),
+            text: formatServerErrorAsText(err, getTranslation('AN_ERROR_OCCURRED') as any as string),
             showCloseBtn: true
           });
           console.log(err);

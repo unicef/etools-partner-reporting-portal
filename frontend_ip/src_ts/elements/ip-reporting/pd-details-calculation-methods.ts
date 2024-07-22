@@ -12,7 +12,7 @@ import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
@@ -333,7 +333,7 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
       })
       .then(() =>
         fireEvent(this, 'toast', {
-          text: translate('CHANGES_SAVED'),
+          text: getTranslation('CHANGES_SAVED'),
           showCloseBtn: true
         })
       )
