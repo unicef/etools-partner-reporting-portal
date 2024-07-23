@@ -1,13 +1,5 @@
 import Constants from '../etools-prp-common/constants';
 
-// L11N
-export const setL11NResources = function (resources: any) {
-  return {
-    type: Constants.SET_L11N_RESOURCES,
-    resources: resources
-  };
-};
-
 // Localization
 export const setLanguage = function (language: string) {
   return {
@@ -95,12 +87,12 @@ const mapWorkspaces = function (workspaces: []) {
 
 export const fetchUserProfile = function (profileThunk: any) {
   return function (dispatch: any) {
-    return profileThunk().then(function (res: any) {
-      dispatch(setUserProfile(res.data));
-      dispatch(setWorkspace(res.data.workspace?.workspace_code));
-      dispatch(setWorkspaces(mapWorkspaces(res.data.workspaces_available)));
-      dispatch(setAccountType(res.data));
-      dispatch(setPartner(res.data.partner));
+    return profileThunk.then(function (res: any) {
+      dispatch(setUserProfile(res));
+      dispatch(setWorkspace(res.workspace?.workspace_code));
+      dispatch(setWorkspaces(mapWorkspaces(res.workspaces_available)));
+      dispatch(setAccountType(res));
+      dispatch(setPartner(res.partner));
     });
   };
 };
@@ -108,8 +100,8 @@ export const fetchUserProfile = function (profileThunk: any) {
 // Workspaces
 export const fetchWorkspaces = function (interventionsThunk: any) {
   return function (dispatch: any) {
-    return interventionsThunk().then((res: any) => {
-      const workspaces = (res.data || []).map((workspace: any) => {
+    return interventionsThunk.then((res: any) => {
+      const workspaces = (res || []).map((workspace: any) => {
         return {
           id: workspace.id,
           code: workspace.workspace_code,

@@ -12,8 +12,6 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
 import '../../etools-prp-common/elements/filter-list';
-import '../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from 'lit-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
@@ -25,6 +23,7 @@ import {RootState} from '../../typings/redux.types';
 import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parser';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 /**
  * @polymer
@@ -215,15 +214,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
     return html`
       <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
       (this.permissions = e.detail.value)}"> </etools-prp-permissions>
-
-      <etools-prp-ajax
-        id="update"
-        .url="${this.updateUrl}"
-        .body="${this.localData}"
-        content-type="application/json"
-        method="put"
-      >
-      </etools-prp-ajax>
 
       <etools-content-panel panel-title="Other info" ?no-header="${this.noHeader}">
         <div class="app-grid">
@@ -570,6 +560,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
   connectedCallback() {
     super.connectedCallback();
 
+    this._updateData = debounce(this._updateData.bind(this), 250);
+
     this.localData = {};
     this.addEventListener('attachments-loaded', this.attachmentsLoaded.bind(this) as any);
   }
@@ -616,30 +608,34 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
   }
 
   _updateData() {
-    debounce(() => {
-      const updateElement = this.shadowRoot!.getElementById('update') as any as EtoolsPrpAjaxEl;
-
-      updateElement.abort();
-
-      store
-        .dispatch(pdReportsUpdate(updateElement.thunk(), this.pdId, this.reportId))
-        // @ts-ignore
-        .then(() => {
-          fireEvent(this, 'toast', {
-            text: getTranslation('CHANGES_SAVED'),
-            showCloseBtn: true
-          });
-        })
-        // @ts-ignore
-        .catch((err) => {
-          fireEvent(this, 'toast', {
-            text: formatServerErrorAsText(err, getTranslation('AN_ERROR_OCCURRED') as any as string),
-            showCloseBtn: true
-          });
-          console.log(err);
+    store
+      .dispatch(
+        pdReportsUpdate(
+          sendRequest({
+            method: 'PUT',
+            endpoint: {url: this.updateUrl},
+            body: this.localData
+          }),
+          this.pdId,
+          this.reportId
+        )
+      )
+      // @ts-ignore
+      .then(() => {
+        fireEvent(this, 'toast', {
+          text: getTranslation('CHANGES_SAVED'),
+          showCloseBtn: true
         });
-    }, 250)();
-  }
+      })
+      // @ts-ignore
+      .catch((err) => {
+        fireEvent(this, 'toast', {
+          text: formatServerErrorAsText(err, getTranslation('AN_ERROR_OCCURRED') as any as string),
+          showCloseBtn: true
+        });
+        console.log(err);
+      });
+}
 
   _computeUpdateUrl(locationId: string, reportId: string) {
     return computeUpdateUrl(locationId, reportId);

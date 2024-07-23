@@ -1,11 +1,9 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/iron-location/iron-location.js';
-import '../etools-prp-common/elements/etools-prp-ajax.js';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax.js';
 import Endpoints from '../endpoints.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {BASE_PATH} from '../etools-prp-common/config.js';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
 @customElement('page-login-token')
 export class PageLoginToken extends LitElement {
@@ -20,9 +18,6 @@ export class PageLoginToken extends LitElement {
     }
   `;
 
-  @property({type: String})
-  query = '';
-
   @property({type: Object})
   data = {};
 
@@ -31,12 +26,25 @@ export class PageLoginToken extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    const token = this.query.split('=')[1];
-    this.data = {token: token};
-    const thunk = (this.shadowRoot!.getElementById('validateToken') as EtoolsPrpAjaxEl).thunk();
-    thunk()
+    this.checkToken();
+  }
+
+  checkToken() {
+    const token = window.location.search.split('=')?.[1];
+
+    if (!token) {
+      fireEvent(this, 'token-error');
+      return;
+    }
+
+    this.data = {token};
+    sendRequest({
+      method: 'POST',
+      endpoint: {url: this.tokenUrl},
+      body: this.data
+    })
       .then((res: any) => {
-        if (res.data.success) {
+        if (res.success) {
           window.location.href = `/${BASE_PATH}/`;
         }
       })
@@ -57,17 +65,6 @@ export class PageLoginToken extends LitElement {
           font-size: var(--paper-font-display1_-_font-size);
         }
       </style>
-
-      <iron-location .query="${this.query}"></iron-location>
-
-      <etools-prp-ajax
-        id="validateToken"
-        url="${this.tokenUrl}"
-        .body="${this.data}"
-        content-type="application/json"
-        method="post"
-      >
-      </etools-prp-ajax>
 
       <h3>The page is loading...</h3>
     `;

@@ -5,7 +5,6 @@ import {store} from '../../redux/store';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {modalStyles} from '../../etools-prp-common/styles/modal-styles';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {ErrorModalEl} from '../../etools-prp-common/elements/error-modal';
 import '../../etools-prp-common/elements/app-switcher';
 import '../../etools-prp-common/elements/workspace-dropdown';
@@ -18,6 +17,7 @@ import {computePostBody, computeAuthorizedPartners} from './js/authorized-office
 import {RootState} from '../../typings/redux.types';
 import {waitForIronOverlayToClose} from '../../etools-prp-common/utils/util';
 import {translate} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('authorized-officer-modal')
 export class AuthorizedOfficerModal extends ModalMixin(RoutingMixin(UtilsMixin(connect(store)(LitElement)))) {
@@ -81,17 +81,6 @@ export class AuthorizedOfficerModal extends ModalMixin(RoutingMixin(UtilsMixin(c
   render() {
     return html`
       ${buttonsStyles} ${modalStyles}
-
-      <iron-location path="${this.path}"> </iron-location>
-
-      <etools-prp-ajax
-        id="submit"
-        .url="${this.submitUrl}"
-        .body="${this.postBody}"
-        content-type="application/json"
-        method="post"
-      >
-      </etools-prp-ajax>
 
       <paper-dialog modal .opened="${this.opened}">
         <div class="header layout horizontal justified">
@@ -157,21 +146,24 @@ export class AuthorizedOfficerModal extends ModalMixin(RoutingMixin(UtilsMixin(c
 
     this.busy = true;
 
-    (this.shadowRoot!.getElementById('submit') as any as EtoolsPrpAjaxEl)
-      .thunk()()
+    sendRequest({
+      method: 'POST',
+      endpoint: {url: this.submitUrl},
+      body: this.postBody
+    })
       .then((res: any) => {
         const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
-        store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res.data));
+        store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
         this.busy = false;
         this.close();
         waitForIronOverlayToClose(300).then(() => (this.path = newPath));
       })
       .catch((res: any) => {
-        const errors = res.data.non_field_errors;
+        const errors = res.non_field_errors;
         this.close();
         (this.shadowRoot!.getElementById('error') as ErrorModalEl).open(errors);
       })
-      .then(() => {
+      .finally(() => {
         this.busy = false;
       });
   }

@@ -16,8 +16,6 @@ import {translate, get as getTranslation} from 'lit-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
-import '../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/confirm-box';
@@ -37,6 +35,7 @@ import {
 import {RootState} from '../../typings/redux.types';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 /**
  * @polymer
@@ -103,15 +102,7 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       >
       </etools-prp-permissions>
-      <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}"> </etools-prp-ajax>
-      <etools-prp-ajax
-        id="update"
-        method="post"
-        .url="${this.indicatorsUrl}"
-        .body="${this.localData}"
-        content-type="application/json"
-      >
-      </etools-prp-ajax>
+
       <page-body>
         <calculation-methods-info-bar></calculation-methods-info-bar>
         <etools-data-table-header no-collapse>
@@ -283,7 +274,7 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
     }
 
     if (changedProperties.has('indicatorsUrl')) {
-      this._fetchData(this.indicatorsUrl); // Example: Fetch data when indicatorsUrl changes
+      this._fetchData(); // Example: Fetch data when indicatorsUrl changes
     }
 
     if (changedProperties.has('data')) {
@@ -296,16 +287,21 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
     return ['ratio', 'percentage'].includes(data.display_type);
   }
 
-  _fetchData(url: string) {
-    if (!url || !this.pdId) {
+  _fetchData() {
+    if (!this.indicatorsUrl || !this.pdId) {
       return;
     }
 
-    const indicatorsEl = this.shadowRoot!.querySelector('#indicators') as any as EtoolsPrpAjaxEl;
-    indicatorsEl.abort();
-
     store
-      .dispatch(pdIndicatorsFetch(indicatorsEl.thunk(), this.pdId))
+      .dispatch(
+        pdIndicatorsFetch(
+          sendRequest({
+            method: 'GET',
+            endpoint: {url: this.indicatorsUrl}
+          }),
+          this.pdId
+        )
+      )
       // @ts-ignore
       .catch(function (err) {
         console.log(err);
@@ -328,8 +324,16 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
   _save() {
     this._confirmIntent()
       .then(() => {
-        const updateThunk = (this.shadowRoot!.querySelector('#update') as any as EtoolsPrpAjaxEl).thunk();
-        return store.dispatch(pdIndicatorsUpdate(updateThunk, this.pdId));
+        return store.dispatch(
+          pdIndicatorsUpdate(
+            sendRequest({
+              method: 'POST',
+              endpoint: {url: this.indicatorsUrl},
+              body: this.localData
+            }),
+            this.pdId
+          )
+        );
       })
       .then(() =>
         fireEvent(this, 'toast', {
@@ -367,6 +371,5 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    (this.shadowRoot?.querySelector('#indicators') as any as EtoolsPrpAjaxEl).abort();
   }
 }

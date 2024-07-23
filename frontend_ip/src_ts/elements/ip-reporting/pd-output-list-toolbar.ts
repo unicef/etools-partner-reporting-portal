@@ -15,7 +15,6 @@ import {
   computeShowRefresh
 } from './js/pd-output-list-toolbar-functions';
 import '../etools-prp-toolbar';
-import '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/refresh-report-modal';
 import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-report-modal';
 import '../../etools-prp-common/elements/download-button';
@@ -117,15 +116,6 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   render() {
     return html`
       ${buttonsStyles}
-
-      <etools-prp-ajax
-        id="refreshReport"
-        .url="${this.refreshUrl}"
-        .body="${this.refreshData}"
-        method="post"
-        content-type="application/json"
-      >
-      </etools-prp-ajax>
 
       <refresh-report-modal id="refresh" .data="${this.refreshData}" .refreshUrl="${this.refreshUrl}">
       </refresh-report-modal>

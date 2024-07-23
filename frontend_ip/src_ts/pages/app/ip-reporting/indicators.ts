@@ -2,7 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../../etools-prp-common/elements/page-header.js';
 import '../../../etools-prp-common/elements/page-body.js';
-import '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import '../../../elements/ip-reporting/indicators-filters.js';
 import '../../../elements/ip-reporting/indicators-toolbar.js';
 import '../../../elements/list-view-indicators.js';
@@ -12,9 +11,9 @@ import {fetchIndicators} from '../../../redux/actions/indicators.js';
 import {store} from '../../../redux/store.js';
 import {connect} from 'pwa-helpers/connect-mixin.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {translate} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
 @customElement('page-ip-reporting-indicators')
 export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitElement)) {
@@ -44,7 +43,6 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
 
   render() {
     return html`
-      <etools-prp-ajax id="indicators" .url="${this.indicatorsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
       <page-header .title="${translate('INDICATORS')}"></page-header>
       <page-body>
         <indicators-filters></indicators-filters>
@@ -81,7 +79,7 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
     super.updated(changedProperties);
 
     if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
-      this._indicatorsAjax(this.queryParams);
+      this._indicatorsAjax();
     }
 
     if (changedProperties.has('workspaceId')) {
@@ -93,17 +91,25 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
     return workspaceId ? Endpoints.allPDIndicators(workspaceId) : '';
   }
 
-  _indicatorsAjax(queryParams) {
-    if (!Object.keys(queryParams).length) {
+  _indicatorsAjax() {
+    if (!this.indicatorsUrl || !Object.keys(this.queryParams).length) {
       return;
     }
 
-    debounce(() => {
-      const indicatorEl = this.shadowRoot!.getElementById('indicators') as EtoolsPrpAjaxEl;
-      // Cancel the pending request, if any
-      indicatorEl.abort();
-      store.dispatch(fetchIndicators(indicatorEl.thunk()));
-    }, 100)();
+    store.dispatch(
+      fetchIndicators(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.indicatorsUrl},
+          params: this.queryParams
+        })
+      )
+    );
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._indicatorsAjax = debounce(this._indicatorsAjax.bind(this), 100);
   }
 
   disconnectedCallback() {

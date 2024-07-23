@@ -22,14 +22,13 @@ import '../../etools-prp-common/elements/reportable-meta';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../../etools-prp-common/elements/report-status';
-import '../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-output')
 export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))) {
@@ -160,15 +159,6 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       >
       </etools-prp-permissions>
-
-      <etools-prp-ajax
-        id="update"
-        .url="${this.reportableUrl}"
-        .body="${this.reportableMeta}"
-        content-type="application/json"
-        method="patch"
-      >
-      </etools-prp-ajax>
 
       <div class="header">
         <labelled-item label="${translate('TITLE')}">${this.data?.title}</labelled-item>
@@ -453,11 +443,19 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     const data = e.detail;
     this.reportableMeta = data;
 
-    const updateElement = this.shadowRoot!.querySelector('#update') as any as EtoolsPrpAjaxEl;
-    updateElement.abort();
-
     store
-      .dispatch(pdReportsUpdateReportable(updateElement.thunk(), this.pdId, this.reportId, this.data.id))
+      .dispatch(
+        pdReportsUpdateReportable(
+          sendRequest({
+            method: 'PATCH',
+            endpoint: {url: this.reportableUrl},
+            body: this.reportableMeta
+          }),
+          this.pdId,
+          this.reportId,
+          this.data.id
+        )
+      )
       // @ts-ignore
       .then(() => {
         fireEvent(this, 'toast', {

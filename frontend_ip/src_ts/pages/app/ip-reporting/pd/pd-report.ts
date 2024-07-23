@@ -5,7 +5,6 @@ import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-tabs/paper-tabs.js';
 import '@polymer/paper-tabs/paper-tab.js';
-import '../../../../etools-prp-common/elements/etools-prp-ajax.js';
 import '../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../etools-prp-common/elements/page-body.js';
@@ -30,12 +29,12 @@ import Endpoints from '../../../../endpoints.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
 import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin.js';
-import {EtoolsPrpAjaxEl} from '../../../../etools-prp-common/elements/etools-prp-ajax.js';
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {translate} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
 @customElement('page-ip-reporting-pd-report')
 export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
@@ -141,8 +140,6 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
         .permissions="${this.permissions}"
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       ></etools-prp-permissions>
-      <etools-prp-ajax id="report" .url=${this.reportUrl} .params=${this.queryParams}></etools-prp-ajax>
-      <etools-prp-ajax id="submit" .url=${this.submitUrl} method="post"></etools-prp-ajax>
 
       <page-header title=${this.headingPrefix} back=${this.backLink}>
         <reporting-period slot="above-title" .range=${this.currentReport.reporting_period}></reporting-period>
@@ -241,6 +238,17 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       >
       </authorized-officer-modal>
     `;
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchReport = debounce(this._fetchReport.bind(this), 250);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).close();
+    (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).close();
   }
 
   stateChanged(state: RootState) {
@@ -374,15 +382,21 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
   }
 
   _fetchReport() {
+    console.log(this.pdId, this.reportUrl);
     if (!this.pdId || !this.reportUrl) {
       return;
     }
-
-    debounce(() => {
-      const elem = this.shadowRoot!.querySelector('#report') as EtoolsPrpAjaxEl;
-      elem.abort();
-      store.dispatch(pdReportsFetchSingle(elem.thunk(), this.pdId));
-    }, 250)();
+    console.log('helllo');
+    store.dispatch(
+      pdReportsFetchSingle(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.reportUrl},
+          params: this.queryParams
+        }),
+        this.pdId
+      )
+    );
   }
 
   _computeHeadingPrefix(mode: string) {
@@ -457,18 +471,20 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
 
   _submit() {
     this.busy = true;
-    (this.shadowRoot!.getElementById('submit') as EtoolsPrpAjaxEl)
-      .thunk()()
+    sendRequest({
+      method: 'POST',
+      endpoint: {url: this.submitUrl}
+    })
       .then((res: any) => {
         const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
 
-        store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res.data));
+        store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
 
         this.busy = false;
         this.path = newPath;
       })
       .catch((res: any) => {
-        const authorizedError = res.data.error_codes.filter((error: string) => {
+        const authorizedError = res.error_codes.filter((error: string) => {
           return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
         });
 
@@ -477,15 +493,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
         if (authorizedError.length > 0) {
           return (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).open();
         }
-        return (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).open(res.data.non_field_errors);
+        return (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).open(res.non_field_errors);
       });
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-
-    (this.shadowRoot!.getElementById('report') as any as EtoolsPrpAjaxEl).abort();
-    (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).close();
-    (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).close();
   }
 }

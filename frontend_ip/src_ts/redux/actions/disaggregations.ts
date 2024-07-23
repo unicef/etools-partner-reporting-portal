@@ -11,8 +11,8 @@ export const disaggregationsSet = function (indicatorId: string, data: any) {
 // use instead of App.Actions.Disaggregations
 export const disaggregationsFetch = function (disaggregationsThunk: any, indicatorId: string) {
   return function (dispatch: any) {
-    return disaggregationsThunk().then(function (res: any) {
-      const firstItem = res.data[0];
+    return disaggregationsThunk.then(function (res: any) {
+      const firstItem = res[0];
 
       dispatch(disaggregationsSet(indicatorId, firstItem));
     });
@@ -39,10 +39,10 @@ export const disaggregationsSetLocationProgress = function (indicatorId: string,
 
 export const disaggregationsUpdateForLocation = function (updateThunk: any, indicatorId: string, locationId: string) {
   return function (dispatch: any) {
-    return updateThunk().then(function (res: any) {
-      dispatch(disaggregationsSetForLocation(indicatorId, locationId, res.data));
+    return updateThunk.then(function (res: any) {
+      dispatch(disaggregationsSetForLocation(indicatorId, locationId, res));
 
-      dispatch(disaggregationsSetLocationProgress(indicatorId, locationId, res.data.disaggregation['()']));
+      dispatch(disaggregationsSetLocationProgress(indicatorId, locationId, res.disaggregation['()']));
     });
   };
 };

@@ -1,7 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/page-body';
 import {BASE_PATH} from '../etools-prp-common/config';
@@ -10,6 +8,7 @@ import {translate} from 'lit-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('page-unauthorized')
 export class PageUnauthorized extends connect(store)(LitElement) {
@@ -54,8 +53,6 @@ export class PageUnauthorized extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <etools-prp-ajax id="userProfile" .url="${this.profileUrl}"> </etools-prp-ajax>
-
       <page-body>
         <div class="item">
           <span class="sign-out-button" @click="${this._logout}">
@@ -88,12 +85,17 @@ export class PageUnauthorized extends connect(store)(LitElement) {
   }
 
   checkAccessRights() {
-    const thunk = (this.shadowRoot!.getElementById('userProfile') as EtoolsPrpAjaxEl).thunk();
+    if (!this.profileUrl) {
+      return;
+    }
 
-    thunk()
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.profileUrl}
+    })
       .then((res: any) => {
-        if (res.data && (res.data.access || []).includes('ip-reporting')) {
-          this.checkWorkspaceExistence(res.data.workspace);
+        if (res && (res.access || []).includes('ip-reporting')) {
+          this.checkWorkspaceExistence(res.workspace);
         } else {
           this.showMessage(true);
         }

@@ -3,11 +3,10 @@ import {property, customElement} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import {translate} from 'lit-translate';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('report-location-filter')
 export class ReportLocationFilter extends connect(store)(LitElement) {
@@ -34,7 +33,6 @@ export class ReportLocationFilter extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <etools-prp-ajax id="locations" .url="${this.locationsUrl}"> </etools-prp-ajax>
       <searchable-dropdown-filter
         .label="${translate('LOCATION')}"
         name="location"
@@ -81,12 +79,12 @@ export class ReportLocationFilter extends connect(store)(LitElement) {
       return;
     }
 
-    const elem = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
-    elem.abort();
-    elem
-      .thunk()()
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.locationsUrl}
+    })
       .then((res: any) => {
-        this.options = [{id: '-1', name: 'All'}].concat(res.data || []);
+        this.options = [{id: '-1', name: 'All'}].concat(res || []);
       })
       .catch((_err: any) => {
         // TODO: error handling
@@ -95,7 +93,6 @@ export class ReportLocationFilter extends connect(store)(LitElement) {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    (this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl).abort();
   }
 }
 

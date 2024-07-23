@@ -5,11 +5,11 @@ import {store} from '../../redux/store';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {get as getTranslation} from 'lit-translate';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {RootState} from '../../typings/redux.types';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-details-doc-download')
 export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -67,7 +67,6 @@ export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(
         ></paper-spinner>
         <a href="#" @click="${this._openDoc}" tracker="PD Details Download Document">Download Document</a>
       </div>
-      <etools-prp-ajax id="pddoc" url="${this.pdDocumentUrl}"> </etools-prp-ajax>
     `;
   }
 
@@ -75,11 +74,13 @@ export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(
     e.preventDefault();
     this.trackAnalytics(e as CustomEvent);
     this.spinnerActive = true;
-    const thunk = (this.shadowRoot?.querySelector('#pddoc') as any as EtoolsPrpAjaxEl).thunk();
 
-    thunk().then((res: any) => {
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.pdDocumentUrl}
+    }).then((res: any) => {
       this.spinnerActive = false;
-      if (res.status !== 200 || !res.data.signed_pd_document_file) {
+      if (!res.signed_pd_document_file) {
         // Fire Toast with error
         fireEvent(this, 'toast', {
           text: getTranslation('AN_ERROR_OCCURRED'),
@@ -88,7 +89,7 @@ export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(
         console.error(res);
       } else {
         const anchor = document.createElement('a');
-        anchor.href = res.data.signed_pd_document_file;
+        anchor.href = res.signed_pd_document_file;
         anchor.target = '_blank';
         anchor.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
         anchor.remove();

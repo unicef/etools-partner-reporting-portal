@@ -4,7 +4,6 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from 'lit-translate';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/report-status';
@@ -20,6 +19,7 @@ import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitElement)) {
@@ -64,65 +64,6 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
 
   @property({type: Object})
   tabs: any[] = [];
-
-  stateChanged(state: RootState) {
-    if (this.loading !== state.indicators.loadingDetails) {
-      this.loading = state.indicators.loadingDetails;
-    }
-
-    if (state.indicators.details && !isJsonStrMatch(this.dataDict, state.indicators.details)) {
-      this.dataDict = state.indicators.details;
-    }
-
-    if (this.appName !== state.app.current) {
-      this.appName = state.app.current;
-    }
-
-    this.params = computeParams(false);
-  }
-
-  updated(changedProperties) {
-    super.updated(changedProperties);
-
-    if (changedProperties.has('indicator')) {
-      this.indicatorDetailUrl = computeIndicatorReportsUrl(this.indicator!);
-    }
-
-    if (changedProperties.has('dataDict') && this.dataDict?.details?.[this.indicator!.id]) {
-      this.data = this.dataDict.details?.[this.indicator!.id];
-    }
-
-    if (changedProperties.has('data')) {
-      if (!isJsonStrMatch(this.locations, bucketByLocation(this.data))) {
-        this.locations = bucketByLocation(this.data);
-        this.tabs = this.locations.map((location: any) => ({
-          tab: location.current.id,
-          tabLabel: location.name,
-          hidden: false
-        }));
-        this.selected = this.locations[0]?.current.id;
-      }
-    }
-
-    if (changedProperties.has('data') || changedProperties.has('loading')) {
-      computeHidden(this.data, this.loading);
-    }
-
-    if (changedProperties.has('isOpen')) {
-      this._openChanged();
-    }
-  }
-
-  private _openChanged(): void {
-    if (this.isOpen) {
-      debounce(() => {
-        const ajaxElement = this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl;
-        store.dispatch(fetchIndicatorDetails(ajaxElement.thunk(), this.indicator!.id));
-      }, 100)();
-    } else {
-      (this.shadowRoot!.querySelector('#indicatorDetail') as any as EtoolsPrpAjaxEl).abort();
-    }
-  }
 
   render() {
     return html`
@@ -178,9 +119,6 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
           margin: 1em 0;
         }
       </style>
-
-      <etools-prp-ajax id="indicatorDetail" url="${this.indicatorDetailUrl}" .params="${this.params}">
-      </etools-prp-ajax>
 
       ${this.loading
         ? html`
@@ -262,5 +200,73 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
         </div>`
       )}
     `;
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._openChanged = debounce(this._openChanged.bind(this), 100);
+  }
+
+  stateChanged(state: RootState) {
+    if (this.loading !== state.indicators.loadingDetails) {
+      this.loading = state.indicators.loadingDetails;
+    }
+
+    if (state.indicators.details && !isJsonStrMatch(this.dataDict, state.indicators.details)) {
+      this.dataDict = state.indicators.details;
+    }
+
+    if (this.appName !== state.app.current) {
+      this.appName = state.app.current;
+    }
+
+    this.params = computeParams(false);
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('indicator')) {
+      this.indicatorDetailUrl = computeIndicatorReportsUrl(this.indicator!);
+    }
+
+    if (changedProperties.has('dataDict') && this.dataDict?.details?.[this.indicator!.id]) {
+      this.data = this.dataDict.details?.[this.indicator!.id];
+    }
+
+    if (changedProperties.has('data')) {
+      if (!isJsonStrMatch(this.locations, bucketByLocation(this.data))) {
+        this.locations = bucketByLocation(this.data);
+        this.tabs = this.locations.map((location: any) => ({
+          tab: location.current.id,
+          tabLabel: location.name,
+          hidden: false
+        }));
+        this.selected = this.locations[0]?.current.id;
+      }
+    }
+
+    if (changedProperties.has('data') || changedProperties.has('loading')) {
+      computeHidden(this.data, this.loading);
+    }
+
+    if (changedProperties.has('isOpen')) {
+      this._openChanged();
+    }
+  }
+
+  private _openChanged(): void {
+    if (this.isOpen) {
+      store.dispatch(
+        fetchIndicatorDetails(
+          sendRequest({
+            method: 'GET',
+            endpoint: {url: this.indicatorDetailUrl},
+            params: this.params
+          }),
+          this.indicator!.id
+        )
+      );
+    }
   }
 }

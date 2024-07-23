@@ -3,14 +3,12 @@ import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-toasts/etools-toasts';
 
 import '../elements/etools-prp-workspaces.js';
-import '../etools-prp-common/elements/etools-prp-ajax.js';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../endpoints.js';
 import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions.js';
 import {fetchCurrencies} from '../redux/actions/currencies.js';
 import {Route} from '../etools-prp-common/typings/globals.types.js';
 import {locationSet} from '../redux/actions/location.js';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store.js';
 import {RootState} from '../typings/redux.types.js';
@@ -19,6 +17,7 @@ import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.j
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 import {translate} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
 @customElement('page-app')
 export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
@@ -88,10 +87,6 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
     return html`
       <etools-prp-workspaces id="workspaces" .all="${this.workspaces}" .current="${this._workspaceCode}">
       </etools-prp-workspaces>
-
-      <etools-prp-ajax id="userProfile" .url="${this.profileUrl}"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="currenciesData" .url="${this.currenciesUrl}"> </etools-prp-ajax>
 
       ${!this.userHasPrpRolesOrAccess
         ? html`<div class="no-groups-notification">
@@ -287,14 +282,26 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   private _fetchProfile() {
-    const userProfileThunk = (this.shadowRoot!.getElementById('userProfile') as EtoolsPrpAjaxEl)?.thunk();
-    return store.dispatch(fetchUserProfile(userProfileThunk));
+    return store.dispatch(
+      fetchUserProfile(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.profileUrl}
+        })
+      )
+    );
   }
 
   private _fetchCurrencies(app: string) {
     if (this.page !== app && app === 'ip-reporting') {
-      const currenciesDataThunk = (this.shadowRoot!.getElementById('currenciesData') as EtoolsPrpAjaxEl)?.thunk();
-      store.dispatch(fetchCurrencies(currenciesDataThunk));
+      store.dispatch(
+        fetchCurrencies(
+          sendRequest({
+            method: 'GET',
+            endpoint: {url: this.currenciesUrl}
+          })
+        )
+      );
     }
   }
 }

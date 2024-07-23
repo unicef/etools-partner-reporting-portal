@@ -2,8 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../../etools-prp-common/elements/page-header.js';
 import '../../../etools-prp-common/elements/page-body.js';
-import '../../../etools-prp-common/elements/etools-prp-ajax.js';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import '../../../elements/ip-reporting/progress-reports-list.js';
 import '../../../elements/ip-reporting/progress-reports-toolbar.js';
 import '../../../elements/ip-reporting/progress-reports-filters.js';
@@ -15,6 +13,7 @@ import {RootState} from '../../../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {translate} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('page-ip-progress-reports')
 export class PageIpProgressReports extends connect(store)(LitElement) {
@@ -38,7 +37,6 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <etools-prp-ajax id="reports" .url="${this.reportsUrl}" .params="${this.queryParams}"></etools-prp-ajax>
       <page-header .title="${translate('PROGRESS_REPORTS')}"></page-header>
       <page-body>
         <progress-reports-filters></progress-reports-filters>
@@ -46,6 +44,11 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
         <progress-reports-list></progress-reports-list>
       </page-body>
     `;
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._handleInputChange = debounce(this._handleInputChange.bind(this), 250);
   }
 
   updated(changedProperties) {
@@ -82,14 +85,15 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
       return;
     }
 
-    debounce(() => {
-      const progressReports = this.shadowRoot!.getElementById('reports') as EtoolsPrpAjaxEl;
-
-      // Cancel the pending request, if any
-      progressReports.abort();
-
-      store.dispatch(progressReportsFetch(progressReports.thunk()));
-    }, 100)();
+    store.dispatch(
+      progressReportsFetch(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.reportsUrl},
+          params: this.queryParams
+        })
+      )
+    );
   }
 }
 export {PageIpProgressReports as PageIpProgressReportsEl};

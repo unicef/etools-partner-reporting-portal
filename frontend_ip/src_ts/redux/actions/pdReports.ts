@@ -19,9 +19,9 @@ export const pdReportsSetCount = function (pdId: string, count: number) {
 // use instead of App.Actions.PDReports
 export const pdReportsFetch = function (pdReportsThunk: any, pdId: any) {
   return function (dispatch: any) {
-    return pdReportsThunk().then(function (res: any) {
-      dispatch(pdReportsSet(pdId, res.data.results));
-      dispatch(pdReportsSetCount(pdId, res.data.count));
+    return pdReportsThunk.then(function (res: any) {
+      dispatch(pdReportsSet(pdId, res.results));
+      dispatch(pdReportsSetCount(pdId, res.count));
     });
   };
 };
@@ -50,10 +50,10 @@ export const pdReportsFetchSingle = function (reportThunk: any, pdId: any) {
   return function (dispatch: any) {
     dispatch(pdReportsLoadingStart());
 
-    return reportThunk()
+    return reportThunk
       .then(function (res: any) {
         dispatch(pdReportsLoadingStop());
-        dispatch(pdReportsSetSingle(pdId, res.data));
+        dispatch(pdReportsSetSingle(pdId, res));
       })
       .catch(function (err: any) {
         dispatch(pdReportsLoadingStop());
@@ -74,8 +74,8 @@ export const pdReportsUpdateSingle = function (pdId: string, reportId: string, d
 
 export const pdReportsUpdate = function (updateThunk: any, pdId: string, reportId: string) {
   return function (dispatch: any) {
-    return updateThunk().then(function (res: any) {
-      dispatch(pdReportsUpdateSingle(pdId, reportId, res.data));
+    return updateThunk.then(function (res: any) {
+      dispatch(pdReportsUpdateSingle(pdId, reportId, res));
     });
   };
 };
@@ -105,8 +105,8 @@ export const pdReportsUpdateReportable = function (
   reportableId: string
 ) {
   return function (dispatch: any) {
-    return updateThunk().then(function (res: any) {
-      dispatch(pdReportsAmendReportable(pdId, reportId, reportableId, res.data));
+    return updateThunk.then(function (res: any) {
+      dispatch(pdReportsAmendReportable(pdId, reportId, reportableId, res));
     });
   };
 };

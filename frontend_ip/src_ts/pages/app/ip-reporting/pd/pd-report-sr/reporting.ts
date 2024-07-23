@@ -4,8 +4,6 @@ import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-pa
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '../../../../../etools-prp-common/elements/labelled-item.js';
-import '../../../../../etools-prp-common/elements/etools-prp-ajax.js';
-import {EtoolsPrpAjaxEl} from '../../../../../etools-prp-common/elements/etools-prp-ajax.js';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../../elements/ip-reporting/report-attachments.js';
 import '../pd-sent-back.js';
@@ -22,6 +20,7 @@ import {store} from '../../../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {connect} from 'pwa-helpers';
 import {translate, get as getTranslation} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
 @customElement('page-pd-report-sr-reporting')
 export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
@@ -162,14 +161,6 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       ></etools-prp-permissions>
 
-      <etools-prp-ajax
-        id="update"
-        .url="${this.updateUrl}"
-        .body="${this.localData}"
-        content-type="application/json"
-        method="put"
-      ></etools-prp-ajax>
-
       <etools-content-panel no-header>
         <div class="app-grid">
           <div class="row">
@@ -215,6 +206,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
 
   connectedCallback() {
     super.connectedCallback();
+    this._updateData = debounce(this._updateData.bind(this), 250);
     this.localData = {};
   }
 
@@ -238,25 +230,31 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
   }
 
   _updateData(localData) {
-    if (!localData.narrative) {
+    if (!this.updateUrl || !localData.narrative) {
       return;
     }
 
-    debounce(() => {
-      const elem = this.shadowRoot!.getElementById('update') as EtoolsPrpAjaxEl;
-      elem.abort();
-      store
-        .dispatch(pdReportsUpdate(elem.thunk(), this.pdId, this.reportId))
-        .then(() => {
-          fireEvent(this, 'toast', {
-            text: getTranslation('CHANGES_SAVED'),
-            showCloseBtn: true
-          });
-        })
-        .catch((err) => {
-          console.log(err);
+    store
+      .dispatch(
+        pdReportsUpdate(
+          sendRequest({
+            method: 'PUT',
+            endpoint: {url: this.updateUrl},
+            body: this.localData
+          }),
+          this.pdId,
+          this.reportId
+        )
+      )
+      .then(() => {
+        fireEvent(this, 'toast', {
+          text: getTranslation('CHANGES_SAVED'),
+          showCloseBtn: true
         });
-    }, 250)();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   _computeUpdateUrl(locationId, reportId) {

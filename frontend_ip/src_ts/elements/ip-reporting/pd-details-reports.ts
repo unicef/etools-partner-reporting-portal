@@ -3,17 +3,16 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../ip-reporting/pd-report-filters.js';
 import '../ip-reporting/pd-reports-toolbar.js';
 import '../ip-reporting/pd-reports-list.js';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax.js';
 import {pdReportsFetch} from '../../redux/actions/pdReports.js';
 import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions.js';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-details-reports')
 export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
@@ -40,6 +39,22 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
 
   @property({type: String})
   pdReportsId!: string;
+
+  render() {
+    return html`
+      ${tableStyles}
+      <page-body>
+        <pd-report-filters></pd-report-filters>
+        <pd-reports-toolbar></pd-reports-toolbar>
+        <pd-reports-list></pd-reports-list>
+      </page-body>
+    `;
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._handleInputChange = debounce(this._handleInputChange.bind(this), 250);
+  }
 
   stateChanged(state: RootState) {
     if (
@@ -78,30 +93,20 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
     }
   }
 
-  render() {
-    return html`
-      ${tableStyles}
-      <etools-prp-ajax id="pdReports" .url="${this.pdReportsUrl}" .params="${this.pdReportsParams}"> </etools-prp-ajax>
-      <page-body>
-        <pd-report-filters></pd-report-filters>
-        <pd-reports-toolbar></pd-reports-toolbar>
-        <pd-reports-list></pd-reports-list>
-      </page-body>
-    `;
-  }
-
   private _handleInputChange() {
     if (!this.pdReportsUrl || !this.pdReportsParams || !Object.keys(this.pdReportsParams).length) {
       return;
     }
 
-    debounce(() => {
-      const pdReportsThunk = (this.shadowRoot!.getElementById('pdReports') as any as EtoolsPrpAjaxEl).thunk();
-
-      // Cancel the pending request, if any
-      (this.shadowRoot!.getElementById('pdReports') as any as EtoolsPrpAjaxEl).abort();
-
-      store.dispatch(pdReportsFetch(pdReportsThunk, this.pdId));
-    }, 250)();
+    store.dispatch(
+      pdReportsFetch(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.pdReportsUrl},
+          params: this.pdReportsParams
+        }),
+        this.pdId
+      )
+    );
   }
 }

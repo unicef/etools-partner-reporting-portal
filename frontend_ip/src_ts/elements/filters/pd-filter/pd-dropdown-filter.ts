@@ -3,11 +3,10 @@ import {property, customElement} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import '../dropdown-filter/dropdown-filter-multi';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import {translate} from 'lit-translate';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-dropdown-filter')
 export class PDDropdownFilter extends connect(store)(LitElement) {
@@ -34,7 +33,6 @@ export class PDDropdownFilter extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <etools-prp-ajax id="programmeDocuments" .url="${this.programmeDocumentsUrl}"></etools-prp-ajax>
       <dropdown-filter-multi
         class="item"
         .label="${translate('PD_TITLE')}"
@@ -77,12 +75,12 @@ export class PDDropdownFilter extends connect(store)(LitElement) {
       return;
     }
 
-    const programmeDocumentsAjax = this.shadowRoot?.getElementById('programmeDocuments') as any as EtoolsPrpAjaxEl;
-    programmeDocumentsAjax.abort();
-    programmeDocumentsAjax
-      .thunk()()
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.programmeDocumentsUrl}
+    })
       .then((res) => {
-        this.data = res.data?.results;
+        this.data = res.results;
       })
       .catch((_err: any) => {
         // TODO: error handling
@@ -92,8 +90,6 @@ export class PDDropdownFilter extends connect(store)(LitElement) {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    const programmeDocumentsAjax = this.shadowRoot?.getElementById('programmeDocuments') as any as EtoolsPrpAjaxEl;
-    programmeDocumentsAjax.abort();
   }
 }
 

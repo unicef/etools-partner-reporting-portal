@@ -156,6 +156,9 @@ const loadPageComponents = (routeDetails: EtoolsRouteDetails) => (_dispatch: any
     case 'login-token':
       imported = import('../../pages/login-token.js');
       break;
+    case 'login':
+      imported = import('../../pages/login.js');
+      break;
     default:
       imported = import('../../pages/app.js').then(() => importSubRoutes(routeDetails));
       break;

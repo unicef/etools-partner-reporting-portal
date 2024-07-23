@@ -1,13 +1,12 @@
 import {html, css, LitElement} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
 import {translate} from 'lit-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import {debounce} from 'lodash-es';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('location-filter')
 export class LocationFilter extends connect(store)(LitElement) {
@@ -31,7 +30,6 @@ export class LocationFilter extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <etools-prp-ajax id="locations" .url="${this.locationsUrl}"></etools-prp-ajax>
       <searchable-dropdown-filter
         .label="${translate('LOCATION')}"
         option-label="name"
@@ -74,18 +72,17 @@ export class LocationFilter extends connect(store)(LitElement) {
       return;
     }
 
-    const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
-    locationsAjax.abort();
-
-    locationsAjax
-      .thunk()()
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.locationsUrl}
+    })
       .then((res) => {
         this.data = [
           {
             id: '-1',
             name: 'All'
           },
-          ...(res.data || [])
+          ...(res || [])
         ];
       })
       .catch((err: any) => {
@@ -95,8 +92,6 @@ export class LocationFilter extends connect(store)(LitElement) {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
-    locationsAjax.abort();
   }
 }
 

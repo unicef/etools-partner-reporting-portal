@@ -43,7 +43,7 @@ export class EtoolsPrpWorkspaces extends connect(store)(LitElement) {
     }
 
     if (changedProperties.has('_all')) {
-      this.all = this._all.slice();
+      this.all = this._all?.slice();
       this._dispatchEvent('all', this.all);
     }
   }

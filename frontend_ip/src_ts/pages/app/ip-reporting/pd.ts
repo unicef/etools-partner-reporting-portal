@@ -1,7 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '../../../etools-prp-common/elements/etools-prp-ajax.js';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax.js';
 import Endpoints from '../../../endpoints.js';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
@@ -15,6 +13,7 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {connect} from 'pwa-helpers';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
 @customElement('page-ip-reporting-pd')
 class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -59,13 +58,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
 
   render() {
     return html`
-      <etools-prp-ajax id="programmeDocumentDetail" .url="${this.programmeDocumentDetailUrl}"></etools-prp-ajax>
-      <etools-prp-ajax
-        id="programmeDocuments"
-        .url="${this.programmeDocumentsUrl}"
-        .params="${this.queryParams}"
-      ></etools-prp-ajax>
-
       ${this.page === 'pd-index'
         ? html` <page-ip-reporting-pd-index name="pd-index" .route="${this.subroute}"></page-ip-reporting-pd-index> `
         : ''}
@@ -146,9 +138,15 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     // if (this.routeDetails?.subRouteName) {
     //   return;
     // }
-    const elem = this.shadowRoot!.getElementById('programmeDocuments') as EtoolsPrpAjaxEl;
-    elem.abort();
-    store.dispatch(pdFetch(elem.thunk()));
+    store.dispatch(
+      pdFetch(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.programmeDocumentsUrl},
+          params: this.queryParams
+        })
+      )
+    );
   }
 
   _routePdIdChanged(pd_id) {
@@ -180,13 +178,12 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       return;
     }
 
-    const elem = this.shadowRoot!.getElementById('programmeDocumentDetail') as EtoolsPrpAjaxEl;
-    elem.abort();
-
-    elem
-      .thunk()()
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.programmeDocumentsUrl}
+    })
       .then((res) => {
-        store.dispatch(pdAdd(res.data));
+        store.dispatch(pdAdd(res));
         store.dispatch(pdSetCount(++rootState.programmeDocuments.all.length));
       })
       .catch((err) => {

@@ -9,12 +9,12 @@ import {
 import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from 'lit-translate';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 /**
  * @polymer
@@ -127,16 +127,6 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   render() {
     return html`
-      <etools-prp-ajax
-        id="upload"
-        method="post"
-        .loading=${this.pending}
-        .url=${this.attachmentsListUrl}
-      ></etools-prp-ajax>
-      <etools-prp-ajax id="replace" method="put" .url=${this.attachmentDeleteUrl}></etools-prp-ajax>
-      <etools-prp-ajax id="download" method="get" .url=${this.attachmentsListUrl}></etools-prp-ajax>
-      <etools-prp-ajax id="delete" method="delete" .url=${this.attachmentDeleteUrl}></etools-prp-ajax>
-
       ${this.showFace
         ? html` <div id="face-container">
             <etools-file
@@ -242,14 +232,18 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
     e.stopPropagation();
 
-    const deleteThunk = (this.shadowRoot!.querySelector('#delete') as any as EtoolsPrpAjaxEl).thunk();
-
-    (this.shadowRoot!.querySelector('#delete') as any as EtoolsPrpAjaxEl).abort();
-
     // @ts-ignore
     return (
       store
-        .dispatch(pdReportsAttachmentsSync(deleteThunk, this.reportId))
+        .dispatch(
+          pdReportsAttachmentsSync(
+            sendRequest({
+              method: 'DELETE',
+              endpoint: {url: this.attachmentDeleteUrl}
+            }),
+            this.reportId
+          )
+        )
         // @ts-ignore
         .then(() => {
           fireEvent(this, 'toast', {
@@ -328,10 +322,11 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
       });
 
       if (attachment.id === null) {
-        thunk = (this.shadowRoot!.querySelector('#upload') as any as EtoolsPrpAjaxEl).thunk();
-        const uplodCtrl = this.shadowRoot!.querySelector('#upload') as any as EtoolsPrpAjaxEl;
-        uplodCtrl.abort();
-        uplodCtrl.body = data;
+        thunk = sendRequest({
+          method: 'PUT',
+          endpoint: {url: this.attachmentsListUrl as string},
+          body: data
+        });
 
         if (attachmentPropertyName === 'faceAttachment') {
           this.faceLoading = true;
@@ -345,10 +340,11 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
       } else {
         this.attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, attachment.id);
 
-        thunk = (this.shadowRoot!.querySelector('#replace') as any as EtoolsPrpAjaxEl).thunk();
-        const replaceCtrl = this.shadowRoot!.querySelector('#replace') as any as EtoolsPrpAjaxEl;
-        replaceCtrl.abort();
-        replaceCtrl.body = data;
+        thunk = sendRequest({
+          method: 'PUT',
+          endpoint: {url: this.attachmentDeleteUrl},
+          body: data
+        });
 
         attachmentPropertyName = attachmentPropertyName.split('.')[0];
       }
@@ -430,10 +426,17 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     if (!this.attachmentsListUrl) {
       return;
     }
-    const downloadThunk = (this.shadowRoot!.querySelector('#download') as any as EtoolsPrpAjaxEl).thunk();
-    (this.shadowRoot!.querySelector('#download') as any as EtoolsPrpAjaxEl).abort();
+
     store
-      .dispatch(pdReportsAttachmentsSync(downloadThunk, this.reportId))
+      .dispatch(
+        pdReportsAttachmentsSync(
+          sendRequest({
+            method: 'GET',
+            endpoint: {url: this.attachmentsListUrl}
+          }),
+          this.reportId
+        )
+      )
       // @ts-ignore
       .catch((_err) => {
         // TODO: error handling
@@ -443,12 +446,5 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-    [
-      this.shadowRoot!.querySelector('#download') as any as EtoolsPrpAjaxEl,
-      this.shadowRoot!.querySelector('#upload') as any as EtoolsPrpAjaxEl,
-      this.shadowRoot!.querySelector('#delete') as any as EtoolsPrpAjaxEl
-    ].forEach((req: EtoolsPrpAjaxEl) => {
-      req.abort();
-    });
   }
 }

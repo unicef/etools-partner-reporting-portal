@@ -3,12 +3,11 @@ import {property, customElement} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import '../dropdown-filter/dropdown-filter-multi';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import {translate} from 'lit-translate';
 import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import Endpoints from '../../../endpoints';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('location-filter-multi')
 export class LocationFilterMulti extends FilterDependenciesMixin(connect(store)(LitElement)) {
@@ -40,7 +39,6 @@ export class LocationFilterMulti extends FilterDependenciesMixin(connect(store)(
 
   render() {
     return html`
-      <etools-prp-ajax id="locations" .url="${this.locationsUrl}"></etools-prp-ajax>
       <dropdown-filter-multi
         .label="${translate('LOCATION')}"
         option-label="name"
@@ -58,8 +56,9 @@ export class LocationFilterMulti extends FilterDependenciesMixin(connect(store)(
     if (changedProperties.has('locationId')) {
       this.locationsUrl = this._computeLocationsUrl(this.locationId);
     }
+
     if (changedProperties.has('locationsUrl')) {
-      this._fetchLocations(this.locationsUrl);
+      this._fetchLocations();
     }
   }
 
@@ -73,16 +72,17 @@ export class LocationFilterMulti extends FilterDependenciesMixin(connect(store)(
     return locationId ? Endpoints.locations(locationId) : '';
   }
 
-  _fetchLocations(url) {
-    if (!url) {
+  _fetchLocations() {
+    if (!this.locationsUrl) {
       return;
     }
-    const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
-    locationsAjax.abort();
-    locationsAjax
-      .thunk()()
+
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.locationsUrl}
+    })
       .then((res) => {
-        this.data = res.data;
+        this.data = res;
       })
       .catch((_err: any) => {
         // TODO: error handling
@@ -91,8 +91,6 @@ export class LocationFilterMulti extends FilterDependenciesMixin(connect(store)(
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    const locationsAjax = this.shadowRoot?.getElementById('locations') as any as EtoolsPrpAjaxEl;
-    locationsAjax.abort();
   }
 }
 

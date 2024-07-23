@@ -7,10 +7,8 @@ import UtilsMixin from './etools-prp-common/mixins/utils-mixin.js';
 import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin.js';
 import Endpoints from './endpoints.js';
 import './etools-prp-common/elements/app-redirect.js';
-import './etools-prp-common/elements/etools-prp-ajax.js';
 import './etools-prp-common/elements/etools-prp-auth.js';
-import {EtoolsPrpAjaxEl} from './etools-prp-common/elements/etools-prp-ajax.js';
-import {reset, userLogout} from './redux/actions.js';
+import {reset, resetToken} from './redux/actions.js';
 import {BASE_PATH} from './etools-prp-common/config.js';
 import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 import {RootState} from './typings/redux.types.js';
@@ -27,6 +25,7 @@ import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router
 import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
 import {registerTranslateConfig, use} from 'lit-translate';
 import {setActiveLanguage} from './redux/actions/active-language';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 dayjs.extend(dayJsUtc);
 
@@ -103,9 +102,6 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
       <app-redirect></app-redirect>
 
       <etools-prp-auth .authenticated="${this.authenticated}"></etools-prp-auth>
-
-      <etools-prp-ajax id="signOut" .url="${this.signoutUrl}" body="{}" content-type="application/json" method="post">
-      </etools-prp-ajax>
 
       ${this._equals(this.page, 'app') ? html`<page-app name="${this.basePath}"></page-app>` : ''}
       ${this._equals(this.page, 'login') ? html` <page-login name="login" .value="${this.error}"></page-login>` : ''}
@@ -192,15 +188,17 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
   }
 
   _onSignOut() {
-    const thunk = (this.shadowRoot!.getElementById('signOut') as EtoolsPrpAjaxEl).thunk();
-    store
-      .dispatch(userLogout(thunk))
-      .then(() => {
+    sendRequest({
+      method: 'POST',
+      endpoint: {url: this.signoutUrl}
+    })
+      .then((_resp: any) => {
+        store.dispatch(resetToken());
         this._goToLanding();
         store.dispatch(reset());
       })
-      .catch((_err: any) => {
-        // TODO: error handling
+      .catch((error: any) => {
+        console.error(error);
       });
   }
 
