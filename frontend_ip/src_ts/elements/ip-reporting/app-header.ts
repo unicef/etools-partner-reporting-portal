@@ -22,6 +22,7 @@ import {connect} from 'pwa-helpers';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import Constants from '../../etools-prp-common/constants';
 import {setActiveLanguage} from '../../redux/actions/active-language';
+import './user-profile-dialog';
 
 /**
  * page header element
@@ -116,6 +117,8 @@ export class PageHeader extends connect(store)(LitElement) {
             .sections="${this.profileDrSections}"
             .offices="${this.profileDrOffices}"
             .users="${this.profileDrUsers}"
+            show-email
+            profile-dialog-component="user-profile-dialog"
             .profile="${this.profile ? {...this.profile} : {}}"
             @save-profile="${this.handleSaveProfile}"
             @sign-out="${this._signOut}"

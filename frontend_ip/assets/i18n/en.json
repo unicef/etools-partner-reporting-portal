@@ -483,5 +483,10 @@
     "NEUTRAL": "Neutral",
     "SATISFIED": "Satisfied",
     "VERY_SATISFIED": "Very Satisfied",
-    "COMMUNITY_CHANNELS": "Community Channels"
+    "COMMUNITY_CHANNELS": "Community Channels",
+    "MY_ROLES":"My roles",
+    "OK_BTN_TEXT":"Ok",
+    "CANCEL_BTN_TEXT":"Cancel",
+    "MY_PROFILE":"My profile",
+    "NAME":"Name"
 }

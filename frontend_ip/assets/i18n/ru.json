@@ -483,5 +483,10 @@
     "NEUTRAL": "Нейтральный",
     "SATISFIED": "Довольный",
     "VERY_SATISFIED": "Очень доволен",
-    "COMMUNITY_CHANNELS": "Каналы сообщества"
+    "COMMUNITY_CHANNELS": "Каналы сообщества",
+    "MY_ROLES": "Meine Rollen",
+    "OK_BTN_TEXT": "Хорошо",
+    "CANCEL_BTN_TEXT": "Отмена",
+    "MY_PROFILE": "Мой профайл",
+    "NAME": "Имя"
 }

@@ -4,7 +4,6 @@ import '../etools-prp-common/elements/etools-prp-ajax';
 import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/page-body';
-import '../etools-prp-common/elements/user-profile/profile-dropdown';
 import {BASE_PATH} from '../etools-prp-common/config';
 import Endpoints from '../endpoints';
 import {translate} from 'lit-translate';

@@ -9,8 +9,6 @@ import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax'
 import {ErrorModalEl} from '../../etools-prp-common/elements/error-modal';
 import '../../etools-prp-common/elements/app-switcher';
 import '../../etools-prp-common/elements/workspace-dropdown';
-import '../organization-dropdown';
-import '../../etools-prp-common/elements/user-profile/profile-dropdown';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
 import ModalMixin from '../../etools-prp-common/mixins/modal-mixin';

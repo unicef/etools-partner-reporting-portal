@@ -483,5 +483,10 @@
     "NEUTRAL": "محايد",
     "SATISFIED": "قنع",
     "VERY_SATISFIED": "راض جدا",
-    "COMMUNITY_CHANNELS": "قنوات المجتمع"
+    "COMMUNITY_CHANNELS": "قنوات المجتمع",
+    "MY_ROLES": "أدواري",
+    "OK_BTN_TEXT": "نعم",
+    "CANCEL_BTN_TEXT": "يلغي",
+    "MY_PROFILE": "ملفي",
+    "NAME": "اسم"
 }

@@ -176,9 +176,7 @@ export class AppMenu extends RoutingMixin(MatomoMixin(PageNavMixin(UtilsMixin(co
       this.overviewUrl = this.buildUrl(this._baseUrl, 'overview');
       this.pdUrl = this.buildUrl(this._baseUrl, 'pd');
       this.progressReportsUrl = this.buildUrl(this._baseUrl, 'progress-reports');
-      this.indicatorsReportsUrl = this.buildUrl(this._baseUrl, 'indicators');
-
-      console.log(this._baseUrl);
+      this.indicatorsReportsUrl = this.buildUrl(this._baseUrl, 'indicators');      
     }
   }
 

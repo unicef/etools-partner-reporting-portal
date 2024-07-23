@@ -19,7 +19,6 @@ import {translate} from 'lit-translate';
 import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('list-view-single-indicator')
 export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(store)(LitElement))) {
