@@ -447,8 +447,8 @@ SOCIAL_AUTH_JSONFIELD_ENABLED = True
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
 
-LOGIN_URL = "/landing"
-LOGIN_ERROR_URL = "/unauthorized"
+LOGIN_URL = "/landing/"
+LOGIN_ERROR_URL = "/unauthorized/"
 LOGOUT_URL = "/api/account/user-logout/"
 
 SOCIAL_AUTH_PIPELINE = (
@@ -558,3 +558,9 @@ UNICEF_LOCATIONS_MODEL = 'core.Location'
 MATOMO_HOST_URL = env('MATOMO_HOST_URL', default='https://unisitetracker.unicef.io/')
 MATOMO_TRACKER_URL = env('MATOMO_TRACKER_URL', default='matomo.php')
 MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)
+
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SAMESITE = 'Strict'
