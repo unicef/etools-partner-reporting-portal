@@ -27,10 +27,6 @@ export const appThemeIpStyles = html`
 
       --theme-selected-item-background-color: var(--paper-grey-200);
 
-      --paper-checkbox-checked-color: var(--theme-primary-color);
-      --paper-checkbox-unchecked-ink-color: var(--theme-primary-color);
-      --paper-checkbox-checked-ink-color: var(--theme-primary-color);
-
       --accent-color: #0099ff;
 
       --paper-tabs-selection-bar-color: var(--theme-primary-color);

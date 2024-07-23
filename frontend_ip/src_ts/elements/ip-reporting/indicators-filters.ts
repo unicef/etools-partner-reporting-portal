@@ -87,12 +87,12 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
 
   private _initStatuses(): {title: string; id: string}[] {
     return [
-      {title: translate('SIGNED'), id: 'signed'},
-      {title: translate('ACTIVE'), id: 'active'},
-      {title: translate('SUSPENDED'), id: 'suspended'},
-      {title: translate('ENDED'), id: 'ended'},
-      {title: translate('CLOSED'), id: 'closed'},
-      {title: translate('TERMINATED'), id: 'terminated'}
+      {title: translate('SIGNED') as any as string, id: 'signed'},
+      {title: translate('ACTIVE') as any as string, id: 'active'},
+      {title: translate('SUSPENDED') as any as string, id: 'suspended'},
+      {title: translate('ENDED') as any as string, id: 'ended'},
+      {title: translate('CLOSED') as any as string, id: 'closed'},
+      {title: translate('TERMINATED') as any as string, id: 'terminated'}
     ];
   }
 }

@@ -2,7 +2,6 @@ import {html, css, LitElement} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import {translate} from 'lit-translate';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('dropdown-filter')

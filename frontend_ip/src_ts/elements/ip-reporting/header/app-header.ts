@@ -8,20 +8,20 @@ import '@unicef-polymer/etools-modules-common/dist/components/dropdowns/organiza
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-import {store} from '../../redux/store';
+import {store} from '../../../redux/store';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import isEmpty from 'lodash-es/isEmpty';
 import {translate, get as getTranslation} from 'lit-translate';
 import {AnyObject, EtoolsUser} from '@unicef-polymer/etools-types';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
-import EndpointsCommon from '../../etools-prp-common/endpoints';
+import EndpointsCommon from '../../../etools-prp-common/endpoints';
 import {Environment} from '@unicef-polymer/etools-utils/dist/singleton/environment';
-import {RootState} from '../../typings/redux.types';
+import {RootState} from '../../../typings/redux.types';
 import {connect} from 'pwa-helpers';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
-import Constants from '../../etools-prp-common/constants';
-import {setActiveLanguage} from '../../redux/actions/active-language';
+import Constants from '../../../etools-prp-common/constants';
+import {setActiveLanguage} from '../../../redux/actions/active-language';
 import './user-profile-dialog';
 
 /**
@@ -56,7 +56,7 @@ export class PageHeader extends connect(store)(LitElement) {
   profileDrUsers: any[] = [];
 
   @property({type: Array})
-  editableFields: string[] = ['office', 'section', 'job_title', 'phone_number', 'oic', 'supervisor'];
+  editableFields: string[] = [];
 
   @property({type: String})
   activeLanguage?: string;
@@ -89,8 +89,8 @@ export class PageHeader extends connect(store)(LitElement) {
           <countries-dropdown
             id="countries"
             .profile="${this.profile}"
-            countries-profile-key="${'workspaces_available'}"
-            country-profile-key="${'workspace'}"
+            countries-profile-key="workspaces_available"
+            country-profile-key="workspace"
             option-label="title"
             .changeCountryEndpoint="${{url: EndpointsCommon.changeWorkspace()}}"
             @country-changed="${() => {
@@ -101,8 +101,8 @@ export class PageHeader extends connect(store)(LitElement) {
           </countries-dropdown>
           <organizations-dropdown
             .profile="${this.profile}"
-            organizations-profile-key="${'partners_available'}"
-            organization-profile-key="${'partner'}"
+            organizations-profile-key="partners_available"
+            organization-profile-key="partner"
             option-label="title"
             .changeOrganizationEndpoint="${{url: EndpointsCommon.changeOrganization()}}"
             @organization-changed="${() => {

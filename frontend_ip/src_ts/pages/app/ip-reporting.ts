@@ -6,7 +6,7 @@ import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header-layout.js
 import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header.js';
 // import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-footer.js';
 
-import '../../elements/ip-reporting/app-header.js';
+import '../../elements/ip-reporting/header/app-header.js';
 import '../../etools-prp-common/elements/page-title.js';
 import {appThemeIpStyles} from '../../styles/app-theme-ip-styles.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
