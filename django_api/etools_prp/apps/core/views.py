@@ -247,11 +247,11 @@ class HomeView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         user = self.request.user
         if user.prp_roles.filter(name__in=[item for item, _, in PRP_IP_ROLE_TYPES]):
-            redirect_page = '/ip'
+            redirect_page = '/ip/'
         elif user.prp_roles.filter(name__in=[item for item, _, in PRP_CLUSTER_ROLE_TYPES]):
-            redirect_page = '/cluster'
+            redirect_page = '/cluster/'
         else:
-            redirect_page = '/unauthorized'
+            redirect_page = '/unauthorized/'
         return redirect_page
 
 
