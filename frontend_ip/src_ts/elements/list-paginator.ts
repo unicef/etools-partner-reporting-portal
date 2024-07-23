@@ -1,7 +1,6 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import PaginationMixin from '../etools-prp-common/mixins/pagination-mixin';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {RootState} from '../typings/redux.types';
 import {connect} from 'pwa-helpers';

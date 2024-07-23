@@ -5,11 +5,8 @@ import { PaperButtonElement } from '@polymer/paper-button/paper-button';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@polymer/paper-tooltip/paper-tooltip';
-import '@polymer/iron-icons/iron-icons';
-import { tableStyles } from '../etools-prp-common/styles/table-styles';
-import { sharedStyles } from '../etools-prp-common/styles/shared-styles';
+import {tableStyles} from '../etools-prp-common/styles/table-styles';
+import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
@@ -35,11 +32,6 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
         display: block;
         width: calc(100% - 35px);
       }
-      --iron-icon: {
-        vertical-align: text-bottom;
-      }
-      --iron-icon-width: 16px;
-      --iron-icon-height: 16px;
     }
     a {
       @apply --link;
@@ -109,11 +101,14 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
       <etools-data-table-row>
         <div slot="row-data" class="layout-horizontal editable-row">
           <span class="col-data col-2 table-cell table-cell--text self-center">
-            ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
-              ? html`<status-badge type="error"></status-badge>`
-              : html``}
-            ${this.indicator?.blueprint?.title}
-            <paper-tooltip>${this.indicator?.blueprint?.title}</paper-tooltip>
+            <sl-tooltip .content="${this.indicator?.blueprint?.title}">
+              <span>
+                ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
+                  ? html`<status-badge type="error"></status-badge>`
+                  : html``}
+                ${this.indicator?.blueprint?.title}
+              </span>
+            </sl-tooltip>
           </span>
           ${this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
             ? html`<span class="col-data col-1 table-cell table-cell--text self-center"
@@ -193,16 +188,12 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
           ${this.canEdit
             ? html`
                 <span class="table-cell table-cell--text table-cell--action self-center">
-                  <paper-button class="button-link" @click=${this._openModal} data-modal-type="edit"
+                  <etools-button variant="text" class="button-link" @click=${this._openModal} data-modal-type="edit"
                     >${translate('EDIT')}
                     ${this._showLocationsWarning(this.indicator, this.type)
-                      ? html`<iron-icon
-                          class="locations-warning"
-                          data-modal-type="edit"
-                          icon="icons:error"
-                        ></iron-icon>`
-                      : ''}
-                  </paper-button>
+                      ? html`<etools-icon class="locations-warning" data-modal-type="edit" name="error"></etools-icon>`
+                      : html``}
+                  </etools-button>
                 </span>
               `
             : html``}
