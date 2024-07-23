@@ -46,7 +46,7 @@ export const pdIndicatorsUpdate = function (updateThunk: any, pdId: string) {
   return function (dispatch: any) {
     dispatch(pdIndicatorsLoadingStart(pdId));
 
-    return updateThunk()
+    return updateThunk
       .then(function (res: any) {
         dispatch(pdIndicatorsSet(pdId, res));
         dispatch(pdIndicatorsLoadingStop(pdId));
