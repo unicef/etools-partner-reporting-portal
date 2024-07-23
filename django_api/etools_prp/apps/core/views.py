@@ -1,6 +1,7 @@
 import importlib
 
 from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -15,6 +16,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from social_django.utils import load_strategy
+from social_django.views import disconnect
 
 from etools_prp.apps.core.common import (
     CURRENCIES,
@@ -279,6 +282,22 @@ class UnauthorizedView(TemplateView):
 # TODO import from unicef-security
 class SocialLogoutView(RedirectView):
 
+    def get(self, request, *args, **kwargs):
+        # Call Django's logout function
+        logout(request)
+
+        # Disconnect social auth association
+        strategy = load_strategy(request)
+        disconnect(request, strategy=strategy)
+
+        # Clear session completely
+        request.session.flush()
+
+        return super().get(request, *args, **kwargs)
+
+    # def get_redirect_url(self, *args, **kwargs):
+    #     return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
+    #         f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
+
     def get_redirect_url(self, *args, **kwargs):
-        return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
-            f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
+        return settings.LOGIN_URL
