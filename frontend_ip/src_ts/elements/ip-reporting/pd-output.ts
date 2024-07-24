@@ -9,7 +9,7 @@ import '@polymer/paper-tooltip/paper-tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import {
   computeReportableUrl,
   computeCompleteIndicator,
@@ -459,7 +459,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       // @ts-ignore
       .then(() => {
         fireEvent(this, 'toast', {
-          text: translate('CHANGES_SAVED'),
+          text: getTranslation('CHANGES_SAVED'),
           showCloseBtn: true
         });
       })

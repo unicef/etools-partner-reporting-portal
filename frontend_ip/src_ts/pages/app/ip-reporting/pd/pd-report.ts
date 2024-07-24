@@ -12,13 +12,10 @@ import '../../../../elements/reporting-period.js';
 import '../../../../etools-prp-common/elements/report-status.js';
 import '../../../../etools-prp-common/elements/message-box.js';
 import '../../../../etools-prp-common/elements/error-modal.js';
-import {ErrorModalEl} from '../../../../etools-prp-common/elements/error-modal.js';
 import '../../../../elements/ip-reporting/pd-reports-report-title.js';
 import '../../../../elements/ip-reporting/pd-report-export-button.js';
 import '../../../../elements/ip-reporting/pd-modal.js';
-import {PdModalEl} from '../../../../elements/ip-reporting/pd-modal.js';
 import '../../../../elements/ip-reporting/authorized-officer-modal.js';
-import {AuthorizedOfficerModalEl} from '../../../../elements/ip-reporting/authorized-officer-modal.js';
 import './pd-report-sr.js';
 import './pd-report-hr.js';
 import './pd-report-qpr.js';
@@ -35,6 +32,7 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {translate} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
 
 @customElement('page-ip-reporting-pd-report')
 export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
@@ -226,17 +224,6 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
             ></page-pd-report-sr>`
           : html``}
       </page-body>
-
-      <pd-modal id="pdDetails"></pd-modal>
-      <error-modal id="error"></error-modal>
-      <authorized-officer-modal
-        id="officer"
-        .pdId="${this.pdId}"
-        .reportId="${this.reportId}"
-        .data="${this.currentReport}"
-        .submitUrl="${this.submitUrl}"
-      >
-      </authorized-officer-modal>
     `;
   }
 
@@ -247,8 +234,6 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).close();
-    (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).close();
   }
 
   stateChanged(state: RootState) {
@@ -382,11 +367,10 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
   }
 
   _fetchReport() {
-    console.log(this.pdId, this.reportUrl);
     if (!this.pdId || !this.reportUrl) {
       return;
     }
-    console.log('helllo');
+
     store.dispatch(
       pdReportsFetchSingle(
         sendRequest({
@@ -419,7 +403,10 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
   _showPdDetails(e: CustomEvent) {
     e.preventDefault();
 
-    (this.shadowRoot!.getElementById('pdDetails') as PdModalEl).open();
+    openDialog({
+      dialog: 'pd-modal',
+      dialogData: {}
+    });
   }
 
   _canExport(report: any, mode: string, permissions: any) {
@@ -491,9 +478,25 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
         this.busy = false;
 
         if (authorizedError.length > 0) {
-          return (this.shadowRoot!.getElementById('officer') as any as AuthorizedOfficerModalEl).open();
+          openDialog({
+            dialog: 'authorized-officer-modal',
+            dialogData: {
+              pdId: this.pdId,
+              reportId: this.reportId,
+              data: this.currentReport,
+              submitUrl: this.submitUrl
+            }
+          });
+          return;
         }
-        return (this.shadowRoot!.getElementById('error') as any as ErrorModalEl).open(res.non_field_errors);
+
+        openDialog({
+          dialog: 'error-modal',
+          dialogData: {
+            errors: res.non_field_errors
+          }
+        });
+        return;
       });
   }
 }

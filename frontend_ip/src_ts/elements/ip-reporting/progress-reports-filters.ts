@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
@@ -98,20 +98,20 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
 
   _localizeStatuses() {
     return [
-      {title: translate('OVERDUE'), id: 'Ove'},
-      {title: translate('SENT_BACK'), id: 'Sen'},
-      {title: translate('DUE'), id: 'Due'},
-      {title: translate('SUBMITTED'), id: 'Sub'},
-      {title: translate('ACCEPTED'), id: 'Acc'},
-      {title: translate('NOT_YET_DUE'), id: 'Not'}
+      {title: getTranslation('OVERDUE'), id: 'Ove'},
+      {title: getTranslation('SENT_BACK'), id: 'Sen'},
+      {title: getTranslation('DUE'), id: 'Due'},
+      {title: getTranslation('SUBMITTED'), id: 'Sub'},
+      {title: getTranslation('ACCEPTED'), id: 'Acc'},
+      {title: getTranslation('NOT_YET_DUE'), id: 'Not'}
     ];
   }
 
   _localizeTypes() {
     return [
-      {title: translate('QPR'), id: 'QPR'},
-      {title: translate('HR'), id: 'HR'},
-      {title: translate('SR'), id: 'SR'}
+      {title: getTranslation('QPR'), id: 'QPR'},
+      {title: getTranslation('HR'), id: 'HR'},
+      {title: getTranslation('SR'), id: 'SR'}
     ];
   }
 }

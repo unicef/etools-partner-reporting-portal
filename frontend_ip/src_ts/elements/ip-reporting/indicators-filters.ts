@@ -10,7 +10,7 @@ import '../filters/pd-filter/pd-dropdown-filter';
 import '../filters/checkbox-filter/checkbox-filter';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
@@ -87,12 +87,12 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
 
   private _initStatuses(): {title: string; id: string}[] {
     return [
-      {title: translate('SIGNED') as any as string, id: 'signed'},
-      {title: translate('ACTIVE') as any as string, id: 'active'},
-      {title: translate('SUSPENDED') as any as string, id: 'suspended'},
-      {title: translate('ENDED') as any as string, id: 'ended'},
-      {title: translate('CLOSED') as any as string, id: 'closed'},
-      {title: translate('TERMINATED') as any as string, id: 'terminated'}
+      {title: getTranslation('SIGNED'), id: 'signed'},
+      {title: getTranslation('ACTIVE'), id: 'active'},
+      {title: getTranslation('SUSPENDED'), id: 'suspended'},
+      {title: getTranslation('ENDED'), id: 'ended'},
+      {title: getTranslation('CLOSED'), id: 'closed'},
+      {title: getTranslation('TERMINATED'), id: 'terminated'}
     ];
   }
 }

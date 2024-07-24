@@ -1,10 +1,10 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/filter-list.js';
 import '../../elements/filters/text-filter/text-filter.js';
@@ -79,12 +79,12 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
 
   private _initStatuses() {
     return [
-      {title: translate('SIGNED'), id: 'signed'},
-      {title: translate('ACTIVE'), id: 'active'},
-      {title: translate('SUSPENDED'), id: 'suspended'},
-      {title: translate('ENDED'), id: 'ended'},
-      {title: translate('CLOSED'), id: 'closed'},
-      {title: translate('TERMINATED'), id: 'terminated'}
+      {title: getTranslation('SIGNED'), id: 'signed'},
+      {title: getTranslation('ACTIVE'), id: 'active'},
+      {title: getTranslation('SUSPENDED'), id: 'suspended'},
+      {title: getTranslation('ENDED'), id: 'ended'},
+      {title: getTranslation('CLOSED'), id: 'closed'},
+      {title: getTranslation('TERMINATED'), id: 'terminated'}
     ];
   }
 
