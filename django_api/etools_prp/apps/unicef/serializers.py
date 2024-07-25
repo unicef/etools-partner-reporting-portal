@@ -27,7 +27,6 @@ from etools_prp.apps.indicator.serializers import (
 from etools_prp.apps.partner.models import Partner
 
 from ..core.models import Realm
-from ..utils.serializers import OptionalElementsListSerializer
 from .models import (
     FinalReview,
     LowerLevelOutput,
@@ -1018,7 +1017,7 @@ class ImportRealmSerializer(serializers.Serializer):
 
 class ImportUserRealmsSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
-    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=True)
+    realms = serializers.ListSerializer(child=ImportRealmSerializer(), allow_empty=True)
 
     class Meta:
         model = get_user_model()
@@ -1077,6 +1076,8 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         validated_data['username'] = validated_data['email']
 
         realms = validated_data.pop('realms')
+        if not realms:
+            raise ValidationError('Cannot create a user without realms.')
 
         first_realm = realms[0]
         validated_data['workspace_id'] = first_realm['country'].id
