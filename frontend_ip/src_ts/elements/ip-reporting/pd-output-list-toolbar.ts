@@ -80,6 +80,14 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
     this.programmeDocument = programmeDocumentReportsCurrent(state);
     this.currentReport = programmeDocumentReportsCurrent(state);
     this.currentUserRoles = state.userProfile?.profile?.prp_roles;
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+
+    if (this.reportId !== state.programmeDocumentReports.current.id) {
+      this.reportId = state.programmeDocumentReports.current.id;
+    }
   }
 
   updated(changedProperties) {
@@ -116,7 +124,7 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   render() {
     return html`
       ${buttonsStyles}
-      <etools-prp-toolbar query="${this.query}" report-id="${this.reportId}" location-id="${this.locationId}">
+      <etools-prp-toolbar .query="${this.query}" .reportId="${this.reportId}" .locationId="${this.locationId}">
         <download-button url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
         <download-button url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
 
