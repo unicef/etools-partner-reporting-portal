@@ -479,6 +479,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     const first = data.indicator_reports[0] || {};
 
     return {
+      id: data.id,
       overall_status: first.overall_status,
       narrative_assessment: first.narrative_assessment
     };

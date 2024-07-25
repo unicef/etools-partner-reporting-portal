@@ -16,12 +16,12 @@ import {
 } from './js/pd-output-list-toolbar-functions';
 import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/refresh-report-modal';
-import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-report-modal';
 import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
 import {RootState} from '../../typings/redux.types';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
 
 @customElement('pd-output-list-toolbar')
 export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) {
@@ -116,10 +116,6 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   render() {
     return html`
       ${buttonsStyles}
-
-      <refresh-report-modal id="refresh" .data="${this.refreshData}" .refreshUrl="${this.refreshUrl}">
-      </refresh-report-modal>
-
       <etools-prp-toolbar query="${this.query}" report-id="${this.reportId}" location-id="${this.locationId}">
         <download-button url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
         <download-button url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
@@ -146,7 +142,13 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   }
 
   _refresh() {
-    (this.shadowRoot?.getElementById('refresh') as RefreshReportModalEl)?.open();
+    openDialog({
+      dialog: 'refresh-report-modal',
+      dialogData: {
+        refreshData: this.refreshData,
+        refreshUrl: this.refreshUrl
+      }
+    });
   }
 
   _onFileUploaded(e: CustomEvent) {
@@ -171,7 +173,6 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-    (this.shadowRoot?.getElementById('refresh') as RefreshReportModalEl)?.close();
   }
 }
 

@@ -470,8 +470,8 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
         this.busy = false;
         this.path = newPath;
       })
-      .catch((res: any) => {
-        const authorizedError = res.error_codes.filter((error: string) => {
+      .catch((err: any) => {
+        const authorizedError = err.response.error_codes.filter((error: string) => {
           return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
         });
 
@@ -493,7 +493,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
         openDialog({
           dialog: 'error-modal',
           dialogData: {
-            errors: res.non_field_errors
+            errors: err.response.non_field_errors
           }
         });
         return;

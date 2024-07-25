@@ -136,12 +136,12 @@ export class AuthorizedOfficerModal extends RoutingMixin(UtilsMixin(connect(stor
         fireEvent(this, 'dialog-closed', {confirmed: true});
         // this.path = newPath; //TODO , should we redirect??
       })
-      .catch((res: any) => {
+      .catch((err: any) => {
         fireEvent(this, 'dialog-closed', {confirmed: false});
         openDialog({
           dialog: 'error-modal',
           dialogData: {
-            errors: res.non_field_errors
+            errors: err.response.non_field_errors
           }
         });
       })
