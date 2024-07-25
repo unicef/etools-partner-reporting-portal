@@ -5,7 +5,6 @@ import {store} from '../../../redux/store';
 import '@unicef-polymer/etools-unicef/src/etools-input/etools-input';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import {PaperInputElement} from '@polymer/paper-input/paper-input';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 
 @customElement('text-filter')

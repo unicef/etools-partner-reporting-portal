@@ -6,7 +6,7 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-currency-amount-input/etools-currency-amount-input';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
-import '@polymer/paper-input/paper-input';
+import '@unicef-polymer/etools-unicef/src/etools-input/etools-input';
 import '@polymer/app-layout/app-grid/app-grid-style';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-permissions';
@@ -96,18 +96,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         --app-grid-gutter: 0px;
       }
 
-      etools-dropdown[readonly],
-      etools-currency-amount-input[readonly] {
-        --paper-input-container-underline: {
-          display: none;
-        }
-        --paper-input-container-underline-focus: {
-          display: none;
-        }
-        --paper-input-container-underline-disabled: {
-          display: none;
-        }
-      }
       .face-form-message {
         color: var(--theme-primary-color);
         font-size: 16px;
@@ -223,13 +211,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                 this._equals(this.computedMode, 'view')
                   ? html`<span class="value">${this._withDefault(this.data.partner_contribution_to_date)}</span>`
                   : html`
-                      <paper-input
+                      <etools-input
                         id="partner_contribution_to_date"
                         .value="${this.localData?.partner_contribution_to_date}"
                         no-label-float
                         char-counter
                         maxlength="2000"
-                      ></paper-input>
+                      ></etools-input>
                     `
               }
             </labelled-item>
@@ -273,13 +261,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span>
                     `
                   : html`
-                      <paper-input
+                      <etools-input
                         id="challenges_in_the_reporting_period"
                         .value="${this.localData?.challenges_in_the_reporting_period}"
                         no-label-float
                         char-counter
                         maxlength="2000"
-                      ></paper-input>
+                      ></etools-input>
                     `
               }
             </labelled-item>
@@ -291,13 +279,13 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                 this._equals(this.computedMode, 'view')
                   ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
                   : html`
-                      <paper-input
+                      <etools-input
                         id="proposed_way_forward"
                         .value="${this.localData?.proposed_way_forward}"
                         no-label-float
                         char-counter
                         maxlength="2000"
-                      ></paper-input>
+                      ></etools-input>
 
                       ${this.showFaceMessage
                         ? html` <div class="face-form-message">${translate('FACE_FORM_SUBMITTED')}</div> `
@@ -328,14 +316,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="release_cash_in_time_comment"
                               .value="${this.localData?.final_review?.release_cash_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -358,14 +346,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="release_supplies_in_time_comment"
                               .value="${this.localData?.final_review?.release_supplies_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -388,14 +376,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="feedback_face_form_in_time_comment"
                               .value="${this.localData?.final_review?.feedback_face_form_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -418,14 +406,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="respond_requests_in_time_comment"
                               .value="${this.localData?.final_review?.respond_requests_in_time_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -448,14 +436,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="implemented_as_planned_comment"
                               .value="${this.localData?.final_review?.implemented_as_planned_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -478,14 +466,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="action_to_address_comment"
                               .value="${this.localData?.final_review?.action_to_address_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -523,14 +511,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             </div>
                           `
                         : html`
-                            <paper-input
+                            <etools-input
                               id="overall_satisfaction_comment"
                               .value="${this.localData?.final_review?.overall_satisfaction_comment}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
                               maxlength="2000"
-                            ></paper-input>
+                            ></etools-input>
                           `}
                     </labelled-item>
                   </div>
@@ -635,7 +623,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         });
         console.log(err);
       });
-}
+  }
 
   _computeUpdateUrl(locationId: string, reportId: string) {
     return computeUpdateUrl(locationId, reportId);
