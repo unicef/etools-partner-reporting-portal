@@ -132,10 +132,8 @@ export class ProgressReportsList extends SortingMixin(
               <div slot="row-data">
                 <div class="col-data col-2 truncate table-cell table-cell--text">
                   <sl-tooltip content="${report.programme_document?.title}" hoist>
-                    <span>
-                      ${this._withDefault(report.programme_document?.reference_number, '-')}
-                    </span>
-                  </sl-tooltip
+                    <span> ${this._withDefault(report.programme_document?.reference_number, '-')} </span>
+                  </sl-tooltip>
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">
                   <pd-reports-report-title

@@ -2,7 +2,6 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles.js';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles.js';
-import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-tabs/paper-tabs.js';
 import '@polymer/paper-tabs/paper-tab.js';
 import '../../../../etools-prp-common/elements/etools-prp-permissions.js';
@@ -142,9 +141,9 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       <page-header title=${this.headingPrefix} back=${this.backLink}>
         <reporting-period slot="above-title" .range=${this.currentReport.reporting_period}></reporting-period>
         <pd-reports-report-title slot="above-title" .report=${this.currentReport}></pd-reports-report-title>
-        <paper-button class="btn-primary" slot="in-title" role="button" @click=${this._showPdDetails}>
+        <etools-button variant="text" slot="in-title" role="button" @click=${this._showPdDetails}>
           ${this.currentReport.programme_document?.reference_number}
-        </paper-button>
+        </etools-button>
 
         ${this._equals(this.currentPd.status, 'Suspended')
           ? html`
@@ -163,9 +162,9 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
             : html``}
           ${this.canSubmit
             ? html`
-                <paper-button class="btn-primary" @click=${this._submit} ?disabled=${this.busy} raised>
+                <etools-button variant="primary" @click=${this._submit} ?disabled=${this.busy}>
                   ${translate('SUBMIT')}
-                </paper-button>
+                </etools-button>
               `
             : html``}
         </div>

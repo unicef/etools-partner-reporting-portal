@@ -31,8 +31,8 @@ export class IndicatorsToolbar extends UtilsMixin(LitElement) {
   render() {
     return html`
       <etools-prp-toolbar .query="${this.query}" .locationId="${this.locationId}">
-        <download-button url="${this.xlsExportUrl}" tracker="Indicators Export Xls">XLS</download-button>
-        <download-button url="${this.pdfExportUrl}" tracker="Indicators Export Pdf">PDF</download-button>
+        <download-button .url="${this.xlsExportUrl}" tracker="Indicators Export Xls">XLS</download-button>
+        <download-button .url="${this.pdfExportUrl}" tracker="Indicators Export Pdf">PDF</download-button>
       </etools-prp-toolbar>
     `;
   }

@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement} from 'lit/decorators.js';
-import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-button/paper-button.js';
+import '@unicef-polymer/etools-unicef/src/etools-button/etools-button';
 
 @customElement('page-not-found')
 export class PageNotFound extends LitElement {
@@ -9,10 +8,6 @@ export class PageNotFound extends LitElement {
     :host {
       display: block;
       padding: 25px;
-
-      --paper-button: {
-        background-color: #fff;
-      }
     }
 
     h1 {
@@ -35,7 +30,7 @@ export class PageNotFound extends LitElement {
     return html`
       <h1>Page not found</h1>
 
-      <paper-button id="return" @click="${this._return}" raised>Head back home</paper-button>
+      <etools-button id="return" @click="${this._return}">Head back home</etools-button>
     `;
   }
 

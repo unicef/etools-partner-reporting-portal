@@ -1,7 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { connect } from 'pwa-helpers';
-import { PaperButtonElement } from '@polymer/paper-button/paper-button';
+import {connect} from 'pwa-helpers';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -236,7 +235,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
   }
 
   _openModal(e: CustomEvent) {
-    (this.shadowRoot!.querySelector('#modal-' + (e.target as PaperButtonElement).dataset.modalType) as any).open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).dataset.modalType) as any).open();
   }
 
   _computeIndicatorReportsUrl(baseUrl: string, indicator: any) {

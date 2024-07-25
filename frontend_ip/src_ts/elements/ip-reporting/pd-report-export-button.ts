@@ -15,7 +15,7 @@ export class PdReportExportButton extends connect(store)(LitElement) {
         text-decoration: none;
       }
 
-      paper-button {
+      etools-button {
         text-transform: uppercase;
       }
     `
@@ -34,7 +34,7 @@ export class PdReportExportButton extends connect(store)(LitElement) {
     return html`
       ${buttonsStyles}
       <a href="${this.fileUrl}" target="_blank" tabindex="-1">
-        <paper-button class="btn-primary">Download report in standard template format</paper-button>
+        <etools-button variant="primary">Download report in standard template format</etools-button>
       </a>
     `;
   }
@@ -51,7 +51,7 @@ export class PdReportExportButton extends connect(store)(LitElement) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
       this.fileUrl = Endpoints.reportExport(this.locationId, this.reportId);
     }

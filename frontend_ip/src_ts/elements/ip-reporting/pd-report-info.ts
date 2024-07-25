@@ -541,9 +541,9 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
           ${
             !this._equals(this.computedMode, 'view')
               ? html`
-                  <paper-button class="btn-primary" id="toggle-button" @tap="${this._handleInput}" raised>
+                  <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
-                  </paper-button>
+                  </etools-button>
                 `
               : html``
           }

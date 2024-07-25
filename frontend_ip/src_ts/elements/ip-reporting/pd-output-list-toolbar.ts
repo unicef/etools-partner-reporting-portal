@@ -125,22 +125,22 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
     return html`
       ${buttonsStyles}
       <etools-prp-toolbar .query="${this.query}" .reportId="${this.reportId}" .locationId="${this.locationId}">
-        <download-button url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
-        <download-button url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
+        <download-button .url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
+        <download-button .url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
 
         ${this.showImportButtons
           ? html`
-              <upload-button url="${this.importUrl}" modal-title="Import Template">
+              <upload-button .url="${this.importUrl}" modal-title="Import Template">
                 ${translate('IMPORT_TEMPLATE')}
               </upload-button>
-              <download-button url="${this.importTemplateUrl}" tracker="Import template">
+              <download-button .url="${this.importTemplateUrl}" tracker="Import template">
                 ${translate('GENERATE_UPLOADER')}
               </download-button>
               ${this.showRefresh
                 ? html`
-                    <paper-button class="btn-primary" @click="${this._refresh}" ?disabled="${this.busy}" raised>
+                    <etools-button variant="primary" @click="${this._refresh}" ?disabled="${this.busy}">
                       ${translate('REFRESH')}
-                    </paper-button>
+                    </etools-button>
                   `
                 : ''}
             `

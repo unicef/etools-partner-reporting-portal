@@ -189,9 +189,9 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
           <div class="toggle-button-container row">
             ${this.computedMode !== 'view'
               ? html`
-                  <paper-button class="btn-primary" id="toggle-button" @click="${this._handleInput}" raised>
+                  <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
-                  </paper-button>
+                  </etools-button>
                 `
               : html``}
           </div>
