@@ -11,6 +11,7 @@ import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table-row';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 
 import {store} from '../redux/store';
 import {translate} from 'lit-translate';
@@ -106,7 +107,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
       >
         <div slot="row-data" class="layout-horizontal editable-row">
           <span class="col-data col-2 table-cell table-cell--text self-center">
-            <sl-tooltip .content="${this.indicator?.blueprint?.title}">
+            <sl-tooltip content="${this.indicator?.blueprint?.title}" hoist>
               <span>
                 ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
                   ? html`<status-badge type="error"></status-badge>`

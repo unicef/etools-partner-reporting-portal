@@ -6,7 +6,7 @@ import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import '@polymer/paper-tooltip/paper-tooltip';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from 'lit-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
@@ -112,14 +112,15 @@ export class PdList extends RoutingMixin(
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="col-data col-2 table-cell table-cell--text truncate">
-                  <a
-                    @click="${this.trackAnalytics}"
-                    tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
-                    href="${this.getLinkUrl(this._baseUrl, pd.id, 'details')}"
-                  >
-                    ${this._withDefault(pd.reference_number)}
-                    <paper-tooltip>${pd.title}</paper-tooltip>
-                  </a>
+                  <sl-tooltip .content="${pd.title}" hoist>
+                    <a
+                      @click="${this.trackAnalytics}"
+                      tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
+                      href="${this.getLinkUrl(this._baseUrl, pd.id, 'details')}"
+                    >
+                      ${this._withDefault(pd.reference_number)}
+                    </a>
+                  </sl-tooltip>
                 </div>
                 <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.status, '')}</div>
                 <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>

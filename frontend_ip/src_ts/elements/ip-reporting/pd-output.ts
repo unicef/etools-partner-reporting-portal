@@ -5,7 +5,7 @@ import '@polymer/iron-collapse/iron-collapse.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
-import '@polymer/paper-tooltip/paper-tooltip.js';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
@@ -219,10 +219,9 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                       </div>
                       <dl class="layout horizontal">
                         <dt>
-                          <a href=${this.calculationMethodUrl}>
-                            ${translate('CALCULATION_METHODS')}
-                            <paper-tooltip>${translate('TO_LEARN_MORE')}</paper-tooltip>
-                          </a>
+                          <sl-tooltip content="${translate('TO_LEARN_MORE')}" hoist>
+                            <a href=${this.calculationMethodUrl}> ${translate('CALCULATION_METHODS')} </a>
+                          </sl-tooltip>
                           :
                         </dt>
                         <dt>

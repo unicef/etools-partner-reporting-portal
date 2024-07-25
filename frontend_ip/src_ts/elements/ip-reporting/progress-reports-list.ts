@@ -7,7 +7,7 @@ import '@polymer/iron-icons/iron-icons';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import '@polymer/paper-tooltip/paper-tooltip';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import './pd-reports-report-title';
@@ -131,10 +131,11 @@ export class ProgressReportsList extends SortingMixin(
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="col-data col-2 truncate table-cell table-cell--text">
-                  <span>
-                    ${this._withDefault(report.programme_document?.reference_number, '-')}
-                    <paper-tooltip>${report.programme_document?.title}</paper-tooltip>
-                  </span>
+                  <sl-tooltip content="${report.programme_document?.title}" hoist>
+                    <span>
+                      ${this._withDefault(report.programme_document?.reference_number, '-')}
+                    </span>
+                  </sl-tooltip
                 </div>
                 <div class="col-data col-2 table-cell table-cell--text">
                   <pd-reports-report-title
