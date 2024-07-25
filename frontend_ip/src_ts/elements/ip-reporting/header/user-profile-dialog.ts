@@ -8,7 +8,6 @@ import {translate} from 'lit-translate';
 import EtoolsDialog from '@unicef-polymer/etools-unicef/src/etools-dialog/etools-dialog';
 
 /**
- * @polymer
  * @customElement
  */
 @customElement('user-profile-dialog')

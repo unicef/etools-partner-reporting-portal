@@ -7,7 +7,6 @@ dayjs.extend(dayJsUtc);
 dayjs.extend(dayJsSameOrBefore);
 
 /**
- * @polymer
  * @mixinFunction
  */
 function DateMixin<T extends Constructor<LitElement>>(baseClass: T) {

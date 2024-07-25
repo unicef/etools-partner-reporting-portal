@@ -3,7 +3,6 @@ import Settings from '../etools-prp-common/settings';
 import {LitElement} from 'lit';
 
 /**
- * @polymer
  * @mixinFunction
  */
 function ProgressReportUtilsMixin<T extends Constructor<LitElement>>(baseClass: T) {
