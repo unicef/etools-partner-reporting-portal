@@ -10,6 +10,7 @@ import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table-row';
 
 import {store} from '../redux/store';
 import {translate} from 'lit-translate';
@@ -98,7 +99,11 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       ></etools-prp-permissions>
 
-      <etools-data-table-row>
+      <etools-data-table-row
+        @opened-changed=${(e) => {
+          this.detailsOpened = e.detail.opened;
+        }}
+      >
         <div slot="row-data" class="layout-horizontal editable-row">
           <span class="col-data col-2 table-cell table-cell--text self-center">
             <sl-tooltip .content="${this.indicator?.blueprint?.title}">

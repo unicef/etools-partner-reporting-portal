@@ -184,7 +184,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
               <div
                 class="indicator-toggle flex-none layout horizontal center-center"
                 type=${this._computeToggleType(indicator.is_related_to_cluster_reporting)}
-                @click=${() => this._toggle(index)}
+                @click=${() => this._toggle(index, indicator)}
                 toggles=${index}
                 role="button"
                 aria-expanded=${indicator.opened}
@@ -299,17 +299,17 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
               no-animation
             >
               <indicator-details
-                report-is-qpr=${this._computeReportIsQpr(this.currentReport, indicator)}
-                report-status=${this.currentReport.status}
-                reportable-id=${this.data?.id}
-                indicator-name=${indicator.reportable.blueprint.title}
-                indicator-id=${indicator.parent_ir_id ? indicator.parent_ir_id : indicator.id}
-                indicator-status=${indicator.report_status}
-                reporting-period=${this.currentReport.reporting_period}
-                override-mode=${this.computedMode}
-                report-id=${this.reportId}
-                current-pd=${this.currentPd}
-                workspace-id=${this.workspaceId}
+                .reportIsQpr=${this._computeReportIsQpr(this.currentReport, indicator)}
+                .reportStatus=${this.currentReport.status}
+                .reportableId=${this.data?.id}
+                .indicatorName=${indicator.reportable.blueprint.title}
+                .indicatorId=${indicator.parent_ir_id ? indicator.parent_ir_id : indicator.id}
+                .indicatorStatus=${indicator.report_status}
+                .reportingPeriod=${this.currentReport.reporting_period}
+                .overrideMode=${this.computedMode}
+                .reportId=${this.reportId}
+                .currentPd=${this.currentPd}
+                .workspaceId=${this.workspaceId}
               ></indicator-details>
             </iron-collapse>
           </div>
@@ -397,8 +397,10 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     return calculationFormulaAcrossPeriods(indicator);
   }
 
-  _toggle(index) {
-    (this.shadowRoot!.querySelector('#collapse-' + index) as any).toggle();
+  _toggle(index, indicator) {
+    indicator.opened = !indicator.opened;
+    // (this.shadowRoot!.querySelector('#collapse-' + index) as any).toggle();
+    this.requestUpdate();
   }
 
   _computeCompleteIndicator(complete: boolean, indicatorId: string, disaggregationsByIndicator: any) {
@@ -423,10 +425,10 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     return false;
   }
 
-  _handleOpenedChanged(e: CustomEvent, data: any) {
+  _handleOpenedChanged(e: CustomEvent, indicator: any) {
     e.stopPropagation();
 
-    if (data.value) {
+    if (indicator.opened) {
       // @ts-ignore
       const indicatorDetails = e.srcElement!.querySelector('indicator-details');
 
