@@ -17,7 +17,6 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 /**
- * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
  */

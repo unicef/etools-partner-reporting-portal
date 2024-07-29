@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
-import '@polymer/paper-input/paper-input.js';
 import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '../../../../../etools-prp-common/elements/labelled-item.js';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions.js';
@@ -174,14 +173,14 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
               ${this.computedMode === 'view'
                 ? html` <span class="value">${this._withDefault(this.data.narrative)}</span> `
                 : html`
-                    <paper-input
+                    <etools-input
                       id="narrative"
-                      value="${this.data.narrative}"
+                      .value="${this.data.narrative}"
                       no-label-float
                       char-counter
                       maxlength="2000"
                     >
-                    </paper-input>
+                    </etools-input>
                   `}
             </labelled-item>
           </div>
@@ -189,9 +188,9 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
           <div class="toggle-button-container row">
             ${this.computedMode !== 'view'
               ? html`
-                  <paper-button class="btn-primary" id="toggle-button" @click="${this._handleInput}" raised>
+                  <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
-                  </paper-button>
+                  </etools-button>
                 `
               : html``}
           </div>

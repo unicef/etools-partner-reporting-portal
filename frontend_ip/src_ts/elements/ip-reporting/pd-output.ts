@@ -3,7 +3,7 @@ import {property, customElement} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
 import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button';
 import '@unicef-polymer/etools-unicef/src/etools-collapse/etools-collapse';
-import '@polymer/paper-tooltip/paper-tooltip.js';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
@@ -404,10 +404,6 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     return calculationFormulaAcrossPeriods(indicator);
   }
 
-  _toggle(index) {
-    (this.shadowRoot!.querySelector('#collapse-' + index) as any).toggle();
-  }
-
   _computeCompleteIndicator(complete: boolean, indicatorId: string, disaggregationsByIndicator: any) {
     let status = computeCompleteIndicator(complete);
     if (status === 'Ove') {
@@ -486,6 +482,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     const first = data.indicator_reports[0] || {};
 
     return {
+      id: data.id,
       overall_status: first.overall_status,
       narrative_assessment: first.narrative_assessment
     };

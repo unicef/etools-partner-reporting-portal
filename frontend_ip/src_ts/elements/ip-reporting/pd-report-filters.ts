@@ -1,11 +1,10 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import '@polymer/paper-button/paper-button.js';
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/dropdown-filter/dropdown-filter';
-import {translate} from 'lit-translate';
+import {get as getTranslation, translate} from 'lit-translate';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
@@ -29,13 +28,13 @@ export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
 
   _localizeStatuses() {
     return [
-      {title: translate('OVERDUE'), id: 'Ove'},
-      {title: translate('SENT_BACK'), id: 'Sen'},
-      {title: translate('DUE'), id: 'Due'},
-      {title: translate('ALL'), id: '-1'},
-      {title: translate('SUBMITTED'), id: 'Sub'},
-      {title: translate('ACCEPTED'), id: 'Acc'},
-      {title: translate('NOT_YET_DUE'), id: 'Not'}
+      {title: getTranslation('OVERDUE'), id: 'Ove'},
+      {title: getTranslation('SENT_BACK'), id: 'Sen'},
+      {title: getTranslation('DUE'), id: 'Due'},
+      {title: getTranslation('ALL'), id: '-1'},
+      {title: getTranslation('SUBMITTED'), id: 'Sub'},
+      {title: getTranslation('ACCEPTED'), id: 'Acc'},
+      {title: getTranslation('NOT_YET_DUE'), id: 'Not'}
     ];
   }
 

@@ -10,7 +10,6 @@ import './etools-prp-common/elements/app-redirect.js';
 import './etools-prp-common/elements/etools-prp-auth.js';
 import {reset, resetToken} from './redux/actions.js';
 import {BASE_PATH} from './etools-prp-common/config.js';
-import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
 import {RootState} from './typings/redux.types.js';
 import {connect, installRouter} from 'pwa-helpers';
 import {store} from './redux/store.js';
@@ -88,7 +87,6 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
 
   constructor() {
     super();
-    setPassiveTouchGestures(true);
   }
 
   protected shouldUpdate(props: PropertyValues) {

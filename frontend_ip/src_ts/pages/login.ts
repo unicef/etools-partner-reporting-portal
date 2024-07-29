@@ -3,7 +3,6 @@ import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
 import '@unicef-polymer/etools-unicef/src/etools-button/etools-button.js';
 import '@polymer/paper-card/paper-card.js';
-import '@polymer/paper-input/paper-input.js';
 import '@polymer/iron-form/iron-form.js';
 import '../etools-prp-common/elements/etools-logo.js';
 import Endpoints from '../endpoints.js';

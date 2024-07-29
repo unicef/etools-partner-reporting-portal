@@ -1,6 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/paper-tooltip/paper-tooltip';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from 'lit-translate';
 import '../etools-prp-toolbar';
@@ -78,18 +78,16 @@ export class ProgressReportsToolbar extends UtilsMixin(connect(store)(LitElement
       <etools-prp-toolbar .query="${this.query}" .params="${this.params}" .locationId="${this.locationId}">
         ${this.canExport
           ? html`
-              <download-button id="btnDownloadPdf" .url="${this.pdfExportUrl}" tracker="Progress Reports Export Pdf">
-                PDF
-              </download-button>
-              <paper-tooltip for="btnDownloadPdf" fit-to-visible-bounds>
-                ${translate('PROGRESS_REPORTS_EXPORT_STATUS')}
-              </paper-tooltip>
-              <download-button id="btnDownloadXLS" .url="${this.xlsExportUrl}" tracker="Progress Reports Export Xls">
-                XLS
-              </download-button>
-              <paper-tooltip for="btnDownloadXLS" fit-to-visible-bounds>
-                ${translate('PROGRESS_REPORTS_EXPORT_STATUS')}
-              </paper-tooltip>
+              <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+                <download-button id="btnDownloadPdf" .url="${this.pdfExportUrl}" tracker="Progress Reports Export Pdf">
+                  PDF
+                </download-button>
+              </sl-tooltip>
+              <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+                <download-button id="btnDownloadXLS" .url="${this.xlsExportUrl}" tracker="Progress Reports Export Xls">
+                  XLS
+                </download-button>
+              </sl-tooltip>
             `
           : html``}
       </etools-prp-toolbar>

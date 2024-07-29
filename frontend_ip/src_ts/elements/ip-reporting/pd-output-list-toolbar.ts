@@ -16,12 +16,12 @@ import {
 } from './js/pd-output-list-toolbar-functions';
 import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/refresh-report-modal';
-import {RefreshReportModalEl} from '../../etools-prp-common/elements/refresh-report-modal';
 import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
 import {RootState} from '../../typings/redux.types';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
 
 @customElement('pd-output-list-toolbar')
 export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) {
@@ -80,6 +80,14 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
     this.programmeDocument = programmeDocumentReportsCurrent(state);
     this.currentReport = programmeDocumentReportsCurrent(state);
     this.currentUserRoles = state.userProfile?.profile?.prp_roles;
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+
+    if (this.reportId !== state.programmeDocumentReports.current.id) {
+      this.reportId = state.programmeDocumentReports.current.id;
+    }
   }
 
   updated(changedProperties) {
@@ -116,27 +124,23 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   render() {
     return html`
       ${buttonsStyles}
-
-      <refresh-report-modal id="refresh" .data="${this.refreshData}" .refreshUrl="${this.refreshUrl}">
-      </refresh-report-modal>
-
-      <etools-prp-toolbar query="${this.query}" report-id="${this.reportId}" location-id="${this.locationId}">
-        <download-button url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
-        <download-button url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
+      <etools-prp-toolbar .query="${this.query}" .reportId="${this.reportId}" .locationId="${this.locationId}">
+        <download-button .url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
+        <download-button .url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
 
         ${this.showImportButtons
           ? html`
-              <upload-button url="${this.importUrl}" modal-title="Import Template">
+              <upload-button .url="${this.importUrl}" modal-title="Import Template">
                 ${translate('IMPORT_TEMPLATE')}
               </upload-button>
-              <download-button url="${this.importTemplateUrl}" tracker="Import template">
+              <download-button .url="${this.importTemplateUrl}" tracker="Import template">
                 ${translate('GENERATE_UPLOADER')}
               </download-button>
               ${this.showRefresh
                 ? html`
-                    <paper-button class="btn-primary" @click="${this._refresh}" ?disabled="${this.busy}" raised>
+                    <etools-button variant="primary" @click="${this._refresh}" ?disabled="${this.busy}">
                       ${translate('REFRESH')}
-                    </paper-button>
+                    </etools-button>
                   `
                 : ''}
             `
@@ -146,7 +150,13 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   }
 
   _refresh() {
-    (this.shadowRoot?.getElementById('refresh') as RefreshReportModalEl)?.open();
+    openDialog({
+      dialog: 'refresh-report-modal',
+      dialogData: {
+        refreshData: this.refreshData,
+        refreshUrl: this.refreshUrl
+      }
+    });
   }
 
   _onFileUploaded(e: CustomEvent) {
@@ -171,7 +181,6 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._removeEventListeners();
-    (this.shadowRoot?.getElementById('refresh') as RefreshReportModalEl)?.close();
   }
 }
 

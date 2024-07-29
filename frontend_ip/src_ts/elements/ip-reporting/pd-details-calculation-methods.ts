@@ -4,7 +4,6 @@ import {connect} from 'pwa-helpers';
 import {customElement, property} from 'lit/decorators.js';
 import '@polymer/paper-radio-group/paper-radio-group';
 import '@polymer/paper-radio-button/paper-radio-button';
-import '@polymer/paper-button/paper-button';
 import '@polymer/iron-flex-layout/iron-flex-layout-classes';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
@@ -213,9 +212,9 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
         </div>
         ${this._canSave(this.permissions)
           ? html`<div class="buttons layout horizontal-reverse">
-              <paper-button @click="${this._save}" class="btn-primary" ?disabled="${this.loading}" raised>
+              <etools-button @click="${this._save}" variant="primary" ?disabled="${this.loading}">
                 ${translate('SAVE')}
-              </paper-button>
+              </etools-button>
             </div>`
           : html``}
       </page-body>

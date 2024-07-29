@@ -1,7 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { connect } from 'pwa-helpers';
-import { PaperButtonElement } from '@polymer/paper-button/paper-button';
+import {connect} from 'pwa-helpers';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -10,6 +9,8 @@ import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table-row';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 
 import {store} from '../redux/store';
 import {translate} from 'lit-translate';
@@ -98,10 +99,14 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
         @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       ></etools-prp-permissions>
 
-      <etools-data-table-row>
+      <etools-data-table-row
+        @opened-changed=${(e) => {
+          this.detailsOpened = e.detail.opened;
+        }}
+      >
         <div slot="row-data" class="layout-horizontal editable-row">
           <span class="col-data col-2 table-cell table-cell--text self-center">
-            <sl-tooltip .content="${this.indicator?.blueprint?.title}">
+            <sl-tooltip content="${this.indicator?.blueprint?.title}" hoist>
               <span>
                 ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
                   ? html`<status-badge type="error"></status-badge>`
@@ -230,7 +235,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
   }
 
   _openModal(e: CustomEvent) {
-    (this.shadowRoot!.querySelector('#modal-' + (e.target as PaperButtonElement).dataset.modalType) as any).open();
+    (this.shadowRoot!.querySelector('#modal-' + (e.target as any).dataset.modalType) as any).open();
   }
 
   _computeIndicatorReportsUrl(baseUrl: string, indicator: any) {

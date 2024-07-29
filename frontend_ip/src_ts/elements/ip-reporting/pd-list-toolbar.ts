@@ -44,8 +44,8 @@ export class PdListToolbar extends UtilsMixin(LitElement) {
   render() {
     return html`
       <etools-prp-toolbar query="${this.query}" location-id="${this.locationId}">
-        <download-button url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
-        <download-button url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
+        <download-button .url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+        <download-button .url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
       </etools-prp-toolbar>
     `;
   }

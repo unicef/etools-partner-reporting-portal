@@ -79,7 +79,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
       color: var(--paper-red-700);
       @apply --paper-font-body2;
     }
-    paper-button {
+    etools-button {
       margin: 0;
     }
     .collapsed {
@@ -112,7 +112,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
             ${this.collapsible
               ? html`
                   <div class="card-actions">
-                    <paper-button noink class="btn-primary" @click="${this._toggle}">${this.buttonText}</paper-button>
+                    <etools-button variant="primary" @click="${this._toggle}">${this.buttonText}</etools-button>
                   </div>
                 `
               : ''}
