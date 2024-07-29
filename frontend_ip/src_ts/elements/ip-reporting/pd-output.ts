@@ -1,15 +1,13 @@
 import {LitElement, html, css} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
-import '@polymer/iron-collapse/iron-collapse.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes.js';
+import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button';
+import '@unicef-polymer/etools-unicef/src/etools-collapse/etools-collapse';
 import '@polymer/paper-tooltip/paper-tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
-import {translate} from 'lit-translate';
+import {translate, get as getTranslation} from 'lit-translate';
 import {
   computeReportableUrl,
   computeCompleteIndicator,
@@ -24,6 +22,7 @@ import '../../etools-prp-common/elements/etools-prp-number';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
@@ -32,12 +31,16 @@ import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-output')
 export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))) {
-  static styles = css`
+  static styles = [layoutStyles, css`
     :host {
       display: block;
       --paper-icon-button: {
         color: var(--theme-secondary-text-color);
       }
+      margin-block-end: 30px;  
+    }
+    .card-container {
+      width: 100%;
     }
     .header {
       padding: 25px;
@@ -102,7 +105,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       font-size: 16px;
       margin-right: 4px;
     }
-  `;
+  `];
 
   @property({type: Object})
   data!: any;
@@ -179,139 +182,142 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
         this.data?.indicator_reports,
         (indicator: any) => indicator.id,
         (indicator, index) => html`
-          <div class="indicator">
-            <div class="layout horizontal">
-              <div
-                class="indicator-toggle flex-none layout horizontal center-center"
-                type=${this._computeToggleType(indicator.is_related_to_cluster_reporting)}
-                @click=${() => this._toggle(index)}
-                toggles=${index}
-                role="button"
-                aria-expanded=${indicator.opened}
-                aria-controls="collapse-${index}"
-                tabindex="-1"
-              >
-                <iron-icon icon="icons:expand-${computeIcon(indicator.opened)}"></iron-icon>
-              </div>
+           <section class="card-container">
+              <div class="layout-horizontal indicator">
+                <etools-icon
+                  name="${indicator.opened ? 'expand-less' : 'expand-more'}"
+                  @click="${(e) => this._handleOpenedChanged(e, indicator, index)}"
+                ></etools-icon>
+            
+                <div class="layout-horizontal">
+                  <div
+                    class="indicator-toggle flex-none layout-horizontal center-center"
+                    type=${this._computeToggleType(indicator.is_related_to_cluster_reporting)}
+                    toggles="${index}"
+                    role="button"
+                    aria-expanded="${indicator.opened}"
+                    aria-controls="collapse-${index}"
+                    tabindex="-1"
+                  >            
+                  </div>
 
-              <div class="indicator-header flex layout horizontal">
-                <div class="indicator-header__title flex-3 layout vertical center-justified">
-                  <div class="layout horizontal">
-                    <div class="status-badge layout vertical center-justified">
-                      <report-status
-                        status=${this._computeCompleteIndicator(
-                          indicator.is_complete,
-                          indicator.id,
-                          this.disaggregationsByIndicator
-                        )}
-                        no-label
-                      ></report-status>
-                    </div>
-                    <div>
+                  <div class="indicator-header flex layout-horizontal">
+                    <div class="indicator-header__title col-3 layout vertical center-justified">
                       <div class="layout horizontal">
-                        <label class="indicatorType">
-                          ${this.getIndicatorDisplayType(
-                            indicator.reportable.blueprint.unit,
-                            indicator.reportable.blueprint.display_type
-                          )}
-                        </label>
-                        <h3>${indicator.reportable.blueprint.title}</h3>
+                        <div class="status-badge layout vertical center-justified">
+                          <report-status
+                            .status="${this._computeCompleteIndicator(
+                              indicator.is_complete,
+                              indicator.id,
+                              this.disaggregationsByIndicator
+                            )}"
+                            no-label
+                          ></report-status>
+                        </div>
+                        <div>
+                          <div class="layout-horizontal">
+                            <label class="indicatorType">
+                              ${this.getIndicatorDisplayType(
+                                indicator.reportable.blueprint.unit,
+                                indicator.reportable.blueprint.display_type
+                              )}
+                            </label>
+                            <h3>${indicator.reportable.blueprint.title}</h3>
+                          </div>
+                          <dl class="layout-horizontal">
+                            <dt>
+                              <a href=${this.calculationMethodUrl}>
+                                ${translate('CALCULATION_METHODS')}
+                                <paper-tooltip>${translate('TO_LEARN_MORE')}</paper-tooltip>
+                              </a>
+                              :
+                            </dt>
+                            <dt>
+                              <b
+                                >${this._toLowerCaseLocalized(
+                                  indicator.reportable.blueprint.calculation_formula_across_locations
+                                )}</b
+                              >
+                              (${this._toLowerCaseLocalized('across_locations')}),
+                              <b>${this._calculationFormulaAcrossPeriods(indicator)}</b>
+                              (${this._toLowerCaseLocalized('across_reporting_periods')})
+                            </dt>
+                          </dl>
+                        </div>
                       </div>
-                      <dl class="layout horizontal">
-                        <dt>
-                          <a href=${this.calculationMethodUrl}>
-                            ${translate('CALCULATION_METHODS')}
-                            <paper-tooltip>${translate('TO_LEARN_MORE')}</paper-tooltip>
-                          </a>
-                          :
-                        </dt>
-                        <dt>
-                          <b
-                            >${this._toLowerCaseLocalized(
-                              indicator.reportable.blueprint.calculation_formula_across_locations
-                            )}</b
-                          >
-                          (${this._toLowerCaseLocalized('across_locations')}),
-                          <b>${this._calculationFormulaAcrossPeriods(indicator)}</b>
-                          (${this._toLowerCaseLocalized('across_reporting_periods')})
-                        </dt>
+                    </div>
+                    <div class="indicator-header__target flex-none layout-vertical center-justified">
+                      <dl class="layout-horizontal justified">
+                        <dt class="col-4">${translate('TARGET')}:</dt>
+                        <dd class="flex">
+                          ${this._equals(indicator.reportable.blueprint.display_type, 'number')
+                            ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
+                            : this._equals(indicator.reportable.blueprint.display_type, 'percentage')
+                            ? html` <span>${indicator.reportable.target.v}%</span> `
+                            : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
+                            ? html` <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span> `
+                            : html``}
+                        </dd>
+                      </dl>
+                      <dl class="layout horizontal justified">
+                        <dt class="col-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
+                        ${this._equals(indicator.reportable.blueprint.display_type, 'number')
+                          ? html`
+                              <dd class="flex">
+                                <etools-prp-number value=${indicator.reportable.achieved.v}></etools-prp-number>
+                              </dd>
+                            `
+                          : html`
+                              <dd class="flex">
+                                ${this._formatIndicatorValue(
+                                  indicator.reportable.blueprint.display_type,
+                                  indicator.reportable.achieved.c,
+                                  1
+                                )}
+                              </dd>
+                            `}
+                      </dl>
+                      <dl class="layout horizontal justified">
+                        <dt class="col-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
+                        ${this._equals(indicator.reportable.blueprint.display_type, 'number')
+                          ? html`
+                              <dd class="flex">
+                                <etools-prp-number value=${indicator.total.v}></etools-prp-number>
+                              </dd>
+                            `
+                          : html`
+                              <dd class="flex">
+                                ${this._formatIndicatorValue(
+                                  indicator.reportable.blueprint.display_type,
+                                  indicator.total.c,
+                                  1
+                                )}
+                              </dd>
+                            `}
                       </dl>
                     </div>
                   </div>
                 </div>
-                <div class="indicator-header__target flex-none layout vertical center-justified">
-                  <dl class="layout horizontal justified">
-                    <dt class="flex-4">${translate('TARGET')}:</dt>
-                    <dd class="flex">
-                      ${this._equals(indicator.reportable.blueprint.display_type, 'number')
-                        ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
-                        : this._equals(indicator.reportable.blueprint.display_type, 'percentage')
-                        ? html` <span>${indicator.reportable.target.v}%</span> `
-                        : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
-                        ? html` <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span> `
-                        : html``}
-                    </dd>
-                  </dl>
-                  <dl class="layout horizontal justified">
-                    <dt class="flex-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
-                    ${this._equals(indicator.reportable.blueprint.display_type, 'number')
-                      ? html`
-                          <dd class="flex">
-                            <etools-prp-number value=${indicator.reportable.achieved.v}></etools-prp-number>
-                          </dd>
-                        `
-                      : html`
-                          <dd class="flex">
-                            ${this._formatIndicatorValue(
-                              indicator.reportable.blueprint.display_type,
-                              indicator.reportable.achieved.c,
-                              1
-                            )}
-                          </dd>
-                        `}
-                  </dl>
-                  <dl class="layout horizontal justified">
-                    <dt class="flex-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
-                    ${this._equals(indicator.reportable.blueprint.display_type, 'number')
-                      ? html`
-                          <dd class="flex">
-                            <etools-prp-number value=${indicator.total.v}></etools-prp-number>
-                          </dd>
-                        `
-                      : html`
-                          <dd class="flex">
-                            ${this._formatIndicatorValue(
-                              indicator.reportable.blueprint.display_type,
-                              indicator.total.c,
-                              1
-                            )}
-                          </dd>
-                        `}
-                  </dl>
-                </div>
               </div>
-            </div>
+                <etools-collapse ?opened="${indicator.opened}" id="collapse-${indicator.id}-${index}">
+                    <indicator-details
+                      id="collapse-${index}"
+                      .reportIsQpr="${this._computeReportIsQpr(this.currentReport, indicator)}"
+                      .reportStatus="${this.currentReport.status}"
+                      .reportableId="${this.data?.id}"
+                      .indicatorName="${indicator.reportable.blueprint.title}"
+                      .indicatorId="${indicator.parent_ir_id ? indicator.parent_ir_id : indicator.id}"
+                      .indicatorStatus="${indicator.report_status}"
+                      .reportingPeriod="${this.currentReport.reporting_period}"
+                      .overrideMode="${this.computedMode}"
+                      .reportId="${this.reportId}"
+                      .currentPd="${this.currentPd}"
+                      .workspaceId="${this.workspaceId}"
+                    ></indicator-details>
+                </etools-collapse>
+            </section>
 
-            <iron-collapse
-              id="collapse-${index}"
-              ?opened=${indicator.opened}
-              @opened-changed=${(e) => this._handleOpenedChanged(e, indicator)}
-              no-animation
-            >
-              <indicator-details
-                report-is-qpr=${this._computeReportIsQpr(this.currentReport, indicator)}
-                report-status=${this.currentReport.status}
-                reportable-id=${this.data?.id}
-                indicator-name=${indicator.reportable.blueprint.title}
-                indicator-id=${indicator.parent_ir_id ? indicator.parent_ir_id : indicator.id}
-                indicator-status=${indicator.report_status}
-                reporting-period=${this.currentReport.reporting_period}
-                override-mode=${this.computedMode}
-                report-id=${this.reportId}
-                current-pd=${this.currentPd}
-                workspace-id=${this.workspaceId}
-              ></indicator-details>
-            </iron-collapse>
+
           </div>
         `
       )}
@@ -319,6 +325,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
   }
 
   stateChanged(state: RootState) {
+    console.log('pd-output stateChanged....');
     if (this.currentReport !== programmeDocumentReportsCurrent(state)) {
       this.currentReport = programmeDocumentReportsCurrent(state);
     }
@@ -423,19 +430,21 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     return false;
   }
 
-  _handleOpenedChanged(e: CustomEvent, data: any) {
+  _handleOpenedChanged(e: CustomEvent, indicator: any, index: number) {
     e.stopPropagation();
-
-    if (data.value) {
+    // @dci
+    //if (data.value) {
       // @ts-ignore
-      const indicatorDetails = e.srcElement!.querySelector('indicator-details');
+      const indicatorDetails = this.shadowRoot?.querySelector(`#collapse-${index}`) as any;
+      //e.srcElement!.querySelector('indicator-details');
 
-      try {
-        indicatorDetails.init();
-      } catch (err) {
-        console.error('pd-output.ts', err);
-      }
-    }
+      //try {
+      indicatorDetails.init();
+      (this.shadowRoot!.querySelector(`#collapse-${indicator.id}-${index}`) as any).toggle();     
+      //} catch (err) {
+      //  console.error('pd-output.ts', err);
+      // }
+    //}
   }
 
   _updateMeta(e: CustomEvent) {
@@ -459,7 +468,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       // @ts-ignore
       .then(() => {
         fireEvent(this, 'toast', {
-          text: translate('CHANGES_SAVED'),
+          text: getTranslation('CHANGES_SAVED'),
           showCloseBtn: true
         });
       })

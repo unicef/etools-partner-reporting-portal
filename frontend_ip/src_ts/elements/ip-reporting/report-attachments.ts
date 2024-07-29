@@ -292,6 +292,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   _filesChanged(change: any) {
+    if (!change?.path) {
+      return
+    }
     let attachmentPropertyName = change.path.replace('.length', '');
     const isEmpty = change.value === 0 ? true : false;
     const attachment = isEmpty ? undefined : change.base[0];
