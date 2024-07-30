@@ -10,13 +10,15 @@ import {computeDocUrl} from './js/pd-details-doc-download-functions';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
 @customElement('pd-details-doc-download')
 export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     .spinner-size {
-      width: 19px;
-      height: 19px;
+      font-size: 16px;
+      margin-right: 5px;
     }
 
     [hidden] {
@@ -59,12 +61,11 @@ export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(
 
   render() {
     return html`
-      <div>
-        <paper-spinner
-          ?hidden="${!this.spinnerActive}"
-          class="spinner-size"
-          .active="${this.spinnerActive}"
-        ></paper-spinner>
+      <style>
+        ${layoutStyles}
+      </style>
+      <div class="layout-horizontal align-items-center">
+        <sl-spinner class="spinner-size" ?hidden="${!this.spinnerActive}"></sl-spinner>
         <a href="#" @click="${this._openDoc}" tracker="PD Details Download Document">Download Document</a>
       </div>
     `;

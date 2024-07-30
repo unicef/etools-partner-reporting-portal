@@ -9,6 +9,7 @@ import {connect} from 'pwa-helpers';
 import {store} from '../redux/store';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button';
 
 @customElement('page-unauthorized')
 export class PageUnauthorized extends connect(store)(LitElement) {
@@ -56,7 +57,7 @@ export class PageUnauthorized extends connect(store)(LitElement) {
       <page-body>
         <div class="item">
           <span class="sign-out-button" @click="${this._logout}">
-            <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
+            <etools-icon-button id="powerSettings" name="power-settings-new"></etools-icon-button>
             ${translate('SIGN_OUT')}
           </span>
         </div>

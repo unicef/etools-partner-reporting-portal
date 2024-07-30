@@ -67,7 +67,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
 
   render() {
     return html`
-      <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
+      <style>
         :host {
           display: block;
           width: 100%;

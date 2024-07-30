@@ -15,6 +15,7 @@ import {translate, get as getTranslation} from 'lit-translate';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 
 /**
  * @customElement
@@ -136,7 +137,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
               ?readonly=${this.readonly}
               use-delete-events
             ></etools-file>
-            ${this.faceLoading ? html`<paper-spinner active></paper-spinner>` : html``}
+            ${this.faceLoading ? html`<sl-spinner></sl-spinner>` : html``}
           </div>`
         : ''}
 
@@ -149,7 +150,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           ?readonly=${this.readonly}
           use-delete-events
         ></etools-file>
-        ${this.otherOneLoading ? html`<paper-spinner active></paper-spinner>` : html``}
+        ${this.otherOneLoading ? html`<sl-spinner></sl-spinner>` : html``}
       </div>
 
       <div id="other-two-container">
@@ -161,7 +162,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           ?readonly=${this.readonly}
           use-delete-events
         ></etools-file>
-        ${this.otherTwoLoading ? html`<paper-spinner active></paper-spinner>` : html``}
+        ${this.otherTwoLoading ? html`<sl-spinner></sl-spinner>` : html``}
       </div>
 
       ${!this.showFace
@@ -174,7 +175,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
               ?readonly=${this.readonly}
               use-delete-events
             ></etools-file>
-            ${this.otherThreeLoading ? html`<paper-spinner active></paper-spinner>` : html``}
+            ${this.otherThreeLoading ? html`<sl-spinner></sl-spinner>` : html``}
           </div>`
         : ''}
     `;
@@ -292,7 +293,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   _filesChanged(change: any) {
     if (!change?.path) {
-      return
+      return;
     }
     let attachmentPropertyName = change.path.replace('.length', '');
     const isEmpty = change.value === 0 ? true : false;

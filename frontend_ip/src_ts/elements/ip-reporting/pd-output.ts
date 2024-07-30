@@ -32,94 +32,97 @@ import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-output')
 export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))) {
-  static styles = [layoutStyles, css`
-    :host {
-      display: block;
-      --paper-icon-button: {
+  static styles = [
+    layoutStyles,
+    css`
+      :host {
+        display: block;
+        margin-block-end: 30px;
+      }
+      etools-icon-button {
         color: var(--theme-secondary-text-color);
       }
-      margin-block-end: 30px;  
-    }
-    .card-container {
-      width: 100%;
-    }
-    .header {
-      padding: 25px;
-    }
-    a {
-      color: var(--theme-primary-color);
-    }
-    labelled-item {
-      margin-bottom: 25px;
-    }
-    .indicator:not(:last-child) {
-      margin-bottom: 25px;
-    }
-    .indicator-toggle {
-      width: 25px;
-      position: relative;
-      z-index: 1;
-      color: white;
-      cursor: pointer;
-    }
-    .indicator-toggle {
-      background: #0099ff;
-    }
-    .indicator-header {
-      padding: 6px 25px 6px 10px;
-      background: var(--paper-grey-300);
-    }
-    .indicator-header dl {
-      margin: 0;
-      text-align: right;
-      font-size: 11px;
-    }
-    .indicator-header dt {
-      color: var(--theme-secondary-text-color);
-      white-space: nowrap;
-    }
-    .indicator-header dd {
-      margin: 0;
-      font-weight: bold;
-      min-width: 60px;
-    }
-    .indicator-header__title h3 {
-      margin: 0 0 0.25em;
-      font-size: 14px;
-    }
-    .indicator-header__title dt {
-      margin-right: 1em;
-    }
-    .status-badge {
-      margin-right: 10px;
-    }
-    .indicator-header__target {
-      width: 320px;
-      padding-left: 10px;
-    }
-    .indicator-header__target dl {
-      text-align: right;
-      width: 100%;
-    }
-    .indicatorType {
-      font-weight: 600;
-      font-size: 16px;
-      margin-right: 4px;
-    }
-    .flex {
-      flex: 1;
-      flex-basis: 0.000000001px;
-    }
-    .flex-4 {
-      flex: 4;
-    }
-    .w100 {
-      width: 100%;
-    }
-    .justified {
-      justify-content: space-between;
-    }
-  `];
+      .card-container {
+        width: 100%;
+      }
+      .header {
+        padding: 25px;
+      }
+      a {
+        color: var(--theme-primary-color);
+      }
+      labelled-item {
+        margin-bottom: 25px;
+      }
+      .indicator:not(:last-child) {
+        margin-bottom: 25px;
+      }
+      .indicator-toggle {
+        width: 25px;
+        position: relative;
+        z-index: 1;
+        color: white;
+        cursor: pointer;
+      }
+      .indicator-toggle {
+        background: #0099ff;
+      }
+      .indicator-header {
+        padding: 6px 25px 6px 10px;
+        background: var(--paper-grey-300);
+      }
+      .indicator-header dl {
+        margin: 0;
+        text-align: right;
+        font-size: 11px;
+      }
+      .indicator-header dt {
+        color: var(--theme-secondary-text-color);
+        white-space: nowrap;
+      }
+      .indicator-header dd {
+        margin: 0;
+        font-weight: bold;
+        min-width: 60px;
+      }
+      .indicator-header__title h3 {
+        margin: 0 0 0.25em;
+        font-size: 14px;
+      }
+      .indicator-header__title dt {
+        margin-right: 1em;
+      }
+      .status-badge {
+        margin-right: 10px;
+      }
+      .indicator-header__target {
+        width: 320px;
+        padding-left: 10px;
+      }
+      .indicator-header__target dl {
+        text-align: right;
+        width: 100%;
+      }
+      .indicatorType {
+        font-weight: 600;
+        font-size: 16px;
+        margin-right: 4px;
+      }
+      .flex {
+        flex: 1;
+        flex-basis: 0.000000001px;
+      }
+      .flex-4 {
+        flex: 4;
+      }
+      .w100 {
+        width: 100%;
+      }
+      .justified {
+        justify-content: space-between;
+      }
+    `
+  ];
 
   @property({type: Object})
   data!: any;
@@ -272,50 +275,56 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                       <dl class="layout-horizontal right-align">
                         <dt class="flex-4">${translate('TARGET')}:</dt>
                         <dd class="flex">
-                          ${this._equals(indicator.reportable.blueprint.display_type, 'number')
-                            ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
-                            : this._equals(indicator.reportable.blueprint.display_type, 'percentage')
-                            ? html` <span>${indicator.reportable.target.v}%</span> `
-                            : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
-                            ? html` <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span> `
-                            : html``}
+                          ${
+                            this._equals(indicator.reportable.blueprint.display_type, 'number')
+                              ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
+                              : this._equals(indicator.reportable.blueprint.display_type, 'percentage')
+                              ? html` <span>${indicator.reportable.target.v}%</span> `
+                              : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
+                              ? html` <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span> `
+                              : html``
+                          }
                         </dd>
                       </dl>
                       <dl class="layout-horizontal right-align">
                         <dt class="flex-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
-                        ${this._equals(indicator.reportable.blueprint.display_type, 'number')
-                          ? html`
-                              <dd class="flex">
-                                <etools-prp-number value=${indicator.reportable.achieved.v}></etools-prp-number>
-                              </dd>
-                            `
-                          : html`
-                              <dd class="flex">
-                                ${this._formatIndicatorValue(
-                                  indicator.reportable.blueprint.display_type,
-                                  indicator.reportable.achieved.c,
-                                  1
-                                )}
-                              </dd>
-                            `}
+                        ${
+                          this._equals(indicator.reportable.blueprint.display_type, 'number')
+                            ? html`
+                                <dd class="flex">
+                                  <etools-prp-number value=${indicator.reportable.achieved.v}></etools-prp-number>
+                                </dd>
+                              `
+                            : html`
+                                <dd class="flex">
+                                  ${this._formatIndicatorValue(
+                                    indicator.reportable.blueprint.display_type,
+                                    indicator.reportable.achieved.c,
+                                    1
+                                  )}
+                                </dd>
+                              `
+                        }
                       </dl>
                       <dl class="layout-horizontal right-align">
                         <dt class="flex-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
-                        ${this._equals(indicator.reportable.blueprint.display_type, 'number')
-                          ? html`
-                              <dd class="flex">
-                                <etools-prp-number value=${indicator.total.v}></etools-prp-number>
-                              </dd>
-                            `
-                          : html`
-                              <dd class="flex">
-                                ${this._formatIndicatorValue(
-                                  indicator.reportable.blueprint.display_type,
-                                  indicator.total.c,
-                                  1
-                                )}
-                              </dd>
-                            `}
+                        ${
+                          this._equals(indicator.reportable.blueprint.display_type, 'number')
+                            ? html`
+                                <dd class="flex">
+                                  <etools-prp-number value=${indicator.total.v}></etools-prp-number>
+                                </dd>
+                              `
+                            : html`
+                                <dd class="flex">
+                                  ${this._formatIndicatorValue(
+                                    indicator.reportable.blueprint.display_type,
+                                    indicator.total.c,
+                                    1
+                                  )}
+                                </dd>
+                              `
+                        }
                       </dl>
                     </div>
                   </div>
@@ -452,18 +461,18 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     e.stopPropagation();
     // @dci
     //if (data.value) {
-      // @ts-ignore
-      this.openedArr[index] = !this.openedArr[index];
-      this.openedArr = [...this.openedArr];
-      const indicatorDetails = this.shadowRoot?.querySelector(`#collapse-${index}`) as any;
-      //e.srcElement!.querySelector('indicator-details');
+    // @ts-ignore
+    this.openedArr[index] = !this.openedArr[index];
+    this.openedArr = [...this.openedArr];
+    const indicatorDetails = this.shadowRoot?.querySelector(`#collapse-${index}`) as any;
+    //e.srcElement!.querySelector('indicator-details');
 
-      //try {
-      indicatorDetails.init();
-      (this.shadowRoot!.querySelector(`#collapse-${indicator.id}-${index}`) as any).toggle();     
-      //} catch (err) {
-      //  console.error('pd-output.ts', err);
-      // }
+    //try {
+    indicatorDetails.init();
+    (this.shadowRoot!.querySelector(`#collapse-${indicator.id}-${index}`) as any).toggle();
+    //} catch (err) {
+    //  console.error('pd-output.ts', err);
+    // }
     //}
   }
 
