@@ -4,10 +4,12 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-currency-amount-input/etools-currency-amount-input';
+import '@unicef-polymer/etools-unicef/src/etools-input/etools-currency';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-unicef/src/etools-input/etools-input';
-import '@polymer/app-layout/app-grid/app-grid-style';
+import '@unicef-polymer/etools-unicef/src/etools-radio/etools-radio-group';
+import '@shoelace-style/shoelace/dist/components/radio/radio.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
@@ -33,16 +35,11 @@ import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
  */
 @customElement('pd-report-info')
 export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
-  static styles = [
+  static styles = [layoutStyles,
     css`
       :host {
         display: block;
         margin-bottom: 25px;
-
-        --app-grid-columns: 8;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 7;
       }
 
       .app-grid {
@@ -63,10 +60,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         background-color: #0099ff;
         color: #fff;
         font-size: 14px;
-      }
-
-      .row {
-        @apply --app-grid-expandible-item;
       }
 
       .value {
@@ -92,9 +85,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         @apply --truncate;
         margin-bottom: 0px;
       }
-      etools-dropdown {
-        --app-grid-gutter: 0px;
-      }
 
       .face-form-message {
         color: var(--theme-primary-color);
@@ -107,8 +97,11 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         margin-bottom: 25px;
       }
 
-      :host labelled-item paper-radio-group paper-radio-button:first-child {
+      :host labelled-item etools-radio-group sl-radio:first-child {
         padding-left: 0;
+      }
+      .r-ml {
+        margin-inline-start: 6px;
       }
     `
   ];
@@ -119,7 +112,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
   @property({type: Object})
   permissions!: any;
 
-  @property({type: Boolean})
+  @property({type: Boolean, attribute: 'no-header'})
   noHeader!: boolean;
 
   @property({type: Boolean})
@@ -204,8 +197,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
       (this.permissions = e.detail.value)}"> </etools-prp-permissions>
 
       <etools-content-panel panel-title="Other info" ?no-header="${this.noHeader}">
-        <div class="app-grid">
-          <div class="row">
+        <div class="row">
+          <div class="col-12 padding-v">
             <labelled-item label="${translate('NON_FINANCIAL_CONTRIBUTION_DURING_REPORTING_PERIOD')}">
               ${
                 this._equals(this.computedMode, 'view')
@@ -214,6 +207,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       <etools-input
                         id="partner_contribution_to_date"
                         .value="${this.localData?.partner_contribution_to_date}"
+                        @value-changed="${({detail}: CustomEvent) => (this.localData.partner_contribution_to_date = detail.value)}"
                         no-label-float
                         char-counter
                         maxlength="2000"
@@ -223,19 +217,20 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
             </labelled-item>
           </div>
 
-          <div class="row">
+          <div class="col-12 padding-v">
             <span class="item-label">${translate('FINANCIAL_CONTRIBUTION_DURING_REPORTING_PERIOD')}</span>
             <div class="currency-row">
               <div class="currency-ammount">
-                <etools-currency-amount-input
+                <etools-currency
                   id="financial_contribution_to_date"
-                  class="w100"
                   type="number"
                   .value="${this.localData?.financial_contribution_to_date}"
+                  @value-changed="${({detail}: CustomEvent) => (this.localData.financial_contribution_to_date = detail.value)}"
                   placeholder="&#8212;"
-                  ?readonly="${this._equals(this.computedMode, 'view')}"
-                  no-label-float
-                ></etools-currency-amount-input>
+                  no-label-float              
+                  ?readonly="${this._equals(this.computedMode, 'view')}"                 
+                >
+                </etools-currency>
               </div>
               <div class="currency">
                 <etools-dropdown
@@ -253,7 +248,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
             </div>
           </div>
 
-          <div class="row">
+          <div class="col-12 padding-v">
             <labelled-item label="${translate('CHALLENGES_BOTTLENECKS')}">
               ${
                 this._equals(this.computedMode, 'view')
@@ -264,6 +259,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       <etools-input
                         id="challenges_in_the_reporting_period"
                         .value="${this.localData?.challenges_in_the_reporting_period}"
+                        @value-changed="${({detail}: CustomEvent) => (this.localData.challenges_in_the_reporting_period = detail.value)}"
                         no-label-float
                         char-counter
                         maxlength="2000"
@@ -273,7 +269,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
             </labelled-item>
           </div>
 
-          <div class="row">
+          <div class="col-12 padding-v">
             <labelled-item label="${translate('PROPOSED_WAY_FORWARD')}">
               ${
                 this._equals(this.computedMode, 'view')
@@ -282,6 +278,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       <etools-input
                         id="proposed_way_forward"
                         .value="${this.localData?.proposed_way_forward}"
+                        @value-changed="${({detail}: CustomEvent) => (this.localData.proposed_way_forward = detail.value)}"
                         no-label-float
                         char-counter
                         maxlength="2000"
@@ -298,16 +295,18 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
           ${
             this._isFinalReport(this.currentReport)
               ? html`
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('RELEASE_CASH_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.release_cash_in_time_choice}">
-                        <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                      <etools-radio-group 
+                        .value="${this.localData?.final_review?.release_cash_in_time_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.release_cash_in_time_choice = e.target.value;}}">
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
-                        </paper-radio-button>
-                        <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        </sl-radio>
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                        </sl-radio>
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -319,6 +318,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="release_cash_in_time_comment"
                               .value="${this.localData?.final_review?.release_cash_in_time_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.release_cash_in_time_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -328,16 +328,18 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     </labelled-item>
                   </div>
 
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('RELEASE_SUPPLIES_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.release_supplies_in_time_choice}">
-                        <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                      <etools-radio-group 
+                        .value="${this.localData?.final_review?.release_supplies_in_time_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.release_supplies_in_time_choice = e.target.value;}}">                        
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
-                        </paper-radio-button>
-                        <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        </sl-radio>
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                        </sl-radio>
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -349,6 +351,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="release_supplies_in_time_comment"
                               .value="${this.localData?.final_review?.release_supplies_in_time_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.release_supplies_in_time_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -358,16 +361,18 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     </labelled-item>
                   </div>
 
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('FEEDBACK_FACE_FORM_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.feedback_face_form_in_time_choice}">
-                        <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                      <etools-radio-group 
+                        .value="${this.localData?.final_review?.feedback_face_form_in_time_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.feedback_face_form_in_time_choice = e.target.value;}}">                        
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
-                        </paper-radio-button>
-                        <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        </sl-radio>
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                        </sl-radio>
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -379,6 +384,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="feedback_face_form_in_time_comment"
                               .value="${this.localData?.final_review?.feedback_face_form_in_time_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.feedback_face_form_in_time_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -388,16 +394,18 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     </labelled-item>
                   </div>
 
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('RESPOND_REQUESTS_IN_TIME')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.respond_requests_in_time_choice}">
-                        <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                      <etools-radio-group 
+                        .value="${this.localData?.final_review?.respond_requests_in_time_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.respond_requests_in_time_choice = e.target.value;}}">
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
-                        </paper-radio-button>
-                        <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        </sl-radio>
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                        </sl-radio>
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -409,6 +417,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="respond_requests_in_time_comment"
                               .value="${this.localData?.final_review?.respond_requests_in_time_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.respond_requests_in_time_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -418,16 +427,18 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     </labelled-item>
                   </div>
 
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('IMPLEMENTED_AS_PLANNED')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.implemented_as_planned_choice}">
-                        <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                      <etools-radio-group
+                        .value="${this.localData?.final_review?.implemented_as_planned_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.implemented_as_planned_choice = e.target.value;}}">                
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
-                        </paper-radio-button>
-                        <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        </sl-radio>
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                        </sl-radio>
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -439,6 +450,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="implemented_as_planned_comment"
                               .value="${this.localData?.final_review?.implemented_as_planned_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.implemented_as_planned_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -448,16 +460,18 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     </labelled-item>
                   </div>
 
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('ACTION_TO_ADDRESS')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.action_to_address_choice}">
-                        <paper-radio-button name="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                      <etools-radio-group
+                        .value="${this.localData?.final_review?.action_to_address_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.action_to_address_choice = e.target.value;}}">                  
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
-                        </paper-radio-button>
-                        <paper-radio-button name="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        </sl-radio>
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                        </sl-radio>
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -469,6 +483,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="action_to_address_comment"
                               .value="${this.localData?.final_review?.action_to_address_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.action_to_address_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -478,31 +493,37 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     </labelled-item>
                   </div>
 
-                  <div class="row">
+                  <div class="col-12 padding-v">
                     <labelled-item label="${translate('OVERALL_SATISFACTION')}">
-                      <paper-radio-group .selected="${this.localData?.final_review?.overall_satisfaction_choice}">
-                        <paper-radio-button
-                          name="very_unsatisfied"
-                          ?disabled="${this._equals(this.computedMode, 'view')}"
-                        >
-                          ${translate('VERY_UNSATISFIED')}
-                        </paper-radio-button>
-                        <paper-radio-button name="unsatisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('UNSATISFIED')}
-                        </paper-radio-button>
-                        <paper-radio-button name="neutral" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NEUTRAL')}
-                        </paper-radio-button>
-                        <paper-radio-button name="satisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('SATISFIED')}
-                        </paper-radio-button>
-                        <paper-radio-button
-                          name="very_satisfied"
-                          ?disabled="${this._equals(this.computedMode, 'view')}"
-                        >
-                          ${translate('VERY_SATISFIED')}
-                        </paper-radio-button>
-                      </paper-radio-group>
+                      <etools-radio-group 
+                        .value="${this.localData?.final_review?.overall_satisfaction_choice}"
+                        @sl-change="${(e: any) => {this.localData.final_review.overall_satisfaction_choice = e.target.value;}}">
+                        <div class="layout-horizontal">   
+                          <sl-radio
+                            class="r-ml"
+                            value="very_unsatisfied"
+                            ?disabled="${this._equals(this.computedMode, 'view')}"
+                          >
+                            ${translate('VERY_UNSATISFIED')}
+                          </sl-radio>
+                          <sl-radio class="r-ml" value="unsatisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
+                            ${translate('UNSATISFIED')}
+                          </sl-radio>
+                          <sl-radio class="r-ml" value="neutral" ?disabled="${this._equals(this.computedMode, 'view')}">
+                            ${translate('NEUTRAL')}
+                          </sl-radio>
+                          <sl-radio class="r-ml" value="satisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
+                            ${translate('SATISFIED')}
+                          </sl-radio>
+                          <sl-radio
+                            class="r-ml"
+                            value="very_satisfied"
+                            ?disabled="${this._equals(this.computedMode, 'view')}"
+                          >
+                            ${translate('VERY_SATISFIED')}
+                          </sl-radio>
+                        </div>  
+                      </etools-radio-group>
 
                       ${this._equals(this.computedMode, 'view')
                         ? html`
@@ -514,6 +535,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                             <etools-input
                               id="overall_satisfaction_comment"
                               .value="${this.localData?.final_review?.overall_satisfaction_comment}"
+                              @value-changed="${({detail}: CustomEvent) => (this.localData.final_review.overall_satisfaction_comment = detail.value)}"
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
@@ -525,7 +547,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                 `
               : html``
           }
-          <div class="toggle-button-container row">
+          <div class="col-12 right-align padding-v">
           ${
             !this._equals(this.computedMode, 'view')
               ? html`
@@ -537,7 +559,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
           }
           </div>
 
-          <div class="row">
+          <div class="col-12 padding-v">
             <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
           </div
         </div>
@@ -572,7 +594,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
       });
     }
 
-    if (data.id === this.localData?.id) {
+    if (isJsonStrMatch(data, this.localData)) {
       return data;
     }
 
