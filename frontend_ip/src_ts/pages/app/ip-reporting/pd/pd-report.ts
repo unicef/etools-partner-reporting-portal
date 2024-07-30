@@ -2,8 +2,6 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles.js';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles.js';
-import '@polymer/paper-tabs/paper-tabs.js';
-import '@polymer/paper-tabs/paper-tab.js';
 import '../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../etools-prp-common/elements/page-body.js';
@@ -62,10 +60,6 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
 
       .toolbar a {
         text-decoration: none;
-      }
-
-      .tabs paper-tab {
-        text-transform: uppercase;
       }
 
       .pd-details-link {
@@ -129,6 +123,9 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
   @property({type: Boolean})
   busy = false;
 
+  @property({type: Array})
+  tabs: any[] = [];
+
   render() {
     return html`
       ${sharedStyles} ${buttonsStyles}
@@ -180,26 +177,14 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
         </div>
 
         <div slot="tabs">
-          <paper-tabs
-            .selected=${this.selectedTab}
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons
-            @selected-changed=${(e) => (this.selectedTab = e.detail.value)}
+          <etools-tabs-lit
+            id="tabs"
+            slot="tabs"
+            .tabs="${this.tabs}"
+            @sl-tab-show="${({detail}: any) => (this.selectedTab = detail.name)}"
+            .activeTab="${this.selectedTab}"
           >
-            ${this._equals(this.currentReport.report_type, 'HR')
-              ? html`<paper-tab name="reporting">${translate('REPORTING_ON_INDICATORS')}</paper-tab>`
-              : html``}
-            ${this._equals(this.currentReport.report_type, 'QPR')
-              ? html`
-                  <paper-tab name="reporting">${translate('REPORTING_ON_RESULTS')}</paper-tab>
-                  <paper-tab name="info">${translate('OTHER_INFO')}</paper-tab>
-                `
-              : html``}
-            ${this._equals(this.currentReport.report_type, 'SR')
-              ? html`<paper-tab name="reporting">${translate('REPORTING_ON_DATA')}</paper-tab>`
-              : html``}
-          </paper-tabs>
+          </etools-tabs-lit>
         </div>
       </page-header>
 
@@ -253,6 +238,29 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
 
     if (!isJsonStrMatch(this.currentReport, programmeDocumentReportsCurrent(state))) {
       this.currentReport = programmeDocumentReportsCurrent(state);
+      this.tabs = [
+        {
+          tab: 'reporting',
+          tabLabel:
+            this.currentReport.report_type === 'HR'
+              ? translate('REPORTING_ON_INDICATORS')
+              : this.currentReport.report_type === 'QPR'
+              ? translate('REPORTING_ON_RESULTS')
+              : (translate('REPORTING_ON_DATA') as any as string),
+          hidden: false
+        }
+      ];
+
+      if (this.currentReport.report_type === 'QPR') {
+        this.tabs = [
+          ...this.tabs,
+          {
+            tab: 'info',
+            tabLabel: translate('OTHER_INFO') as any as string,
+            hidden: false
+          }
+        ];
+      }
     }
 
     if (this.mode !== state.programmeDocumentReports.current.mode) {

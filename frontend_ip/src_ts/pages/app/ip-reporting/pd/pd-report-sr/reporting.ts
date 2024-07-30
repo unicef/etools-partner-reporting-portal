@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
-import '@polymer/app-layout/app-grid/app-grid-style.js';
 import '../../../../../etools-prp-common/elements/labelled-item.js';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../../elements/ip-reporting/report-attachments.js';
