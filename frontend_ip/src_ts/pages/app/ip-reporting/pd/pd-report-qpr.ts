@@ -11,14 +11,8 @@ export class PagePdReportQpr extends UtilsMixin(LitElement) {
 
   render() {
     return html`
-      <div>
-        <div name="reporting" ?hidden=${this.selectedTab !== 'reporting'}>
-          <page-pd-report-reporting></page-pd-report-reporting>
-        </div>
-        <div name="info" ?hidden=${this.selectedTab !== 'info'}>
-          <page-pd-report-info></page-pd-report-info>
-        </div>
-      </div>
+      ${this.selectedTab === 'reporting' ? html`<page-pd-report-reporting></page-pd-report-reporting>` : ''}
+      ${this.selectedTab === 'info' ? html`<page-pd-report-info></page-pd-report-info>` : ''}
     `;
   }
 }
