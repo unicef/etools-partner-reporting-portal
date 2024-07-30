@@ -1,20 +1,25 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/download-button';
 import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
 @customElement('indicators-toolbar')
-export class IndicatorsToolbar extends UtilsMixin(LitElement) {
+export class IndicatorsToolbar extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
+    ${layoutStyles}
     :host {
       display: block;
+      margin-bottom: 25px;
     }
   `;
 
-  @property({type: String})
-  query = '';
+  @property({type: Object})
+  queryParams: any;
 
   @property({type: String})
   locationId = '';
@@ -30,11 +35,24 @@ export class IndicatorsToolbar extends UtilsMixin(LitElement) {
 
   render() {
     return html`
-      <etools-prp-toolbar .query="${this.query}" .locationId="${this.locationId}">
+      <div class="layout-horizontal right-align">
         <download-button .url="${this.xlsExportUrl}" tracker="Indicators Export Xls">XLS</download-button>
         <download-button .url="${this.pdfExportUrl}" tracker="Indicators Export Pdf">PDF</download-button>
-      </etools-prp-toolbar>
+      </div>
     `;
+  }
+
+  stateChanged(state: any) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.queryParams, state.app?.routeDetails?.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
   }
 
   updated(changedProperties: any) {
@@ -44,9 +62,9 @@ export class IndicatorsToolbar extends UtilsMixin(LitElement) {
       this.indicatorsUrl = computeIndicatorsUrl(this.locationId);
     }
 
-    if (changedProperties.has('indicatorsUrl') || changedProperties.has('query')) {
-      this.xlsExportUrl = this._appendQuery(this.indicatorsUrl, this.query, 'export=xlsx');
-      this.pdfExportUrl = this._appendQuery(this.indicatorsUrl, this.query, 'export=pdf');
+    if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
+      this.xlsExportUrl = this._appendQuery(this.indicatorsUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = this._appendQuery(this.indicatorsUrl, this.queryParams, 'export=pdf');
     }
   }
 }

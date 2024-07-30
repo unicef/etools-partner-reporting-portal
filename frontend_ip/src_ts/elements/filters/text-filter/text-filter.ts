@@ -32,7 +32,7 @@ class TextFilter extends FilterMixin(connect(store)(LitElement)) {
   }
 
   _filterValueChanged() {
-    const newValue = (this.shadowRoot!.getElementById('field') as PaperInputElement).value!.trim();
+    const newValue = (this.shadowRoot!.getElementById('field') as any).value!.trim(); // PaperInputElement
 
     if (newValue !== this.lastValue) {
       fireEvent(this, 'filter-changed', {

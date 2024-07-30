@@ -1,20 +1,25 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/download-button';
 import {computePdUrl} from './js/pd-list-toolbar-functions.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
 @customElement('pd-list-toolbar')
-export class PdListToolbar extends UtilsMixin(LitElement) {
+export class PdListToolbar extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
+    ${layoutStyles}
     :host {
       display: block;
+      margin: 25px 0;
     }
   `;
 
-  @property({type: String})
-  query!: string;
+  @property({type: Object})
+  queryParams: any;
 
   @property({type: String})
   locationId!: string;
@@ -30,23 +35,36 @@ export class PdListToolbar extends UtilsMixin(LitElement) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('locationId')) {
       this.pdUrl = computePdUrl(this.locationId);
     }
 
-    if (changedProperties.has('pdUrl') || changedProperties.has('query')) {
-      this.pdfExportUrl = this._appendQuery(this.pdUrl, this.query, 'export=pdf');
-      this.xlsxExportUrl = this._appendQuery(this.pdUrl, this.query, 'export=xlsx');
+    if (changedProperties.has('pdUrl') || changedProperties.has('queryParams')) {
+      this.pdfExportUrl = this._appendQuery(this.pdUrl, this.queryParams, 'export=pdf');
+      this.xlsxExportUrl = this._appendQuery(this.pdUrl, this.queryParams, 'export=xlsx');
+    }
+  }
+
+  stateChanged(state: any) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.queryParams, state.app?.routeDetails?.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
     }
   }
 
   render() {
     return html`
-      <etools-prp-toolbar query="${this.query}" location-id="${this.locationId}">
-        <download-button .url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+      <div class="layout-horizontal right-align">
         <download-button .url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
-      </etools-prp-toolbar>
+        <download-button .url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+      </div>
     `;
   }
 }

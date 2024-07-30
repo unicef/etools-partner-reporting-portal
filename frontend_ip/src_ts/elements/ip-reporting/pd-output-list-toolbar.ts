@@ -3,7 +3,6 @@ import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from 'lit-translate';
 import Endpoints from '../../endpoints';
-import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {
   computeImportTemplateUrl,
@@ -14,7 +13,6 @@ import {
   computeCanRefresh,
   computeShowRefresh
 } from './js/pd-output-list-toolbar-functions';
-import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/refresh-report-modal';
 import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
@@ -22,17 +20,21 @@ import {RootState} from '../../typings/redux.types';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
 @customElement('pd-output-list-toolbar')
 export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
+    ${layoutStyles}
     :host {
       display: block;
+      margin-bottom: 25px;
     }
   `;
 
-  @property({type: String})
-  query!: string;
+  @property({type: Object})
+  queryParams!: any;
 
   @property({type: String})
   locationId!: string;
@@ -81,6 +83,13 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
     this.currentReport = programmeDocumentReportsCurrent(state);
     this.currentUserRoles = state.userProfile?.profile?.prp_roles;
 
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.queryParams, state.app?.routeDetails?.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
     if (this.locationId !== state.location.id) {
       this.locationId = state.location.id;
     }
@@ -99,9 +108,9 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
       this.pdReportUrl = computePdReportUrl(this.locationId, this.reportId);
     }
 
-    if (changedProperties.has('pdReportUrl') || changedProperties.has('query')) {
-      this.pdfExportUrl = this._appendQuery(this.pdReportUrl, this.query, 'export=pdf');
-      this.xlsExportUrl = this._appendQuery(this.pdReportUrl, this.query, 'export=xlsx');
+    if (changedProperties.has('pdReportUrl') || changedProperties.has('queryParams')) {
+      this.pdfExportUrl = this._appendQuery(this.pdReportUrl, this.queryParams, 'export=pdf');
+      this.xlsExportUrl = this._appendQuery(this.pdReportUrl, this.queryParams, 'export=xlsx');
     }
 
     if (changedProperties.has('reportId')) {
@@ -123,10 +132,9 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
 
   render() {
     return html`
-      ${buttonsStyles}
-      <etools-prp-toolbar .query="${this.query}" .reportId="${this.reportId}" .locationId="${this.locationId}">
-        <download-button .url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
+      <div class="layout-horizontal right-align">
         <download-button .url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
+        <download-button .url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
 
         ${this.showImportButtons
           ? html`
@@ -145,7 +153,7 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
                 : ''}
             `
           : ''}
-      </etools-prp-toolbar>
+      </div>
     `;
   }
 

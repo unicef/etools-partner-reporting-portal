@@ -1,8 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-toasts/etools-toasts';
-
-import '../elements/etools-prp-workspaces.js';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../endpoints.js';
 import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions.js';
@@ -85,9 +83,6 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
 
   render() {
     return html`
-      <etools-prp-workspaces id="workspaces" .all="${this.workspaces}" .current="${this._workspaceCode}">
-      </etools-prp-workspaces>
-
       ${!this.userHasPrpRolesOrAccess
         ? html`<div class="no-groups-notification">
             <h3>${translate('ACCOUNT_CREATED')}</h3>
