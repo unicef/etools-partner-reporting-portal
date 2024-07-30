@@ -6,6 +6,7 @@ import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 
 @customElement('pd-sent-back')
 export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
@@ -32,7 +33,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
 
   static styles = css`
     :host {
-      --paper-card-content: {
+      etools-content-panel::part(ecp-content) {
         padding: 30px 30px 30px 70px;
       }
     }
@@ -103,7 +104,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
     return html`${buttonsStyles}
     ${this.hasFeedback
       ? html`
-          <paper-card class="sent-back-feedback">
+          <etools-content-panel no-header class="sent-back-feedback">
             <div class="ribbon" aria-hidden="true"></div>
             <div class="card-content">
               <h3>Report was sent back</h3>
@@ -116,7 +117,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
                   </div>
                 `
               : ''}
-          </paper-card>
+          </etools-content-panel>
         `
       : html``} `;
   }

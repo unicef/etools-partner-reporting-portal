@@ -8,8 +8,6 @@ import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header.js';
 
 import '../../elements/ip-reporting/header/app-header.js';
 import '../../etools-prp-common/elements/page-title.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-overlay-behavior/iron-overlay-backdrop.js';
 
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin.js';
 import {Route} from '../../etools-prp-common/typings/globals.types.js';
