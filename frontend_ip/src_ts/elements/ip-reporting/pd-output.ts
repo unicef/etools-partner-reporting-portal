@@ -61,11 +61,8 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       color: white;
       cursor: pointer;
     }
-    .indicator-toggle[type='default'] {
+    .indicator-toggle {
       background: #0099ff;
-    }
-    .indicator-toggle[type='cluster'] {
-      background: #009d55;
     }
     .indicator-header {
       padding: 6px 25px 6px 10px;
@@ -78,10 +75,12 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     }
     .indicator-header dt {
       color: var(--theme-secondary-text-color);
+      white-space: nowrap;
     }
     .indicator-header dd {
       margin: 0;
       font-weight: bold;
+      min-width: 60px;
     }
     .indicator-header__title h3 {
       margin: 0 0 0.25em;
@@ -99,11 +98,25 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     }
     .indicator-header__target dl {
       text-align: right;
+      width: 100%;
     }
     .indicatorType {
       font-weight: 600;
       font-size: 16px;
       margin-right: 4px;
+    }
+    .flex {
+      flex: 1;
+      flex-basis: 0.000000001px;
+    }
+    .flex-4 {
+      flex: 4;
+    }
+    .w100 {
+      width: 100%;
+    }
+    .justified {
+      justify-content: space-between;
     }
   `];
 
@@ -155,6 +168,9 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
   @property({type: Boolean})
   showMeta: boolean = false;
 
+  @property({type: Array})
+  openedArr: boolean[] = [];
+
   render() {
     return html`
       <etools-prp-permissions
@@ -184,14 +200,17 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
         (indicator, index) => html`
            <section class="card-container">
               <div class="layout-horizontal indicator">
-                <etools-icon
-                  name="${indicator.opened ? 'expand-less' : 'expand-more'}"
-                  @click="${(e) => this._handleOpenedChanged(e, indicator, index)}"
-                ></etools-icon>
-            
-                <div class="layout-horizontal">
+
+                <div class="layout-horizontal indicator-toggle">
+                  <etools-icon
+                    name="${this.openedArr[index] ? 'expand-less' : 'expand-more'}"
+                    @click="${(e) => this._handleOpenedChanged(e, indicator, index)}"
+                  ></etools-icon>
+                </div>
+
+                <div class="layout-horizontal w100">
                   <div
-                    class="indicator-toggle flex-none layout-horizontal center-center"
+                    class="flex-none layout-horizontal center-center"
                     type=${this._computeToggleType(indicator.is_related_to_cluster_reporting)}
                     toggles="${index}"
                     role="button"
@@ -201,10 +220,10 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                   >            
                   </div>
 
-                  <div class="indicator-header flex layout-horizontal">
-                    <div class="indicator-header__title col-3 layout vertical center-justified">
-                      <div class="layout horizontal">
-                        <div class="status-badge layout vertical center-justified">
+                  <div class="indicator-header layout-horizontal w100 justified">
+                    <div class="indicator-header__title layout-vertical center-align">
+                      <div class="layout-horizontal">
+                        <div class="status-badge layout-vertical center-align">
                           <report-status
                             .status="${this._computeCompleteIndicator(
                               indicator.is_complete,
@@ -225,12 +244,14 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                             <h3>${indicator.reportable.blueprint.title}</h3>
                           </div>
                           <dl class="layout-horizontal">
-                            <dt>
-                              <a href=${this.calculationMethodUrl}>
-                                ${translate('CALCULATION_METHODS')}
-                                <paper-tooltip>${translate('TO_LEARN_MORE')}</paper-tooltip>
-                              </a>
-                              :
+                            <dt>                            
+                            <sl-tooltip content="${translate('TO_LEARN_MORE')}" placement="top">
+                              <span class="ripple-wrapper main">
+                                <a href=${this.calculationMethodUrl}>
+                                  ${translate('CALCULATION_METHODS')}
+                                </a>  
+                              </span>
+                            </sl-tooltip>                              
                             </dt>
                             <dt>
                               <b
@@ -246,9 +267,9 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                         </div>
                       </div>
                     </div>
-                    <div class="indicator-header__target flex-none layout-vertical center-justified">
-                      <dl class="layout-horizontal justified">
-                        <dt class="col-4">${translate('TARGET')}:</dt>
+                    <div class="indicator-header__target layout-vertical center-align">
+                      <dl class="layout-horizontal right-align">
+                        <dt class="flex-4">${translate('TARGET')}:</dt>
                         <dd class="flex">
                           ${this._equals(indicator.reportable.blueprint.display_type, 'number')
                             ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
@@ -259,8 +280,8 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                             : html``}
                         </dd>
                       </dl>
-                      <dl class="layout horizontal justified">
-                        <dt class="col-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
+                      <dl class="layout-horizontal right-align">
+                        <dt class="flex-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
                         ${this._equals(indicator.reportable.blueprint.display_type, 'number')
                           ? html`
                               <dd class="flex">
@@ -277,8 +298,8 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                               </dd>
                             `}
                       </dl>
-                      <dl class="layout horizontal justified">
-                        <dt class="col-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
+                      <dl class="layout-horizontal right-align">
+                        <dt class="flex-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
                         ${this._equals(indicator.reportable.blueprint.display_type, 'number')
                           ? html`
                               <dd class="flex">
@@ -431,6 +452,8 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     // @dci
     //if (data.value) {
       // @ts-ignore
+      this.openedArr[index] = !this.openedArr[index];
+      this.openedArr = [...this.openedArr];
       const indicatorDetails = this.shadowRoot?.querySelector(`#collapse-${index}`) as any;
       //e.srcElement!.querySelector('indicator-details');
 
