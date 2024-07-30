@@ -3,9 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icon/iron-icon';
+import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 import {
   shouldDisplayLink,
   getReportTitleFull,
@@ -65,10 +63,10 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
         ? html`
             <a href="${this._getReportLink(this.report, this.permissions, this.baseUrl)}">
               ${this.displayLinkIcon
-                ? html`<iron-icon
+                ? html`<etools-icon
                     class="link-mode-icon"
-                    icon="${this._getReportIcon(this.report, this.permissions)}"
-                  ></iron-icon>`
+                    name="${this._getReportIcon(this.report, this.permissions)}"
+                  ></etools-icon>`
                 : html``}
               ${this._getReportTitle(this.report)}
             </a>

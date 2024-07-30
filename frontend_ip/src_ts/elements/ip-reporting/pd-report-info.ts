@@ -28,7 +28,6 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 /**
- * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin

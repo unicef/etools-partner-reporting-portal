@@ -14,6 +14,7 @@ import '../elements/etools-prp-progress-bar-cluster';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table-row';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
+import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 
 import {store} from '../redux/store';
 import {translate} from 'lit-translate';

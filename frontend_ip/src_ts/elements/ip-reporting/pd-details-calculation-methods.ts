@@ -2,9 +2,8 @@ import {LitElement, css, html} from 'lit';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {customElement, property} from 'lit/decorators.js';
-import '@polymer/paper-radio-group/paper-radio-group';
-import '@polymer/paper-radio-button/paper-radio-button';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes';
+import '@unicef-polymer/etools-unicef/src/etools-radio/etools-radio-group';
+import '@shoelace-style/shoelace/dist/components/radio/radio.js';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -17,8 +16,6 @@ import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndic
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/calculation-methods-info-bar';
-import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {
   computeIndicatorsUrl,
   computeFormattedData,
@@ -36,7 +33,6 @@ import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
 import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
 
 /**
- * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
@@ -61,11 +57,11 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
         font-weight: bold;
       }
 
-      paper-radio-button {
+      sl-radio {
         padding: 0 !important;
       }
 
-      paper-radio-button:not(:first-child) {
+      sl-radio:not(:first-child) {
         margin-left: 12px;
       }
 
@@ -82,7 +78,7 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
         display: none !important;
       }
 
-      paper-radio-button[name='latest'] {
+      sl-radio[name='latest'] {
         text-transform: uppercase;
       }
     `
@@ -90,7 +86,6 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
 
   render() {
     return html`
-      ${buttonsStyles} ${tableStyles}
       <style>
         ${dataTableStylesLit}
       </style>
@@ -141,63 +136,54 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
                         <div class="col-data col-4 table-cell">
                           ${this._canEdit(item, this.permissions)
                             ? html`
-                                <paper-radio-group
+                                <etools-radio-group
                                   data-id="${item.data?.id}"
                                   data-llo-id="${item.llo_id}"
                                   data-scope="calculation_formula_across_locations"
-                                  @paper-radio-group-changed="${this._onValueChanged}"
-                                  .selected="${computeSelected(item.data, 'calculation_formula_across_locations')}"
+                                  @sl-change="${this._onValueChanged}"
+                                  .value="${computeSelected(item.data, 'calculation_formula_across_locations')}"
                                 >
-                                  <paper-radio-button
-                                    name="sum"
-                                    ?disabled="${computeDisabled(item.data?.display_type)}"
-                                  >
+                                  <sl-radio value="sum" ?disabled="${computeDisabled(item.data?.display_type)}">
                                     ${translate('SUM')}
-                                  </paper-radio-button>
-                                  <paper-radio-button
-                                    name="max"
-                                    ?disabled="${computeDisabled(item.data?.display_type)}"
-                                  >
+                                  </sl-radio>
+                                  <sl-radio value="max" ?disabled="${computeDisabled(item.data?.display_type)}">
                                     ${translate('MAX')}
-                                  </paper-radio-button>
-                                  <paper-radio-button
-                                    name="avg"
-                                    ?disabled="${computeDisabled(item.data?.display_type)}"
-                                  >
+                                  </sl-radio>
+                                  <sl-radio value="avg" ?disabled="${computeDisabled(item.data?.display_type)}">
                                     ${translate('AVG')}
-                                  </paper-radio-button>
-                                </paper-radio-group>
+                                  </sl-radio>
+                                </etools-radio-group>
                               `
                             : html` ${item.data.calculation_formula_across_locations} `}
                         </div>
                         <div class="col-data col-4 table-cell">
                           ${this._canEdit(item, this.permissions)
                             ? html`
-                                <paper-radio-group
+                                <etools-radio-group
                                   data-id="${item.data?.id}"
                                   data-llo-id="${item.llo_id}"
                                   data-scope="calculation_formula_across_periods"
-                                  @paper-radio-group-changed="${this._onValueChanged}"
-                                  .selected="${computeSelected(item.data, 'calculation_formula_across_periods')}"
+                                  @sl-change="${this._onValueChanged}"
+                                  .value="${computeSelected(item.data, 'calculation_formula_across_periods')}"
                                   ?disabled="${computeDisabled(item.data)}"
                                 >
-                                  <paper-radio-button name="sum" ?disabled="${computeDisabled(item.data.display_type)}">
+                                  <sl-radio value="sum" ?disabled="${computeDisabled(item.data.display_type)}">
                                     ${translate('SUM')}
-                                  </paper-radio-button>
-                                  <paper-radio-button name="max" ?disabled="${computeDisabled(item.data.display_type)}">
+                                  </sl-radio>
+                                  <sl-radio value="max" ?disabled="${computeDisabled(item.data.display_type)}">
                                     ${translate('MAX')}
-                                  </paper-radio-button>
-                                  <paper-radio-button name="avg" ?disabled="${computeDisabled(item.data.display_type)}">
+                                  </sl-radio>
+                                  <sl-radio value="avg" ?disabled="${computeDisabled(item.data.display_type)}">
                                     ${translate('AVG')}
-                                  </paper-radio-button>
-                                  <paper-radio-button
-                                    name="latest"
+                                  </sl-radio>
+                                  <sl-radio
+                                    value="latest"
                                     ?hidden="${!this._hasTypeRatioOrPercentage(item.data)}"
                                     ?disabled="${computeDisabled(item.data.display_type)}"
                                   >
                                     ${translate('LATEST')}
-                                  </paper-radio-button>
-                                </paper-radio-group>
+                                  </sl-radio>
+                                </etools-radio-group>
                               `
                             : html` ${item.data.calculation_formula_across_periods} `}
                         </div>
@@ -306,16 +292,12 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
   }
 
   _onValueChanged(e: CustomEvent) {
-    const newValue = (e.target as any).selected;
+    const newValue = (e.target as any).value;
     const data = (e.target as any).dataset;
     const indices = onValueChanged(data, this.localData);
 
     this.localData.ll_outputs_and_indicators[indices.lloIndex].indicators[indices.indicatorIndex][data.scope] =
       newValue;
-    // this.set(
-    //   ['localData.ll_outputs_and_indicators', indices.lloIndex, 'indicators', indices.indicatorIndex, data.scope],
-    //   newValue
-    // );
   }
 
   _save() {

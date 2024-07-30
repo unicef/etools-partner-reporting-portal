@@ -11,7 +11,7 @@ import '../../etools-prp-common/elements/labelled-item';
 import {partnerLoading} from '../../redux/selectors/partner';
 import {computePartnerType} from './js/partner-details-functions';
 import {RootState} from '../../typings/redux.types';
-
+import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 @customElement('partner-details')
 export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
@@ -44,7 +44,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
       padding-left: 2em;
     }
 
-    .field-value iron-icon {
+    .field-value etools-icon {
       position: absolute;
       left: 0;
       top: 0;
@@ -113,7 +113,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
           <li class="item">
             <labelled-item label="${translate('ADDRESS')}">
               <span class="field-value" has-icon>
-                <iron-icon icon="communication:location-on"></iron-icon>
+                <etools-icon name="communication:location-on"></etools-icon>
                 ${this._withDefault(this.partner?.street_address)}
               </span>
             </labelled-item>
@@ -121,7 +121,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
           <li class="item">
             <labelled-item label="${translate('PHONE_NUMBER')}">
               <span class="field-value" has-icon>
-                <iron-icon icon="communication:phone"></iron-icon>
+                <etools-icon name="communication:phone"></etools-icon>
                 ${this._withDefault(this.partner?.phone_number)}
               </span>
             </labelled-item>
@@ -129,7 +129,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
           <li class="item">
             <labelled-item label="${translate('EMAIL_ADDRESS')}">
               <span class="field-value" has-icon>
-                <iron-icon icon="communication:email"></iron-icon>
+                <etools-icon name="communication:email"></etools-icon>
                 ${this._withDefault(this.partner?.email)}
               </span>
             </labelled-item>

@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
+import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button';
 import '@unicef-polymer/etools-unicef/src/etools-collapse/etools-collapse';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';

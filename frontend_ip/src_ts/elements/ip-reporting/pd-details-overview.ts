@@ -6,9 +6,6 @@ import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/
 import {computeLoaded, hasAmendments, computeReportingRequirements} from './js/pd-details-overview-functions';
 import {RootState} from '../../typings/redux.types';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-
-import '@polymer/iron-icons/communication-icons';
-import '@polymer/iron-icon/iron-icon';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
@@ -67,7 +64,7 @@ export class PdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
         padding-left: 2em;
       }
 
-      .field-value iron-icon {
+      .field-value etools-icon {
         position: absolute;
         left: 0;
         top: 0;

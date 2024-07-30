@@ -88,7 +88,7 @@ export class PageUnauthorized extends connect(store)(LitElement) {
     if (!this.profileUrl) {
       return;
     }
-
+    this.showMessage(true);
     sendRequest({
       method: 'GET',
       endpoint: {url: this.profileUrl}
