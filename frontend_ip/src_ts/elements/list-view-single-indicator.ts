@@ -8,6 +8,9 @@ import {tableStyles} from '../etools-prp-common/styles/table-styles';
 import {sharedStyles} from '../etools-prp-common/styles/shared-styles';
 import '../etools-prp-common/elements/etools-prp-permissions';
 import '../etools-prp-common/elements/status-badge';
+import '../etools-prp-common/elements/etools-prp-progress-bar';
+import '../elements/etools-prp-progress-bar-alt';
+import '../elements/etools-prp-progress-bar-cluster';
 import '../elements/ip-reporting/ip-reporting-indicator-details';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table-row';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
@@ -157,7 +160,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
           ></span>
           <span class="col-data col-2 table-cell table-cell--text self-center flex-2">
             <div class="self-center flex-none">
-              <dl class="indicator-progress layout horizontal">
+              <dl class="indicator-progress layout-horizontal">
                 <dt class="flex-none self-center">${translate('AGAINST_TARGET')}</dt>
                 <dd class="flex-none">
                   ${this._equals(this.progressBarType, 'cluster')
@@ -168,7 +171,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
                     : this._equals(this.progressBarType, 'default')
                     ? html`<etools-prp-progress-bar
                         .displayType=${this.indicator?.blueprint?.display_type}
-                        .number=${this.indicator?.total_against_target}
+                        .number=${Math.random()}
                       ></etools-prp-progress-bar>`
                     : html``}
                 </dd>
@@ -176,7 +179,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
 
               ${this.isClusterApp
                 ? html`
-                    <dl class="indicator-progress layout horizontal">
+                    <dl class="indicator-progress layout-horizontal">
                       <dt class="flex-none self-center">${translate('AGAINST_IN_NEED')}:</dt>
                       <dd class="flex-none">
                         <etools-prp-progress-bar-alt

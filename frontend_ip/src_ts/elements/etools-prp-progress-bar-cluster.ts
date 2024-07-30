@@ -17,12 +17,9 @@ export class EtoolsPrpProgressBarCluster extends LitElement {
     :host {
       display: block;
       width: 100%;
-      --paper-progress-active-color: #88c245;
     }
     etools-prp-progress-bar {
-      --etools-prp-progress-bar: {
-        /* Add specific styles if needed */
-      }
+      --etools-indicator-color: #88c245;
     }
   `;
 

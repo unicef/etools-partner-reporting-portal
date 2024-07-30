@@ -8,7 +8,6 @@ import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header.js';
 
 import '../../elements/ip-reporting/header/app-header.js';
 import '../../etools-prp-common/elements/page-title.js';
-import {appThemeIpStyles} from '../../styles/app-theme-ip-styles.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-overlay-behavior/iron-overlay-backdrop.js';
 
@@ -94,7 +93,6 @@ export class PageIpReporting extends UtilsMixin(RoutingMixin(connect(store)(LitE
 
   render() {
     return html`
-      ${appThemeIpStyles}
       <page-title .title="${translate('IP_REPORTING')}"></page-title>
 
      <app-drawer-layout

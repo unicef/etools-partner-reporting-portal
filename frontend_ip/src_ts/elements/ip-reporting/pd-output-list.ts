@@ -66,7 +66,7 @@ export class PdOutputList extends connect(store)(LitElement) {
       <etools-content-panel panel-title="${translate('PD_OUTPUT_RESULTS')}">
         ${this.loading
           ? html`
-              <div class="loader layout horizontal center-center">
+              <div class="loader layout-horizontal center-center">
                 <div>
                   <etools-loading no-overlay active></etools-loading>
                 </div>

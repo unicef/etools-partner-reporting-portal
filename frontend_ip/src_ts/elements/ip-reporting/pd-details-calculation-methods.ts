@@ -9,7 +9,6 @@ import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import Constants from '../../etools-prp-common/constants';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from 'lit-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
@@ -17,9 +16,7 @@ import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/etools-prp-permissions';
-import '../../etools-prp-common/elements/confirm-box';
 import '../../etools-prp-common/elements/calculation-methods-info-bar';
-import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {
@@ -35,6 +32,8 @@ import {RootState} from '../../typings/redux.types';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
 
 /**
  * @polymer
@@ -211,14 +210,13 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
           <etools-loading ?active="${this.loading}"></etools-loading>
         </div>
         ${this._canSave(this.permissions)
-          ? html`<div class="buttons layout horizontal-reverse">
+          ? html`<div class="buttons layout-horizontal">
               <etools-button @click="${this._save}" variant="primary" ?disabled="${this.loading}">
                 ${translate('SAVE')}
               </etools-button>
             </div>`
           : html``}
       </page-body>
-      <confirm-box id="confirm"></confirm-box>
     `;
   }
 
@@ -346,18 +344,27 @@ export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(conne
   }
 
   _confirmIntent() {
-    const deferred = this._deferred();
-    (this.shadowRoot!.querySelector('#confirm') as ConfirmBoxEl).run({
-      body:
-        'Please make sure the calculation methods for your indicators are ' +
-        'properly configured. Changing calculation methods would recalculate ' +
-        'progress reports for your indicators!',
-      result: deferred,
-      maxWidth: '500px',
-      mode: Constants.CONFIRM_MODAL
-    });
+    return new Promise(async (resolve, reject) => {
+      const confirmed = await openDialog({
+        dialog: 'are-you-sure',
+        dialogData: {
+          content:
+            'Please make sure the calculation methods for your indicators are ' +
+            'properly configured. Changing calculation methods would recalculate ' +
+            'progress reports for your indicators!',
+          confirmBtnText: translate('CONTINUE'),
+          cancelBtnText: translate('CANCEL')
+        }
+      }).then(({confirmed}) => {
+        return confirmed;
+      });
 
-    return deferred.promise;
+      if (confirmed) {
+        return resolve(true);
+      } else {
+        return reject();
+      }
+    });
   }
 
   _canEdit(item: any, permissions: any) {

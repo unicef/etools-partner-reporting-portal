@@ -11,7 +11,6 @@ import '../etools-prp-common/elements/page-title.js';
 import {BASE_PATH} from '../etools-prp-common/config.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store.js';
-import {appThemeIpStyles} from '../styles/app-theme-ip-styles.js';
 import {translate} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
@@ -121,7 +120,6 @@ export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
 
   render() {
     return html`
-      hello ${appThemeIpStyles}
       <page-title title="${translate('SIGN_IN')}"></page-title>
 
       <etools-media-query
