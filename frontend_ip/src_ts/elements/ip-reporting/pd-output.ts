@@ -69,7 +69,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       }
       .indicator-header {
         padding: 6px 25px 6px 10px;
-        background: var(--paper-grey-300);
+        background: var(--sl-color-gray-300);
       }
       .indicator-header dl {
         margin: 0;
