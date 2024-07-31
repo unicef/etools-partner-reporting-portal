@@ -119,17 +119,6 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
           </etools-data-table-column>
         </etools-data-table-header>
 
-        <etools-data-table-footer
-          .pageSize="${this.paginator.page_size}"
-          .pageNumber="${this.paginator.page}"
-          .totalResults="${this.paginator.count}"
-          .visibleRange="${this.paginator.visible_range}"
-          @visible-range-changed="${this.visibleRangeChanged}"
-          @page-size-changed="${this._pageSizeChanged}"
-          @page-number-changed="${this._pageNumberChanged}"
-        >
-        </etools-data-table-footer>
-
         ${this.data?.map(
           (indicator) => html`
             <list-view-single-indicator
@@ -149,8 +138,8 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
           .totalResults="${this.paginator.count}"
           .visibleRange="${this.paginator.visible_range}"
           @visible-range-changed="${this.visibleRangeChanged}"
-          @page-size-changed="${this._pageSizeChanged}"
-          @page-number-changed="${this._pageNumberChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
         >
         </etools-data-table-footer>
       </etools-content-panel>

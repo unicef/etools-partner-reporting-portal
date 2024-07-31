@@ -80,6 +80,7 @@ export class PdReportsList extends PaginationMixin(
     this.data = programmeDocumentReportsAll(state);
     if (this.data) {
       const totalResults = programmeDocumentReportsCount(state);
+      console.log('totalResults', totalResults);
       if (typeof totalResults !== 'undefined') {
         this.paginator = {...this.paginator, count: totalResults};
         this.loading = false;
@@ -95,20 +96,23 @@ export class PdReportsList extends PaginationMixin(
 
   render() {
     return html`
-      ${tableStyles} 
-      <style> ${dataTableStylesLit} </style>     
+      ${tableStyles}
+      <style>
+        ${dataTableStylesLit}
+      </style>
 
-      <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
-      (this.permissions = e.detail.value)}"></etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
       <etools-content-panel panel-title="${translate('LIST_OF_REPORTS')}">
         <etools-loading ?active="${this.loading}"></etools-loading>
 
         <etools-data-table-header
           no-collapse
-          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${
-      this.paginator.count
-    } ${translate('RESULTS_TO_SHOW')}"
+          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
+            .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column class="col-3">
             <div class="table-column">${translate('REPORT_NUMBER')}</div>
@@ -126,7 +130,6 @@ export class PdReportsList extends PaginationMixin(
             <div class="table-column">${translate('REPORTING_PERIOD')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
-
 
         ${(this.data || []).map(
           (report: any) => html`
@@ -156,18 +159,22 @@ export class PdReportsList extends PaginationMixin(
 
         <list-placeholder .data="${this.data}" ?loading="${this.loading}"></list-placeholder>
 
-      
         <etools-data-table-footer
-          .pageSize=${this.paginator.page_size}"
+          .pageSize="${this.paginator.page_size}"
           .pageNumber="${this.paginator.page}"
-          .totalResults"${this.paginator.count}"
-          .visibleRange"${this.paginator.visible_range}"
-          @page-size-changed="${this._pageSizeChanged}"
-          @page-number-changed="${this._pageNumberChanged}"
-        ></etools-data-table-footer>
-        
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
+        >
+        </etools-data-table-footer>
       </etools-content-panel>
     `;
+  }
+
+  paginatorChanged() {
+    this._paginatorChanged();
   }
 }
 

@@ -90,7 +90,11 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
         sendRequest({
           method: 'GET',
           endpoint: {url: this.reportsUrl},
-          params: this.queryParams
+          params: {
+            page: 1,
+            page_size: 10,
+            ...this.queryParams
+          }
         })
       )
     );

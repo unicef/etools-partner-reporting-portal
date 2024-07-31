@@ -11,7 +11,6 @@ import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styl
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from 'lit-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
-import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/etools-prp-permissions';
@@ -36,10 +35,9 @@ import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin DataTableMixin
  */
 @customElement('pd-details-calculation-methods')
-export class PdDetailsCalculationMethods extends DataTableMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitElement)) {
   static styles = [
     layoutStyles,
     css`
