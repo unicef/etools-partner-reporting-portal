@@ -88,6 +88,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       .indicator-header__title h3 {
         margin: 0 0 0.25em;
         font-size: 14px;
+        text-align: left;
       }
       .indicator-header__title dt {
         margin-right: 1em;
@@ -106,7 +107,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       .indicatorType {
         font-weight: 600;
         font-size: 16px;
-        margin-right: 4px;
+        margin-right: 4px;               
       }
       .flex {
         flex: 1;
