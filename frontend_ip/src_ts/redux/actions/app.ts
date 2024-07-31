@@ -44,25 +44,6 @@ export const updateStoreRouteDetails: ActionCreator<AppActionUpdateRouteDetails>
   };
 };
 
-const importSubRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-
-  switch (routeDetails.subRouteName) {
-    case 'ip-reporting':
-      imported = import('../../pages/app/ip-reporting.js').then(() => importSubSubRoutes(routeDetails));
-      break;
-    default:
-      imported = import('../../pages/app/ip-reporting.js').then(() => importSubSubRoutes(routeDetails));
-      break;
-  }
-
-  // imported?.then(() => {
-  //   console.log('Imported importSubRoutes', routeDetails.subRouteName);
-  // });
-
-  return imported;
-};
-
 const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
 
@@ -128,6 +109,25 @@ const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
 
   // imported?.then(() => {
   //   console.log('Imported importSubSubRoutes', routeDetails.subSubRouteName);
+  // });
+
+  return imported;
+};
+
+const importSubRoutes = (routeDetails: EtoolsRouteDetails) => {
+  let imported: Promise<any> | undefined;
+
+  switch (routeDetails.subRouteName) {
+    case 'ip-reporting':
+      imported = import('../../pages/app/ip-reporting.js').then(() => importSubSubRoutes(routeDetails));
+      break;
+    default:
+      imported = import('../../pages/app/ip-reporting.js').then(() => importSubSubRoutes(routeDetails));
+      break;
+  }
+
+  // imported?.then(() => {
+  //   console.log('Imported importSubRoutes', routeDetails.subRouteName);
   // });
 
   return imported;

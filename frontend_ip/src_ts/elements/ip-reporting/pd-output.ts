@@ -12,7 +12,6 @@ import {translate, get as getTranslation} from 'lit-translate';
 import {
   computeReportableUrl,
   computeCompleteIndicator,
-  computeIcon,
   calculationFormulaAcrossPeriods
 } from './js/pd-output-functions';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -146,31 +145,31 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
   reportableData: any = {};
 
   @property({type: String})
-  mode: string = '';
+  mode = '';
 
   @property({type: String})
-  disaggregationsByIndicator: string = '';
+  disaggregationsByIndicator = '';
 
   @property({type: String})
-  computedMode: string = '';
+  computedMode = '';
 
   @property({type: String})
-  pdId: string = '';
+  pdId = '';
 
   @property({type: String})
-  reportId: string = '';
+  reportId = '';
 
   @property({type: String})
-  reportableUrl: string = '';
+  reportableUrl = '';
 
   @property({type: String})
-  calculationMethodUrl: string = '';
+  calculationMethodUrl = '';
 
   @property({type: Object})
   currentReport: any = {};
 
   @property({type: Boolean})
-  showMeta: boolean = false;
+  showMeta = false;
 
   @property({type: Array})
   openedArr: boolean[] = [];
@@ -460,20 +459,20 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
   _handleOpenedChanged(e: CustomEvent, indicator: any, index: number) {
     e.stopPropagation();
     // @dci
-    //if (data.value) {
+    // if (data.value) {
     // @ts-ignore
     this.openedArr[index] = !this.openedArr[index];
     this.openedArr = [...this.openedArr];
     const indicatorDetails = this.shadowRoot?.querySelector(`#collapse-${index}`) as any;
-    //e.srcElement!.querySelector('indicator-details');
+    // e.srcElement!.querySelector('indicator-details');
 
-    //try {
+    // try {
     indicatorDetails.init();
     (this.shadowRoot!.querySelector(`#collapse-${indicator.id}-${index}`) as any).toggle();
-    //} catch (err) {
+    // } catch (err) {
     //  console.error('pd-output.ts', err);
     // }
-    //}
+    // }
   }
 
   _updateMeta(e: CustomEvent) {

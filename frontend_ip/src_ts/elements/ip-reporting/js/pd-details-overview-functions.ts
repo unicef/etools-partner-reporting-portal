@@ -9,7 +9,7 @@ export function hasAmendments(pd: any) {
 }
 
 export function computeReportingRequirements(reportingPeriods: any[], dateFormat: string) {
-    const byType = (reportingPeriods || []).reduce(function (acc, curr) {
+  const byType = (reportingPeriods || []).reduce(function (acc, curr) {
     const type = curr.report_type.toLowerCase();
 
     if (!acc[type]) {

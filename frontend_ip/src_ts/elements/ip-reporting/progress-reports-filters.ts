@@ -38,10 +38,16 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
   filters!: any;
 
   @property({type: Array, attribute: false})
-  statuses: any[] = this._localizeStatuses();
+  statuses: any[] = [];
 
   @property({type: Array, attribute: false})
-  types: any[] = this._localizeTypes();
+  types: any[] = [];
+
+  constructor() {
+    super();
+    this.statuses = this._localizeStatuses();
+    this.types = this._localizeTypes();
+  }
 
   render() {
     return html`

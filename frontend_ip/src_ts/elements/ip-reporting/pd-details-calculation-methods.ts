@@ -324,8 +324,8 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
   }
 
   _confirmIntent() {
-    return new Promise(async (resolve, reject) => {
-      const confirmed = await openDialog({
+    return new Promise((resolve, reject) => {
+      openDialog({
         dialog: 'are-you-sure',
         dialogData: {
           content:
@@ -336,14 +336,12 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
           cancelBtnText: translate('CANCEL')
         }
       }).then(({confirmed}) => {
-        return confirmed;
+        if (confirmed) {
+          return resolve(true);
+        } else {
+          return reject();
+        }
       });
-
-      if (confirmed) {
-        return resolve(true);
-      } else {
-        return reject();
-      }
     });
   }
 

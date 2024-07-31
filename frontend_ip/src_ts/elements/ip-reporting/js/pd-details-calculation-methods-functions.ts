@@ -1,7 +1,7 @@
 import Endpoints from '../../../endpoints';
 
 export function computeIndicatorsUrl(locationId: string, pdId: string) {
-  return (locationId && pdId) ? Endpoints.calculationMethods(locationId, pdId) : '';
+  return locationId && pdId ? Endpoints.calculationMethods(locationId, pdId) : '';
 }
 
 export function computeFormattedData(data: any) {

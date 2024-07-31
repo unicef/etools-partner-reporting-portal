@@ -24,7 +24,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
   queryParams!: any;
 
   @property({type: Array})
-  statuses: any[] = this._initStatuses();
+  statuses: any[] = [];
 
   @property({type: Object})
   filters: any[] = [];
@@ -61,6 +61,11 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
         </div>
       </filter-list>
     `;
+  }
+
+  constructor() {
+    super();
+    this.statuses = this._initStatuses();
   }
 
   updated(changedProperties) {

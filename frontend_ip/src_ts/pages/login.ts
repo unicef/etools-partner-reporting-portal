@@ -98,7 +98,7 @@ export class PageLogin extends connect(store)(LitElement) {
   `;
 
   @property({type: Boolean})
-  isDesktop: boolean = false;
+  isDesktop = false;
 
   @property({type: Number})
   logoSize = 120;

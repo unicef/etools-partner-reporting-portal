@@ -39,7 +39,7 @@ export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {
   user: any = {};
 
   @property({type: Boolean})
-  loading: boolean = false;
+  loading = false;
 
   render() {
     return html`

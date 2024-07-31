@@ -1,4 +1,4 @@
-import { BASE_PATH } from '../../etools-prp-common/config';
+import {BASE_PATH} from '../../etools-prp-common/config';
 import Constants from '../../etools-prp-common/constants';
 import {Workspace} from '../../typings/entities.types';
 
