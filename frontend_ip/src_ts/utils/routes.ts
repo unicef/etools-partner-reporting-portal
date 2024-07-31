@@ -16,17 +16,6 @@ EtoolsRouter.init({
   redirectedPathsToSubpageLists: []
 });
 
-// /ip/ -> app-shell.ts
-// /ip/app/ -> app-shell.ts > app.ts
-// /ip/app/ip-reporting -> app-shell.ts > app.ts > ip-reporting.ts
-
-// /ip/{countryCode}/{module}/{page}  -> app-shell.ts > pages/app.ts > pages/app/{module}.ts > pages/app/ip-reporting/{page}.ts
-//  /ip/ -> /ip/app/RWA -> /ip/app/RWA/ip-reporting -> /ip/app/RWA/ip-reproting/overview
-
-// ip
-// unauthorized
-// not-found'
-// login-token
 EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
   return {
     routeName: 'login',
@@ -172,7 +161,7 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
   )
   .addRoute(
     new RegExp(
-      `^${routeParamRegex}\\/${routeParamRegex}\\/pd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$`
+      `^${routeParamRegex}\\/${routeParamRegex}\\/pd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$` // eslint-disable-line
     ),
     (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
       return {

@@ -21,7 +21,8 @@ export class ReportFilters extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   filters: any[] = [];
 
-  static styles = [layoutStyles,
+  static styles = [
+    layoutStyles,
     css`
       :host {
         display: block;
@@ -51,10 +52,7 @@ export class ReportFilters extends UtilsMixin(connect(store)(LitElement)) {
         </div>
         <div class="row padding-v">
           <div class="col-12">
-            <checkbox-filter
-              name="incomplete"
-              .value="${this._withDefault(this.queryParams?.incomplete, '')}"
-            >
+            <checkbox-filter name="incomplete" .value="${this._withDefault(this.queryParams?.incomplete, '')}">
               <span class="checkbox-label">${translate('SHOW_INCOMPLETE_ONLY')}</span>
             </checkbox-filter>
           </div>

@@ -31,7 +31,7 @@ export class EtoolsPrpCurrency extends LitElement {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    
+
     if (changedProperties.has('currency')) {
       this.meta = this._computeMeta(this.currency);
     }

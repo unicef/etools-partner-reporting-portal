@@ -11,7 +11,6 @@ import '../../etools-prp-common/elements/list-placeholder';
 import './pd-reports-report-title';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-//import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
@@ -82,6 +81,10 @@ export class ProgressReportsList extends SortingMixin(
     }
   }
 
+  paginatorChanged() {
+    this._paginatorChanged();
+  }
+
   render() {
     return html`
       ${tableStyles}
@@ -114,16 +117,6 @@ export class ProgressReportsList extends SortingMixin(
           </etools-data-table-column>
         </etools-data-table-header>
 
-        <etools-data-table-footer
-          .pageSize="${this.paginator.page_size}"
-          .pageNumber="${this.paginator.page}"
-          .totalResults="${this.paginator.count}"
-          .visibleRange="${this.paginator.visible_range}"
-          @visible-range-changed="${this.visibleRangeChanged}"
-          @page-size-changed="${this._pageSizeChanged}"
-          @page-number-changed="${this._pageNumberChanged}"
-        >
-        </etools-data-table-footer>
         ${(this.data || []).map(
           (report: any) => html`
             <etools-data-table-row no-collapse>
@@ -163,8 +156,8 @@ export class ProgressReportsList extends SortingMixin(
           .totalResults="${this.paginator.count}"
           .visibleRange="${this.paginator.visible_range}"
           @visible-range-changed="${this.visibleRangeChanged}"
-          @page-size-changed="${this._pageSizeChanged}"
-          @page-number-changed="${this._pageNumberChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
         >
         </etools-data-table-footer>
         <etools-loading .active="${this.loading}"></etools-loading>

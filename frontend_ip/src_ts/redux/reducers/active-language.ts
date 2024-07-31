@@ -1,7 +1,7 @@
 import Constants from '../../etools-prp-common/constants';
 
 export class ActiveLanguageState {
-  activeLanguage: string = '';
+  activeLanguage = '';
 }
 
 const INITIAL_STATE = new ActiveLanguageState();

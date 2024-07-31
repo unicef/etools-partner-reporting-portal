@@ -2,9 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
 import '@unicef-polymer/etools-unicef/src/etools-button/etools-button.js';
-import '../etools-prp-common/elements/etools-logo.js';
 import Endpoints from '../endpoints.js';
-import ResponsiveMixin from '../etools-prp-common/mixins/responsive-mixin.js';
 import '../etools-prp-common/elements/page-title.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../redux/store.js';
@@ -12,9 +10,10 @@ import {translate} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import {BASE_PATH} from '../etools-prp-common/config.js';
+import {etoolsLogo} from '../etools-prp-common/elements/etools-logo.js';
 
 @customElement('page-login')
-export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
+export class PageLogin extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -57,13 +56,13 @@ export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
 
     .login-buttons {
       padding: 3em 1em;
-      background: var(--theme-primary-color);
+      color: black;
     }
 
     .login-buttons-label {
       font-size: var(--paper-font-headline_-_font-size);
       margin: 0 0 0.75em;
-      color: var(--theme-primary-text-color-light);
+      color: black;
       text-align: center;
     }
 
@@ -92,7 +91,14 @@ export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
       color: var(--paper-deep-orange-a700);
       font-size: 1.2em;
     }
+
+    #logo {
+      fill: black;
+    }
   `;
+
+  @property({type: Boolean})
+  isDesktop = false;
 
   @property({type: Number})
   logoSize = 120;
@@ -121,17 +127,11 @@ export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
     return html`
       <page-title title="${translate('SIGN_IN')}"></page-title>
 
-      <etools-media-query
-        query="${this.desktopLayoutQuery}"
-        query-matches="${this.isDesktop}"
-        @query-matches-changed="${this._handleMediaQuery}"
-      ></etools-media-query>
-
       <div class="login-container">
         <div class="login-container-inner">
           <etools-content-panel no-header>
             <div class="header">
-              <etools-logo .size="${this.logoSize}" text-color="#233944"></etools-logo>
+              ${etoolsLogo}
               <h1>Partner Reporting Portal</h1>
             </div>
             <div class="login-buttons">
@@ -151,7 +151,7 @@ export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
                   ? html` <li><p class="error-token">Unable to login, invalid token, please try again.</p></li> `
                   : html``}
                 <li>
-                  <etools-button id="login-button" @click="${this._redirectAuth}" variant="white"
+                  <etools-button id="login-button" @click="${this._redirectAuth}" variant="primary"
                     >Sign in</etools-button
                   >
                 </li>
@@ -205,10 +205,5 @@ export class PageLogin extends ResponsiveMixin(connect(store)(LitElement)) {
 
   _redirectAuth() {
     window.location.href = Endpoints.login();
-  }
-
-  private _handleMediaQuery(event: CustomEvent) {
-    this.isDesktop = event.detail.value;
-    this.logoSize = this.isDesktop ? 180 : 120;
   }
 }

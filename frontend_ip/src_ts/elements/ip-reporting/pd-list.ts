@@ -167,9 +167,24 @@ export class PdList extends RoutingMixin(
 
         <list-placeholder .data="${this.data}" .loading="${this.loading}"> </list-placeholder>
 
+        <etools-data-table-footer
+          .pageSize="${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
+        >
+        </etools-data-table-footer>
+
         <etools-loading ?active="${this.loading}"></etools-loading>
       </etools-content-panel>
     `;
+  }
+
+  paginatorChanged() {
+    this._paginatorChanged();
   }
 
   _computeFundsReceivedToDateCurrency(percentage) {

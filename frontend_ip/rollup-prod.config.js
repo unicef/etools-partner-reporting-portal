@@ -34,9 +34,9 @@ const copyConfig = {
     { src: 'manifest.json', dest: 'src' },
     { src: 'version.json', dest: 'src' },
     { src: 'upgrade-browser.html', dest: 'src' },
-
     { src: 'assets', dest: 'src' },
-    { src: 'index.html', dest: 'src' }
+    { src: 'index.html', dest: 'src' },
+    { src: 'node_modules/numeral/min', dest: 'src/node_modules/numeral' }
   ]
 };
 

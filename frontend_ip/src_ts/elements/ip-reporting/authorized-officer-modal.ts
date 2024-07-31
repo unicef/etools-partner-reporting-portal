@@ -129,7 +129,7 @@ export class AuthorizedOfficerModal extends RoutingMixin(UtilsMixin(connect(stor
       body: this.postBody
     })
       .then((res: any) => {
-        //TODO , should we redirect??
+        // TODO , should we redirect??
         // const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
         store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
         this.busy = false;

@@ -36,7 +36,12 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
   queryParams!: any;
 
   @property({type: Array})
-  pd_statuses: any[] = this._initStatuses();
+  pd_statuses: any[] = [];
+
+  constructor() {
+    super();
+    this.pd_statuses = this._initStatuses();
+  }
 
   render() {
     return html`

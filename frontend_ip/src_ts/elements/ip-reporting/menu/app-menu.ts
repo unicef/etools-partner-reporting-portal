@@ -12,7 +12,6 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
 import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
 import {translate} from 'lit-translate';
-import PageNavMixin from '../../../etools-prp-common/mixins/page-nav-mixin';
 import {RootState} from '../../../typings/redux.types';
 
 /**
@@ -21,7 +20,7 @@ import {RootState} from '../../../typings/redux.types';
  * @customElement
  */
 @customElement('app-menu')
-export class AppMenu extends RoutingMixin(MatomoMixin(PageNavMixin(UtilsMixin(connect(store)(LitElement))))) {
+export class AppMenu extends RoutingMixin(MatomoMixin(UtilsMixin(connect(store)(LitElement)))) {
   static get styles() {
     return [navMenuStyles];
   }
@@ -176,7 +175,7 @@ export class AppMenu extends RoutingMixin(MatomoMixin(PageNavMixin(UtilsMixin(co
       this.overviewUrl = this.buildUrl(this._baseUrl, 'overview');
       this.pdUrl = this.buildUrl(this._baseUrl, 'pd');
       this.progressReportsUrl = this.buildUrl(this._baseUrl, 'progress-reports');
-      this.indicatorsReportsUrl = this.buildUrl(this._baseUrl, 'indicators');      
+      this.indicatorsReportsUrl = this.buildUrl(this._baseUrl, 'indicators');
     }
   }
 
