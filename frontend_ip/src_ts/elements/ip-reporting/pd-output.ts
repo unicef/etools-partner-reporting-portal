@@ -43,6 +43,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       }
       .card-container {
         width: 100%;
+        margin-bottom: 25px;
       }
       .header {
         padding: 25px;
@@ -51,9 +52,6 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
         color: var(--theme-primary-color);
       }
       labelled-item {
-        margin-bottom: 25px;
-      }
-      .indicator:not(:last-child) {
         margin-bottom: 25px;
       }
       .indicator-toggle {

@@ -112,7 +112,7 @@ export class PdList extends RoutingMixin(
             <etools-data-table-row no-collapse>
               <div slot="row-data">
                 <div class="col-data col-2 table-cell table-cell--text truncate">
-                  <sl-tooltip .content="${pd.title}" hoist>
+                  <sl-tooltip placement="top-end" .content="${pd.title}" hoist>
                     <a
                       @click="${this.trackAnalytics}"
                       tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
