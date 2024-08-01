@@ -171,7 +171,7 @@
   --list-disabled-icon-color: var(--light-disabled-icon-color);
 
   /* etools-panel styles */
-  --ecp-header-color: var(--primary-text-color);
+  --ecp-header-color: var(--light-primary-text-color);
 
   --toolbar-height: 60px;
   --side-bar-scrolling: visible;
