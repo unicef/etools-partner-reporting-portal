@@ -267,16 +267,16 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       this.mode = state.programmeDocumentReports.current.mode;
     }
 
-    if (this.reportId !== state.programmeDocumentReports.current.id) {
-      this.reportId = state.programmeDocumentReports.current.id;
+    if (this.reportId !== state.programmeDocumentReports?.current?.id) {
+      this.reportId = state.programmeDocumentReports?.current?.id;
     }
 
     if (this.pdId !== state.programmeDocuments.current) {
       this.pdId = state.programmeDocuments.current;
     }
 
-    if (this.locationId !== state.location.id) {
-      this.locationId = state.location.id;
+    if (this.locationId !== state.location?.id) {
+      this.locationId = state.location?.id;
     }
   }
 
