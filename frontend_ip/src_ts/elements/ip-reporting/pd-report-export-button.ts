@@ -1,48 +1,61 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/paper-button/paper-button.js';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
+import {RootState} from '../../typings/redux.types';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- */
-class PdReportExportButton extends ReduxConnectedElement {
-  public static get template() {
+@customElement('pd-report-export-button')
+export class PdReportExportButton extends connect(store)(LitElement) {
+  static styles = [
+    css`
+      a {
+        color: var(--theme-primary-color);
+        text-decoration: none;
+      }
+
+      etools-button {
+        text-transform: uppercase;
+      }
+    `
+  ];
+
+  @property({type: String})
+  locationId!: string;
+
+  @property({type: String})
+  reportId!: string;
+
+  @property({type: String})
+  fileUrl!: string;
+
+  render() {
     return html`
       ${buttonsStyles}
-      <style>
-        a {
-          color: var(--theme-primary-color);
-          text-decoration: none;
-        }
-
-        paper-button {
-          text-transform: uppercase;
-        }
-      </style>
-
-      <a href="[[fileUrl]]" target="_blank" tabindex="-1">
-        <paper-button class="btn-primary">Download report in standard template format</paper-button>
+      <a href="${this.fileUrl}" target="_blank" tabindex="-1">
+        <etools-button variant="primary">Download report in standard template format</etools-button>
       </a>
     `;
   }
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
+  stateChanged(state: RootState) {
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
-  reportId!: string;
+    if (this.reportId !== state.programmeDocumentReports.current.id) {
+      this.reportId = state.programmeDocumentReports.current.id;
+    }
+  }
 
-  @property({type: String, computed: '_computeFileUrl(locationId, reportId)'})
-  fileUrl!: string;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  _computeFileUrl = Endpoints.reportExport.bind(Endpoints);
+    if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
+      this.fileUrl = Endpoints.reportExport(this.locationId, this.reportId);
+    }
+  }
 }
-
-window.customElements.define('pd-report-export-button', PdReportExportButton);
 
 export {PdReportExportButton as PdReportExportButtonEl};

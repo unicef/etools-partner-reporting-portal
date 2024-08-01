@@ -29,9 +29,9 @@ export const pdIndicatorsFetch = function (indicatorsThunk: any, pdId: string) {
   return function (dispatch: any) {
     dispatch(pdIndicatorsLoadingStart(pdId));
 
-    return indicatorsThunk()
+    return indicatorsThunk
       .then(function (res: any) {
-        dispatch(pdIndicatorsSet(pdId, res.data));
+        dispatch(pdIndicatorsSet(pdId, res));
         dispatch(pdIndicatorsLoadingStop(pdId));
       })
       .catch(function (err: any) {
@@ -46,9 +46,9 @@ export const pdIndicatorsUpdate = function (updateThunk: any, pdId: string) {
   return function (dispatch: any) {
     dispatch(pdIndicatorsLoadingStart(pdId));
 
-    return updateThunk()
+    return updateThunk
       .then(function (res: any) {
-        dispatch(pdIndicatorsSet(pdId, res.data));
+        dispatch(pdIndicatorsSet(pdId, res));
         dispatch(pdIndicatorsLoadingStop(pdId));
       })
       .catch(function (err: any) {

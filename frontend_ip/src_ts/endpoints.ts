@@ -22,7 +22,7 @@ const Endpoints = {
   },
 
   programmeDocuments(locationId: string) {
-    return this._buildUrl('/unicef/' + locationId + '/programme-document/?page_size=all');
+    return this._buildUrl('/unicef/' + locationId + '/programme-document/');
   },
 
   programmeDocumentDetail(locationId: string, pdId: string) {

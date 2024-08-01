@@ -1,9 +1,8 @@
 import Constants from '../../etools-prp-common/constants';
 import {combineReducers} from 'redux';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 export class DisaggregationsState {
-  byIndicator: GenericObject = {};
+  byIndicator: any = {};
 }
 
 export const Disaggregations = combineReducers({
@@ -14,7 +13,7 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_DISAGGREGATIONS:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         change[action.indicatorId] = action.data;
 
@@ -23,7 +22,7 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
 
     case Constants.SET_DISAGGREGATIONS_FOR_LOCATION:
       return (function () {
-        const newState: GenericObject = Object.assign({}, state);
+        const newState: any = Object.assign({}, state);
         let locations;
         let index;
 
@@ -43,14 +42,14 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
 
     case Constants.SET_PROGRESS_FOR_LOCATION:
       return (function () {
-        const newState: GenericObject = Object.assign({}, state);
+        const newState: any = Object.assign({}, state);
         let locations;
         let index;
 
         try {
           locations = newState[action.indicatorId].indicator_location_data;
 
-          index = locations.findIndex(function (item: GenericObject) {
+          index = locations.findIndex(function (item: any) {
             return item.location.id === action.locationId;
           });
 

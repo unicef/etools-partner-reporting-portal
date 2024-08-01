@@ -1,12 +1,8 @@
-FROM node:12.22.7-alpine3.12
+FROM node:14.21-alpine3.16
 RUN apk update
 RUN apk add --update bash
 
 RUN apk add git
-RUN npm install -g --unsafe-perm polymer-cli
-RUN npm install -g gulp
 RUN npm install -g typescript@4.x
 
 WORKDIR /code
-
-CMD ["npm", "run", "devPoly3"]

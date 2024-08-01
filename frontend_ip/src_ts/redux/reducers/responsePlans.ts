@@ -1,10 +1,9 @@
 import {combineReducers} from 'redux';
 import Constants from '../../etools-prp-common/constants';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 export class ResponsePlansState {
   all = [];
-  current = null;
+  current: any = null;
   currentID = '';
 }
 
@@ -14,7 +13,7 @@ export const ResponsePlans = combineReducers({
   currentID: currentResponsePlanIdReducer
 });
 
-function allResponsePlansReducer(state: GenericObject[] = [], action: any) {
+function allResponsePlansReducer(state: any[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_RESPONSE_PLANS:
       return action.plans;

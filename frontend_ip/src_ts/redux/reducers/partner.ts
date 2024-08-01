@@ -1,8 +1,7 @@
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Constants from '../../etools-prp-common/constants';
 
 export class PartnerState {
-  current: GenericObject = {};
+  current: any = {};
 }
 
 const INITIAL_STATE = new PartnerState();

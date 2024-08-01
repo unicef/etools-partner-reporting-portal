@@ -38,10 +38,10 @@ export const pdReportsAttachmentsSync = function (attachmentsThunk: any, reportI
   return function (dispatch: any) {
     dispatch(pdReportsAttachmentsLoadingStart(reportId));
 
-    return attachmentsThunk()
+    return attachmentsThunk
       .then(function (res: any) {
         dispatch(pdReportsAttachmentsLoadingStop(reportId));
-        dispatch(pdReportsAttachmentsSet(reportId, res.data, res));
+        dispatch(pdReportsAttachmentsSet(reportId, res, res));
       })
       .catch(function (err: any) {
         dispatch(pdReportsAttachmentsLoadingStop(reportId));

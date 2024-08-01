@@ -7,7 +7,7 @@ export const llosAll = createSelector(
   function (state: RootState) {
     return programmeDocumentReportsCurrent(state);
   },
-  function (currentReport) {
+  function (currentReport: any) {
     if (!Object.keys(currentReport).length) {
       return [];
     }

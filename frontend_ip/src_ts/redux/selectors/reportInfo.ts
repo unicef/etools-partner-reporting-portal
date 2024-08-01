@@ -1,6 +1,5 @@
 import {RootState} from '../../typings/redux.types';
 import {createSelector} from 'reselect';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 const keys = [
   'partner_contribution_to_date',
@@ -36,7 +35,7 @@ export const reportInfoCurrent = createSelector(
         return Number(report.id) === Number(reportId);
       })[0] || {};
 
-    return keys.reduce(function (acc: GenericObject, curr: string) {
+    return keys.reduce(function (acc: any, curr: string) {
       acc[curr] = report[curr];
 
       return acc;

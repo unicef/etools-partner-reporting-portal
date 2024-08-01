@@ -1,110 +1,118 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/polymer/lib/elements/dom-if';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/etools-prp-permissions';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icon/iron-icon';
+import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 import {
   shouldDisplayLink,
   getReportTitleFull,
   getReportTitle,
   getReportLink
 } from './js/pd-reports-report-title-functions';
+import {buildUrl} from '../../etools-prp-common/utils/util';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdReportsReportTitle extends LocalizeMixin(
-  ProgressReportUtilsMixin(UtilsMixin(RoutingMixin(ReduxConnectedElement)))
-) {
-  public static get template() {
+@customElement('pd-reports-report-title')
+export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(LitElement)) {
+  static styles = css`
+    .final-badge {
+      display: inline-block;
+      border-radius: 1px;
+      padding: 1px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      background-color: var(--sl-color-neutral-300);
+      margin-left: 5px;
+      font-weight: bold;
+    }
+    .link-mode-icon {
+      height: 15px;
+      margin-right: 2px;
+    }
+    a {
+      color: var(--primary-color);
+    }
+  `;
+
+  @property({type: Object})
+  permissions!: any;
+
+  @property({type: Object})
+  report!: any;
+
+  @property({type: String})
+  baseUrl!: string;
+
+  @property({type: Boolean, attribute: 'display-link'})
+  displayLink = false;
+
+  @property({type: Boolean, attribute: 'display-link-icon'})
+  displayLinkIcon = false;
+
+  @property({type: Boolean, attribute: 'show-link'})
+  showLink = false;
+
+  render() {
     return html`
-      <style>
-        .final-badge {
-          display: inline-block;
-          border-radius: 1px;
-          padding: 1px 6px;
-          font-size: 10px;
-          text-transform: uppercase;
-          background-color: var(--paper-grey-300);
-          margin-left: 5px;
-          font-weight: bold;
-        }
-        .link-mode-icon {
-          height: 15px;
-          margin-right: 2px;
-        }
-        a {
-          color: var(--primary-color);
-        }
-      </style>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
-      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
-
-      <template is="dom-if" if="[[showLink]]" restamp="true">
-        <a href="[[_getReportLink(report, permissions)]]">
-          <template is="dom-if" if="[[displayLinkIcon]]" restamp="true">
-            <iron-icon class="link-mode-icon" icon="[[_getReportIcon(report, permissions)]]"></iron-icon>
-          </template>
-          [[_getReportTitle(report, localize)]]
-        </a>
-      </template>
-      <template is="dom-if" if="[[!showLink]]" restamp="true"> [[_getReportTitleFull(report, localize)]] </template>
-      <template is="dom-if" if="[[_isFinalReport(report)]]" restamp="true">
-        <div class="final-badge">final</div>
-      </template>
+      ${this.showLink
+        ? html`
+            <a href="${this._getReportLink(this.report, this.permissions, this.baseUrl)}">
+              ${this.displayLinkIcon
+                ? html`<etools-icon
+                    class="link-mode-icon"
+                    name="${this._getReportIcon(this.report, this.permissions)}"
+                  ></etools-icon>`
+                : html``}
+              ${this._getReportTitle(this.report)}
+            </a>
+          `
+        : html`${this._getReportTitleFull(this.report)}`}
+      ${this._isFinalReport(this.report) ? html`<div class="final-badge">final</div>` : html``}
     `;
   }
 
-  @property({type: Object})
-  permissions!: GenericObject;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: Object})
-  report!: GenericObject;
-
-  @property({type: Boolean})
-  displayLink = false;
-
-  @property({type: Boolean})
-  displayLinkIcon = false;
-
-  @property({type: Boolean, computed: '_shouldDisplayLink(displayLink, report, permissions)'})
-  showLink!: boolean;
-
-  _shouldDisplayLink(displayLink: string, report: GenericObject, permissions: GenericObject) {
-    if (!permissions) {
-      return;
+    if (
+      changedProperties.has('displayLink') ||
+      changedProperties.has('report') ||
+      changedProperties.has('permissions')
+    ) {
+      this.showLink = !!this._shouldDisplayLink();
     }
-    return shouldDisplayLink(displayLink, report, permissions, this._canNavigateToReport);
   }
 
-  _getReportTitleFull(report: GenericObject, localize: (x: string) => string) {
-    return report ? getReportTitleFull(report, localize) : '';
+  _shouldDisplayLink() {
+    if (!this.permissions) {
+      return false;
+    }
+
+    return shouldDisplayLink(this.displayLink, this.report, this.permissions, this._canNavigateToReport);
   }
 
-  _getReportTitle(report: GenericObject, localize: (x: string) => string) {
-    return getReportTitle(report, localize);
+  _getReportTitleFull(report: any) {
+    return report ? getReportTitleFull(report) : '';
   }
 
-  _getReportLink(report: GenericObject, permissions: GenericObject) {
-    if (!permissions) {
-      return;
+  _getReportTitle(report: any) {
+    return getReportTitle(report);
+  }
+
+  _getReportLink(report: any, permissions: any, baseUrl: any) {
+    if (!permissions || !report || !baseUrl) {
+      return '';
     }
     const suffix = this._getMode(report, permissions);
-    return getReportLink(report, suffix, this.buildUrl, this._baseUrl);
+    return getReportLink(report, suffix, buildUrl, baseUrl);
   }
 
-  _getReportIcon(report: GenericObject, permissions: GenericObject) {
+  _getReportIcon(report: any, permissions: any) {
     if (!permissions) {
       return 'icons:visibility';
     }
@@ -112,7 +120,5 @@ class PdReportsReportTitle extends LocalizeMixin(
     return suffix === 'view' ? 'icons:visibility' : 'icons:create';
   }
 }
-
-window.customElements.define('pd-reports-report-title', PdReportsReportTitle);
 
 export {PdReportsReportTitle as PdReportsReportTitleEl};

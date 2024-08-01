@@ -1,66 +1,68 @@
-import {html, PolymerElement} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import {LitElement, html, css} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin FilterMixin
- */
-class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-        #field {
-          width: 100%;
-        }
-      </style>
-
-      <etools-dropdown
-        id="field"
-        label="[[label]]"
-        options="[[data]]"
-        option-value="id"
-        option-label="[[optionLabel]]"
-        selected="[[value]]"
-        disabled="[[disabled]]"
-        selected-item="{{selectedItem}}"
-        trigger-value-change-event
-        on-etools-selected-item-changed="_handleDropdownChange"
-      >
-      </etools-dropdown>
-    `;
-  }
+@customElement('searchable-dropdown-filter')
+export class SearchableDropdownFilter extends FilterMixin(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+    #field {
+      width: 100%;
+    }
+  `;
 
   @property({type: Object})
-  selectedItem!: GenericObject;
+  selectedItem: any = {};
 
   @property({type: Boolean})
-  disabled!: boolean;
+  disabled = false;
 
   @property({type: String})
   value = '-1';
 
   @property({type: String})
-  name!: string;
+  name = '';
 
   @property({type: String})
-  label!: string;
+  label = '';
 
-  @property({type: String})
+  @property({type: String, attribute: 'option-label'})
   optionLabel = 'title';
 
-  @property({type: Array, observer: '_handleData'})
-  data = [];
+  @property({type: Array})
+  data: any[] = [];
 
-  _handleDropdownChange(event: CustomEvent) {
-    if (event.detail.selectedItem) {
+  render() {
+    return html`
+      <etools-dropdown
+        id="field"
+        .label="${this.label}"
+        .options="${this.data}"
+        .optionValue="${'id'}"
+        .optionLabel="${this.optionLabel}"
+        .selected="${this.value}"
+        .disabled="${this.disabled}""
+        trigger-value-change-event
+        @etools-selected-item-changed="${this._handleDropdownChange}"
+      >
+      </etools-dropdown>
+    `;
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('data')) {
+      this._handleData(this.data);
+    }
+  }
+
+  _handleDropdownChange(event) {
+    if (event.detail.selectedItem && Object.keys(event.detail.selectedItem).length) {
       setTimeout(() => {
         fireEvent(this, 'filter-changed', {
           name: this.name,
@@ -70,11 +72,11 @@ class SearchableDropdownFilter extends FilterMixin(PolymerElement) {
     }
   }
 
-  _handleData(data: any) {
+  _handleData(data) {
     if (data.length) {
       this._filterReady();
     }
   }
 }
 
-window.customElements.define('searchable-dropdown-filter', SearchableDropdownFilter);
+export {SearchableDropdownFilter as SearchableDropdownFilterEl};

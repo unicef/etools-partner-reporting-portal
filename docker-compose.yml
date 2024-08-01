@@ -175,7 +175,7 @@ services:
     build:
       context: ./frontend_ip
       dockerfile: ./Dockerfile-dev
-    image: etoolsdev/etools-ip:dev
+    image: etoolsdev/etools-ip:rollup
     container_name: prp_ip_local
     labels:
       - traefik.http.routers.prp_ip.rule=PathPrefix(`/ip/`) && Host(`prp.localhost`)
@@ -185,6 +185,8 @@ services:
       - traefik.http.routers.prp_ip.service=prp_ip
       - traefik.enable=true
       - project.label=prp
+    ports:
+      - "3001:3001"
     volumes:
       - './frontend_ip:/code'
-    command: ${FE_COMMAND:-sh -c "npm run devPoly3"}
+    command: ${FE_COMMAND:-sh -c "npm start"}

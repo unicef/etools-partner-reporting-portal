@@ -1,5 +1,3 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-
-export function getReportTitle(report: GenericObject) {
+export function getReportTitle(report: any) {
   return report.report_type + report.report_number;
 }

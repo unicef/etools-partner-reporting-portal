@@ -1,11 +1,10 @@
 import Constants from '../../etools-prp-common/constants';
 import {combineReducers} from 'redux';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 export class ProgrammeDocumentReportsState {
-  byPD: GenericObject = {};
-  countByPD: GenericObject = {};
-  allIds: GenericObject[] = [];
+  byPD: any = {};
+  countByPD: any = {};
+  allIds: any[] = [];
   current = {
     id: '',
     mode: '',
@@ -28,7 +27,7 @@ function reportsByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         change[action.pdId] = action.data;
 
@@ -37,10 +36,10 @@ function reportsByPDReducer(state = {}, action: any) {
 
     case Constants.SET_PD_REPORT:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         // @ts-ignore
-        const reports: GenericObject[] = state[action.pdId] || [];
+        const reports: any[] = state[action.pdId] || [];
 
         const index = reports.findIndex(function (report) {
           return Number(report.id) === Number(action.data.id);
@@ -59,10 +58,10 @@ function reportsByPDReducer(state = {}, action: any) {
 
     case Constants.UPDATE_PD_REPORT:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         // @ts-ignore
-        change[action.pdId] = (state[action.pdId] || []).map(function (report: GenericObject) {
+        change[action.pdId] = (state[action.pdId] || []).map(function (report: any) {
           return Number(report.id) === Number(action.reportId) ? Object.assign({}, report, action.data) : report;
         });
 
@@ -77,16 +76,16 @@ function reportsByPDReducer(state = {}, action: any) {
          * of them, to be consistent :(
          */
 
-        const change: GenericObject = {};
+        const change: any = {};
 
         // @ts-ignore
-        change[action.pdId] = state[action.pdId].map(function (report: GenericObject) {
+        change[action.pdId] = state[action.pdId].map(function (report: any) {
           if (Number(report.id) !== Number(action.reportId)) {
             return report;
           }
 
           return Object.assign({}, report, {
-            indicator_reports: report.indicator_reports.map(function (indicatorReport: GenericObject) {
+            indicator_reports: report.indicator_reports.map(function (indicatorReport: any) {
               if (Number(indicatorReport.reportable.object_id) !== Number(action.reportableId)) {
                 return indicatorReport;
               }
@@ -111,7 +110,7 @@ function reportsCountByPDReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS_COUNT:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         change[action.pdId] = action.count;
 
@@ -123,7 +122,7 @@ function reportsCountByPDReducer(state = {}, action: any) {
   }
 }
 
-function pdIdsReducer(state: GenericObject[] = [], action: any) {
+function pdIdsReducer(state: any[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_PD_REPORTS:
       return (function () {

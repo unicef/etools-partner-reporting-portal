@@ -1,52 +1,56 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../../redux/store';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
 import {llosAll} from '../../../redux/selectors/llos';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import {RootState} from '../../../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- */
-class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
+@customElement('reportable-filter')
+export class ReportableFilters extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
 
+  @property({type: Array})
+  options: any[] = [];
+
+  @property({type: String})
+  value = '';
+
+  @property({type: Array})
+  data: any[] = [];
+
+  render() {
+    return html`
       <searchable-dropdown-filter
         class="item"
-        label="[[localize('pd_output')]]"
+        .label="${translate('PD_OUTPUT')}"
         name="llo"
-        value="[[value]]"
-        data="[[options]]"
+        .value="${this.value}"
+        .data="${this.options}"
       >
       </searchable-dropdown-filter>
     `;
   }
 
-  @property({type: Array, computed: '_computeOptions(data)'})
-  options!: any;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: String})
-  value!: string;
-
-  @property({type: Array, computed: '_llosAll(rootState)'})
-  data = [];
-
-  _llosAll(rootState: RootState) {
-    return llosAll(rootState);
+    if (changedProperties.has('data')) {
+      this.options = this._computeOptions();
+    }
   }
 
-  _computeOptions(data: any) {
-    const other = data.map((item: any) => {
+  stateChanged(state: RootState) {
+    this.data = llosAll(state);
+  }
+
+  _computeOptions() {
+    const other = this.data?.map((item: any) => {
       return {
         id: String(item.id),
         title: item.title
@@ -62,4 +66,4 @@ class ReportableFilters extends LocalizeMixin(ReduxConnectedElement) {
   }
 }
 
-window.customElements.define('reportable-filter', ReportableFilters);
+export {ReportableFilters as ReportableFiltersEl};

@@ -1,10 +1,9 @@
 import {combineReducers} from 'redux';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Constants from '../../etools-prp-common/constants';
 
 export class ProgrammeDocumentReportsAttachmentsState {
-  byReport: GenericObject = {};
-  pendingByReport: GenericObject = {};
+  byReport: any = {};
+  pendingByReport: any = {};
 }
 
 export const ProgrammeDocumentReportsAttachments = combineReducers({
@@ -13,7 +12,7 @@ export const ProgrammeDocumentReportsAttachments = combineReducers({
 });
 
 function updateForReport(state: any, reportId: any, newValue: any) {
-  const change: GenericObject = {};
+  const change: any = {};
   let isNew = true;
 
   if (newValue instanceof Array === true || newValue instanceof Boolean === true) {

@@ -1,4 +1,3 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../endpoints';
 
 export function computeUpdateUrl(locationId: string, reportId: string) {
@@ -6,6 +5,6 @@ export function computeUpdateUrl(locationId: string, reportId: string) {
 }
 
 // @ts-ignore
-export function computeMode(mode: string, overrideMode: string, report: any, permissions: GenericObject) {
+export function computeMode(mode: string, overrideMode: string, report: any, permissions: any) {
   return permissions && permissions.savePdReport ? overrideMode || mode : 'view';
 }

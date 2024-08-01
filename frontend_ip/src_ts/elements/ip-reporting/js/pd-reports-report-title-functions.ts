@@ -1,40 +1,40 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import {get as getTranslation} from 'lit-translate';
 
 export function shouldDisplayLink(
-  displayLink: string,
-  report: GenericObject,
-  permissions: GenericObject,
+  displayLink: boolean,
+  report: any,
+  permissions: any,
   fn: (x?: any, y?: any) => boolean
 ) {
   return displayLink && fn(permissions, report);
 }
 
-export function getReportTitleFull(report: GenericObject, localize: (x: string) => string) {
+export function getReportTitleFull(report: any) {
   let title = '';
   if (report.report_type === 'QPR') {
-    title += localize('qpr_short') + report.report_number + ' ' + localize('qpr_long');
+    title += getTranslation('qpr_short') + report.report_number + ' ' + getTranslation('qpr_long');
   } else if (report.report_type === 'HR') {
-    title += localize('hr_short') + report.report_number + ' ' + localize('hr_long');
+    title += getTranslation('hr_short') + report.report_number + ' ' + getTranslation('hr_long');
   } else if (report.report_type === 'SR') {
-    title += localize('sr_short') + report.report_number + ' ' + localize('sr_long');
+    title += getTranslation('sr_short') + report.report_number + ' ' + getTranslation('sr_long');
   }
   return title;
 }
 
-export function getReportTitle(report: GenericObject, localize: (x: string) => string) {
+export function getReportTitle(report: any) {
   let title = '';
   if (report.report_type === 'QPR') {
-    title += localize('qpr_short') + report.report_number;
+    title += getTranslation('qpr_short') + report.report_number;
   } else if (report.report_type === 'HR') {
-    title += localize('hr_short') + report.report_number;
+    title += getTranslation('hr_short') + report.report_number;
   } else if (report.report_type === 'SR') {
-    title += localize('sr_short') + report.report_number;
+    title += getTranslation('sr_short') + report.report_number;
   }
   return title;
 }
 
 export function getReportLink(
-  report: GenericObject,
+  report: any,
   suffix: string,
   buildUrlFn: (baseUrl: string, tail: string) => string,
   baseUrl: string

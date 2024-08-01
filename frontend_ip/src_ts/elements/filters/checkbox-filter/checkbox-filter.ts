@@ -1,78 +1,67 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/paper-checkbox/paper-checkbox';
+import {LitElement, html, css} from 'lit';
+import '@unicef-polymer/etools-unicef/src/etools-checkbox/etools-checkbox';
+import {property, customElement} from 'lit/decorators.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {property} from '@polymer/decorators';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin FilterMixin
- */
-class CheckboxFilter extends UtilsMixin(FilterMixin(PolymerElement)) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
+@customElement('checkbox-filter')
+export class CheckboxFilter extends UtilsMixin(FilterMixin(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
 
-        ::slotted() .checkbox-label {
-          font-size: 12px;
-        }
-      </style>
+    ::slotted() .checkbox-label {
+      font-size: 12px;
+    }
+  `;
 
-      <paper-checkbox id="field" name="[[name]]" checked="{{checked}}" on-tap="_handleInput">
-        <slot></slot>
-      </paper-checkbox>
-    `;
-  }
-
-  @property({type: Boolean, notify: true, computed: '_computeChecked(value)'})
-  checked!: boolean;
+  @property({type: Boolean, reflect: true})
+  checked = false;
 
   @property({type: String})
   value = '';
 
-  private _debouncer!: Debouncer;
-
-  _handleInput() {
-    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const newValue = (this.$.field as HTMLInputElement).checked;
-
-      if (newValue.toString() !== this.lastValue) {
-        fireEvent(this, 'filter-changed', {
-          name: this.name,
-          value: newValue.toString()
-        });
-      }
-    });
+  render() {
+    return html`
+      <etools-checkbox id="field" name="${this.name}" ?checked="${this.checked}" @sl-change="${this._handleInput}"
+        ><slot></slot
+      ></etools-checkbox>
+    `;
   }
 
-  _computeChecked(value: string) {
-    return value ? !!this._toNumber(value) : false;
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('value')) {
+      this.checked = this._computeChecked(this.value);
+    }
+  }
+
+  _handleInput(e: any) {
+    const newValue = e.target.checked;
+
+    if (newValue.toString() !== this.lastValue) {
+      fireEvent(this, 'filter-changed', {
+        name: this.name,
+        value: newValue.toString()
+      });
+    }
+  }
+
+  _computeChecked(value) {
+    return (typeof value === 'boolean' && value) || value === 'true' ? true : false;
   }
 
   connectedCallback() {
     super.connectedCallback();
-
     this._filterReady();
   }
 
   disconnectedCallback() {
-    super.connectedCallback();
-
-    if (this._debouncer && this._debouncer.isActive()) {
-      this._debouncer.cancel();
-    }
+    super.disconnectedCallback();
   }
 }
-
-window.customElements.define('checkbox-filter', CheckboxFilter);
 
 export {CheckboxFilter as CheckboxFilterEl};
