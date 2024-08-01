@@ -81,10 +81,12 @@ export class PdReportsList extends PaginationMixin(
     if (this.data) {
       const totalResults = programmeDocumentReportsCount(state);
       console.log('totalResults', totalResults);
-      if (typeof totalResults !== 'undefined') {
-        this.paginator = {...this.paginator, count: totalResults};
+      if (typeof totalResults !== 'undefined') {        
         this.loading = false;
-        this.requestUpdate();
+        if (this.paginator?.count !== totalResults) {
+          this.paginator = {...this.paginator, count: totalResults};
+          this.requestUpdate();
+        }
       }
     }
   }

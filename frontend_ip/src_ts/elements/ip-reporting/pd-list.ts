@@ -41,7 +41,7 @@ export class PdList extends RoutingMixin(
       this.data = state.programmeDocuments.all;
     }
 
-    if (state.programmeDocuments?.count && this.totalResults !== state.programmeDocuments?.count) {
+    if (state.programmeDocuments?.count && this.paginator?.count !== state.programmeDocuments.count) {
       this.paginator = {...this.paginator, count: state.programmeDocuments.count};
     }
 

@@ -177,9 +177,8 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
       this.showProjectContextColumn = this.type === 'pa';
     }
 
-    if (changedProperties.has('data') && this.data?.length) {
+    if (changedProperties.has('data') && this.data?.length && this.paginator?.count !== this.data.length) {
       this.paginator = {...this.paginator, count: this.data.length};
-      this.requestUpdate();
     }
   }
 
