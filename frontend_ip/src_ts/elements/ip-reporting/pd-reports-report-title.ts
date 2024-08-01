@@ -21,7 +21,7 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
       padding: 1px 6px;
       font-size: 10px;
       text-transform: uppercase;
-      background-color: var(--paper-grey-300);
+      background-color: var(--sl-color-neutral-300);
       margin-left: 5px;
       font-weight: bold;
     }

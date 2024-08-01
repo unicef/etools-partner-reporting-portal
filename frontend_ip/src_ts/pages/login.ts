@@ -88,7 +88,7 @@ export class PageLogin extends connect(store)(LitElement) {
     }
 
     p.error-token {
-      color: var(--paper-deep-orange-a700);
+      color: var(--sl-color-warning-700);
       font-size: 1.2em;
     }
 

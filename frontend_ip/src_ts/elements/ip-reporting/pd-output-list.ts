@@ -32,7 +32,7 @@ export class PdOutputList extends connect(store)(LitElement) {
     }
 
     pd-output:not(:first-of-type) {
-      border-top: 1px solid var(--paper-grey-300);
+      border-top: 1px solid var(--sl-color-neutral-300);
     }
   `;
 

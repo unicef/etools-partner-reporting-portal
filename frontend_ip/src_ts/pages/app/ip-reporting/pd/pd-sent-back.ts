@@ -44,7 +44,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
     .sent-back-feedback {
       width: 100%;
       margin-bottom: 25px;
-      border-top: 2px solid var(--paper-red-700);
+      border-top: 2px solid var(--sl-color-danger-700);
       position: relative;
     }
     .ribbon {
@@ -54,7 +54,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
       left: 16px;
       top: 0;
       z-index: 2;
-      background: var(--paper-red-700);
+      background: var(--sl-color-danger-700);
     }
     .ribbon::before,
     .ribbon::after {
@@ -68,17 +68,16 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
     }
     .ribbon::before {
       left: 0;
-      border-left: 15px solid var(--paper-red-700);
+      border-left: 15px solid var(--sl-color-danger-700);
     }
     .ribbon::after {
       right: 0;
-      border-right: 15px solid var(--paper-red-700);
+      border-right: 15px solid var(--sl-color-danger-700);
     }
     h3 {
       margin: 0 0 1em;
       text-transform: uppercase;
-      color: var(--paper-red-700);
-      @apply --paper-font-body2;
+      color: var(--sl-color-danger-700);
     }
     etools-button {
       margin: 0;

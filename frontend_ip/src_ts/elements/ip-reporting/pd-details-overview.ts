@@ -68,7 +68,7 @@ export class PdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
         position: absolute;
         left: 0;
         top: 0;
-        color: var(--paper-grey-600);
+        color: var(--sl-color-neutral-600);
       }
       page-body > * {
         display: block;

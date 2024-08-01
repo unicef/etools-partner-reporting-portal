@@ -30,7 +30,7 @@ export class AppMenu extends RoutingMixin(MatomoMixin(UtilsMixin(connect(store)(
     // language=HTML
     return html`
       <div class="menu-header">
-        <span id="app-name"> ePD </span>
+        <span id="app-name"> IP Reporting </span>
 
         <sl-tooltip for="menu-header-top-icon" placement="right" content="ePD">
           <span class="ripple-wrapper main">

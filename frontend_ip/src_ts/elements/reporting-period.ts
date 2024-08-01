@@ -11,11 +11,11 @@ export class ReportingPeriod extends UtilsMixin(connect(store)(LitElement)) {
     :host {
       display: inline-block;
       padding: 1px 3px;
-      border: 1px solid var(--paper-grey-500);
+      border: 1px solid var(--sl-color-neutral-500);
       font-size: 10px;
       text-transform: uppercase;
       white-space: nowrap;
-      color: var(--paper-grey-500);
+      color: var(--sl-color-neutral-500);
     }
 
     .range {

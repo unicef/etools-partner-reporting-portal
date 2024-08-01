@@ -82,7 +82,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         font-size: 12px;
         color: #737373;
         display: block;
-        @apply --truncate;
         margin-bottom: 0px;
       }
 

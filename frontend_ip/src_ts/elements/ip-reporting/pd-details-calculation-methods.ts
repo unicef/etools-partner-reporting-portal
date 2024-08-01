@@ -51,7 +51,7 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
       }
 
       .pd-output {
-        --list-bg-color: var(--paper-grey-200);
+        --list-bg-color: var(--sl-color-neutral-200);
         font-weight: bold;
       }
 

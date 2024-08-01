@@ -27,9 +27,6 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
       display: block;
       margin-bottom: 25px;
     }
-    .row {
-      @apply --app-grid-expandible-item;
-    }
     .value {
       font-size: 16px;
       word-wrap: break-word;

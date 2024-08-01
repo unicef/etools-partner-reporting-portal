@@ -40,7 +40,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
       position: absolute;
       left: 0;
       top: 0;
-      color: var(--paper-grey-600);
+      color: var(--sl-color-neutral-600);
     }
   `];
 

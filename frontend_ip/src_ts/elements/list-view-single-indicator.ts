@@ -38,11 +38,9 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
         width: calc(100% - 35px);
       }
     }
-    a {
-      @apply --link;
+    a {     
     }
     .button-link {
-      @apply --link;
       font-size: 13px;
       text-transform: none;
     }
@@ -62,9 +60,6 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
     }
     .indicator-progress dd {
       margin: 0;
-    }
-    etools-prp-progress-bar {
-      @apply --etools-prp-progress-bar;
     }
     .table-cell--action {
       text-align: right;

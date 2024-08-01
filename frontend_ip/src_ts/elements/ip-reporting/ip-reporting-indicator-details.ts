@@ -98,7 +98,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
 
         .report-meta {
           font-size: 12px;
-          background: var(--paper-grey-100);
+          background: var(--sl-color-neutral-100);
         }
 
         .report-meta dt,
@@ -112,7 +112,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
         }
 
         .report-meta dd {
-          color: var(--paper-grey-600);
+          color: var(--sl-color-neutral-600);
         }
 
         .report-meta labelled-item {
