@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "quotemark": [true, "single"],
+    "typedef": [
+      false,
+      "call-signature"
+    ]
+
+  }
+}
