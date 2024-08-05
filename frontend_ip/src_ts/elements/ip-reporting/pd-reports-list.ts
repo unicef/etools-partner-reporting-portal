@@ -81,7 +81,7 @@ export class PdReportsList extends PaginationMixin(
     if (this.data) {
       const totalResults = programmeDocumentReportsCount(state);
       console.log('totalResults', totalResults);
-      if (typeof totalResults !== 'undefined') {        
+      if (typeof totalResults !== 'undefined') {
         this.loading = false;
         if (this.paginator?.count !== totalResults) {
           this.paginator = {...this.paginator, count: totalResults};

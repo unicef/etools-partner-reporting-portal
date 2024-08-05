@@ -13,16 +13,19 @@ import {translate} from 'lit-translate';
 
 @customElement('risk-rating')
 export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {
-  static styles = [layoutStyles, css`
-    labelled-item {
-      padding-block-start: 8px;
-      padding-block-end: 8px;
-    }
-    .field-value {
-      display: block;
-      word-wrap: break-word;
-    }
-  `];
+  static styles = [
+    layoutStyles,
+    css`
+      labelled-item {
+        padding-block-start: 8px;
+        padding-block-end: 8px;
+      }
+      .field-value {
+        display: block;
+        word-wrap: break-word;
+      }
+    `
+  ];
 
   @property({type: Object})
   partner: any = {};

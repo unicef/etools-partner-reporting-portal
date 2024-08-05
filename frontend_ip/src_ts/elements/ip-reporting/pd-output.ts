@@ -104,7 +104,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       .indicatorType {
         font-weight: 600;
         font-size: 16px;
-        margin-right: 4px;               
+        margin-right: 4px;
       }
       .flex {
         flex: 1;
@@ -476,6 +476,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
 
   _updateMeta(e: CustomEvent) {
     e.stopPropagation();
+
     const data = e.detail;
     this.reportableMeta = data;
 

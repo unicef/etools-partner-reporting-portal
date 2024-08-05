@@ -38,7 +38,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
         width: calc(100% - 35px);
       }
     }
-    a {     
+    a {
     }
     .button-link {
       font-size: 13px;

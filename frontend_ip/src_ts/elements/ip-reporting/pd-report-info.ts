@@ -42,12 +42,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         margin-bottom: 25px;
       }
 
-      .app-grid {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-      }
-
       .toggle-button-container {
         max-width: calc((100% - 0.1px) / 8 * 7 - 25px);
 
@@ -74,7 +68,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         flex-wrap: wrap;
       }
       .currency-ammount {
-        width: 242px;
+        width: 240px;
         margin-right: 40px;
         margin-top: 20px;
       }
@@ -101,6 +95,9 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
       }
       .r-ml {
         margin-inline-start: 6px;
+      }
+      .currency {
+        width: 240px;
       }
     `
   ];
@@ -236,17 +233,21 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
               <div class="currency">
                 <etools-dropdown
                   id="financial_contribution_currency"
-                  class="item validate full-width"
                   .options="${this.currencies}"
                   option-value="value"
                   option-label="label"
                   .selected="${this.localData?.financial_contribution_currency}"
                   ?readonly="${this._equals(this.computedMode, 'view')}"
                   ?required="${this._hasCurrencyAmmount(this.data.financial_contribution_to_date)}"
-                  no-dynamic-align
+                  trigger-value-change-event
+                  @etools-selected-item-changed="${(event: CustomEvent) => {
+                    if (this.localData?.financial_contribution_currency !== event.detail.selectedItem?.value) {
+                      this.localData.financial_contribution_currency = event.detail.selectedItem?.value;
+                    }
+                  }}"
                 ></etools-dropdown>
               </div>
-            </div>
+           </div>
           </div>
 
           <div class="col-12 padding-v">

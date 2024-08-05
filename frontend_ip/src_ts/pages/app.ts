@@ -227,9 +227,11 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
         EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
         return;
       }
-      this.page = routeDetails.subRouteName;
-      store.dispatch(setApp(routeDetails.subRouteName));
-      this._fetchCurrencies(routeDetails.subRouteName);
+      if (this.page !== routeDetails.subRouteName) {
+        this.page = routeDetails.subRouteName;
+        store.dispatch(setApp(routeDetails.subRouteName));
+        this._fetchCurrencies();
+      }
     }
   }
 
@@ -287,16 +289,14 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
     );
   }
 
-  private _fetchCurrencies(app: string) {
-    if (this.page !== app && app === 'ip-reporting') {
-      store.dispatch(
-        fetchCurrencies(
-          sendRequest({
-            method: 'GET',
-            endpoint: {url: this.currenciesUrl}
-          })
-        )
-      );
-    }
+  private _fetchCurrencies() {
+    store.dispatch(
+      fetchCurrencies(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.currenciesUrl}
+        })
+      )
+    );
   }
 }

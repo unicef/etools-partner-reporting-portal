@@ -15,34 +15,37 @@ import {RootState} from '../../typings/redux.types';
 import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 @customElement('partner-details')
 export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
-  static styles = [layoutStyles, css`
-    :host {
-      display: block;
-      margin-bottom: 25px;
-    }
+  static styles = [
+    layoutStyles,
+    css`
+      :host {
+        display: block;
+        margin-bottom: 25px;
+      }
 
-    labelled-item {
-      padding-block-start: 8px;
-      padding-block-end: 8px;
-    }
+      labelled-item {
+        padding-block-start: 8px;
+        padding-block-end: 8px;
+      }
 
-    .field-value {
-      display: block;
-      word-wrap: break-word;
-    }
+      .field-value {
+        display: block;
+        word-wrap: break-word;
+      }
 
-    .field-value[has-icon] {
-      position: relative;
-      padding-left: 2em;
-    }
+      .field-value[has-icon] {
+        position: relative;
+        padding-left: 2em;
+      }
 
-    .field-value etools-icon {
-      position: absolute;
-      left: 0;
-      top: 0;
-      color: var(--sl-color-neutral-600);
-    }
-  `];
+      .field-value etools-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: var(--sl-color-neutral-600);
+      }
+    `
+  ];
 
   @property({type: Object})
   partner!: any;
