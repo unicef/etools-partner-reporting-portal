@@ -167,7 +167,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
                     : this._equals(this.progressBarType, 'default')
                     ? html`<etools-prp-progress-bar
                         .displayType=${this.indicator?.blueprint?.display_type}
-                        .number=${Math.random()}
+                        .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar>`
                     : html``}
                 </dd>

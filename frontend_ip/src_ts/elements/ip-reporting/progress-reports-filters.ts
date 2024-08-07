@@ -90,10 +90,7 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
   }
 
   stateChanged(state: RootState) {
-    if (
-      state.app?.routeDetails?.queryParams &&
-      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
-    ) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
     }
   }

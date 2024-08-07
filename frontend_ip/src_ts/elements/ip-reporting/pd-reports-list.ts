@@ -61,11 +61,11 @@ export class PdReportsList extends PaginationMixin(
 
   stateChanged(state: RootState) {
     super.stateChanged(state);
+    if (state.app?.routeDetails?.params?.activeTab !== 'reports') {
+      return;
+    }
 
-    if (
-      state.app?.routeDetails?.queryParams &&
-      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
-    ) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
     }
 
@@ -80,7 +80,6 @@ export class PdReportsList extends PaginationMixin(
     this.data = programmeDocumentReportsAll(state);
     if (this.data) {
       const totalResults = programmeDocumentReportsCount(state);
-      console.log('totalResults', totalResults);
       if (typeof totalResults !== 'undefined') {
         this.loading = false;
         if (this.paginator?.count !== totalResults) {

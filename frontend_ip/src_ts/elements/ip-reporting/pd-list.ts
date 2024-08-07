@@ -33,6 +33,10 @@ export class PdList extends RoutingMixin(
   data: any[] = [];
 
   stateChanged(state: RootState) {
+    if (state.app?.routeDetails.subSubRouteName !== 'pd') {
+      return;
+    }
+
     if (this.loading !== state.programmeDocuments?.loading) {
       this.loading = state.programmeDocuments.loading;
     }
@@ -93,7 +97,7 @@ export class PdList extends RoutingMixin(
           <etools-data-table-column field="total_unicef_cash" sortable class="col-1">
             <div class="table-column">${translate('UNICEF_CASH')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="total_unicef_supplies" sortable class="col-1">
+          <etools-data-table-column field="total_unicef_supplies" class="col-1">
             <div class="table-column">${translate('UNICEF_SUPPLIES')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="budget" sortable class="col-1">

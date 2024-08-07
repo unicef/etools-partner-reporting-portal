@@ -57,10 +57,11 @@ export class ProgressReportsList extends SortingMixin(
   baseUrl!: string;
 
   stateChanged(state: RootState) {
-    if (
-      state.app?.routeDetails?.queryParams &&
-      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
-    ) {
+    if (state.app?.routeDetails.subSubRouteName !== 'progress-reports') {
+      return;
+    }
+
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
     }
 

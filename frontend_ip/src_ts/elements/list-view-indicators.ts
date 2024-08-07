@@ -157,12 +157,25 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
     this.openedDetails.length = 0;
   }
 
+  paginatorChanged() {
+    this._paginatorChanged();
+  }
+
   stateChanged(state: RootState) {
-    if (
-      state.app?.routeDetails?.queryParams &&
-      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
-    ) {
+    if (state.app?.routeDetails.subSubRouteName !== 'indicators') {
+      return;
+    }
+
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (state.indicators.all && !isJsonStrMatch(this.data, state.indicators.all)) {
+      this.data = state.indicators.all;
+    }
+
+    if (state.indicators?.count && this.paginator?.count !== state.indicators.count) {
+      this.paginator = {...this.paginator, count: state.indicators.count};
     }
 
     if (this.appName !== state.app.current) {
@@ -175,10 +188,6 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
 
     if (changedProperties.has('type')) {
       this.showProjectContextColumn = this.type === 'pa';
-    }
-
-    if (changedProperties.has('data') && this.data?.length && this.paginator?.count !== this.data.length) {
-      this.paginator = {...this.paginator, count: this.data.length};
     }
   }
 

@@ -77,7 +77,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   stateChanged(state: RootState) {
-    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
     }
   }

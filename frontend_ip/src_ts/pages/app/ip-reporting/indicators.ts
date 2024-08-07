@@ -23,14 +23,8 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
     }
   `;
 
-  @property({type: Array})
-  data = [];
-
   @property({type: Boolean})
   loading = false;
-
-  @property({type: Number})
-  totalResults = 0;
 
   @property({type: String})
   workspaceId = '';
@@ -47,29 +41,20 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
       <page-body>
         <indicators-filters></indicators-filters>
         <indicators-toolbar></indicators-toolbar>
-        <list-view-indicators .data="${this.data}" .totalResults="${this.totalResults}"></list-view-indicators>
+        <list-view-indicators></list-view-indicators>
       </page-body>
     `;
   }
 
   stateChanged(state) {
-    if (
-      state.app?.routeDetails?.queryParams &&
-      !isJsonStrMatch(this.routeDetails, state.app.routeDetails.queryParams)
-    ) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
-    }
-
-    if (state.indicators.all && !isJsonStrMatch(this.data, state.indicators.all)) {
-      this.data = state.indicators.all;
     }
 
     if (this.loading !== state.indicators.loading) {
       this.loading = state.indicators.loading;
     }
-    if (this.totalResults !== state.indicators.count) {
-      this.totalResults = state.indicators.count;
-    }
+
     if (this.workspaceId !== state.location.id) {
       this.workspaceId = state.location.id;
     }
