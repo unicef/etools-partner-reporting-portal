@@ -170,6 +170,9 @@
   --list-icon-color: var(--dark-icon-color);
   --list-disabled-icon-color: var(--light-disabled-icon-color);
 
+  --theme-table-bg-primary: #edf8ff;
+  --theme-table-bg-secondary: #c4e3f7;
+  
   /* etools-panel styles */
   --ecp-header-color: var(--light-primary-text-color);
 

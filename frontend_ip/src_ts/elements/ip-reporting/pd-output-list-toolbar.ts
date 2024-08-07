@@ -69,6 +69,9 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   @property({type: Object})
   refreshData: any = null;
 
+  @property({type: Object})
+  programmeDocument!: any;
+
   @property({type: Boolean})
   canRefresh = false;
 
@@ -133,17 +136,8 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
   render() {
     return html`
       <div class="layout-horizontal right-align">
-        <download-button .url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
-        <download-button .url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
-
         ${this.showImportButtons
           ? html`
-              <upload-button .url="${this.importUrl}" modal-title="Import Template">
-                ${translate('IMPORT_TEMPLATE')}
-              </upload-button>
-              <download-button .url="${this.importTemplateUrl}" tracker="Import template">
-                ${translate('GENERATE_UPLOADER')}
-              </download-button>
               ${this.showRefresh
                 ? html`
                     <etools-button variant="primary" @click="${this._refresh}" ?disabled="${this.busy}">
@@ -151,8 +145,18 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
                     </etools-button>
                   `
                 : ''}
+              <download-button .url="${this.importTemplateUrl}" tracker="Import template">
+                ${translate('GENERATE_UPLOADER')}
+              </download-button>
+
+              <upload-button .url="${this.importUrl}" modal-title="Import Template">
+                ${translate('IMPORT_TEMPLATE')}
+              </upload-button>
             `
           : ''}
+
+        <download-button .url="${this.xlsExportUrl}" tracker="PD Report Export Xls">XLS</download-button>
+        <download-button .url="${this.pdfExportUrl}" tracker="PD Report Export Pdf">PDF</download-button>
       </div>
     `;
   }
