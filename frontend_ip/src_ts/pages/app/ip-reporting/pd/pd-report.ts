@@ -30,6 +30,7 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {translate} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 
 @customElement('page-ip-reporting-pd-report')
 export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
@@ -225,6 +226,10 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       this.queryParams = state.app?.routeDetails.queryParams;
     }
 
+    if (state.workspaces.baseUrl && this.baseUrl !== state.workspaces.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
+    }
+
     if (state.app.routeDetails && !isJsonStrMatch(this.routeData, state.app.routeDetails?.params)) {
       this.routeData = state.app.routeDetails?.params;
     }
@@ -296,7 +301,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       changedProperties.has('baseUrl') ||
       changedProperties.has('backLink')
     ) {
-      this._handlePermissions(this.permissions, this.mode, this.baseUrl, this.backLink);
+      this._handlePermissions();
     }
 
     if (changedProperties.has('locationId') || changedProperties.has('reportId') || changedProperties.has('pdId')) {
@@ -354,6 +359,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       return;
     }
     store.dispatch(pdReportsSetCurrent(reportId, mode));
+    this._handlePermissions();
   }
 
   _onReportStatusChanged(currentReport: any, mode: any) {
@@ -451,12 +457,13 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
     return currentReport.submitted_by !== currentReport.submitting_user;
   }
 
-  _handlePermissions(permissions: any, mode: string, baseUrl: string, tail: string) {
-    if (!permissions) {
+  _handlePermissions() {
+    if (!this.permissions) {
       return;
     }
-    if (!permissions.editProgressReport && mode === 'edit') {
-      window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));
+
+    if (!this.permissions.editProgressReport && this.mode === 'edit') {
+      EtoolsRouter.updateAppLocation(this.buildUrl(this.baseUrl, this.backLink));
     }
   }
 

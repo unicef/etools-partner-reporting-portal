@@ -354,7 +354,6 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
   }
 
   stateChanged(state: RootState) {
-    console.log('pd-output stateChanged....');
     if (this.currentReport !== programmeDocumentReportsCurrent(state)) {
       this.currentReport = programmeDocumentReportsCurrent(state);
     }

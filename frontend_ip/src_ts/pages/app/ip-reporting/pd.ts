@@ -151,12 +151,14 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
   }
 
   _routePdIdChanged(pd_id) {
-    if (pd_id && pd_id !== this.pdId) {
+    if (pd_id !== this.pdId) {
       this.pdId = pd_id;
-      store.dispatch(pdSetCurrent(pd_id));
+      if (this.pdId) {
+        store.dispatch(pdSetCurrent(pd_id));
+      }
     }
 
-    this.page = pd_id ? 'pd-router' : 'pd-index';
+    this.page = this.pdId ? 'pd-router' : 'pd-index';
   }
 
   _routePathChanged(path) {

@@ -37,6 +37,7 @@
     "@types/lodash-es": "^4.17.6",
     "@unicef-polymer/etools-modules-common": "^5.0.0-rc.54",
     "@unicef-polymer/etools-piwik-analytics": "^4.0.1-rc.3",
+    "@unicef-polymer/etools-types": "^1.11.17",
     "@unicef-polymer/etools-unicef": "^1.0.0-rc.98",
     "@unicef-polymer/etools-utils": "^2.0.0-rc.11",
     "@webcomponents/webcomponentsjs": "^2.6.0",
