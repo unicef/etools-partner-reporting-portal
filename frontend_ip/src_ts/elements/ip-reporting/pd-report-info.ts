@@ -42,14 +42,6 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         margin-bottom: 25px;
       }
 
-      .toggle-button-container {
-        max-width: calc((100% - 0.1px) / 8 * 7 - 25px);
-
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-      }
-
       #toggle-button {
         background-color: #0099ff;
         color: #fff;

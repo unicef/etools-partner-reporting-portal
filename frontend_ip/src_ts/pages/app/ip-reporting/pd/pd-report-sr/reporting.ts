@@ -19,10 +19,12 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {connect} from 'pwa-helpers';
 import {translate, get as getTranslation} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles.js';
 
 @customElement('page-pd-report-sr-reporting')
 export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
+    ${layoutStyles}
     :host {
       display: block;
       margin-bottom: 25px;
@@ -31,16 +33,12 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
       font-size: 16px;
       word-wrap: break-word;
     }
-    .toggle-button-container {
-      max-width: calc((100% - 0.1px) / 8 * 7 - 25px);
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
     #toggle-button {
       background-color: #0099ff;
       color: #fff;
       font-size: 14px;
+      margin-top: 15px;
+      margin-right: 0;
     }
   `;
 
@@ -182,7 +180,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
             </labelled-item>
           </div>
 
-          <div class="toggle-button-container row">
+          <div class="row layout-horizontal right-align">
             ${this.computedMode !== 'view'
               ? html`
                   <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
