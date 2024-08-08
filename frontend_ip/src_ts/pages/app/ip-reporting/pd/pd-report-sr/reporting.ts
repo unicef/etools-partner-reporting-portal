@@ -174,6 +174,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
                       .value="${this.data.narrative}"
                       no-label-float
                       char-counter
+                      .charCount=${this.data?.narrative?.length}
                       maxlength="2000"
                     >
                     </etools-input>

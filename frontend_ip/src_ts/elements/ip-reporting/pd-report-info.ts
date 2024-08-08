@@ -207,6 +207,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                           (this.localData.partner_contribution_to_date = detail.value)}"
                         no-label-float
                         char-counter
+                        .charCount=${this.localData?.partner_contribution_to_date?.length}
                         maxlength="2000"
                       ></etools-input>
                     `
@@ -265,6 +266,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                           (this.localData.challenges_in_the_reporting_period = detail.value)}"
                         no-label-float
                         char-counter
+                        .charCount=${this.localData?.challenges_in_the_reporting_period?.length}
                         maxlength="2000"
                       ></etools-input>
                     `
@@ -285,6 +287,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                           (this.localData.proposed_way_forward = detail.value)}"
                         no-label-float
                         char-counter
+                        .charCount=${this.localData?.proposed_way_forward?.length}
                         maxlength="2000"
                       ></etools-input>
 
@@ -330,6 +333,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.release_cash_in_time_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
@@ -367,6 +371,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.release_supplies_in_time_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
@@ -404,6 +409,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.feedback_face_form_in_time_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
@@ -441,6 +447,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.respond_requests_in_time_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
@@ -478,6 +485,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.implemented_as_planned_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
@@ -515,6 +523,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.action_to_address_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
@@ -579,6 +588,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                               no-label-float
                               placeholder="${translate('COMMENTS')}"
                               char-counter
+                              .charCount=${this.localData?.final_review?.overall_satisfaction_comment?.length}
                               maxlength="2000"
                             ></etools-input>
                           `}
