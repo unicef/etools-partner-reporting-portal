@@ -170,11 +170,11 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
       this.queryParams = state.app?.routeDetails.queryParams;
     }
 
-    if (state.indicators.all && !isJsonStrMatch(this.data, state.indicators.all)) {
+    if (state.indicators.all !== undefined && !isJsonStrMatch(this.data, state.indicators.all)) {
       this.data = state.indicators.all;
     }
 
-    if (state.indicators?.count && this.paginator?.count !== state.indicators.count) {
+    if (state.indicators?.count !== undefined && this.paginator?.count !== state.indicators.count) {
       this.paginator = {...this.paginator, count: state.indicators.count};
     }
 

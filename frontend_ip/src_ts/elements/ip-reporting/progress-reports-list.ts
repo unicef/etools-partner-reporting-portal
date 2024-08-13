@@ -69,11 +69,11 @@ export class ProgressReportsList extends SortingMixin(
       this.loading = state.progressReports.loading;
     }
 
-    if (state.progressReports.all && !isJsonStrMatch(this.data, state.progressReports.all)) {
+    if (state.progressReports.all !== undefined && !isJsonStrMatch(this.data, state.progressReports.all)) {
       this.data = state.progressReports.all;
     }
 
-    if (state.progressReports?.count && this.paginator?.count !== state.progressReports.count) {
+    if (state.progressReports?.count !== undefined && this.paginator?.count !== state.progressReports.count) {
       this.paginator = {...this.paginator, count: state.progressReports.count};
     }
 

@@ -41,11 +41,11 @@ export class PdList extends RoutingMixin(
       this.loading = state.programmeDocuments.loading;
     }
 
-    if (state.programmeDocuments?.all && this.data !== state.programmeDocuments?.all) {
+    if (state.programmeDocuments?.all !== undefined && this.data !== state.programmeDocuments?.all) {
       this.data = state.programmeDocuments.all;
     }
 
-    if (state.programmeDocuments?.count && this.paginator?.count !== state.programmeDocuments.count) {
+    if (state.programmeDocuments?.count !== undefined && this.paginator?.count !== state.programmeDocuments.count) {
       this.paginator = {...this.paginator, count: state.programmeDocuments.count};
     }
 
@@ -76,7 +76,7 @@ export class PdList extends RoutingMixin(
       <etools-content-panel panel-title="${translate('LIST_PDS')}">
         <etools-data-table-header
           no-collapse
-          label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
+          .label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column field="reference_number" class="col-2" sortable>
