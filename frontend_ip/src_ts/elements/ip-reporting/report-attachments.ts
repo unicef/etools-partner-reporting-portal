@@ -148,9 +148,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
               id="faceAttachmentComponent"
               label="${translate('FACE')}"
               .fileUrl="${this.faceAttachment?.file_name}"
-              .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl,  this.faceAttachment?.id)}"
+              .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.faceAttachment?.id)}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'faceAttachmentComponent')}"
-              @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'faceAttachmentComponent')}"
+              @delete-file="${() => this._deleteFile('faceAttachmentComponent', this.faceAttachment?.id)}"
               .endpointInfo="${{
                 rawFilePropertyName: 'path',
                 extraInfo: {type: 'FACE'},
@@ -170,9 +170,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           id="otherOneAttachmentComponent"
           label="${translate('OTHER')} #1"
           .fileUrl="${this.otherOneAttachment?.file_name}"
-          .uploadEndpoint="${this.attachmentsListUrl}"
+          .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherOneAttachment?.id)}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherOneAttachmentComponent')}"
-          @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'otherOneAttachmentComponent')}"
+          @delete-file="${() => this._deleteFile('otherOneAttachmentComponent', this.otherOneAttachment?.id)}"
           .endpointInfo="${{
             rawFilePropertyName: 'path',
             extraInfo: {type: 'Other'},
@@ -191,9 +191,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           id="otherTwoAttachmentComponent"
           label="${translate('OTHER')} #2"
           .fileUrl="${this.otherTwoAttachment?.file_name}"
-          .uploadEndpoint="${this.attachmentsListUrl}"
+          .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherTwoAttachment?.id)}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherTwoAttachmentComponent')}"
-          @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'otherTwoAttachmentComponent')}"
+          @delete-file="${() => this._deleteFile('otherTwoAttachmentComponent', this.otherTwoAttachment?.id)}"
           .endpointInfo="${{
             rawFilePropertyName: 'path',
             extraInfo: {type: 'Other'},
@@ -213,9 +213,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
               id="otherTwoAttachmentComponent"
               label="${translate('OTHER')} #3"
               .fileUrl="${this.otherThreeAttachment?.file_name}"
-              .uploadEndpoint="${this.attachmentsListUrl}"
+              .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherThreeAttachmentComponent')}"
-              @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'otherThreeAttachmentComponent')}"
+              @delete-file="${() => this._deleteFile('otherThreeAttachmentComponent', this.otherThreeAttachment?.id)}"
               .endpointInfo="${{
                 rawFilePropertyName: 'path',
                 extraInfo: {type: 'Other'},
@@ -268,29 +268,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
-    if(attachmentsListUrl) 
-      return '';
-    
-    return id ? `${attachmentsListUrl}/${id}/` : attachmentsListUrl;
-  }
+    if (attachmentsListUrl) return '';
 
-  _fileDeleted(e: CustomEvent, type: string) {
-    switch (type) {
-      case 'faceAttachmentComponent':
-        this.faceAttachment = undefined;
-        break;
-      case 'otherOneAttachmentComponent':
-        this.otherOneAttachment = undefined;
-        break;
-      case 'otherTwoAttachmentComponent':
-        this.otherTwoAttachment = undefined;
-        break;
-      case 'otherThreeAttachmentComponent':
-        this.otherThreeAttachment = undefined;
-        break;
-    }
-    
-    this.requestUpdate();
+    return id ? `${attachmentsListUrl}/${id}/` : attachmentsListUrl;
   }
 
   _setFiles() {
@@ -324,46 +304,42 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     return getDeleteUrl(locationId, reportId, attachmentId);
   }
 
-  _onDeleteFile(e: CustomEvent) {
-    this.attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, e.detail.file.id);
+  _deleteFile(type: string, id: string | undefined) {
+    if (!type || !id) {
+      return;
+    }
 
-    e.stopPropagation();
+    const attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, id);
+
     sendRequest({
       method: 'DELETE',
-      endpoint: {url: this.attachmentDeleteUrl}
-    }).then((_res) => {
-      store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(e.detail.file.id))).then(() => {
-        fireEvent(this, 'toast', {
-          text: getTranslation('FILE_DELETED'),
-          showCloseBtn: true
+      endpoint: {url: attachmentDeleteUrl}
+    })
+      .then((_res) => {
+        store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id))).then(() => {
+          fireEvent(this, 'toast', {text: getTranslation('FILE_DELETED')});
+
+          switch (type) {
+            case 'faceAttachmentComponent':
+              this.faceAttachment = undefined;
+              break;
+            case 'otherOneAttachmentComponent':
+              this.otherOneAttachment = undefined;
+              break;
+            case 'otherTwoAttachmentComponent':
+              this.otherTwoAttachment = undefined;
+              break;
+            case 'otherThreeAttachmentComponent':
+              this.otherThreeAttachment = undefined;
+              break;
+          }
+          this.requestUpdate();
         });
-
-        this.attachmentDeleteUrl = undefined;
-
-        if (this.get('faceAttachment').length !== 0 && e.detail.file.id === this.get('faceAttachment')[0].id) {
-          (this.shadowRoot!.getElementById('faceAttachmentComponent') as any).fileInput.value = null;
-          (this.shadowRoot!.getElementById('faceAttachmentComponent') as any).files = [];
-        } else if (
-          this.get('otherOneAttachment').length !== 0 &&
-          e.detail.file.id === this.get('otherOneAttachment')[0].id
-        ) {
-          (this.shadowRoot!.getElementById('otherOneAttachmentComponent') as any).fileInput.value = null;
-          (this.shadowRoot!.getElementById('otherOneAttachmentComponent') as any).files = [];
-        } else if (
-          this.get('otherTwoAttachment').length !== 0 &&
-          e.detail.file.id === this.get('otherTwoAttachment')[0].id
-        ) {
-          (this.shadowRoot!.getElementById('otherTwoAttachmentComponent') as any).fileInput.value = null;
-          (this.shadowRoot!.getElementById('otherTwoAttachmentComponent') as any).files = [];
-        } else if (
-          this.get('otherThreeAttachment').length !== 0 &&
-          e.detail.file.id === this.get('otherThreeAttachment')[0].id
-        ) {
-          (this.shadowRoot!.getElementById('otherThreeAttachmentComponent') as any).fileInput.value = null;
-          (this.shadowRoot!.getElementById('otherThreeAttachmentComponent') as any).files = [];
-        }
+      })
+      .catch((err) => {
+        console.log(err);
+        fireEvent(this, 'toast', {text: getTranslation('AN_ERROR_OCCURRED')});
       });
-    });
   }
 
   replaceCharsThatAreNotLetterDigitDotOrUnderline(files: any[]) {
@@ -499,21 +475,6 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           // TODO: error handling
         });
     }, 100)();
-  }
-
-  _addEventListeners() {
-    this._onDeleteFile = this._onDeleteFile.bind(this);
-    this.addEventListener('delete-file', this._onDeleteFile as any);
-  }
-
-  _removeEventListeners() {
-    this.removeEventListener('delete-file', this._onDeleteFile as any);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-
-    this._addEventListeners();
   }
 
   _getReportAttachments() {
