@@ -268,7 +268,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
-    if (attachmentsListUrl) return '';
+    if (!attachmentsListUrl) return '';
 
     return id ? `${attachmentsListUrl}/${id}/` : attachmentsListUrl;
   }
