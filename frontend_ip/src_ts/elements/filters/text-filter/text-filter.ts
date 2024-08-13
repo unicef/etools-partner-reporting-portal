@@ -18,6 +18,9 @@ class TextFilter extends FilterMixin(connect(store)(LitElement)) {
   @property({type: String})
   properties = '';
 
+  @property({type: String})
+  value = '';
+
   render() {
     return html`
       <etools-input
