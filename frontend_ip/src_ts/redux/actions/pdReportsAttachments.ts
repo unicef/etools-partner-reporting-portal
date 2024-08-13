@@ -14,15 +14,12 @@ export const pdReportsAttachmentsLoadingStop = function (reportId: string) {
   };
 };
 
-export const pdReportsAttachmentsSet = function (reportId: string, data: any, res: any) {
-  if (res.status === 204) {
-    const resUrl = res.xhr.responseURL.split('/');
-    const deletedAttachmentId = resUrl[resUrl.length - 2];
-
+export const pdReportsAttachmentsSet = function (reportId: string, data: any, deletedAttachmentId?: number) {
+  if (deletedAttachmentId) {
     return {
       type: Constants.SET_PD_REPORT_ATTACHMENT,
       reportId: reportId,
-      data: {id: parseInt(deletedAttachmentId, 10), action: 'delete'}
+      data: {id: deletedAttachmentId, action: 'delete'}
     };
   } else {
     return {
