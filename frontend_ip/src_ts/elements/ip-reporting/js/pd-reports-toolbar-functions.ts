@@ -1,7 +1,7 @@
 import Endpoints from '../../../endpoints';
 
 export function computePdReportsUrl(locationId: string) {
-  return Endpoints.programmeDocumentReports(locationId);
+  return locationId ? Endpoints.programmeDocumentReports(locationId) : '';
 }
 
 export function canExport(totalResults: number) {

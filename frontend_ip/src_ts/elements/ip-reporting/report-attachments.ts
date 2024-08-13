@@ -270,7 +270,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
     if (!attachmentsListUrl) return '';
 
-    return id ? `${attachmentsListUrl}/${id}/` : attachmentsListUrl;
+    return id ? `${attachmentsListUrl}${id}/` : attachmentsListUrl;
   }
 
   _setFiles() {
@@ -316,25 +316,25 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
       endpoint: {url: attachmentDeleteUrl}
     })
       .then((_res) => {
-        store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id))).then(() => {
-          fireEvent(this, 'toast', {text: getTranslation('FILE_DELETED')});
+        store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id)));
 
-          switch (type) {
-            case 'faceAttachmentComponent':
-              this.faceAttachment = undefined;
-              break;
-            case 'otherOneAttachmentComponent':
-              this.otherOneAttachment = undefined;
-              break;
-            case 'otherTwoAttachmentComponent':
-              this.otherTwoAttachment = undefined;
-              break;
-            case 'otherThreeAttachmentComponent':
-              this.otherThreeAttachment = undefined;
-              break;
-          }
-          this.requestUpdate();
-        });
+        fireEvent(this, 'toast', {text: getTranslation('FILE_DELETED')});
+
+        switch (type) {
+          case 'faceAttachmentComponent':
+            this.faceAttachment = undefined;
+            break;
+          case 'otherOneAttachmentComponent':
+            this.otherOneAttachment = undefined;
+            break;
+          case 'otherTwoAttachmentComponent':
+            this.otherTwoAttachment = undefined;
+            break;
+          case 'otherThreeAttachmentComponent':
+            this.otherThreeAttachment = undefined;
+            break;
+        }
+        this.requestUpdate();
       })
       .catch((err) => {
         console.log(err);
