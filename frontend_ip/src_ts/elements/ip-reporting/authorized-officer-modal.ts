@@ -14,6 +14,7 @@ import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 
 @customElement('authorized-officer-modal')
 export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement)) {
@@ -49,6 +50,9 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
 
   @property({type: String})
   submitUrl = '';
+
+  @property({type: String})
+  baseUrl = '';
 
   set dialogData(data: any) {
     const {pdId, reportId, currentReport, submitUrl}: any = data;
@@ -87,7 +91,12 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
             option-value="value"
             option-label="title"
             required
-            selected="${this.selectedFocalPoint}"
+            .selected="${this.selectedFocalPoint}"
+            @etools-selected-item-changed="${(event: CustomEvent) => {
+              if (this.selectedFocalPoint !== event.detail.selectedItem?.value) {
+                this.selectedFocalPoint = event.detail.selectedItem?.value;
+              }
+            }}"
             with-backdrop
             hide-search
           >
@@ -102,6 +111,10 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
   stateChanged(state: RootState) {
     if (!isJsonStrMatch(this.currentPd, currentProgrammeDocument(state))) {
       this.currentPd = currentProgrammeDocument(state);
+    }
+
+    if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
     }
   }
 
@@ -130,11 +143,10 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
     })
       .then((res: any) => {
         // TODO , should we redirect??
-        // const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
         store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
         this.busy = false;
         fireEvent(this, 'dialog-closed', {confirmed: true});
-        // this.path = newPath; //TODO , should we redirect??
+        EtoolsRouter.updateAppLocation(`${this.baseUrl}/pd/${this.pdId}/view/reports`);
       })
       .catch((err: any) => {
         fireEvent(this, 'dialog-closed', {confirmed: false});

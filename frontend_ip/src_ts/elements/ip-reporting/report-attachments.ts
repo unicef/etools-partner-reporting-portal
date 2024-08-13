@@ -350,6 +350,5 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this._removeEventListeners();
   }
 }
