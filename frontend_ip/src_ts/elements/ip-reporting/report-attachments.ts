@@ -113,19 +113,6 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   updated(changedProperties) {
     super.updated(changedProperties);
 
-    if (changedProperties.has('faceAttachment')) {
-      // this._filesChanged(this.faceAttachment, 'faceAttachment');
-    }
-    if (changedProperties.has('otherOneAttachment')) {
-      // this._filesChanged(this.otherOneAttachment, 'otherOneAttachment');
-    }
-    if (changedProperties.has('otherTwoAttachment')) {
-      // this._filesChanged(this.otherTwoAttachment, 'otherTwoAttachment');
-    }
-    if (changedProperties.has('otherThreeAttachment')) {
-      // this._filesChanged(this.otherThreeAttachment, 'otherThreeAttachment');
-    }
-
     if (changedProperties.has('attachmentsListUrl')) {
       this._getReportAttachments();
     }
