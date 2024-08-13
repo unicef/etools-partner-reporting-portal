@@ -94,10 +94,19 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: String})
   reportId!: string;
- 
-  @state() 
-  mapKeyToLoading = {'faceAttachmentComponent': this.faceLoading, 'otherOneAttachmentComponent': this.otherOneLoading,
-    'otherTwoAttachmentComponent': this.otherTwoLoading, 'otherThreeAttachmentComponent': this.otherThreeLoading};
+
+  @state() mapKeyToLoading;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+
+    this.mapKeyToLoading = {
+      faceAttachmentComponent: this.faceLoading,
+      otherOneAttachmentComponent: this.otherOneLoading,
+      otherTwoAttachmentComponent: this.otherTwoLoading,
+      otherThreeAttachmentComponent: this.otherThreeLoading
+    };
+  }
 
   stateChanged(state: RootState) {
     if (this.pending !== this._programmeDocumentReportsAttachmentsPending(state)) {
