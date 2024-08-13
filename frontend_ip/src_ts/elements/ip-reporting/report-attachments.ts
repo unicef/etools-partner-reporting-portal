@@ -147,14 +147,15 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
             <etools-upload
               id="faceAttachmentComponent"
               label="${translate('FACE')}"
-              .fileUrl="${this.faceAttachment}"
-              .uploadEndpoint="${this.attachmentsListUrl}"
+              .fileUrl="${this.faceAttachment?.file_name}"
+              .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl,  this.faceAttachment?.id)}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'faceAttachmentComponent')}"
               @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'faceAttachmentComponent')}"
               .endpointInfo="${{
                 rawFilePropertyName: 'path',
                 extraInfo: {type: 'FACE'},
-                rejectWithRequest: true
+                rejectWithRequest: true,
+                method: this.faceAttachment?.id ? 'PUT' : 'POST'
               }}"
               ?disabled="${this.pending}"
               ?readonly="${this.readonly}"
@@ -168,14 +169,15 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         <etools-upload
           id="otherOneAttachmentComponent"
           label="${translate('OTHER')} #1"
-          .fileUrl="${this.otherOneAttachment}"
+          .fileUrl="${this.otherOneAttachment?.file_name}"
           .uploadEndpoint="${this.attachmentsListUrl}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherOneAttachmentComponent')}"
           @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'otherOneAttachmentComponent')}"
           .endpointInfo="${{
             rawFilePropertyName: 'path',
             extraInfo: {type: 'Other'},
-            rejectWithRequest: true
+            rejectWithRequest: true,
+            method: this.otherOneAttachment?.id ? 'PUT' : 'POST'
           }}"
           ?disabled="${this.pending}"
           ?readonly="${this.readonly}"
@@ -188,14 +190,15 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         <etools-upload
           id="otherTwoAttachmentComponent"
           label="${translate('OTHER')} #2"
-          .fileUrl="${this.otherTwoAttachment}"
+          .fileUrl="${this.otherTwoAttachment?.file_name}"
           .uploadEndpoint="${this.attachmentsListUrl}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherTwoAttachmentComponent')}"
           @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'otherTwoAttachmentComponent')}"
           .endpointInfo="${{
             rawFilePropertyName: 'path',
             extraInfo: {type: 'Other'},
-            rejectWithRequest: true
+            rejectWithRequest: true,
+            method: this.otherTwoAttachment?.id ? 'PUT' : 'POST'
           }}"
           ?disabled="${this.pending}"
           ?readonly="${this.readonly}"
@@ -209,14 +212,15 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
             <etools-upload
               id="otherTwoAttachmentComponent"
               label="${translate('OTHER')} #3"
-              .fileUrl="${this.otherThreeAttachment}"
+              .fileUrl="${this.otherThreeAttachment?.file_name}"
               .uploadEndpoint="${this.attachmentsListUrl}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherThreeAttachmentComponent')}"
               @delete-file="${(e: CustomEvent) => this._fileDeleted(e, 'otherThreeAttachmentComponent')}"
               .endpointInfo="${{
                 rawFilePropertyName: 'path',
                 extraInfo: {type: 'Other'},
-                rejectWithRequest: true
+                rejectWithRequest: true,
+                method: this.otherThreeAttachment?.id ? 'PUT' : 'POST'
               }}"
               ?disabled="${this.pending}"
               ?readonly="${this.readonly}"
@@ -263,6 +267,13 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     }
   }
 
+  getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
+    if(attachmentsListUrl) 
+      return '';
+    
+    return id ? `${attachmentsListUrl}/${id}/` : attachmentsListUrl;
+  }
+
   _fileDeleted(e: CustomEvent, type: string) {
     switch (type) {
       case 'faceAttachmentComponent':
@@ -278,6 +289,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         this.otherThreeAttachment = undefined;
         break;
     }
+    
     this.requestUpdate();
   }
 

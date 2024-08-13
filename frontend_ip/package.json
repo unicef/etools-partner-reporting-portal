@@ -28,7 +28,8 @@
     "rd:init": "relative-deps init",
     "rd:add": "relative-deps add",
     "rd:reload": "relative-deps",
-    "rd:watch": "chokidar \"../../etools-polymer/**/*.js\" \"../../etools-polymer/**/**/*.js\" -c 'npm run rd:reload' --silent"
+    "rd:watch": "chokidar \"../../etools-polymer/**/*.js\" \"../../etools-polymer/**/**/*.js\" -c 'npm run rd:reload' --silent",
+    "prepare": "relative-deps"
   },
   "private": true,
   "dependencies": {
@@ -39,7 +40,7 @@
     "@unicef-polymer/etools-piwik-analytics": "^4.0.1-rc.3",
     "@unicef-polymer/etools-types": "^1.11.17",
     "@unicef-polymer/etools-unicef": "^1.0.0-rc.98",
-    "@unicef-polymer/etools-utils": "^2.0.0-rc.11",
+    "@unicef-polymer/etools-utils": "^2.0.0-rc.12",
     "@webcomponents/webcomponentsjs": "^2.6.0",
     "browser-capabilities": "^1.1.4",
     "dayjs": "^1.11.5",
