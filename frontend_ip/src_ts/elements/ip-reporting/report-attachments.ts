@@ -6,15 +6,14 @@ import {
   programmeDocumentReportsAttachmentsPending,
   programmeDocumentReportsAttachmentsCurrent
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
-import {pdReportsAttachmentsSync, pdReportsAttachmentsSet} from '../../redux/actions/pdReportsAttachments';
+import {pdReportsAttachmentsSet} from '../../redux/actions/pdReportsAttachments';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from 'lit-translate';
 import {RootState} from '../../typings/redux.types';
-import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
-import {sendRequest, upload} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-upload';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 
@@ -113,19 +112,6 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
-
-    if (changedProperties.has('faceAttachment')) {
-      // this._filesChanged(this.faceAttachment, 'faceAttachment');
-    }
-    if (changedProperties.has('otherOneAttachment')) {
-      // this._filesChanged(this.otherOneAttachment, 'otherOneAttachment');
-    }
-    if (changedProperties.has('otherTwoAttachment')) {
-      // this._filesChanged(this.otherTwoAttachment, 'otherTwoAttachment');
-    }
-    if (changedProperties.has('otherThreeAttachment')) {
-      // this._filesChanged(this.otherThreeAttachment, 'otherThreeAttachment');
-    }
 
     if (changedProperties.has('attachmentsListUrl')) {
       this._getReportAttachments();
@@ -348,133 +334,6 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\\.]+/g, '_');
       }
     });
-  }
-
-  _filesChanged(files: any[], type: string) {
-    if (!files || !files.length) {
-      return;
-    }
-
-    this.replaceCharsThatAreNotLetterDigitDotOrUnderline(files);
-    const attachmentType = type.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
-    const attachment = files[0];
-
-    debounce(() => {
-      const data = new FormData();
-      let thunk;
-
-      const config = {
-        uploadEndpoint: this.attachmentsListUrl!,
-        endpointInfo: {rawFilePropertyName: 'path', extraInfo: {type: attachmentType}}
-      };
-      files.forEach((file: any) => {
-        // data.append('path', file.raw, file.file_name);
-        // data.append('type', attachmentType);
-
-        if (type === 'faceAttachment') {
-          this.faceLoading = true;
-        } else if (type === 'otherOneAttachment') {
-          this.otherOneLoading = true;
-        } else if (type === 'otherTwoAttachment') {
-          this.otherTwoLoading = true;
-        } else if (type === 'otherThreeAttachment') {
-          this.otherThreeLoading = true;
-        }
-
-        upload(config, file.raw, file.file_name)
-          .then((res: any) => {
-            pdReportsAttachmentsSet(this.reportId, res);
-          })
-          .catch((err) => {
-            console.log(err);
-            this.faceLoading = false;
-            this.otherOneLoading = false;
-            this.otherTwoLoading = false;
-            this.otherThreeLoading = false;
-          });
-      });
-
-      if (attachment.id === null) {
-        thunk = sendRequest({
-          method: 'POST',
-          endpoint: {url: this.attachmentsListUrl as string},
-          body: data
-        });
-
-        if (type === 'faceAttachment') {
-          this.faceLoading = true;
-        } else if (type === 'otherOneAttachment') {
-          this.otherOneLoading = true;
-        } else if (type === 'otherTwoAttachment') {
-          this.otherTwoLoading = true;
-        } else if (type === 'otherThreeAttachment') {
-          this.otherThreeLoading = true;
-        }
-      } else {
-        this.attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, attachment.id);
-
-        thunk = sendRequest({
-          method: 'DELETE',
-          endpoint: {url: this.attachmentDeleteUrl},
-          body: data
-        });
-      }
-
-      store
-        .dispatch(pdReportsAttachmentsSync(thunk, this.reportId))
-        // @ts-ignore
-        .then(() => {
-          fireEvent(this, 'toast', {
-            text: getTranslation('FILE_UPLOADED'),
-            showCloseBtn: true
-          });
-          this.faceLoading = false;
-          this.otherOneLoading = false;
-          this.otherTwoLoading = false;
-          this.otherThreeLoading = false;
-
-          const attachments = this.get('attachments');
-
-          attachments.forEach((item: any) => {
-            if (attachment.id !== null && item.id === attachment.id) {
-              return;
-            }
-          });
-
-          if (attachment.id === null) {
-            const duplicates = attachments.filter((item: any) => {
-              const tokens = attachment.file_name.split('.');
-              if (tokens.length === 0) {
-                return item.file_name.indexOf(attachment.file_name) !== -1;
-              } else {
-                return item.file_name.indexOf(tokens[0]) !== -1 && item.file_name.indexOf(tokens[1]) !== -1;
-              }
-            });
-
-            if (duplicates.length === 1) {
-              // @dci
-            } else if (duplicates.length > 1) {
-              let correctedItem;
-
-              duplicates.forEach((item: any) => {
-                if (item.file_name !== attachment.file_name) {
-                  correctedItem = item;
-                  return;
-                }
-              });
-
-              if (correctedItem) {
-                // @dci
-              }
-            }
-          }
-
-          this.attachmentDeleteUrl = undefined;
-        })
-        .catch((_err: any) => {
-          // TODO: error handling
-        });
-    }, 100)();
   }
 
   _getReportAttachments() {
