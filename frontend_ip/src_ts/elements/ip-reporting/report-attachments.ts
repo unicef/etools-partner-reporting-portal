@@ -252,16 +252,16 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
       const uploadResponse = e.detail.success;
       switch (type) {
         case 'faceAttachmentComponent':
-          this.faceAttachment.id = uploadResponse.id;
+          this.faceAttachment = uploadResponse;
           break;
         case 'otherOneAttachmentComponent':
-          this.otherOneAttachment.id = uploadResponse.id;
+          this.otherOneAttachment = uploadResponse;
           break;
         case 'otherTwoAttachmentComponent':
-          this.otherTwoAttachment.id = uploadResponse.id;
+          this.otherTwoAttachment = uploadResponse;
           break;
         case 'otherThreeAttachmentComponent':
-          this.otherThreeAttachment.id = uploadResponse.id;
+          this.otherThreeAttachment = uploadResponse;
           break;
       }
     }
