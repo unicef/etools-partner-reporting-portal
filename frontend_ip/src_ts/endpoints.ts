@@ -26,7 +26,7 @@ const Endpoints = {
   },
 
   programmeDocumentDetail(locationId: string, pdId: string) {
-    return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId);
+    return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId + '/');
   },
   programmeDocumentDocDownload(locationId: string, pdId: string) {
     return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId + '/pmp-document/');

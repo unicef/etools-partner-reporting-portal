@@ -183,7 +183,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
 
     sendRequest({
       method: 'GET',
-      endpoint: {url: this.programmeDocumentsUrl}
+      endpoint: {url: this.programmeDocumentDetailUrl}
     })
       .then((res) => {
         store.dispatch(pdAdd(res));
