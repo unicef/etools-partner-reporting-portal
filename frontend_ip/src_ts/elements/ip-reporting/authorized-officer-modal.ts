@@ -6,7 +6,6 @@ import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-unicef/src/etools-dialog/etools-dialog';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import {RootState} from '../../typings/redux.types';
@@ -14,9 +13,10 @@ import {translate} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('authorized-officer-modal')
-export class AuthorizedOfficerModal extends RoutingMixin(UtilsMixin(connect(store)(LitElement))) {
+export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   data!: any;
 
@@ -100,7 +100,7 @@ export class AuthorizedOfficerModal extends RoutingMixin(UtilsMixin(connect(stor
   }
 
   stateChanged(state: RootState) {
-    if (this.currentPd !== currentProgrammeDocument(state)) {
+    if (!isJsonStrMatch(this.currentPd, currentProgrammeDocument(state))) {
       this.currentPd = currentProgrammeDocument(state);
     }
   }
