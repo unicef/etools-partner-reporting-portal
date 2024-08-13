@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {
@@ -94,6 +94,10 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: String})
   reportId!: string;
+ 
+  @state() 
+  mapKeyToLoading = {'faceAttachmentComponent': this.faceLoading, 'otherOneAttachmentComponent': this.otherOneLoading,
+    'otherTwoAttachmentComponent': this.otherTwoLoading, 'otherThreeAttachmentComponent': this.otherThreeLoading};
 
   stateChanged(state: RootState) {
     if (this.pending !== this._programmeDocumentReportsAttachmentsPending(state)) {
@@ -135,6 +139,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
               label="${translate('FACE')}"
               .fileUrl="${this.faceAttachment?.file_name}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.faceAttachment?.id)}"
+              @upload-started="${() => this._uploadStarted('faceAttachmentComponent')}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'faceAttachmentComponent')}"
               @delete-file="${() => this._deleteFile('faceAttachmentComponent', this.faceAttachment?.id)}"
               .endpointInfo="${{
@@ -157,6 +162,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           label="${translate('OTHER')} #1"
           .fileUrl="${this.otherOneAttachment?.file_name}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherOneAttachment?.id)}"
+          @upload-started="${() => this._uploadStarted('otherOneAttachmentComponent')}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherOneAttachmentComponent')}"
           @delete-file="${() => this._deleteFile('otherOneAttachmentComponent', this.otherOneAttachment?.id)}"
           .endpointInfo="${{
@@ -178,6 +184,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           label="${translate('OTHER')} #2"
           .fileUrl="${this.otherTwoAttachment?.file_name}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherTwoAttachment?.id)}"
+          @upload-started="${() => this._uploadStarted('otherTwoAttachmentComponent')}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherTwoAttachmentComponent')}"
           @delete-file="${() => this._deleteFile('otherTwoAttachmentComponent', this.otherTwoAttachment?.id)}"
           .endpointInfo="${{
@@ -200,6 +207,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
               label="${translate('OTHER')} #3"
               .fileUrl="${this.otherThreeAttachment?.file_name}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
+              @upload-started="${() => this._uploadStarted('otherThreeAttachmentComponent')}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherThreeAttachmentComponent')}"
               @delete-file="${() => this._deleteFile('otherThreeAttachmentComponent', this.otherThreeAttachment?.id)}"
               .endpointInfo="${{
@@ -233,6 +241,12 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     return computeListUrl(locationId, reportId);
   }
 
+  _uploadStarted(type: string) {
+    this.mapKeyToLoading[type] = true;
+    this.pending = true;
+    this.requestUpdate();
+  }
+
   _uploadFinished(e: CustomEvent, type: string) {
     if (e.detail.success) {
       const uploadResponse = e.detail.success;
@@ -251,6 +265,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           break;
       }
     }
+    this.pending = false;
+    this.mapKeyToLoading[type] = false;
+    this.requestUpdate();
   }
 
   getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
@@ -346,9 +363,5 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     }).then((data) => {
       store.dispatch(pdReportsAttachmentsSet(this.reportId, data));
     });
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
   }
 }
