@@ -104,8 +104,8 @@ export class PdOutputList extends connect(store)(LitElement) {
       this.workspaceId = state.location.id;
     }
 
-    if (this.pdId !== state.programmeDocuments.current) {
-      this.pdId = state.programmeDocuments.current;
+    if (this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
     }
   }
 

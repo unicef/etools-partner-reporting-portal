@@ -145,8 +145,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
       this.locationId = state.location.id;
     }
 
-    if (this.pdId !== state.programmeDocuments.current) {
-      this.pdId = state.programmeDocuments.current;
+    if (this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
     }
 
     if (this.reportId !== state.programmeDocumentReports.current.id) {

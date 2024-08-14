@@ -4,7 +4,7 @@ import Endpoints from '../../../endpoints.js';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments.js';
-import {pdAdd, pdFetch, pdSetCount, pdSetCurrent} from '../../../redux/actions/pd.js';
+import {pdFetch, pdSetCurrent, pdSetCurrentId} from '../../../redux/actions/pd.js';
 import './pd/pd-index.js';
 import './pd/pd-router.js';
 import {RootState} from '../../../typings/redux.types.js';
@@ -135,6 +135,12 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     // if (this.routeDetails?.subRouteName) {
     //   return;
     // }
+
+    // We are on details so we do not need the list
+    if (this.routeDetails?.params?.pdID) {
+      return;
+    }
+
     store.dispatch(
       pdFetch(
         sendRequest({
@@ -154,7 +160,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     if (pd_id !== this.pdId) {
       this.pdId = pd_id;
       if (this.pdId) {
-        store.dispatch(pdSetCurrent(pd_id));
+        store.dispatch(pdSetCurrentId(pd_id));
       }
     }
 
@@ -176,7 +182,9 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
     }
 
     const rootState = store.getState();
-    const pdDataIsLoaded = rootState.programmeDocuments.all.find((x) => String(x.id) === String(this.pdId));
+    const pdDataIsLoaded =
+      rootState.programmeDocuments.currentPd && String(rootState.programmeDocuments.currentPd.id) === String(this.pdId);
+
     if (pdDataIsLoaded) {
       return;
     }
@@ -186,8 +194,7 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
       endpoint: {url: this.programmeDocumentDetailUrl}
     })
       .then((res) => {
-        store.dispatch(pdAdd(res));
-        store.dispatch(pdSetCount(++rootState.programmeDocuments.all.length));
+        store.dispatch(pdSetCurrent(res));
       })
       .catch((err) => {
         console.log(err);

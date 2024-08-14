@@ -358,8 +358,8 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       this.currentReport = programmeDocumentReportsCurrent(state);
     }
 
-    if (this.pdId !== state.programmeDocuments.current) {
-      this.pdId = state.programmeDocuments.current;
+    if (this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
     }
 
     if (this.reportId !== state.programmeDocumentReports.current.id) {

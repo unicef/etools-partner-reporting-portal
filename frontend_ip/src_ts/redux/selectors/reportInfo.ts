@@ -18,7 +18,7 @@ export const reportInfoCurrent = createSelector(
     return state.programmeDocumentReports.byPD;
   },
   function (state: RootState) {
-    return state.programmeDocuments.current;
+    return state.programmeDocuments.currentPdId;
   },
   function (state: RootState) {
     return state.programmeDocumentReports.current.id;

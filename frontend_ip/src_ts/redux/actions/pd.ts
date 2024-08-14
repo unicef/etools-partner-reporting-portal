@@ -54,9 +54,16 @@ export const pdFetch = function (pdThunk: any) {
   };
 };
 
-export const pdSetCurrent = function (pdId: number) {
+export const pdSetCurrentId = function (pdId: number) {
+  return {
+    type: Constants.SET_CURRENT_PD_ID,
+    pdId: pdId
+  };
+};
+
+export const pdSetCurrent = function (pd: any) {
   return {
     type: Constants.SET_CURRENT_PD,
-    pdId: pdId
+    pd: pd
   };
 };

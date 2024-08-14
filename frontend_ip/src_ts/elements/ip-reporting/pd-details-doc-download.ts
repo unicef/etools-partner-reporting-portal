@@ -12,6 +12,7 @@ import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-details-doc-download')
 export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
@@ -42,7 +43,7 @@ export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(
   docUrl = '';
 
   stateChanged(state: RootState) {
-    if (currentProgrammeDocument(state)) {
+    if (!isJsonStrMatch(this.pd, currentProgrammeDocument(state))) {
       this.pd = currentProgrammeDocument(state);
     }
 

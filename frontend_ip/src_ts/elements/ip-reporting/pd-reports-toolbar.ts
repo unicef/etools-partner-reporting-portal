@@ -74,8 +74,8 @@ class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
       this.locationId = state.location.id;
     }
 
-    if (this.pdId !== state.programmeDocuments.current) {
-      this.pdId = state.programmeDocuments.current;
+    if (this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
     }
   }
 

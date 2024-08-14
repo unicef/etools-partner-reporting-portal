@@ -7,7 +7,7 @@ export const programmeDocumentReportsAll = createSelector(
     return state.programmeDocumentReports.byPD;
   },
   function (state) {
-    return state.programmeDocuments.current;
+    return state.programmeDocuments.currentPdId;
   },
   function (byPD: any, pdId: string) {
     return byPD[pdId];
@@ -19,7 +19,7 @@ export const programmeDocumentReportsCount = createSelector(
     return state.programmeDocumentReports.countByPD;
   },
   function (state) {
-    return state.programmeDocuments.current;
+    return state.programmeDocuments.currentPdId;
   },
   function (countByPD: any, pdId: string) {
     return countByPD[pdId];
@@ -31,7 +31,7 @@ export const programmeDocumentReportsCurrent = createSelector(
     return state.programmeDocumentReports.byPD;
   },
   function (state) {
-    return state.programmeDocuments.current;
+    return state.programmeDocuments.currentPdId;
   },
   function (state) {
     return state.programmeDocumentReports.current.id;

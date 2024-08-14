@@ -235,8 +235,8 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
     if (state.location?.id && this.locationId !== state.location.id) {
       this.locationId = state.location.id;
     }
-    if (state.programmeDocuments?.current && this.pdId !== state.programmeDocuments.current) {
-      this.pdId = state.programmeDocuments.current;
+    if (state.programmeDocuments?.currentPdId && this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
     }
 
     if (this.loading != pdIndicatorsLoading(state)) {

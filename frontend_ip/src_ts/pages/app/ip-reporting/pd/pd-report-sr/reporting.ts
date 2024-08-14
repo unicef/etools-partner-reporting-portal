@@ -125,8 +125,8 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
     this.data = this._reportInfoCurrent(state);
     this.currentReport = this._currentProgrammeDocument(state);
 
-    if (this.pdId !== state.programmeDocuments.current) {
-      this.pdId = state.programmeDocuments.current;
+    if (this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
     }
     if (this.programmeDocuments !== state.programmeDocuments.all) {
       this.programmeDocuments = state.programmeDocuments.all;

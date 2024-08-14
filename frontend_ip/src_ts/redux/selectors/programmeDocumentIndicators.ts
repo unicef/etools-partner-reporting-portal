@@ -6,7 +6,7 @@ export const pdIndicatorsAll = createSelector(pdId, pick('byPd'), byPd);
 export const pdIndicatorsLoading = createSelector(pdId, pick('loading'), byPd);
 
 function pdId(state: RootState) {
-  return state.programmeDocuments.current;
+  return state.programmeDocuments.currentPdId;
 }
 
 function byPd(pdId: any, data: any) {
