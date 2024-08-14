@@ -334,10 +334,12 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
   }
 
   _computeReportUrl(locationId: string, reportId: string, _: any) {
-    return Endpoints.programmeDocumentReport(locationId, reportId);
+    return locationId && reportId ? Endpoints.programmeDocumentReport(locationId, reportId) : '';
   }
 
   _computeSubmitUrl(locationId: string, reportId: string, reportType: string) {
+    if (!locationId || !reportId) return '';
+
     switch (reportType) {
       case 'SR':
         return Endpoints.programmeDocumentReportSubmitSpecial(locationId, reportId);
