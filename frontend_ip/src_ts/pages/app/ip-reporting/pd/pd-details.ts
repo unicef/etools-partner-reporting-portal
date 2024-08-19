@@ -21,7 +21,7 @@ const DETAILS = 'details';
 const REPORTS = 'reports';
 const CALCULATION_METHODS = 'calculation_methods';
 
-const NAVIGATION_TABS: PageTab[] = [
+const NAVIGATION_TABS: any[] = [
   {
     tab: DETAILS,
     tabLabel: translate('DETAILS') as any as string,
@@ -50,16 +50,26 @@ export class PageIpReportingPdDetails extends UtilsMixin(connect(store)(LitEleme
     }
   `;
 
-  @property({type: String}) pagePath = '';
-  @property({type: Object}) pd: any = {};
-  @property() activeTab: string = DETAILS;
-  @property() pageTabs: PageTab[] = NAVIGATION_TABS;
+  @property({type: String})
+  pagePath = '';
+
+  @property({type: Object})
+  pd: any = {};
+
+  @property()
+  activeTab: string = DETAILS;
+
+  @property()
+  pageTabs: any[] = NAVIGATION_TABS;
+
+  @property({type: Object})
+  pdQuery = {status: String(['signed', 'active', 'suspended'])};
 
   render() {
     return html`
       ${sharedStyles}
 
-      <page-header title="${this.pd.title}" back="pd?&status=Sig%2CAct%2CSus">
+      <page-header title="${this.pd.title}" back="${this._appendQuery('pd', this.pdQuery)}">
         ${this.pd?.status === 'Suspended'
           ? html` <message-box slot="header-content" type="warning">
               PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.

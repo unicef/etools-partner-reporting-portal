@@ -105,7 +105,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
       >
         <div slot="row-data" class="layout-horizontal editable-row">
           <span class="col-data col-2 table-cell table-cell--text self-center">
-            <sl-tooltip content="${this.indicator?.blueprint?.title}" hoist>
+            <sl-tooltip content="${this.indicator?.blueprint?.title}">
               <span>
                 ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
                   ? html`<status-badge type="error"></status-badge>`
