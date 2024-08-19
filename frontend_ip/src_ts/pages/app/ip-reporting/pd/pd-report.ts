@@ -288,7 +288,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
     }
 
     if (changedProperties.has('routeData')) {
-      this._onReportChanged(this.routeData.reportId, this.routeData.mode);
+      this._onReportChanged(this.routeData?.reportId, this.routeData?.mode);
     }
 
     if (changedProperties.has('currentReport') || changedProperties.has('routeData')) {
