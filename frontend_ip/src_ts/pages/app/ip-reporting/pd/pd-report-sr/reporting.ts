@@ -155,12 +155,12 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
       ></etools-prp-permissions>
 
       <etools-content-panel no-header>
-          <div class="row">
-            <div class="col-12 padding-v">
-              <labelled-item label="${translate('DESCRIPTION')}">
-                <span class="value">${this.srDescription}</span>
-              </labelled-item>
-            </div>
+        <div class="row">
+          <div class="col-12 padding-v">
+            <labelled-item label="${translate('DESCRIPTION')}">
+              <span class="value">${this.srDescription}</span>
+            </labelled-item>
+          </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('NARRATIVE')}">
