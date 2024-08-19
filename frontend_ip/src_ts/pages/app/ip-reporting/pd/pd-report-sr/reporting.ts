@@ -155,14 +155,14 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
       ></etools-prp-permissions>
 
       <etools-content-panel no-header>
-        <div class="app-grid">
           <div class="row">
-            <labelled-item label="${translate('DESCRIPTION')}">
-              <span class="value">${this.srDescription}</span>
-            </labelled-item>
-          </div>
+            <div class="col-12 padding-v">
+              <labelled-item label="${translate('DESCRIPTION')}">
+                <span class="value">${this.srDescription}</span>
+              </labelled-item>
+            </div>
 
-          <div class="row">
+          <div class="col-12 padding-v">
             <labelled-item label="${translate('NARRATIVE')}">
               ${this.computedMode === 'view'
                 ? html` <span class="value">${this._withDefault(this.data.narrative)}</span> `
@@ -180,7 +180,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
             </labelled-item>
           </div>
 
-          <div class="row layout-horizontal right-align">
+          <div class="col-12 right-align padding-v">
             ${this.computedMode !== 'view'
               ? html`
                   <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
@@ -190,8 +190,8 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
               : html``}
           </div>
 
-          <div class="row">
-            <report-attachments readonly="${this.computedMode === 'view'}"></report-attachments>
+          <div class="col-12 padding-v">
+            <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
