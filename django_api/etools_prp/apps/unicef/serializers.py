@@ -422,6 +422,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_date',
             'review_overall_status',
             'review_overall_status_display',
+            'accepted_comment',
             'sent_back_feedback',
             'programme_document',
             'funds_received_to_date',

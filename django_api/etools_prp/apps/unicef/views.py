@@ -1063,6 +1063,7 @@ class ProgressReportReviewAPIView(APIView):
 
         elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
             progress_report.review_overall_status = serializer.validated_data['overall_status']
+            progress_report.accepted_comment = serializer.validated_data.get('comment')
 
         progress_report.save()
         serializer = ProgressReportSerializer(instance=progress_report)
