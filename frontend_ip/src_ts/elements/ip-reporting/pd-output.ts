@@ -137,6 +137,9 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
   @property({type: String})
   workspaceId = '';
 
+  @property({type: String})
+  baseUrl!: string;
+
   @property({type: Object})
   currentPd!: any;
 
@@ -373,6 +376,9 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     if (this.disaggregationsByIndicator !== state.disaggregations.byIndicator) {
       this.disaggregationsByIndicator = state.disaggregations.byIndicator;
     }
+    if(state.workspaces.baseUrl && this.path !== state.workspaces.baseUrl) {     
+      this.baseUrl = state.workspaces.baseUrl;
+    }
   }
 
   updated(changedProperties) {
@@ -399,8 +405,8 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       this.reportableUrl = computeReportableUrl(this.reportId, this.data);
     }
 
-    if (changedProperties.has('_baseUrldata') || changedProperties.has('pdId')) {
-      this.calculationMethodUrl = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/calculation-methods');
+    if (changedProperties.has('baseUrl') || changedProperties.has('pdId')) {
+      this.calculationMethodUrl = this.buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/calculation-methods');
     }
   }
 
