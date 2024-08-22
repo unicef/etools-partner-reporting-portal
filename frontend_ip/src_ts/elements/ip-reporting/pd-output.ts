@@ -70,11 +70,12 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
       }
       .indicator-header dl {
         margin: 0;
-        text-align: right;
         font-size: 11px;
       }
       .indicator-header dt {
         color: var(--theme-secondary-text-color);
+      }
+      .indicator-header dt.no-wrap {
         white-space: nowrap;
       }
       .indicator-header dd {
@@ -250,15 +251,15 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
                           </div>
                           <dl class="layout-horizontal">
                             <dt>                            
-                            <sl-tooltip content="${translate('TO_LEARN_MORE')}" placement="top">
-                              <span class="ripple-wrapper main">
-                                <a href=${this.calculationMethodUrl}>
-                                  ${translate('CALCULATION_METHODS')}
-                                </a>  
-                              </span>
-                            </sl-tooltip>                              
+                              <sl-tooltip content="${translate('TO_LEARN_MORE')}" placement="top">
+                                <span class="ripple-wrapper main">
+                                  <a href=${this.calculationMethodUrl}>
+                                    ${translate('CALCULATION_METHODS')}
+                                  </a>  
+                                </span>
+                              </sl-tooltip>                              
                             </dt>
-                            <dt>
+                            <dt class="no-wrap">
                               <b
                                 >${this._toLowerCaseLocalized(
                                   indicator.reportable.blueprint.calculation_formula_across_locations
