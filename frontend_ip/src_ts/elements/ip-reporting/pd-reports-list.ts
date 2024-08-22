@@ -69,8 +69,8 @@ export class PdReportsList extends PaginationMixin(
       this.queryParams = state.app?.routeDetails.queryParams;
     }
 
-    if (this.pdId !== state.programmeDocuments?.current) {
-      this.pdId = state.programmeDocuments?.current;
+    if (this.pdId !== state.programmeDocuments?.currentPdId) {
+      this.pdId = state.programmeDocuments?.currentPdId;
     }
 
     if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {

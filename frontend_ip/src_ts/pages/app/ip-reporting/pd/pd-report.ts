@@ -101,6 +101,9 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
   reportUrl!: string;
 
   @property({type: Object})
+  queryParams: any;
+
+  @property({type: Object})
   currentReport: any;
 
   @property({type: String})
