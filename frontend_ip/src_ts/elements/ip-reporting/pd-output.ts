@@ -407,7 +407,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     }
 
     if (changedProperties.has('baseUrl') || changedProperties.has('pdId')) {
-      this.calculationMethodUrl = this.buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/calculation-methods');
+      this.calculationMethodUrl = this.buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/calculation_methods');
     }
   }
 
