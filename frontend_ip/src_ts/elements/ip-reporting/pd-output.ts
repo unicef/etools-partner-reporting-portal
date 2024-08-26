@@ -377,7 +377,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     if (this.disaggregationsByIndicator !== state.disaggregations.byIndicator) {
       this.disaggregationsByIndicator = state.disaggregations.byIndicator;
     }
-    if(state.workspaces.baseUrl && this.path !== state.workspaces.baseUrl) {     
+    if (state.workspaces.baseUrl && this.path !== state.workspaces.baseUrl) {
       this.baseUrl = state.workspaces.baseUrl;
     }
   }
