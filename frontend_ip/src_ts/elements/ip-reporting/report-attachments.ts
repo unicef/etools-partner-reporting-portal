@@ -146,7 +146,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
             <etools-upload
               id="faceAttachmentComponent"
               label="${translate('FACE')}"
-              .fileUrl="${this.faceAttachment?.file_name}"
+              .fileUrl="${this.faceAttachment?.path}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.faceAttachment?.id)}"
               @upload-started="${() => this._uploadStarted('faceAttachmentComponent')}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'faceAttachmentComponent')}"
@@ -169,7 +169,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         <etools-upload
           id="otherOneAttachmentComponent"
           label="${translate('OTHER')} #1"
-          .fileUrl="${this.otherOneAttachment?.file_name}"
+          .fileUrl="${this.otherOneAttachment?.path}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherOneAttachment?.id)}"
           @upload-started="${() => this._uploadStarted('otherOneAttachmentComponent')}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherOneAttachmentComponent')}"
@@ -191,7 +191,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         <etools-upload
           id="otherTwoAttachmentComponent"
           label="${translate('OTHER')} #2"
-          .fileUrl="${this.otherTwoAttachment?.file_name}"
+          .fileUrl="${this.otherTwoAttachment?.path}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherTwoAttachment?.id)}"
           @upload-started="${() => this._uploadStarted('otherTwoAttachmentComponent')}"
           @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherTwoAttachmentComponent')}"
@@ -214,7 +214,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
             <etools-upload
               id="otherTwoAttachmentComponent"
               label="${translate('OTHER')} #3"
-              .fileUrl="${this.otherThreeAttachment?.file_name}"
+              .fileUrl="${this.otherThreeAttachment?.path}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
               @upload-started="${() => this._uploadStarted('otherThreeAttachmentComponent')}"
               @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherThreeAttachmentComponent')}"
