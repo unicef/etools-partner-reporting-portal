@@ -22,9 +22,11 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
 import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path';
-import {registerTranslateConfig, use} from 'lit-translate';
+import {registerTranslateConfig, translate, use} from 'lit-translate';
 import {setActiveLanguage} from './redux/actions/active-language';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
 
 dayjs.extend(dayJsUtc);
 
@@ -117,6 +119,13 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
     }
   }
 
+  firstUpdated(changedProperties: PropertyValues) {
+    super.firstUpdated(changedProperties);
+    this.waitForTranslationsToLoad().then(async () => {
+      this.checkAppVersion();
+    });
+  }
+
   stateChanged(state: RootState) {
     this.setCurrentLanguage(state);
 
@@ -154,6 +163,7 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
       store.dispatch(setActiveLanguage(currentLanguage));
     }
   }
+
   async loadLocalization() {
     this.waitForTranslationsToLoad().then(async () => {
       await use(this.selectedLanguage);
@@ -170,6 +180,42 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
         }
       }, 50);
     });
+  }
+
+  checkAppVersion() {
+    fetch('version.json')
+      .then((res) => res.json())
+      .then((version) => {
+        if (version.revision != document.getElementById('buildRevNo')!.innerText) {
+          console.log('version.json', version.revision);
+          console.log('buildRevNo ', document.getElementById('buildRevNo')!.innerText);
+          this._showConfirmNewVersionDialog();
+        }
+      });
+  }
+
+  private async _showConfirmNewVersionDialog() {
+    // COMMENT THIS TO OUT TO REMOVE CONFIRMATION DIALOG FOR REFRESH APP
+    const confirmed = await openDialog({
+      dialog: 'are-you-sure',
+      dialogData: {
+        content: translate('A_NEW_VERSION_OF_THE_APP_IS_AV'),
+        confirmBtnText: translate('YES')
+      }
+    }).then(({confirmed}) => {
+      return confirmed;
+    });
+
+    if (confirmed) {
+      if (navigator.serviceWorker) {
+        caches.keys().then((cacheNames) => {
+          cacheNames.forEach((cacheName) => {
+            caches.delete(cacheName);
+          });
+          location.reload();
+        });
+      }
+    }
   }
 
   canAccessPage(_routeName: string) {

@@ -488,5 +488,6 @@
     "OK_BTN_TEXT":"Ok",
     "CANCEL_BTN_TEXT":"Cancel",
     "MY_PROFILE":"My profile",
+    "A_NEW_VERSION_OF_THE_APP_IS_AV": "A new version of the app is available. Refresh page?",
     "NAME":"Name"
 }

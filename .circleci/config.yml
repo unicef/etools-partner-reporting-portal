@@ -146,6 +146,10 @@ jobs:
             BUILDDATE=$(date -u +%F_%T)
             sed -i "0,/revNo/s//$REVNO/" package.json
             sed -i "0,/bDate/s//$BUILDDATE/" package.json
+            sed -i "0,/revNo/s//$REVNO/" version.json
+            sed -i "0,/bDate/s//$BUILDDATE/" version.json
+            sed -i "0,/revNo/s//$REVNO/" index.html
+            sed -i "0,/bDate/s//$BUILDDATE/" index.html
       - run:
           name: Install Docker client
           command: |
