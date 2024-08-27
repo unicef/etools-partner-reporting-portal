@@ -149,7 +149,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
           ${this.currentReport?.programme_document?.reference_number}
         </etools-button>
 
-        ${this._equals(this.currentPd.status, 'Suspended')
+        ${this._equals(this.currentPd?.status, 'Suspended')
           ? html`
               <message-box slot="header-content" type="warning">
                 This report belongs to a suspended PD. Please contact UNICEF programme focal person to confirm reporting
@@ -196,19 +196,19 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
       </page-header>
 
       <page-body>
-        ${this._equals(this.currentReport.report_type, 'HR')
+        ${this._equals(this.currentReport?.report_type, 'HR')
           ? html`<page-pd-report-hr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
             ></page-pd-report-hr>`
           : html``}
-        ${this._equals(this.currentReport.report_type, 'QPR')
+        ${this._equals(this.currentReport?.report_type, 'QPR')
           ? html`<page-pd-report-qpr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
             ></page-pd-report-qpr>`
           : html``}
-        ${this._equals(this.currentReport.report_type, 'SR')
+        ${this._equals(this.currentReport?.report_type, 'SR')
           ? html`<page-pd-report-sr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
