@@ -143,10 +143,10 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
       ></etools-prp-permissions>
 
       <page-header title=${this.headingPrefix} back=${this.backLink}>
-        <reporting-period slot="above-title" .range=${this.currentReport.reporting_period}></reporting-period>
+        <reporting-period slot="above-title" .range=${this.currentReport?.reporting_period}></reporting-period>
         <pd-reports-report-title slot="above-title" .report=${this.currentReport}></pd-reports-report-title>
         <etools-button variant="text" slot="in-title" role="button" @click=${this._showPdDetails}>
-          ${this.currentReport.programme_document?.reference_number}
+          ${this.currentReport?.programme_document?.reference_number}
         </etools-button>
 
         ${this._equals(this.currentPd.status, 'Suspended')
@@ -159,7 +159,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
           : html``}
 
         <div slot="toolbar">
-          <report-status .status=${this.currentReport.status}></report-status>
+          <report-status .status=${this.currentReport?.status}></report-status>
 
           ${this._canExport(this.currentReport, this.mode, this.permissions)
             ? html`<pd-report-export-button></pd-report-export-button>`
@@ -176,9 +176,9 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
         <div slot="toolbar">
           ${this.submittedOnBehalf
             ? html`
-                <p>${translate('SUBMITTED_BY')}: ${this.currentReport.submitting_user}</p>
-                <p>${translate('ON_BEHALF_OF')}: ${this.currentReport.submitted_by}</p>
-                <p>${translate('DATE_OF_SUBMISSION')}: ${this.currentReport.submission_date}</p>
+                <p>${translate('SUBMITTED_BY')}: ${this.currentReport?.submitting_user}</p>
+                <p>${translate('ON_BEHALF_OF')}: ${this.currentReport?.submitted_by}</p>
+                <p>${translate('DATE_OF_SUBMISSION')}: ${this.currentReport?.submission_date}</p>
               `
             : html``}
         </div>

@@ -341,7 +341,7 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                       .indicatorName="${indicator.reportable.blueprint.title}"
                       .indicatorId="${indicator.parent_ir_id ? indicator.parent_ir_id : indicator.id}"
                       .indicatorStatus="${indicator.report_status}"
-                      .reportingPeriod="${this.currentReport.reporting_period}"
+                      .reportingPeriod="${this.currentReport?.reporting_period}"
                       .overrideMode="${this.computedMode}"
                       .reportId="${this.reportId}"
                       .currentPd="${this.currentPd}"
