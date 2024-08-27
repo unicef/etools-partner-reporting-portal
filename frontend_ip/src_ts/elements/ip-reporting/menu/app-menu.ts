@@ -10,9 +10,9 @@ import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../redux/store';
-import RoutingMixin from '../../../etools-prp-common/mixins/routing-mixin';
 import {translate} from 'lit-translate';
 import {RootState} from '../../../typings/redux.types';
+import {buildUrl} from '../../../etools-prp-common/utils/util';
 
 /**
  * main menu
@@ -20,7 +20,7 @@ import {RootState} from '../../../typings/redux.types';
  * @customElement
  */
 @customElement('app-menu')
-export class AppMenu extends RoutingMixin(MatomoMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
   static get styles() {
     return [navMenuStyles];
   }
@@ -156,6 +156,9 @@ export class AppMenu extends RoutingMixin(MatomoMixin(UtilsMixin(connect(store)(
   progressReportsUrl!: string;
 
   @property({type: String})
+  baseUrl!: string;
+
+  @property({type: String})
   indicatorsReportsUrl!: string;
 
   public _toggleSmallMenu(): void {
@@ -170,12 +173,12 @@ export class AppMenu extends RoutingMixin(MatomoMixin(UtilsMixin(connect(store)(
   }
 
   stateChanged(state: RootState): void {
-    if (state.workspaces?.baseUrl) {
-      this._baseUrl = state.workspaces?.baseUrl;
-      this.overviewUrl = this.buildUrl(this._baseUrl, 'overview');
-      this.pdUrl = this.buildUrl(this._baseUrl, 'pd');
-      this.progressReportsUrl = this.buildUrl(this._baseUrl, 'progress-reports');
-      this.indicatorsReportsUrl = this.buildUrl(this._baseUrl, 'indicators');
+    if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
+      this.overviewUrl = buildUrl(this.baseUrl, 'overview');
+      this.pdUrl = buildUrl(this.baseUrl, 'pd');
+      this.progressReportsUrl = buildUrl(this.baseUrl, 'progress-reports');
+      this.indicatorsReportsUrl = buildUrl(this.baseUrl, 'indicators');
     }
   }
 

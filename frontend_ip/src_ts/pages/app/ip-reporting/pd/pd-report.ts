@@ -22,7 +22,6 @@ import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '
 import Endpoints from '../../../../endpoints.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
-import RoutingMixin from '../../../../etools-prp-common/mixins/routing-mixin.js';
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
@@ -31,9 +30,10 @@ import {translate} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {buildUrl} from '../../../../etools-prp-common/utils/util.js';
 
 @customElement('page-ip-reporting-pd-report')
-export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(LitElement))) {
+export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin(LitElement)) {
   static styles = [
     css`
       :host {
@@ -120,6 +120,9 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
 
   @property({type: String})
   submitUrl = '';
+
+  @property({type: String})
+  baseUrl!: string;
 
   @property({type: String})
   refreshUrl = Endpoints.reportProgressReset();
@@ -468,7 +471,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
     }
 
     if (!this.permissions.editProgressReport && this.mode === 'edit') {
-      EtoolsRouter.updateAppLocation(this.buildUrl(this.baseUrl, this.backLink));
+      EtoolsRouter.updateAppLocation(buildUrl(this.baseUrl, this.backLink));
     }
   }
 
@@ -479,7 +482,7 @@ export class PageIpReportingPdReport extends RoutingMixin(ProgressReportUtilsMix
       endpoint: {url: this.submitUrl}
     })
       .then((res: any) => {
-        const newPath = this.buildUrl(this._baseUrl, 'pd/' + this.pdId + '/view/reports');
+        const newPath = buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/reports');
 
         store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
 

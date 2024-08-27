@@ -7,7 +7,6 @@ import '@unicef-polymer/etools-unicef/src/etools-collapse/etools-collapse';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import {translate, get as getTranslation} from 'lit-translate';
 import {
   computeReportableUrl,
@@ -28,9 +27,10 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {buildUrl} from '../../etools-prp-common/utils/util';
 
 @customElement('pd-output')
-export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement)))) {
+export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = [
     layoutStyles,
     css`
@@ -407,7 +407,7 @@ export class PdOutput extends RoutingMixin(ProgressReportUtilsMixin(UtilsMixin(c
     }
 
     if (changedProperties.has('baseUrl') || changedProperties.has('pdId')) {
-      this.calculationMethodUrl = this.buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/calculation_methods');
+      this.calculationMethodUrl = buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/calculation_methods');
     }
   }
 

@@ -92,7 +92,7 @@ export class PdReportsList extends PaginationMixin(
 
   _getLink(report: any, permissions: any) {
     const suffix = this._getMode(report, permissions);
-    return getLink(report, suffix, this.buildUrl, this._baseUrl);
+    return getLink(report, suffix, this.buildUrl, this.baseUrl);
   }
 
   render() {

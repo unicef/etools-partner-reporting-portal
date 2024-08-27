@@ -4,7 +4,6 @@ import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-drawer-layout.js
 import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-drawer.js';
 import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header-layout.js';
 import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header.js';
-// import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-footer.js';
 
 import '../../elements/ip-reporting/header/app-header.js';
 import '../../etools-prp-common/elements/page-title.js';
@@ -16,7 +15,6 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {store} from '../../redux/store.js';
 import {connect, installMediaQueryWatcher} from 'pwa-helpers';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin.js';
 import '../../elements/ip-reporting/menu/app-menu.js';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
@@ -26,7 +24,7 @@ import {translate} from 'lit-translate';
 // import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 
 @customElement('page-ip-reporting')
-export class PageIpReporting extends UtilsMixin(RoutingMixin(connect(store)(LitElement))) {
+export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
   static styles = [
     css`
       ${appDrawerStyles}

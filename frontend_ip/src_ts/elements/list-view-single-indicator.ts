@@ -18,12 +18,13 @@ import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 
 import {store} from '../redux/store';
 import {translate} from 'lit-translate';
-import RoutingMixin from '../etools-prp-common/mixins/routing-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
+import {buildUrl} from '../etools-prp-common/utils/util';
+import {BASE_PATH} from '../etools-prp-common/config';
 
 @customElement('list-view-single-indicator')
-export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(store)(LitElement))) {
+export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -86,6 +87,18 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
 
   @property({type: String})
   type = '';
+
+  @property({type: String})
+  baseUrlCluster!: string;
+
+  @property({type: String})
+  currentWorkspace!: string;
+
+  @property({type: String})
+  currentApp!: string;
+
+  @property({type: String})
+  currentPlan!: string;
 
   render() {
     return html`
@@ -216,16 +229,40 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
     if (this.appName !== state.app.current) {
       this.appName = state.app.current;
     }
+    if (state.workspaces?.current && state.workspaces.current !== this.currentWorkspace) {
+      this.currentWorkspace = state.workspaces?.current;
+    }
+    if (state.app?.current && state.app?.current !== this.currentApp) {
+      this.currentApp = state.app?.current;
+    }
+    if (state.responsePlans?.current && state.responsePlans?.current !== this.currentPlan) {
+      this.currentPlan = state.responsePlans?.current;
+    }
   }
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    if (changedProperties.has('_baseUrlCluster') || changedProperties.has('indicator')) {
-      this.indicatorReportsUrl = this._computeIndicatorReportsUrl(this._baseUrlCluster, this.indicator);
+
+    if (
+      changedProperties.has('currentWorkspace') ||
+      changedProperties.has('currentApp') ||
+      changedProperties.has('currentPlan')
+    ) {
+      this._computeBaseUrlCluster(this.currentWorkspace, this.currentApp, this.currentPlan);
+    }
+
+    if (changedProperties.has('baseUrlCluster') || changedProperties.has('indicator')) {
+      this.indicatorReportsUrl = this._computeIndicatorReportsUrl(this.baseUrlCluster, this.indicator);
     }
 
     if (changedProperties.has('indicator') || changedProperties.has('indicator')) {
       this.progressBarType = this._computeProgressBarType(this.indicator);
+    }
+  }
+
+  _computeBaseUrlCluster(workspace?: string, app?: string, planId?: string) {
+    if (workspace && app && planId) {
+      this.baseUrlCluster = `/${BASE_PATH}/${workspace}/${app}/plan/${planId}`;
     }
   }
 
@@ -261,7 +298,7 @@ export class ListViewSingleIndicator extends RoutingMixin(UtilsMixin(connect(sto
 
     query_params += '&indicator=' + indicator.id.toString();
 
-    return this.buildUrl(baseUrl, query_params); // Assuming buildUrl method is defined somewhere
+    return buildUrl(baseUrl, query_params);
   }
 
   _computeProgressBarType(indicator: any) {

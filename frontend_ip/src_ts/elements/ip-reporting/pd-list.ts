@@ -11,7 +11,6 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from 'lit-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../../etools-prp-common/elements/report-status';
@@ -21,16 +20,18 @@ import '../../etools-prp-common/elements/list-placeholder';
 import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
+import {buildUrl} from '../../etools-prp-common/utils/util';
 
 @customElement('pd-list')
-export class PdList extends RoutingMixin(
-  MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement)))))
-) {
+export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
   @property({type: Boolean})
   loading = false;
 
   @property({type: Array})
   data: any[] = [];
+
+  @property({type: String})
+  baseUrl!: string;
 
   stateChanged(state: RootState) {
     if (state.app?.routeDetails.subSubRouteName !== 'pd') {
@@ -39,6 +40,10 @@ export class PdList extends RoutingMixin(
 
     if (this.loading !== state.programmeDocuments?.loading) {
       this.loading = state.programmeDocuments.loading;
+    }
+
+    if (state.workspaces.baseUrl && this.baseUrl !== state.workspaces.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
     }
 
     if (state.programmeDocuments?.all !== undefined && this.data !== state.programmeDocuments?.all) {
@@ -120,7 +125,7 @@ export class PdList extends RoutingMixin(
                     <a
                       @click="${this.trackAnalytics}"
                       tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
-                      href="${this.getLinkUrl(this._baseUrl, pd.id, 'details')}"
+                      href="${this.getLinkUrl(this.baseUrl, pd.id, 'details')}"
                       class="truncate"
                     >
                       ${this._withDefault(pd.reference_number)}
@@ -160,7 +165,7 @@ export class PdList extends RoutingMixin(
                   <a
                     @click="${this.trackAnalytics}"
                     tracker="Reports"
-                    href="${this.getLinkUrl(this._baseUrl, pd.id, 'reports')}"
+                    href="${this.getLinkUrl(this.baseUrl, pd.id, 'reports')}"
                   >
                     ${translate('REPORTS')}
                   </a>
@@ -201,7 +206,7 @@ export class PdList extends RoutingMixin(
   }
 
   getLinkUrl(baseUrl, id, page) {
-    return this.buildUrl(baseUrl, `pd/${id}/view/${page}`);
+    return buildUrl(baseUrl, `pd/${id}/view/${page}`);
   }
 
   _getPdRefNumberTracker(pdRefNumber) {

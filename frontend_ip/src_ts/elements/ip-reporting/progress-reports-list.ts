@@ -12,7 +12,6 @@ import './pd-reports-report-title';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
 import {translate} from 'lit-translate';
@@ -24,7 +23,7 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('progress-reports-list')
 export class ProgressReportsList extends SortingMixin(
-  ProgressReportUtilsMixin(RoutingMixin(PaginationMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement))))))
+  ProgressReportUtilsMixin(PaginationMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement)))))
 ) {
   static styles = [
     layoutStyles,
