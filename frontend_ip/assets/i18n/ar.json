@@ -489,5 +489,7 @@
     "CANCEL_BTN_TEXT": "يلغي",
     "MY_PROFILE": "ملفي",
     "A_NEW_VERSION_OF_THE_APP_IS_AV": "يتوفر إصدار جديد من التطبيق. إعادة تحميل الصفحة؟",
-    "NAME": "اسم"
+    "NAME": "اسم",
+    "ACHIEVED_AS_PLANNED": "تحقق كما هو مخطط",
+    "NOT_ACHIEVED_AS_PLANNED": "لم يتحقق كما هو مخطط"
 }
