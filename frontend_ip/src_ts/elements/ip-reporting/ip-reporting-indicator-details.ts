@@ -21,15 +21,14 @@ import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: String})
   indicatorDetailUrl = '';
 
-  @property({type: Number})
-  selected = 0;
+  @property({type: String})
+  selected = '';
 
   @property({type: Boolean})
   isOpen = false;
@@ -152,7 +151,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
       <list-placeholder .data="${this.data}" .loading="${this.loading}" .message="${translate('NO_REPORT_DATA')}">
       </list-placeholder>
 
-      ${computeHidden(this.locations, this.loading)
+      ${computeHidden(this.locations, this.loading) && this.tabs.length
         ? html`<etools-tabs-lit
             id="tabs"
             slot="tabs"
@@ -235,7 +234,9 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
           tabLabel: location.name,
           hidden: false
         }));
-        this.selected = this.locations[0]?.current.id;
+        setTimeout(() => {
+          this.selected = String(this.locations[0]?.current.id);
+        }, 0);
       }
     }
 
