@@ -1,4 +1,4 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
@@ -20,18 +20,11 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitElement)) {
-  static styles = css`
-    :host {
-      display: block;
-      width: 100%;
-    }
-
-    /* Insert component-specific styles here */
-  `;
-
   @property({type: String})
   indicatorDetailUrl = '';
 
@@ -68,7 +61,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
   render() {
     return html`
       <style>
-        :host {
+        ${layoutStyles} :host {
           display: block;
           width: 100%;
         }
@@ -129,10 +122,10 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
         : ''}
       ${computeHidden(this.data, this.loading)
         ? html`
-            <div class="report-meta app-grid">
+            <div class="report-meta layout-horizontal row">
               ${(this.data || []).map(
                 (report) => html`
-                  <div class="item">
+                  <div class="item col-6">
                     <dl>
                       <dt>${translate('SUBMITTED')}:</dt>
                       <dd>${report.submission_date}</dd>
@@ -173,10 +166,10 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
           name="location-${location.current.id}"
           ?hidden="${this.selected.toString() !== location.current.id.toString()}"
         >
-          <div class="app-grid">
+          <div class="layout-horizontal row">
             ${location.current
               ? html`
-                  <div class="item">
+                  <div class="item col-6">
                     <disaggregation-table
                       .data="${location.current}"
                       .mapping="${location.reportInfo.current.disagg_lookup_map}"
@@ -187,7 +180,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
               : html``}
             ${location.previous
               ? html`
-                  <div class="item">
+                  <div class="item col-6">
                     <disaggregation-table
                       .data="${location.previous}"
                       .mapping="${location.reportInfo.previous.disagg_lookup_map}"

@@ -312,9 +312,4 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
   _showLocationsWarning(indicator: any, type: string) {
     return !indicator.locations.length && type !== 'ca';
   }
-
-  // onDetailsOpenedChanged(event: CustomEvent) {
-  //   this.detailsOpened = event.detail.opened;
-  //   fireEvent(this, 'details-opened-changed', {row: event.target, detailsOpened: event.detail.opened});
-  // }
 }

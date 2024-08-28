@@ -18,6 +18,7 @@ import '../etools-prp-common/elements/etools-prp-permissions';
 import {store} from '../redux/store';
 import {RootState} from '../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {repeat} from 'lit/directives/repeat.js';
 
 @customElement('list-view-indicators')
 export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(connect(store)(LitElement)))) {
@@ -119,15 +120,15 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
           </etools-data-table-column>
         </etools-data-table-header>
 
-        ${this.data?.map(
-          (indicator) => html`
-            <list-view-single-indicator
-              .indicator="${indicator}"
-              .isCustom="${this.isCustom}"
-              .canEdit="${this.canEdit}"
-              .type="${this.type}"
-            ></list-view-single-indicator>
-          `
+        ${repeat(
+          this.data || [],
+          (indicator) => indicator.id,
+          (indicator) => html`<list-view-single-indicator
+            .indicator="${indicator}"
+            .isCustom="${this.isCustom}"
+            .canEdit="${this.canEdit}"
+            .type="${this.type}"
+          ></list-view-single-indicator> `
         )}
 
         <list-placeholder .data="${this.data}"></list-placeholder>
@@ -144,17 +145,6 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
         </etools-data-table-footer>
       </etools-content-panel>
     `;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this._addEventListeners();
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._removeEventListeners();
-    this.openedDetails.length = 0;
   }
 
   paginatorChanged() {
@@ -189,13 +179,5 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
     if (changedProperties.has('type')) {
       this.showProjectContextColumn = this.type === 'pa';
     }
-  }
-
-  private _addEventListeners() {
-    this.addEventListener('details-opened-changed', this._detailsChange as EventListener);
-  }
-
-  private _removeEventListeners() {
-    this.removeEventListener('details-opened-changed', this._detailsChange as EventListener);
   }
 }
