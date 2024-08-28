@@ -22,6 +22,7 @@ import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
 import {buildUrl} from '../etools-prp-common/utils/util';
 import {BASE_PATH} from '../etools-prp-common/config';
+import {classMap} from 'lit/directives/class-map.js';
 
 @customElement('list-view-single-indicator')
 export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElement)) {
@@ -54,9 +55,7 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
       margin-bottom: 6px;
     }
     .indicator-progress dt {
-      width: 100px;
       margin-right: 10px;
-      text-align: right;
       color: var(--theme-secondary-text-color);
     }
     .indicator-progress dd {
@@ -117,7 +116,13 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
         }}
       >
         <div slot="row-data" class="layout-horizontal editable-row">
-          <span class="col-data col-2 table-cell table-cell--text self-center">
+          <span
+            class="col-data col-2 table-cell table-cell--text self-center"
+            class=${classMap({
+              'col-3': this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext'),
+              'col-4': !this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
+            })}
+          >
             <sl-tooltip content="${this.indicator?.blueprint?.title}">
               <span>
                 ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
@@ -132,10 +137,10 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
                 >${this.indicator?.content_object_title}</span
               >`
             : html``}
-          <span class="col-data col-2 table-cell table-cell--text self-center"
+          <span class="col-data col-1 table-cell table-cell--text self-center"
             >${this.indicator?.blueprint?.calculation_formula_across_locations}</span
           >
-          <span class="col-data col-2 table-cell table-cell--text self-center"
+          <span class="col-data col-1 table-cell table-cell--text self-center"
             >${this.indicator?.blueprint?.calculation_formula_across_periods}</span
           >
           <span class="col-data col-1 table-cell table-cell--text self-center">
@@ -201,19 +206,18 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
                 : html``}
             </div>
           </span>
-
-          ${this.canEdit
-            ? html`
-                <span class="table-cell table-cell--text table-cell--action self-center">
+          <span class="col-data col-1 table-cell table-cell--text self-center">
+            ${this.canEdit
+              ? html`
                   <etools-button variant="text" class="button-link" @click=${this._openModal} data-modal-type="edit"
                     >${translate('EDIT')}
                     ${this._showLocationsWarning(this.indicator, this.type)
                       ? html`<etools-icon class="locations-warning" data-modal-type="edit" name="error"></etools-icon>`
                       : html``}
                   </etools-button>
-                </span>
-              `
-            : html``}
+                `
+              : html``}
+          </span>
         </div>
         <div slot="row-data-details">
           <ip-reporting-indicator-details

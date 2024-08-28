@@ -19,22 +19,9 @@ import {store} from '../redux/store';
 import {RootState} from '../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {repeat} from 'lit/directives/repeat.js';
-
+import {classMap} from 'lit/directives/class-map.js';
 @customElement('list-view-indicators')
 export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(connect(store)(LitElement)))) {
-  static styles = css`
-    ${layoutStyles},
-    :host {
-      display: block;
-    }
-    etools-content-panel::part(ecp-content) {
-      padding: 1px 0 0;
-    }
-    message-box {
-      margin: 25px 25px 0;
-    }
-  `;
-
   @property({type: Array})
   data: any[] = [];
 
@@ -69,7 +56,15 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
     return html`
       ${tableStyles}
       <style>
-        ${dataTableStylesLit}
+        ${layoutStyles} ${dataTableStylesLit} :host {
+          display: block;
+        }
+        etools-content-panel::part(ecp-content) {
+          padding: 1px 0 0;
+        }
+        message-box {
+          margin: 25px 25px 0;
+        }
       </style>
 
       <etools-prp-permissions
@@ -79,11 +74,13 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
 
       <etools-content-panel panel-title="${translate('LIST_OF_INDICATORS')}">
         <etools-data-table-header
-          id="listHeader"
-          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
+          .label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
-          <etools-data-table-column field="indicator" class="col-2">
+          <etools-data-table-column
+            field="indicator"
+            class=${classMap({'col-3': this.showProjectContextColumn, 'col-4': !this.showProjectContextColumn})}
+          >
             <div class="table-column">${translate('INDICATOR')}</div>
           </etools-data-table-column>
 
@@ -95,11 +92,11 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
               `
             : ''}
 
-          <etools-data-table-column field="blueprint.calculation_formula_across_locations" class="col-2">
+          <etools-data-table-column field="blueprint.calculation_formula_across_locations" class="col-1">
             <div class="table-column">${translate('CALC_ACROSS_LOCATIONS')}</div>
           </etools-data-table-column>
 
-          <etools-data-table-column field="blueprint.calculation_formula_across_periods" class="col-2">
+          <etools-data-table-column field="blueprint.calculation_formula_across_periods" class="col-1">
             <div class="table-column">${translate('CALC_ACROSS_PERIODS')}</div>
           </etools-data-table-column>
 
@@ -118,6 +115,8 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
           <etools-data-table-column field="progress_percentage" sortable class="col-2">
             <div class="table-column">${translate('CURRENT_PROGRESS')}</div>
           </etools-data-table-column>
+
+          <etools-data-table-column class="col-1"></etools-data-table-column>
         </etools-data-table-header>
 
         ${repeat(
