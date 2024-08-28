@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/download-button';
+import {translate} from 'lit-translate';
 import {computePdUrl} from './js/pd-list-toolbar-functions.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {store} from '../../redux/store';
@@ -15,6 +16,9 @@ export class PdListToolbar extends UtilsMixin(connect(store)(LitElement)) {
     :host {
       display: block;
       margin: 25px 0;
+    }
+    .right-align {
+      text-align: left;
     }
   `;
 
@@ -62,8 +66,12 @@ export class PdListToolbar extends UtilsMixin(connect(store)(LitElement)) {
   render() {
     return html`
       <div class="layout-horizontal right-align">
-        <download-button .url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
-        <download-button .url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+        <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+          <download-button .url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
+        </sl-tooltip>
+        <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+          <download-button .url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+        </sl-tooltip>
       </div>
     `;
   }

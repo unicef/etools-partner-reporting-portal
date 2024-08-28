@@ -20,6 +20,9 @@ export class ProgressReportsToolbar extends UtilsMixin(connect(store)(LitElement
       position: relative;
       margin-bottom: 25px;
     }
+    .right-align {
+      text-align: left;
+    }
   `;
 
   @property({type: Object})
