@@ -194,7 +194,7 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
           <etools-loading ?active="${this.loading}"></etools-loading>
         </div>
         ${this._canSave(this.permissions)
-          ? html`<div class="buttons layout-horizontal">
+          ? html`<div class="buttons layout-horizontal right-align">
               <etools-button @click="${this._save}" variant="primary" ?disabled="${this.loading}">
                 ${translate('SAVE')}
               </etools-button>
