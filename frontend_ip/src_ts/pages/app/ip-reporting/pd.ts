@@ -24,9 +24,6 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
   `;
 
   @property({type: Object})
-  subroute: any = {};
-
-  @property({type: Object})
   queryParams: any = {};
 
   @property({type: String})
@@ -59,10 +56,10 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElemen
   render() {
     return html`
       ${this.page === 'pd-index'
-        ? html` <page-ip-reporting-pd-index name="pd-index" .route="${this.subroute}"></page-ip-reporting-pd-index> `
+        ? html` <page-ip-reporting-pd-index name="pd-index"></page-ip-reporting-pd-index> `
         : ''}
       ${this.page === 'pd-router'
-        ? html` <page-ip-reporting-pd-router name="pd-router" .route="${this.subroute}"></page-ip-reporting-pd-router> `
+        ? html` <page-ip-reporting-pd-router name="pd-router"></page-ip-reporting-pd-router> `
         : ''}
     `;
   }

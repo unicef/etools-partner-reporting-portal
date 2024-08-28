@@ -119,25 +119,18 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
 
           ${
             this._equals(this.page, 'overview')
-              ? html` <page-ip-reporting-overview name="overview" .route="${this.subroute}">
-                </page-ip-reporting-overview>`
+              ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
               : ''
           }
-          ${
-            this._equals(this.page, 'pd')
-              ? html` <page-ip-reporting-pd name="pd" .route="${this.subroute}"> </page-ip-reporting-pd>`
-              : ''
-          }
+          ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
           ${
             this._equals(this.page, 'indicators')
-              ? html` <page-ip-reporting-indicators name="indicators" .route="${this.subroute}">
-                </page-ip-reporting-indicators>`
+              ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
               : ''
           }
           ${
             this._equals(this.page, 'progress-reports')
-              ? html` <page-ip-progress-reports name="progress-reports" .route="${this.subroute}">
-                </page-ip-progress-reports>`
+              ? html` <page-ip-progress-reports name="progress-reports"> </page-ip-progress-reports>`
               : ''
           }
 

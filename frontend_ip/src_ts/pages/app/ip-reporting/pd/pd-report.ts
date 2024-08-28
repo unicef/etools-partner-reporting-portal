@@ -22,6 +22,7 @@ import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '
 import Endpoints from '../../../../endpoints.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
+import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
@@ -33,7 +34,7 @@ import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.j
 import {buildUrl} from '../../../../etools-prp-common/utils/util.js';
 
 @customElement('page-ip-reporting-pd-report')
-export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin(LitElement)) {
+export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = [
     css`
       :host {

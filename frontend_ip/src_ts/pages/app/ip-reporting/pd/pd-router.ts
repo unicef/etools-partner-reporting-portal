@@ -7,6 +7,7 @@ import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 
 @customElement('page-ip-reporting-pd-router')
 class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
@@ -15,6 +16,9 @@ class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: String})
   pdId = '';
+
+  @property({type: Object})
+  routeDetails!: EtoolsRouteDetails;
 
   static styles = css`
     :host {
@@ -31,17 +35,17 @@ class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
       </style>
 
       ${this._equals(this.page, 'pd-details')
-        ? html` <page-ip-reporting-pd-details name="pd-details" .route="${this.subroute}">
-          </page-ip-reporting-pd-details>`
+        ? html` <page-ip-reporting-pd-details name="pd-details"> </page-ip-reporting-pd-details>`
         : html``}
       ${this._equals(this.page, 'pd-report')
-        ? html` <page-ip-reporting-pd-report name="pd-report" .route="${this.subroute}"> </page-ip-reporting-pd-report>`
+        ? html` <page-ip-reporting-pd-report name="pd-report"> </page-ip-reporting-pd-report>`
         : html``}
     `;
   }
 
   stateChanged(state: RootState) {
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this.routeDetails = state.app.routeDetails;
       this._routeTreeChanged(state.app.routeDetails.params?.pdRoute);
     }
   }
