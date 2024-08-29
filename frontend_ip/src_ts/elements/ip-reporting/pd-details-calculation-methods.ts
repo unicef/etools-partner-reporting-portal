@@ -298,6 +298,17 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
       newValue;
   }
 
+  getDataForSave(data: any) {
+    // exclude latest because BE will throw error
+    const dataToSave = this._clone(data);
+    (dataToSave.ll_outputs_and_indicators || []).forEach((item) => {
+      item.indicators = (item.indicators || []).filter(
+        (indicator) => indicator.calculation_formula_across_periods !== 'latest'
+      );
+    });
+    return dataToSave;
+  }
+
   _save() {
     this._confirmIntent()
       .then(() => {
@@ -306,7 +317,7 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
             sendRequest({
               method: 'POST',
               endpoint: {url: this.indicatorsUrl},
-              body: this.localData
+              body: this.getDataForSave(this.localData)
             }),
             this.pdId
           )
