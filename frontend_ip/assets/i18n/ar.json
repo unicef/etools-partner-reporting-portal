@@ -119,6 +119,7 @@
     "SUSPENDED": "مُعَلق",
     "ENDED": "منْتهي",
     "CLOSED": "مغلق",
+    "CLOSE": "يغلق",
     "TERMINATED": "تم إنهاؤه",
     "REPORTS": "تقارير",
     "ALL": "الكل",

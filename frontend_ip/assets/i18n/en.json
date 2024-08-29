@@ -119,6 +119,7 @@
     "SUSPENDED": "Suspended",
     "ENDED": "Ended",
     "CLOSED": "Closed",
+    "CLOSE": "Close",
     "TERMINATED": "Terminated",
     "REPORTS": "Reports",
     "ALL": "All",
