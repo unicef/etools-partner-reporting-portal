@@ -47,8 +47,9 @@ export const pdIndicatorsUpdate = function (updateThunk: any, pdId: string) {
     dispatch(pdIndicatorsLoadingStart(pdId));
 
     return updateThunk
-      .then(function (res: any) {
-        dispatch(pdIndicatorsSet(pdId, res));
+      .then(function (_res: any) {
+        // we send filtered indicators (without latest), response will contain only what was sent, need to re-fetch
+        // dispatch(pdIndicatorsSet(pdId, res));
         dispatch(pdIndicatorsLoadingStop(pdId));
       })
       .catch(function (err: any) {

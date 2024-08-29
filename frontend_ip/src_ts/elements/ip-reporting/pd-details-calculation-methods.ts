@@ -302,9 +302,11 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
     // exclude latest because BE will throw error
     const dataToSave = this._clone(data);
     (dataToSave.ll_outputs_and_indicators || []).forEach((item) => {
-      item.indicators = (item.indicators || []).filter(
-        (indicator) => indicator.calculation_formula_across_periods !== 'latest'
-      );
+      if (item.indicators?.length) {
+        item.indicators = item.indicators.filter(
+          (indicator) => indicator.calculation_formula_across_periods !== 'latest'
+        );
+      }
     });
     return dataToSave;
   }
@@ -323,12 +325,14 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
           )
         );
       })
-      .then(() =>
+      .then(() => {
         fireEvent(this, 'toast', {
           text: getTranslation('CHANGES_SAVED'),
           showCloseBtn: true
-        })
-      )
+        });
+        // we send filtered indicators (without latest), response will contain only what was sent, need to re-fetch
+        this._fetchData();
+      })
       .catch((_err: any) => {
         console.log(_err);
       });
