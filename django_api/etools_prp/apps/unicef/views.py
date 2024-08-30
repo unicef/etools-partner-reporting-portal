@@ -1047,7 +1047,7 @@ class ProgressReportReviewAPIView(APIView):
         }:
             raise ValidationError("This report is not in submitted / accepted state.")
 
-        serializer = ProgressReportReviewSerializer(data=request.data)
+        serializer = ProgressReportReviewSerializer(data=request.data, instance=progress_report)
         serializer.is_valid(raise_exception=True)
 
         progress_report.status = serializer.validated_data['status']
