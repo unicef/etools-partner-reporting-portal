@@ -1087,15 +1087,8 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     )
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
-    def get(self, request, workspace_id, pd_id):
-        """
-        Construct the input data to the serializer for the LLO and its
-        associated indicators.
-        """
-        pd = get_object_or_404(
-            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
-        )
-
+    @staticmethod
+    def get_response_data(pd):
         data = {'ll_outputs_and_indicators': []}
         for llo in pd.lower_level_outputs:
             indicator_blueprints = []
@@ -1108,9 +1101,19 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             }
 
             data['ll_outputs_and_indicators'].append(inner_data)
+        return data
+
+    def get(self, request, workspace_id, pd_id):
+        """
+        Construct the input data to the serializer for the LLO and its
+        associated indicators.
+        """
+        pd = get_object_or_404(
+            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
+        )
 
         return Response(ProgrammeDocumentCalculationMethodsSerializer(
-            data).data)
+            self.get_response_data(pd)).data)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -1170,7 +1173,8 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                     fail_silently=False
                 )
 
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        return Response(ProgrammeDocumentCalculationMethodsSerializer(
+            self.get_response_data(pd_to_notify)).data)
 
 
 class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
