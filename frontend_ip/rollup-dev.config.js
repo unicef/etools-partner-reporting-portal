@@ -5,7 +5,7 @@ import copy from 'rollup-plugin-copy';
 
 // For livereload to work you need to expose port in docker-compose.yaml with ports: -"3003:3003"
 const appPort = 8082;
-const liveReloadPort = 3001;
+const liveReloadPort = 4001;
 
 console.log("\x1b[92m" + "Starting app on port:" + appPort + " \x1b[0m");
 console.log("\x1b[92m" + "LiveReload starting on port:" + liveReloadPort + " \x1b[0m");
