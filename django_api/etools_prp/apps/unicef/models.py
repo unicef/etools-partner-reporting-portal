@@ -437,6 +437,7 @@ class ProgressReport(TimeStampedModel):
         null=True
     )
     sent_back_feedback = models.TextField(blank=True, null=True)
+    accepted_comment = models.CharField(verbose_name="Report accepted comment", max_length=50, blank=True, null=True)
     report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
