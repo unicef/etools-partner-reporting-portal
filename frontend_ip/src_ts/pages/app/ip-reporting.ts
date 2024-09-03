@@ -91,7 +91,7 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
     return html`
       <page-title .title="${translate('IP_REPORTING')}"></page-title>
 
-     <app-drawer-layout
+      <app-drawer-layout
         id="layout"
         responsive-width="850px"
         fullbleed
@@ -110,31 +110,22 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
         >
           <!-- App main menu(left sidebar) -->
           <app-menu .selectedOption="${this.page}" ?small-menu="${this.smallMenu}"></app-menu>
-
         </app-drawer>
 
         <!-- Main content -->
         <app-header-layout id="appHeadLayout" fullbleed has-scrolling-region>
-           <ip-reporting-app-header></ip-reporting-app-header>
+          <ip-reporting-app-header></ip-reporting-app-header>
 
-          ${
-            this._equals(this.page, 'overview')
-              ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
-              : ''
-          }
+          ${this._equals(this.page, 'overview')
+            ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
+            : ''}
           ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
-          ${
-            this._equals(this.page, 'indicators')
-              ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
-              : ''
-          }
-          ${
-            this._equals(this.page, 'progress-reports')
-              ? html` <page-ip-progress-reports name="progress-reports"> </page-ip-progress-reports>`
-              : ''
-          }
-
-        </main>
+          ${this._equals(this.page, 'indicators')
+            ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
+            : ''}
+          ${this._equals(this.page, 'progress-reports')
+            ? html` <page-ip-progress-reports name="progress-reports"> </page-ip-progress-reports>`
+            : ''}
         </app-header-layout>
       </app-drawer-layout>
     `;
