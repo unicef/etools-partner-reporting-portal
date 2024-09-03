@@ -490,5 +490,7 @@
     "CANCEL_BTN_TEXT": "Annuler",
     "MY_PROFILE": "Mon profil",
     "A_NEW_VERSION_OF_THE_APP_IS_AV": "Une nouvelle version de l'application est disponible. Rafraîchir la page?",
-    "NAME": "Nom"
+    "NAME": "Nom",
+    "ACHIEVED_AS_PLANNED": "Réalisé comme prévu",
+    "NOT_ACHIEVED_AS_PLANNED": "Non réalisé comme prévu"
 }
