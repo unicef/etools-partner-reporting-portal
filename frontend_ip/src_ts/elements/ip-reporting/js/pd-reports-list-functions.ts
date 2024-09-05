@@ -1,7 +1,5 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-
 export function getLink(
-  report: GenericObject,
+  report: any,
   suffix: string,
   buildUrlFn: (baseUrl: string, tail: string) => string,
   baseUrl: string

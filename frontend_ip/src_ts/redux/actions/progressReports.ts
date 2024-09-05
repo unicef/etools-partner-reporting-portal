@@ -31,12 +31,10 @@ export const progressReportsFetch = function (progressReportsThunk: any) {
   return function (dispatch: any) {
     dispatch(progressReportsLoadingStart());
 
-    return progressReportsThunk()
+    return progressReportsThunk
       .then(function (res: any) {
-        const progressReportsData = res.data;
-
-        dispatch(progressReportsSet(progressReportsData.results));
-        dispatch(progressReportsSetCount(progressReportsData.count));
+        dispatch(progressReportsSet(res?.results || []));
+        dispatch(progressReportsSetCount(res?.count || 0));
         dispatch(progressReportsLoadingStop());
       })
       .catch(function (err: any) {
