@@ -1377,6 +1377,40 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
         # for final reports, the met status is mapped to 'Achieved as planned'
         self.assertEqual(progress_report.indicator_reports.last().get_overall_status_display(), 'Achieved as planned')
 
+    def test_review_accept_final_qpr_report_send_back(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.is_final = True
+        progress_report.status = PROGRESS_REPORT_STATUS.submitted
+        progress_report.save(update_fields=['status', 'is_final'])
+
+        url = reverse(
+            'progress-reports-review',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        default_unicef_user.jwt_payload = {'email': default_unicef_user.email, 'user_id': default_unicef_user.id}
+        data = {
+            "status": "Sen",
+            "comment": "Comment when sending back",
+            "reviewed_by_name": f"{default_unicef_user.first_name} {default_unicef_user.last_name}",
+            "review_date": datetime.datetime.now().date()
+        }
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.sent_back)
+        self.assertEqual(progress_report.sent_back_feedback, data['comment'])
+        self.assertEqual(progress_report.review_date, datetime.datetime.now().date())
+        self.assertEqual(progress_report.reviewed_by_name, f"{default_unicef_user.first_name} {default_unicef_user.last_name}")
+        self.assertEqual(progress_report.reviewed_by_email, default_unicef_user.email)
+        self.assertEqual(progress_report.reviewed_by_external_id, default_unicef_user.id)
+
 
 class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
 
