@@ -682,7 +682,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
       // @ts-ignore
       .catch((err) => {
         fireEvent(this, 'toast', {
-          text: formatServerErrorAsText(err, getTranslation('AN_ERROR_OCCURRED') as any as string),
+          text: formatServerErrorAsText(err.response, getTranslation('AN_ERROR_OCCURRED') as any as string),
           showCloseBtn: true
         });
         console.log(err);

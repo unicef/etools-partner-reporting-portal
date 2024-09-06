@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/download-button';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import {translate} from 'lit-translate';
 import {computePdUrl} from './js/pd-list-toolbar-functions.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';

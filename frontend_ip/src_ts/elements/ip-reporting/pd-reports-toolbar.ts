@@ -1,6 +1,7 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/download-button';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {programmeDocumentReportsCount} from '../../redux/selectors/programmeDocumentReports';
 import {computePdReportsUrl, canExport, computePdQuery} from './js/pd-reports-toolbar-functions';
@@ -9,6 +10,7 @@ import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {translate} from 'lit-translate';
 
 @customElement('pd-reports-toolbar')
 class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
@@ -17,6 +19,9 @@ class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
     :host {
       display: block;
       margin: 25px 0;
+    }
+    .right-align {
+      text-align: left;
     }
   `;
 
@@ -52,8 +57,12 @@ class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
       <div class="layout-horizontal right-align">
         ${this.canExport
           ? html`
-              <download-button .url="${this.xlsExportUrl}" tracker="PD Reports Export Xls">XLS</download-button>
-              <download-button .url="${this.pdfExportUrl}" tracker="PD Reports Export Pdf">PDF</download-button>
+              <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+                <download-button .url="${this.xlsExportUrl}" tracker="PD Reports Export Xls">XLS</download-button>
+              </sl-tooltip>
+              <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+                <download-button .url="${this.pdfExportUrl}" tracker="PD Reports Export Pdf">PDF</download-button>
+              </sl-tooltip>
             `
           : ''}
       </div>
