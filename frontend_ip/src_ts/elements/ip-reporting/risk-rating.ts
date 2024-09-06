@@ -1,92 +1,88 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/app-layout/app-grid/app-grid-style';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-loading/etools-loading';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '../../etools-prp-common/elements/labelled-item';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
 import {partnerLoading} from '../../redux/selectors/partner';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {RootState} from '../../typings/redux.types';
+import '../../etools-prp-common/elements/labelled-item';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import {translate} from 'lit-translate';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- * @appliesMixin UtilsMixin
- */
-class RiskRating extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
-  public static get template() {
+@customElement('risk-rating')
+export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = [
+    layoutStyles,
+    css`
+      labelled-item {
+        padding-block-start: 8px;
+        padding-block-end: 8px;
+      }
+      .field-value {
+        display: block;
+        word-wrap: break-word;
+      }
+    `
+  ];
+
+  @property({type: Object})
+  partner: any = {};
+
+  @property({type: Object})
+  user: any = {};
+
+  @property({type: Boolean})
+  loading = false;
+
+  render() {
     return html`
-      <style include="app-grid-style">
-        :host {
-          display: block;
+      <etools-content-panel panel-title="${translate('CAPACITY_ASSESSMENT')}">
+        <etools-loading ?active="${this.loading}"></etools-loading>
 
-          --app-grid-columns: 3;
-          --app-grid-gutter: 25px;
-          --app-grid-item-height: auto;
-        }
-
-        .app-grid {
-          padding: 0;
-          margin: 0;
-          list-style: none;
-        }
-
-        .field-value {
-          display: block;
-          word-wrap: break-word;
-        }
-      </style>
-
-      <etools-content-panel panel-title="[[localize('capacity_assessment')]]">
-        <etools-loading active="[[loading]]"></etools-loading>
-
-        <ul class="app-grid">
-          <li class="item">
-            <labelled-item label="[[localize('financial_risk_rating')]]">
-              <span class="field-value">[[_withDefault(partner.rating)]]</span>
+        <div class="row">
+          <div class="col-md-4 col-12">
+            <labelled-item label="${translate('FINANCIAL_RISK_RATING')}">
+              <span class="field-value">${this._withDefault(this.partner.rating)}</span>
             </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="[[localize('type_of_assessment')]]">
-              <span class="field-value">[[_withDefault(partner.type_of_assessment)]]</span>
+          </div>
+          <div class="col-md-4 col-12">
+            <labelled-item label="${translate('TYPE_OF_ASSESSMENT')}">
+              <span class="field-value">${this._withDefault(this.partner.type_of_assessment)}</span>
             </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="[[localize('risk_rating_last_date_assessment')]]">
-              <span class="field-value">[[_withDefault(partner.last_assessment_date)]]</span>
+          </div>
+          <div class="col-md-4 col-12">
+            <labelled-item label="${translate('RISK_RATING_LAST_DATE_ASSESSMENT')}">
+              <span class="field-value">${this._withDefault(this.partner.last_assessment_date)}</span>
             </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="[[localize('sea_risk_rating')]]">
-              <span class="field-value">[[_withDefault(partner.sea_risk_rating_name)]]</span>
+          </div>
+          <div class="col-md-4 col-12">
+            <labelled-item label="${translate('SEA_RISK_RATING')}">
+              <span class="field-value">${this._withDefault(this.partner.sea_risk_rating_name)}</span>
             </labelled-item>
-          </li>
-          <li class="item">
-            <labelled-item label="[[localize('psea_risk_rating_date_of_assessment')]]">
-              <span class="field-value">[[_withDefault(partner.psea_assessment_date)]]</span>
+          </div>
+          <div class="col-md-4 col-12">
+            <labelled-item label="${translate('PSEA_RISK_RATING_DATE_OF_ASSESSMENT')}">
+              <span class="field-value">${this._withDefault(this.partner.psea_assessment_date)}</span>
             </labelled-item>
-          </li>
-        </ul>
+          </div>
+        </div>
       </etools-content-panel>
     `;
   }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.partner.current)'})
-  partner!: GenericObject;
+  stateChanged(state: RootState) {
+    if (this.partner !== state.partner.current) {
+      this.partner = state.partner.current;
+    }
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
-  user!: GenericObject;
+    if (this.user !== state.userProfile.profile) {
+      this.user = state.userProfile.profile;
+    }
 
-  @property({type: Boolean, computed: '_partnerLoading(rootState)'})
-  loading!: boolean;
-
-  _partnerLoading(rootState: RootState) {
-    return partnerLoading(rootState);
+    if (this.partner !== partnerLoading(state)) {
+      this.loading = partnerLoading(state);
+    }
   }
 }
-
-window.customElements.define('risk-rating', RiskRating);

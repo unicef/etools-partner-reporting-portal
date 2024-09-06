@@ -1,43 +1,43 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
-import '../../../etools-prp-common/elements/page-header';
-import '../../../etools-prp-common/elements/page-body';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import '../../../elements/ip-reporting/progress-reports-list';
-import '../../../elements/ip-reporting/progress-reports-toolbar';
-import '../../../elements/ip-reporting/progress-reports-filters';
-import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {progressReportsFetch} from '../../../redux/actions/progressReports';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '../../../etools-prp-common/elements/page-header.js';
+import '../../../etools-prp-common/elements/page-body.js';
+import '../../../elements/ip-reporting/progress-reports-list.js';
+import '../../../elements/ip-reporting/progress-reports-toolbar.js';
+import '../../../elements/ip-reporting/progress-reports-filters.js';
+import Endpoints from '../../../endpoints.js';
+import {progressReportsFetch} from '../../../redux/actions/progressReports.js';
+import {store} from '../../../redux/store.js';
+import {connect} from 'pwa-helpers';
+import {RootState} from '../../../typings/redux.types.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
+import {translate} from 'lit-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
- */
-class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template() {
+@customElement('page-ip-progress-reports')
+export class PageIpProgressReports extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: String, attribute: false})
+  reportsUrl = '';
+
+  @property({type: String, attribute: false})
+  locationId = '';
+
+  @property({type: Object, attribute: false})
+  queryParams = {};
+
+  @property({type: Object})
+  routeDetails: any;
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-prp-ajax id="reports" url="[[reportsUrl]]" params="[[queryParams]]"> </etools-prp-ajax>
-
-      <page-header title="[[localize('progress_reports')]]"></page-header>
-
+      <page-header .title="${translate('PROGRESS_REPORTS')}"></page-header>
       <page-body>
         <progress-reports-filters></progress-reports-filters>
         <progress-reports-toolbar></progress-reports-toolbar>
@@ -46,40 +46,55 @@ class PageIpProgressReports extends LocalizeMixin(ReduxConnectedElement) {
     `;
   }
 
-  @property({type: String, computed: '_computeProgressReportsUrl(locationId)'})
-  reportsUrl!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
-
-  @property({type: Object})
-  queryParams!: GenericObject;
-
-  public static get observers() {
-    return ['_handleInputChange(reportsUrl, queryParams)'];
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._handleInputChange = debounce(this._handleInputChange.bind(this), 250);
   }
 
-  _computeProgressReportsUrl(locationId: string) {
-    return locationId ? Endpoints.progressReports(locationId) : '';
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('reportsUrl') || changedProperties.has('queryParams')) {
+      this._handleInputChange();
+    }
+
+    if (changedProperties.has('locationId')) {
+      this.reportsUrl = this._computeProgressReportsUrl();
+    }
   }
 
-  _handleInputChange(reportsUrl: string, queryParams: GenericObject) {
-    if (!reportsUrl || !queryParams || !Object.keys(queryParams).length) {
+  stateChanged(state: RootState) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+  }
+
+  _computeProgressReportsUrl() {
+    return this.locationId ? Endpoints.progressReports(this.locationId) : '';
+  }
+
+  _handleInputChange() {
+    if (!this.reportsUrl || !this.queryParams || !Object.keys(this.queryParams).length) {
       return;
     }
 
-    const progressReportsThunk = (this.$.reports as EtoolsPrpAjaxEl).thunk();
-
-    // Cancel the pending request, if any
-    (this.$.reports as EtoolsPrpAjaxEl).abort();
-
-    this.reduxStore
-      .dispatch(progressReportsFetch(progressReportsThunk))
-      // @ts-ignore
-      .catch((_err: GenericObject) => {
-        // TODO: error handling
-      });
+    store.dispatch(
+      progressReportsFetch(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.reportsUrl},
+          params: {
+            page: 1,
+            page_size: 10,
+            ...this.queryParams
+          }
+        })
+      )
+    );
   }
 }
-
-window.customElements.define('page-ip-progress-reports', PageIpProgressReports);
+export {PageIpProgressReports as PageIpProgressReportsEl};

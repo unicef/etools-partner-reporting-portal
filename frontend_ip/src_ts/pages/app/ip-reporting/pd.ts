@@ -1,177 +1,126 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route';
-import '@polymer/iron-pages/iron-pages';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
-import '@polymer/polymer/lib/elements/dom-if';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../../../endpoints';
-import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
-import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {pdAdd, pdFetch, pdSetCount, pdSetCurrent} from '../../../redux/actions/pd';
-import {getDomainByEnv} from '../../../etools-prp-common/config';
-import './pd/pd-index';
-import './pd/pd-router';
-import {RootState} from '../../../typings/redux.types';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import Endpoints from '../../../endpoints.js';
+import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin.js';
+import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
+import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments.js';
+import {pdFetch, pdSetCurrent, pdSetCurrentId} from '../../../redux/actions/pd.js';
+import './pd/pd-index.js';
+import './pd/pd-router.js';
+import {RootState} from '../../../typings/redux.types.js';
+import {store} from '../../../redux/store.js';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {connect} from 'pwa-helpers';
+import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin SortingMixin
- * @appliesMixin UtilsMixin
- */
-class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
+@customElement('page-ip-reporting-pd')
+class PageIpReportingPd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: Object})
+  queryParams: any = {};
+
+  @property({type: String})
+  page = '';
+
+  @property({type: String})
+  programmeDocumentsUrl = '';
+
+  @property({type: String})
+  locationId = '';
+
+  @property({type: Object})
+  currentPD: any = {};
+
+  @property({type: Object})
+  routeDetails!: EtoolsRouteDetails;
+
+  @property({type: Number})
+  pdId!: any;
+
+  @property({type: String})
+  programmeDocumentDetailUrl = '';
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._handleInputChange = debounce(this._handleInputChange.bind(this), 100) as any;
+    this._getPdRecord = debounce(this._getPdRecord.bind(this), 100) as any;
+  }
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-ajax id="programmeDocumentDetail" url="[[programmeDocumentDetailUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]" params="[[queryParams]]">
-      </etools-prp-ajax>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <app-route route="{{route}}" pattern="/:pd_id" data="{{routeData}}" tail="{{subroute}}"> </app-route>
-
-      <iron-pages selected="[[page]]" attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'pd-index')]]" restamp="true">
-          <page-ip-reporting-pd-index name="pd-index" route="{{subroute}}"> </page-ip-reporting-pd-index>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'pd-router')]]" restamp="true">
-          <page-ip-reporting-pd-router name="pd-router" route="{{subroute}}"> </page-ip-reporting-pd-router>
-        </template>
-      </iron-pages>
+      ${this.page === 'pd-index'
+        ? html` <page-ip-reporting-pd-index name="pd-index"></page-ip-reporting-pd-index> `
+        : ''}
+      ${this.page === 'pd-router'
+        ? html` <page-ip-reporting-pd-router name="pd-router"></page-ip-reporting-pd-router> `
+        : ''}
     `;
   }
 
-  @property({type: Object})
-  query!: GenericObject;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: Object})
-  subroute!: GenericObject;
-
-  @property({type: Object})
-  queryParams!: GenericObject;
-
-  @property({type: String, observer: '_pageChanged'})
-  page!: string;
-
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)'})
-  programmeDocumentsUrl!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
-
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
-  currentPD!: GenericObject;
-
-  @property({type: Number})
-  pdId!: number;
-
-  @property({type: String, computed: '_computePdDetailsUrl(locationId, pdId)'})
-  programmeDocumentDetailUrl!: string;
-
-  fetchPdsDebouncer!: Debouncer | null;
-  private _pdDetailDebouncer!: Debouncer;
-
-  public static get observers() {
-    return [
-      '_handleInputChange(programmeDocumentsUrl, queryParams)',
-      '_routePdIdChanged(routeData.pd_id)',
-      '_routePathChanged(route.path)',
-      '_getPdRecord(programmeDocumentDetailUrl)'
-    ];
-  }
-
-  _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState);
-  }
-
-  _routePdIdChanged(pd_id: number) {
-    if (pd_id && pd_id !== this.pdId) {
-      this.pdId = pd_id;
-      this.reduxStore.dispatch(pdSetCurrent(pd_id));
+    if (changedProperties.has('locationId')) {
+      this.programmeDocumentsUrl = this._computeProgrammeDocumentsUrl(this.locationId);
     }
 
-    this.page = pd_id ? 'pd-router' : 'pd-index';
+    if (changedProperties.has('locationId') || changedProperties.has('pdId')) {
+      this.programmeDocumentDetailUrl = this._computePdDetailsUrl(this.locationId, this.pdId);
+    }
+
+    if (changedProperties.has('programmeDocumentsUrl') || changedProperties.has('queryParams')) {
+      this._handleInputChange(this.programmeDocumentsUrl);
+    }
+
+    if (changedProperties.has('programmeDocumentDetailUrl')) {
+      this._getPdRecord();
+    }
+  }
+
+  stateChanged(state: RootState) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.currentPD !== currentProgrammeDocument(state)) {
+      this.currentPD = currentProgrammeDocument(state);
+    }
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this.routeDetails = state.app.routeDetails;
+      this._routePdIdChanged(state.app.routeDetails.params?.pdID);
+    }
+  }
+
+  _computeProgrammeDocumentsUrl(locationId) {
+    return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
   _computePdDetailsUrl(locationId: string, pdId: string) {
-    if (!locationId || !pdId) {
-      return;
-    }
-    return Endpoints.programmeDocumentDetail(locationId, pdId);
+    return locationId && pdId ? Endpoints.programmeDocumentDetail(locationId, pdId) : '';
   }
 
-  _getPdRecord() {
-    if (!this.programmeDocumentDetailUrl) {
-      return;
-    }
-
-    const pdDataIsLoaded = this.rootState.programmeDocuments.all.find((x) => String(x.id) === String(this.pdId));
-    if (pdDataIsLoaded) {
-      // pd it's already loaded
-      return;
-    }
-
-    // in case user navigates directly to detail url, state.programmeDocuments it's empty so need to load Pd
-    this._pdDetailDebouncer = Debouncer.debounce(this._pdDetailDebouncer, timeOut.after(10), () => {
-      const pdThunk = (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).thunk();
-
-      // Cancel the pending request, if any
-      (this.$.programmeDocumentDetail as EtoolsPrpAjaxEl).abort();
-
-      pdThunk()
-        .then((res: any) => {
-          this.reduxStore.dispatch(pdAdd(res.data));
-          this.reduxStore.dispatch(pdSetCount(++this.rootState.programmeDocuments.all.length));
-        })
-        .catch((err: GenericObject) => {
-          console.log(err);
-        });
-    });
+  _onQueryChanged(event) {
+    this.query = event.detail.value;
   }
 
-  _routePathChanged(path: string) {
-    if (!path.length) {
-      this.page = '';
-
-      setTimeout(() => {
-        this.set('route.path', '/');
-      });
-    }
+  _onParamsObjectChanged(event) {
+    this.queryParams = event.detail.value;
   }
 
-  async _pageChanged(page: string) {
-    if (!page) {
-      return;
-    }
-
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
-  }
-
-  _computeProgrammeDocumentsUrl(locationId: string) {
-    return locationId ? Endpoints.programmeDocuments(locationId) : '';
+  _onRouteDataChanged(event) {
+    this.routeData = event.detail.value;
   }
 
   _handleInputChange(programmeDocumentsUrl: string) {
@@ -179,33 +128,79 @@ class PageIpReportingPd extends SortingMixin(UtilsMixin(ReduxConnectedElement)) 
       return;
     }
 
-    if (this.subroute.path) {
-      // Don't refetch on child routes
+    // @dci need this to avoid re-getting data when not necessary ???
+    // if (this.routeDetails?.subRouteName) {
+    //   return;
+    // }
+
+    // We are on details so we do not need the list
+    if (this.routeDetails?.params?.pdID) {
       return;
     }
 
-    this.fetchPdsDebouncer = Debouncer.debounce(this.fetchPdsDebouncer, timeOut.after(100), () => {
-      const pdThunk = (this.$.programmeDocuments as EtoolsPrpAjaxEl).thunk();
+    store.dispatch(
+      pdFetch(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.programmeDocumentsUrl},
+          params: {
+            page: 1,
+            page_size: 10,
+            ...this.queryParams
+          }
+        })
+      )
+    );
+  }
 
-      // Cancel the pending request, if any
-      (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+  _routePdIdChanged(pd_id) {
+    if (pd_id !== this.pdId) {
+      this.pdId = pd_id;
+      if (this.pdId) {
+        store.dispatch(pdSetCurrentId(pd_id));
+      }
+    }
 
-      this.reduxStore
-        .dispatch(pdFetch(pdThunk))
-        // @ts-ignore
-        .catch((_err: GenericObject) => {
-          // TODO: error handling
-        });
-    });
+    this.page = this.pdId ? 'pd-router' : 'pd-index';
+  }
+
+  _routePathChanged(path) {
+    if (!path.length) {
+      this.page = '';
+      setTimeout(() => {
+        this.route.path = '/';
+      });
+    }
+  }
+
+  _getPdRecord() {
+    if (!this.programmeDocumentDetailUrl) {
+      return;
+    }
+
+    const rootState = store.getState();
+    const pdDataIsLoaded =
+      rootState.programmeDocuments.currentPd && String(rootState.programmeDocuments.currentPd.id) === String(this.pdId);
+
+    if (pdDataIsLoaded) {
+      return;
+    }
+
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.programmeDocumentDetailUrl}
+    })
+      .then((res) => {
+        store.dispatch(pdSetCurrent(res));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
-    if (this.fetchPdsDebouncer && this.fetchPdsDebouncer.isActive()) {
-      this.fetchPdsDebouncer.cancel();
-    }
   }
 }
 
-window.customElements.define('page-ip-reporting-pd', PageIpReportingPd);
+export {PageIpReportingPd as PageIpReportingPdEl};

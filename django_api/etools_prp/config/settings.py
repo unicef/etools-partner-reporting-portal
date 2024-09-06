@@ -184,7 +184,7 @@ DATABASES = {
         'USER': env('POSTGRES_USER', default='postgres'),
         'PASSWORD': env('POSTGRES_PASSWORD', default=''),
         'HOST': env('POSTGRES_HOST', default='localhost'),
-        'PORT': 5432,
+        'PORT': env('POSTGRES_PORT', default=5432),
     }
 }
 
@@ -543,7 +543,7 @@ if SENTRY_DSN:
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration(), CeleryIntegration()],)
 
 if DEBUG:
-    CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')
+    CORS_ORIGIN_WHITELIST += ('http://etools.localhost:8082', 'http://prp.localhost:8081')
     FIXTURE_DIRS += ["fixtures"]
     INSTALLED_APPS += [
         'debug_toolbar',

@@ -6,5 +6,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends bzip2
 
 COPY load_db_data.sh /docker-entrypoint-initdb.d/20_load_db_data.sh
 
-EXPOSE 5432
+EXPOSE $PGPORT
 CMD ["postgres"]
