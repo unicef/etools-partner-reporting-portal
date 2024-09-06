@@ -1,48 +1,42 @@
-import {html, PolymerElement} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/paper-input/paper-input';
-import '@polymer/iron-icons/iron-icons';
-import '@unicef-polymer/etools-date-time/datepicker-lite';
+import {LitElement, html, css} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-date-time/datepicker-lite';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 import DateMixin from '../../../mixins/date-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import Settings from '../../../etools-prp-common/settings';
-declare const dayjs: any;
+import dayjs from 'dayjs';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin FilterMixin
- * @appliesMixin DateMixin
- */
-class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
-  static get template() {
+@customElement('date-filter')
+export class DateFilter extends FilterMixin(DateMixin(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: String})
+  value = '';
+
+  @property({type: String})
+  format = Settings.dateFormat;
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
       <datepicker-lite
         id="field"
-        label="[[label]]"
-        value="[[value]]"
-        input-date-format="[[format]]"
-        selected-date-display-format="[[format]]"
+        label="${this.label}"
+        .value="${this.value}"
+        .inputDateFormat="${this.format}"
+        .selectedDateDisplayFormat="${this.format}"
         fire-date-has-changed
-        on-date-has-changed="_filterDateHasChanged"
+        @date-has-changed="${this._filterDateHasChanged}"
       >
       </datepicker-lite>
     `;
   }
 
-  @property({type: String})
-  value!: string;
-
-  @property({type: String})
-  format = Settings.dateFormat;
-
-  _filterDateHasChanged(event: CustomEvent) {
+  _filterDateHasChanged(event) {
     const newValue = event.detail.date ? dayjs(event.detail.date).format(this.format) : '';
     fireEvent(this, 'filter-changed', {
       name: this.name,
@@ -52,9 +46,8 @@ class DateFilter extends FilterMixin(DateMixin(PolymerElement)) {
 
   connectedCallback() {
     super.connectedCallback();
-
     this._filterReady();
   }
 }
 
-window.customElements.define('date-filter', DateFilter);
+export {DateFilter as DateFilterEl};

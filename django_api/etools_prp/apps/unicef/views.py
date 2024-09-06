@@ -1047,7 +1047,7 @@ class ProgressReportReviewAPIView(APIView):
         }:
             raise ValidationError("This report is not in submitted / accepted state.")
 
-        serializer = ProgressReportReviewSerializer(data=request.data)
+        serializer = ProgressReportReviewSerializer(data=request.data, instance=progress_report)
         serializer.is_valid(raise_exception=True)
 
         progress_report.status = serializer.validated_data['status']
@@ -1063,6 +1063,7 @@ class ProgressReportReviewAPIView(APIView):
 
         elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
             progress_report.review_overall_status = serializer.validated_data['overall_status']
+            progress_report.accepted_comment = serializer.validated_data.get('comment')
 
         progress_report.save()
         serializer = ProgressReportSerializer(instance=progress_report)
@@ -1087,15 +1088,8 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     )
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
-    def get(self, request, workspace_id, pd_id):
-        """
-        Construct the input data to the serializer for the LLO and its
-        associated indicators.
-        """
-        pd = get_object_or_404(
-            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
-        )
-
+    @staticmethod
+    def get_response_data(pd):
         data = {'ll_outputs_and_indicators': []}
         for llo in pd.lower_level_outputs:
             indicator_blueprints = []
@@ -1108,9 +1102,19 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             }
 
             data['ll_outputs_and_indicators'].append(inner_data)
+        return data
+
+    def get(self, request, workspace_id, pd_id):
+        """
+        Construct the input data to the serializer for the LLO and its
+        associated indicators.
+        """
+        pd = get_object_or_404(
+            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
+        )
 
         return Response(ProgrammeDocumentCalculationMethodsSerializer(
-            data).data)
+            self.get_response_data(pd)).data)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -1170,7 +1174,8 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                     fail_silently=False
                 )
 
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        return Response(ProgrammeDocumentCalculationMethodsSerializer(
+            self.get_response_data(pd_to_notify)).data)
 
 
 class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
