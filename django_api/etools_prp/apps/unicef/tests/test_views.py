@@ -1404,8 +1404,8 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
-        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.send_back)
-        self.assertEqual(progress_report.sent_back_feedback, OVERALL_STATUS.met)
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.sent_back)
+        self.assertEqual(progress_report.sent_back_feedback, data['comment'])
         self.assertEqual(progress_report.review_date, datetime.datetime.now().date())
         self.assertEqual(progress_report.reviewed_by_name, f"{default_unicef_user.first_name} {default_unicef_user.last_name}")
         self.assertEqual(progress_report.reviewed_by_email, default_unicef_user.email)
