@@ -29,9 +29,9 @@ export const pdIndicatorsFetch = function (indicatorsThunk: any, pdId: string) {
   return function (dispatch: any) {
     dispatch(pdIndicatorsLoadingStart(pdId));
 
-    return indicatorsThunk()
+    return indicatorsThunk
       .then(function (res: any) {
-        dispatch(pdIndicatorsSet(pdId, res.data));
+        dispatch(pdIndicatorsSet(pdId, res));
         dispatch(pdIndicatorsLoadingStop(pdId));
       })
       .catch(function (err: any) {
@@ -46,9 +46,10 @@ export const pdIndicatorsUpdate = function (updateThunk: any, pdId: string) {
   return function (dispatch: any) {
     dispatch(pdIndicatorsLoadingStart(pdId));
 
-    return updateThunk()
-      .then(function (res: any) {
-        dispatch(pdIndicatorsSet(pdId, res.data));
+    return updateThunk
+      .then(function (_res: any) {
+        // we send filtered indicators (without latest), response will contain only what was sent, need to re-fetch
+        // dispatch(pdIndicatorsSet(pdId, res));
         dispatch(pdIndicatorsLoadingStop(pdId));
       })
       .catch(function (err: any) {

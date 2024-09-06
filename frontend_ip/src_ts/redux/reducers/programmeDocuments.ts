@@ -1,22 +1,23 @@
 import {combineReducers} from 'redux';
 import Constants from '../../etools-prp-common/constants';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 
 export class ProgrammeDocumentsState {
   all: any[] = [];
-  current = '';
+  currentPdId = '';
+  currentPd: any = {};
   count = 0;
   loading = false;
 }
 
 export const ProgrammeDocuments = combineReducers({
   all: allPDsReducer,
-  current: currentPDReducer,
+  currentPdId: currentPDIdReducer,
+  currentPd: currentPDReducer,
   count: PDsCountReducer,
   loading: loadingPDsReducer
 });
 
-function allPDsReducer(state: GenericObject[] = [], action: any) {
+function allPDsReducer(state: any[] = [], action: any) {
   switch (action.type) {
     case Constants.SET_PROGRAMME_DOCUMENTS:
       return action.data.slice();
@@ -32,10 +33,23 @@ function allPDsReducer(state: GenericObject[] = [], action: any) {
   }
 }
 
+function currentPDIdReducer(state = '', action: any) {
+  switch (action.type) {
+    case Constants.SET_CURRENT_PD_ID:
+      return action.pdId;
+
+    case Constants.RESET:
+      return '';
+
+    default:
+      return state;
+  }
+}
+
 function currentPDReducer(state = '', action: any) {
   switch (action.type) {
     case Constants.SET_CURRENT_PD:
-      return action.pdId;
+      return action.pd;
 
     case Constants.RESET:
       return '';

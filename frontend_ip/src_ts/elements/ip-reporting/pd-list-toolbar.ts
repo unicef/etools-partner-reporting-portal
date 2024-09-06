@@ -1,47 +1,81 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/download-button';
-import {computePdUrl} from './js/pd-list-toolbar-functions';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
+import {translate} from 'lit-translate';
+import {computePdUrl} from './js/pd-list-toolbar-functions.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
-class PdListToolbar extends UtilsMixin(PolymerElement) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
+@customElement('pd-list-toolbar')
+export class PdListToolbar extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = css`
+    ${layoutStyles}
+    :host {
+      display: block;
+      margin: 25px 0;
+    }
+    .right-align {
+      text-align: left;
+    }
+  `;
 
-      <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
-        <!-- TODO: Possibly use https://www.webcomponents.org/element/Collaborne/iron-file-icons for different files? -->
-        <download-button url="[[pdfExportUrl]]" tracker="Programme Documents Export Pdf">PDF</download-button>
-        <download-button url="[[xlsxExportUrl]]" tracker="Programme Documents Export Xlsx">XLS</download-button>
-      </etools-prp-toolbar>
-    `;
-  }
-
-  @property({type: String})
-  query!: string;
+  @property({type: Object})
+  queryParams: any;
 
   @property({type: String})
   locationId!: string;
 
-  @property({type: String, computed: '_computePdUrl(locationId)'})
+  @property({type: String, attribute: false})
   pdUrl!: string;
 
-  @property({type: String, computed: "_appendQuery(pdUrl, query, 'export=xlsx')"})
-  xlsxExportUrl!: string;
+  @property({type: String, attribute: false})
+  pdfExportUrl?: string;
 
-  @property({type: String, computed: "_appendQuery(pdUrl, query, 'export=pdf')"})
-  pdfExportUrl!: string;
+  @property({type: String, attribute: false})
+  xlsxExportUrl?: string;
 
-  _computePdUrl(locationId: string) {
-    return computePdUrl(locationId);
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('locationId')) {
+      this.pdUrl = computePdUrl(this.locationId);
+    }
+
+    if (changedProperties.has('pdUrl') || changedProperties.has('queryParams')) {
+      this.pdfExportUrl = this._appendQuery(this.pdUrl, this.queryParams, 'export=pdf');
+      this.xlsxExportUrl = this._appendQuery(this.pdUrl, this.queryParams, 'export=xlsx');
+    }
+  }
+
+  stateChanged(state: any) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.queryParams, state.app?.routeDetails?.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+  }
+
+  render() {
+    return html`
+      <div class="layout-horizontal right-align">
+        <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+          <download-button .url="${this.xlsxExportUrl}" tracker="Programme Documents Export Xlsx">XLS</download-button>
+        </sl-tooltip>
+        <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+          <download-button .url="${this.pdfExportUrl}" tracker="Programme Documents Export Pdf">PDF</download-button>
+        </sl-tooltip>
+      </div>
+    `;
   }
 }
-
-window.customElements.define('pd-list-toolbar', PdListToolbar);
 
 export {PdListToolbar as PdListToolbarEl};

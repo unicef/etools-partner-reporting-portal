@@ -1,5 +1,4 @@
 import Endpoints from '../../../endpoints';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 
 export function computeParams(val: boolean) {
   let params = {};
@@ -13,7 +12,7 @@ export function computeParams(val: boolean) {
   return params;
 }
 
-export function computeIndicatorReportsUrl(indicator: GenericObject) {
+export function computeIndicatorReportsUrl(indicator: any) {
   const target_indicator_id = indicator.cluster_partner_indicator_reportable_id
     ? indicator.cluster_partner_indicator_reportable_id
     : indicator.id;
@@ -28,7 +27,7 @@ export function bucketByLocation(data: any[]) {
   // API gives us two objects, one for current reporting period and
   // one for previous. We want to create a list of locations, each with a
   // current and/or previous report.
-  const locations: GenericObject = {};
+  const locations: any = {};
 
   if (!data) {
     return [];
@@ -40,14 +39,14 @@ export function bucketByLocation(data: any[]) {
       timeframe = 'previous';
     }
 
-    report.indicator_location_data.forEach(function (locationReport: GenericObject) {
+    report.indicator_location_data.forEach(function (locationReport: any) {
       if (locations[locationReport.location.id]) {
         const toUpdate = locations[locationReport.location.id];
         toUpdate[timeframe] = locationReport;
         toUpdate.reportInfo[timeframe] = report;
         locations[locationReport.location.id] = toUpdate;
       } else {
-        const newDict: GenericObject = {reportInfo: {}};
+        const newDict: any = {reportInfo: {}};
         newDict[timeframe] = locationReport;
         newDict.name = locationReport.location.name;
         newDict.reportInfo[timeframe] = report;

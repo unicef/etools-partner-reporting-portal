@@ -1,28 +1,24 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import '../../../etools-prp-common/elements/page-header';
-import '../../../etools-prp-common/elements/page-body';
-import '../../../elements/ip-reporting/partner-details';
-import '../../../elements/ip-reporting/risk-rating';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
+import {LitElement, html, css} from 'lit';
+import {customElement} from 'lit/decorators.js';
+import '../../../etools-prp-common/elements/page-header.js';
+import '../../../etools-prp-common/elements/page-body.js';
+import '../../../elements/ip-reporting/partner-details.js';
+import '../../../elements/ip-reporting/risk-rating.js';
+import {connect} from 'pwa-helpers/connect-mixin.js';
+import {store} from '../../../redux/store.js';
+import {translate} from 'lit-translate';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
- */
-class PageIpReportingOverview extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template() {
+@customElement('page-ip-reporting-overview')
+export class PageIpReportingOverview extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <page-header title="[[localize('overview')]]"></page-header>
-
+      <page-header .title="${translate('OVERVIEW')}"></page-header>
       <page-body>
         <partner-details></partner-details>
         <risk-rating></risk-rating>
@@ -30,4 +26,3 @@ class PageIpReportingOverview extends LocalizeMixin(ReduxConnectedElement) {
     `;
   }
 }
-window.customElements.define('page-ip-reporting-overview', PageIpReportingOverview);
