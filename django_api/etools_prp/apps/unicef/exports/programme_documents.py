@@ -161,9 +161,10 @@ class ProgrammeDocumentsPDFExporter:
 
         for pd in self.programme_documents.order_by('id'):
             cash_transfer_percentage = calc_cash_transfer_percentage(pd)
-
+            if len(pd.title) > 100 and ' ' not in pd.title:
+                title = pd.title[:100]
             rows.append([
-                HTMLTableCell(pd.title, rowspan=5),
+                HTMLTableCell(title, rowspan=5),
                 HTMLTableHeader('Agreement'),
                 HTMLTableCell(pd.agreement),
                 HTMLTableHeader('UNICEF Office(s)'),
