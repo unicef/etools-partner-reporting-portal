@@ -376,8 +376,9 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
       return;
     }
 
-    if (currentReport.status === 'Sen') {
+    if (currentReport.status === 'Sen' && (mode || '').toLowerCase() !== 'edit') {
       this.routeData = {...this.routeData, mode: 'edit'};
+      return;
     }
 
     if (this._isReadOnlyReport(currentReport) && (mode || '').toLowerCase() !== 'view') {
