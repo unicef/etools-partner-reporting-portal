@@ -621,7 +621,8 @@ class ProgressReportReviewSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'overall_status': 'Invalid overall status'
             })
-        if self.instance.is_final and overall_status not in [FINAL_OVERALL_STATUS.met, FINAL_OVERALL_STATUS.constrained]:
+        if self.instance.is_final and overall_status and \
+                overall_status not in [FINAL_OVERALL_STATUS.met, FINAL_OVERALL_STATUS.constrained]:
             raise serializers.ValidationError({
                 'overall_status': 'Overall status for a final report is invalid.'
             })
