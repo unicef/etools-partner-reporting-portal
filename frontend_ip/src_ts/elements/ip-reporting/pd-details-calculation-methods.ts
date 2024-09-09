@@ -330,8 +330,6 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
           text: getTranslation('CHANGES_SAVED'),
           showCloseBtn: true
         });
-        // we send filtered indicators (without latest), response will contain only what was sent, need to re-fetch
-        this._fetchData();
       })
       .catch((_err: any) => {
         console.log(_err);
