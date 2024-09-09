@@ -598,7 +598,7 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.sent_back,
         PROGRESS_REPORT_STATUS.accepted
     ])
-    comment = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False, allow_blank=True)
     overall_status = serializers.ChoiceField(required=False, choices=OVERALL_STATUS)
     reviewed_by_name = serializers.CharField(required=True)
     review_date = serializers.DateField()
