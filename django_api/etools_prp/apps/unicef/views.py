@@ -911,7 +911,7 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                         else:
                             calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
-                    if calculated[loc_id]['data']['d'] == 0:
+                    if calculated[loc_id]['data'].get('d') == 0:
                         calculated[loc_id]['data']['c'] = 0
                     else:
                         calculated[loc_id]['total']['c'] = convert_string_number_to_float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
