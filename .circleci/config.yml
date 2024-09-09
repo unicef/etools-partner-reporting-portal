@@ -257,7 +257,7 @@ workflows:
                 - develop
                 - locations-name
                 - epd_sync_updates
-                - pd-overview-loading
+                - prp-common-cluster
                 - update-packages-fixes
       - build_and_deploy_fe_cluster:
           filters:
@@ -273,3 +273,4 @@ workflows:
                 - master
                 - staging
                 - develop
+                - prp-common-cluster
