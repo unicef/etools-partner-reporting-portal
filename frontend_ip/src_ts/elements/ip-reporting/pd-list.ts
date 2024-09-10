@@ -1,198 +1,217 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/iron-icon/iron-icon';
-import '@polymer/iron-icons/iron-icons';
-import '@unicef-polymer/etools-data-table/etools-data-table';
-import '@unicef-polymer/etools-data-table/data-table-styles';
-import '@polymer/paper-tooltip/paper-tooltip';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
+import {LitElement, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {repeat} from 'lit/directives/repeat.js';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate} from 'lit-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/etools-prp-number';
 import '../etools-prp-currency';
 import '../../etools-prp-common/elements/list-placeholder';
+import {store} from '../../redux/store';
+import {connect} from 'pwa-helpers';
+import {RootState} from '../../typings/redux.types';
+import {buildUrl} from '../../etools-prp-common/utils/util';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin DataTableMixin
- * @appliesMixin PaginationMixin
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdList extends MatomoMixin(
-  LocalizeMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement)))))
-) {
-  public static get template() {
+@customElement('pd-list')
+export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
+  @property({type: Boolean})
+  loading = false;
+
+  @property({type: Array})
+  data: any[] = [];
+
+  @property({type: String})
+  baseUrl!: string;
+
+  stateChanged(state: RootState) {
+    if (state.app?.routeDetails.subSubRouteName !== 'pd') {
+      return;
+    }
+
+    if (this.loading !== state.programmeDocuments?.loading) {
+      this.loading = state.programmeDocuments.loading;
+    }
+
+    if (state.workspaces.baseUrl && this.baseUrl !== state.workspaces.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
+    }
+
+    if (state.programmeDocuments?.all !== undefined && this.data !== state.programmeDocuments?.all) {
+      this.data = state.programmeDocuments.all;
+    }
+
+    if (state.programmeDocuments?.count !== undefined && this.paginator?.count !== state.programmeDocuments.count) {
+      this.paginator = {...this.paginator, count: state.programmeDocuments.count};
+    }
+
+    super.stateChanged(state);
+  }
+
+  static get styles() {
+    return [layoutStyles];
+  }
+
+  render() {
     return html`
       ${tableStyles}
-      <style include="data-table-styles">
-        :host {
+      <style>
+        ${dataTableStylesLit} :host {
           display: block;
         }
+
         etools-content-panel::part(ecp-content) {
           padding: 0;
         }
+
         .cell-reports {
           text-align: right;
           text-transform: uppercase;
         }
       </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-content-panel panel-title="[[localize('list_pds')]]">
+      <etools-content-panel panel-title="${translate('LIST_PDS')}">
         <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+          .label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
+            .count} ${translate('RESULTS_TO_SHOW')}"
         >
-          <etools-data-table-column field="reference_number" sortable>
-            <div class="table-column">[[localize('pd_ref_number')]]</div>
+          <etools-data-table-column field="reference_number" class="col-2" sortable>
+            <div class="table-column">${translate('PD_REF_NUMBER')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="status" sortable>
-            <div class="table-column">[[localize('pd_ssfa_status')]]</div>
+          <etools-data-table-column field="status" sortable class="col-1">
+            <div class="table-column">${translate('PD_SSFA_STATUS')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="start_date" sortable>
-            <div class="table-column">[[localize('start_date')]]</div>
+          <etools-data-table-column field="start_date" sortable class="col-1">
+            <div class="table-column">${translate('START_DATE')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="end_date" sortable>
-            <div class="table-column">[[localize('end_date')]]</div>
+          <etools-data-table-column field="end_date" sortable class="col-1">
+            <div class="table-column">${translate('END_DATE')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="cso_contribution" sortable>
-            <div class="table-column">[[localize('cso_contribution')]]</div>
+          <etools-data-table-column field="cso_contribution" sortable class="col-1">
+            <div class="table-column">${translate('CSO_CONTRIBUTION')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="total_unicef_cash" sortable>
-            <div class="table-column">[[localize('unicef_cash')]]</div>
+          <etools-data-table-column field="total_unicef_cash" sortable class="col-1">
+            <div class="table-column">${translate('UNICEF_CASH')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="total_unicef_supplies" sortable>
-            <div class="table-column">[[localize('unicef_supplies')]]</div>
+          <etools-data-table-column field="total_unicef_supplies" class="col-1">
+            <div class="table-column">${translate('UNICEF_SUPPLIES')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="budget" sortable>
-            <div class="table-column">[[localize('planned_budget')]]</div>
+          <etools-data-table-column field="budget" sortable class="col-1">
+            <div class="table-column">${translate('PLANNED_BUDGET')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="funds_received_to_date" sortable>
-            <div class="table-column">[[localize('cash_transfers')]]</div>
+          <etools-data-table-column field="funds_received_to_date" sortable class="col-2">
+            <div class="table-column">${translate('CASH_TRANSFERS')}</div>
           </etools-data-table-column>
-          <etools-data-table-column></etools-data-table-column>
+          <etools-data-table-column class="col-1"></etools-data-table-column>
         </etools-data-table-header>
 
+        ${repeat(
+          this.data || [],
+          (pd: any) => pd.id,
+          (pd, _index) => html`
+            <etools-data-table-row no-collapse>
+              <div slot="row-data">
+                <div class="col-data col-2 table-cell table-cell--text">
+                  <sl-tooltip placement="top-end" .content="${pd.title}">
+                    <a
+                      @click="${this.trackAnalytics}"
+                      tracker="${this._getPdRefNumberTracker(pd.reference_number)}"
+                      href="${this.getLinkUrl(this.baseUrl, pd.id, 'details')}"
+                      class="truncate"
+                    >
+                      ${this._withDefault(pd.reference_number)}
+                    </a>
+                  </sl-tooltip>
+                </div>
+                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.status, '')}</div>
+                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>
+                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.end_date)}</div>
+                <div class="col-data col-1 table-cell table-cell--text">
+                  <etools-prp-currency value="${pd.cso_contribution}" currency="${pd.cso_contribution_currency}">
+                  </etools-prp-currency>
+                </div>
+                <div class="col-data col-1 table-cell table-cell--text">
+                  <etools-prp-currency value="${pd.total_unicef_cash}" currency="${pd.total_unicef_cash_currency}">
+                  </etools-prp-currency>
+                </div>
+                <div class="col-data col-1 table-cell table-cell--text">
+                  <etools-prp-currency
+                    value="${pd.total_unicef_supplies}"
+                    currency="${pd.total_unicef_supplies_currency}"
+                  >
+                  </etools-prp-currency>
+                </div>
+                <div class="col-data col-1 table-cell table-cell--text">
+                  <etools-prp-currency value="${pd.budget}" currency="${pd.budget_currency}"> </etools-prp-currency>
+                </div>
+                <div class="col-data col-2 table-cell table-cell--text">
+                  <etools-prp-currency
+                    value="${pd.funds_received_to_date}"
+                    currency="${pd.funds_received_to_date_currency}"
+                  >
+                  </etools-prp-currency>
+                  (${this._computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)})
+                </div>
+                <div class="col-data col-1 table-cell table-cell--text cell-reports">
+                  <a
+                    @click="${this.trackAnalytics}"
+                    tracker="Reports"
+                    href="${this.getLinkUrl(this.baseUrl, pd.id, 'reports')}"
+                  >
+                    ${translate('REPORTS')}
+                  </a>
+                </div>
+              </div>
+            </etools-data-table-row>
+          `
+        )}
+
+        <list-placeholder .data="${this.data}" .loading="${this.loading}"> </list-placeholder>
+
         <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
+          .pageSize="${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
         >
         </etools-data-table-footer>
 
-        <template id="list" is="dom-repeat" items="[[data]]" as="pd" initial-count="[[pageSize]]">
-          <etools-data-table-row no-collapse>
-            <div slot="row-data">
-              <div class="table-cell table-cell--text">
-                <a
-                  on-tap="trackAnalytics"
-                  tracker$="[[_getPdRefNumberTracker(pd.reference_number)]]"
-                  href="[[getLinkUrl(pd.id, 'details')]]"
-                >
-                  [[_withDefault(pd.reference_number)]]
-                  <paper-tooltip>[[pd.title]]</paper-tooltip>
-                </a>
-              </div>
-              <div class="table-cell table-cell--text">[[_withDefault(pd.status, '', localize)]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(pd.start_date)]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(pd.end_date)]]</div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency value="[[pd.cso_contribution]]" currency="[[pd.cso_contribution_currency]]">
-                </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency value="[[pd.total_unicef_cash]]" currency="[[pd.total_unicef_cash_currency]]">
-                </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency
-                  value="[[pd.total_unicef_supplies]]"
-                  currency="[[pd.total_unicef_supplies_currency]]"
-                >
-                </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency value="[[pd.budget]]" currency="[[pd.budget_currency]]"> </etools-prp-currency>
-              </div>
-              <div class="table-cell table-cell--text">
-                <etools-prp-currency
-                  value="[[pd.funds_received_to_date]]"
-                  currency="[[pd.funds_received_to_date_currency]]"
-                >
-                </etools-prp-currency>
-                ([[_computeFundsReceivedToDateCurrency(pd.funds_received_to_date_percentage)]])
-              </div>
-              <div class="table-cell table-cell--text cell-reports">
-                <a on-tap="trackAnalytics" tracker="Reports" href="[[getLinkUrl(pd.id, 'reports')]]"
-                  >[[localize('reports')]]</a
-                >
-              </div>
-            </div>
-          </etools-data-table-row>
-        </template>
-
-        <list-placeholder data="[[data]]" loading="[[loading]]"> </list-placeholder>
-
-        <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
-        >
-        </etools-data-table-footer>
-
-        <etools-loading active="[[loading]]"></etools-loading>
+        <etools-loading ?active="${this.loading}"></etools-loading>
       </etools-content-panel>
     `;
   }
 
-  @property({type: Boolean, computed: 'getReduxStateValue(rootState.programmeDocuments.loading)'})
-  loading!: boolean;
+  paginatorChanged() {
+    this._paginatorChanged();
+  }
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.programmeDocuments.all)'})
-  data!: any[];
-
-  @property({type: Number, computed: 'getReduxStateValue(rootState.programmeDocuments.count)'})
-  totalResults!: number;
-
-  _computeFundsReceivedToDateCurrency(percentage?: number) {
+  _computeFundsReceivedToDateCurrency(percentage) {
     if (percentage === null || percentage === -1) {
       return 'N/A';
     } else {
-      return percentage + '%';
+      return `${percentage}%`;
     }
   }
 
-  getLinkUrl(id: string, page: string) {
-    return this.buildUrl(this._baseUrl, `pd/${id}/view/${page}`);
+  getLinkUrl(baseUrl, id, page) {
+    return buildUrl(baseUrl, `pd/${id}/view/${page}`);
   }
 
-  _getPdRefNumberTracker(pdRefNumber: string) {
+  _getPdRefNumberTracker(pdRefNumber) {
     return `PD reference number: ${pdRefNumber}`;
   }
 }
-
-window.customElements.define('pd-list', PdList);
 
 export {PdList as PdListEl};

@@ -30,14 +30,16 @@ export const setIndicatorsCount = function (indicators: any) {
 export const fetchIndicators = function (indicatorsThunk: any) {
   return function (dispatch: any) {
     dispatch(indicatorsLoadingStart());
-    return indicatorsThunk()
+    return indicatorsThunk
       .catch(function () {
         dispatch(indicatorsLoadingStop());
       })
       .then(function (res: any) {
-        dispatch(setIndicators(res.data));
+        if (res) {
+          dispatch(setIndicators(res));
+          dispatch(setIndicatorsCount(res));
+        }
         dispatch(indicatorsLoadingStop());
-        dispatch(setIndicatorsCount(res.data));
       });
   };
 };
@@ -65,11 +67,11 @@ export const setIndicatorDetails = function (data: any) {
 export const fetchIndicatorDetails = function (indicatorsThunk: any, id: string) {
   return function (dispatch: any) {
     dispatch(indicatorDetailsLoadingStart());
-    return indicatorsThunk()
+    return indicatorsThunk
       .then(function (res: any) {
         const formattedById = {};
         // @ts-ignore
-        formattedById[id] = res.data;
+        formattedById[id] = res;
         dispatch(indicatorDetailsLoadingStop());
         dispatch(setIndicatorDetails(formattedById));
       })
