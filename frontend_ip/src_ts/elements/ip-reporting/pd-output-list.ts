@@ -90,8 +90,7 @@ export class PdOutputList extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: RootState) {
-    this.data = llosAll(state);
+  stateChanged(state: RootState) {   
     this.currentPd = currentProgrammeDocument(state);
 
     if (this.loading !== state.programmeDocumentReports.current.loading) {
@@ -109,12 +108,16 @@ export class PdOutputList extends connect(store)(LitElement) {
     if (this.pdId !== state.programmeDocuments.currentPdId) {
       this.pdId = state.programmeDocuments.currentPdId;
     }
+    setTimeout(() => {
+      this.data = llosAll(state);
+    }, 10);    
   }
 
   updated(changedProperties) {
     super.updated(changedProperties);
 
     if (changedProperties.has('data')) {
+      console.log('pd-output-list...', this.data);
       this.viewData = computeViewData(this.data);
     }
   }
