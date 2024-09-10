@@ -382,7 +382,12 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
     }
 
     if (this._isReadOnlyReport(currentReport) && (mode || '').toLowerCase() !== 'view') {
-      this.routeData = {...this.routeData, mode: 'view'};
+      const newRoute = {...this.routeData, mode: 'view'};
+      console.log('pd-reports view, newRoute', newRoute);
+      console.log('pd-reports view, routeData', this.routeData);
+      if (!isJsonStrMatch(newRoute, this.routeData)) {
+        this.routeData = newRoute;
+      }
     }
   }
 

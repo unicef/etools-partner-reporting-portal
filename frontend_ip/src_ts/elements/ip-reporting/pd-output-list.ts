@@ -108,9 +108,7 @@ export class PdOutputList extends connect(store)(LitElement) {
     if (this.pdId !== state.programmeDocuments.currentPdId) {
       this.pdId = state.programmeDocuments.currentPdId;
     }
-    setTimeout(() => {
-      this.data = llosAll(state);
-    }, 10);    
+    this.data = llosAll(state);
   }
 
   updated(changedProperties) {
