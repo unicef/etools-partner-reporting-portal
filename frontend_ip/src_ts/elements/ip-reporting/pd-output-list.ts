@@ -115,7 +115,6 @@ export class PdOutputList extends connect(store)(LitElement) {
     super.updated(changedProperties);
 
     if (changedProperties.has('data')) {
-      console.log('pd-output-list...', this.data);
       this.viewData = computeViewData(this.data);
     }
   }
