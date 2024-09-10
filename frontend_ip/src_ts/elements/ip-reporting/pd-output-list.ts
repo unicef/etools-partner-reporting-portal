@@ -3,6 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import {translate} from 'lit-translate';
 import {computeViewData} from './js/pd-output-list-functions';
 import {llosAll} from '../../redux/selectors/llos';
+import {repeat} from 'lit/directives/repeat.js';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
@@ -72,8 +73,9 @@ export class PdOutputList extends connect(store)(LitElement) {
               </div>
             `
           : html`
-              ${(this.viewData || []).map(
-                (item) => html`
+              ${repeat(
+                this.viewData || [],
+                (item: any, _index: number) => html`
                   <pd-output
                     .data="${item}"
                     .currentPd="${this.currentPd}"
