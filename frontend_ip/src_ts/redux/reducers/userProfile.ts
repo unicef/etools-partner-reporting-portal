@@ -1,7 +1,7 @@
 import Constants from '../../etools-prp-common/constants';
 
 export class UserProfileState {
-  profile = undefined;
+  profile: any = undefined;
 }
 
 export const UserProfile = (state = {profile: undefined}, action: any) => {

@@ -9,8 +9,8 @@ export const setCurrenciesData = function (currenciesData: any) {
 
 export const fetchCurrencies = function (currenciesDataThunk: any) {
   return function (dispatch: any) {
-    return currenciesDataThunk().then(function (res: any) {
-      dispatch(setCurrenciesData(res.data));
+    return currenciesDataThunk.then(function (res: any) {
+      dispatch(setCurrenciesData(res));
     });
   };
 };

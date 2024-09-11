@@ -1,21 +1,19 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@unicef-polymer/etools-content-panel/etools-content-panel.js';
-import '@unicef-polymer/etools-data-table/etools-data-table.js';
-import '@unicef-polymer/etools-loading/etools-loading.js';
-import '@polymer/iron-location/iron-location.js';
-import '@polymer/iron-location/iron-query-params.js';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '../../etools-prp-common/mixins/pagination-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import RoutingMixin from '../../etools-prp-common/mixins/routing-mixin';
+import {translate} from 'lit-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {
   programmeDocumentReportsAll,
@@ -24,135 +22,190 @@ import {
 import {getLink} from './js/pd-reports-list-functions';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {RootState} from '../../typings/redux.types';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin DataTableMixin
- * @appliesMixin PaginationMixin
- * @appliesMixin UtilsMixin
- * @appliesMixin RoutingMixin
- * @appliesMixin ProgressReportUtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdReportsList extends LocalizeMixin(
-  ProgressReportUtilsMixin(RoutingMixin(UtilsMixin(PaginationMixin(DataTableMixin(ReduxConnectedElement)))))
+@customElement('pd-reports-list')
+export class PdReportsList extends PaginationMixin(
+  DataTableMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))))
 ) {
-  public static get template() {
+  static styles = [
+    layoutStyles,
+    css`
+      :host {
+        display: block;
+      }
+      etools-content-panel::part(ecp-content) {
+        padding: 0;
+      }
+    `
+  ];
+
+  @property({type: Boolean, reflect: true})
+  loading = true;
+
+  @property({type: Object})
+  filters: any[] = [];
+
+  @property({type: Object})
+  permissions: any = {};
+
+  @property({type: String})
+  pdId!: string;
+
+  @property({type: String})
+  baseUrl!: string;
+
+  @property({type: Array})
+  data: any[] = [];
+
+  @property({type: Boolean})
+  lowResolutionLayout = false;
+
+  stateChanged(state: RootState) {
+    super.stateChanged(state);
+    if (state.app?.routeDetails?.params?.activeTab !== 'reports') {
+      return;
+    }
+
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.pdId !== state.programmeDocuments?.currentPdId) {
+      this.pdId = state.programmeDocuments?.currentPdId;
+    }
+
+    if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
+      this.baseUrl = state.workspaces.baseUrl;
+    }
+
+    this.data = programmeDocumentReportsAll(state);
+    if (this.data) {
+      const totalResults = programmeDocumentReportsCount(state);
+      if (typeof totalResults !== 'undefined') {
+        this.loading = false;
+        if (this.paginator?.count !== totalResults) {
+          this.paginator = {...this.paginator, count: totalResults};
+          this.requestUpdate();
+        }
+      }
+    }
+  }
+
+  _getLink(report: any, permissions: any) {
+    const suffix = this._getMode(report, permissions);
+    return getLink(report, suffix, this.buildUrl, this.baseUrl);
+  }
+
+  render() {
     return html`
       ${tableStyles}
-      <style include="data-table-styles">
-        :host {
-          display: block;
-        }
-        etools-content-panel::part(ecp-content) {
-          padding: 0;
-        }
+      <style>
+        ${dataTableStylesLit}
       </style>
+      <etools-media-query
+        query="(max-width: 1100px)"
+        @query-matches-changed="${(e: CustomEvent) => {
+          this.lowResolutionLayout = e.detail.value;
+        }}"
+      ></etools-media-query>
 
-      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
 
-      <iron-location query="{{query}}"> </iron-location>
+      <etools-content-panel panel-title="${translate('LIST_OF_REPORTS')}">
+        <etools-loading ?active="${this.loading}"></etools-loading>
 
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-content-panel panel-title="[[localize('list_of_reports')]]">
         <etools-data-table-header
           no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
+          .lowResolutionLayout="${this.lowResolutionLayout}"
+          label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
+            .count} ${translate('RESULTS_TO_SHOW')}"
         >
-          <etools-data-table-column>
-            <div class="table-column">[[localize('report_number')]]</div>
+          <etools-data-table-column class="col-3">
+            <div class="table-column">${translate('REPORT_NUMBER')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="status" sortable>
-            <div class="table-column">[[localize('report_status')]]</div>
+          <etools-data-table-column field="status" sortable class="col-2">
+            <div class="table-column">${translate('REPORT_STATUS')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="due_date" sortable>
-            <div class="table-column">[[localize('due_date')]]</div>
+          <etools-data-table-column field="due_date" sortable class="col-2">
+            <div class="table-column">${translate('DUE_DATE')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="date_of_submission" sortable>
-            <div class="table-column">[[localize('date_of_submission')]]</div>
+          <etools-data-table-column field="date_of_submission" sortable class="col-2">
+            <div class="table-column">${translate('DATE_OF_SUBMISSION')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="reporting_period" sortable>
-            <div class="table-column">[[localize('reporting_period')]]</div>
+          <etools-data-table-column field="reporting_period" sortable class="col-3">
+            <div class="table-column">${translate('REPORTING_PERIOD')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
 
+        ${(this.data || []).map(
+          (report: any) => html`
+            <etools-data-table-row no-collapse .lowResolutionLayout="${this.lowResolutionLayout}">
+              <div slot="row-data">
+                <div
+                  class="col-data col-3 table-cell table-cell--text cell-reports"
+                  data-col-header-label="${translate('REPORT_NUMBER')}"
+                >
+                  <pd-reports-report-title
+                    .displayLink="${true}"
+                    .report="${report}"
+                    .baseUrl="${this.baseUrl}"
+                  ></pd-reports-report-title>
+                </div>
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('REPORT_STATUS')}"
+                >
+                  <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
+                </div>
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('DUE_DATE')}"
+                >
+                  ${this._withDefault(report.due_date, '-')}
+                </div>
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('DATE_OF_SUBMISSION')}"
+                >
+                  ${this._withDefault(report.submission_date)}
+                </div>
+                <div
+                  class="col-data col-3 table-cell table-cell--text"
+                  data-col-header-label="${translate('REPORTING_PERIOD')}"
+                >
+                  ${this._withDefault(report.reporting_period)}
+                </div>
+              </div>
+            </etools-data-table-row>
+          `
+        )}
+
+        <list-placeholder .data="${this.data}" ?loading="${this.loading}"></list-placeholder>
+
         <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
+          .lowResolutionLayout="${this.lowResolutionLayout}"
+          .pageSize="${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
         >
         </etools-data-table-footer>
-
-        <template id="list" is="dom-repeat" items="[[data]]" as="report" initial-count="[[pageSize]]">
-          <etools-data-table-row no-collapse>
-            <div slot="row-data">
-              <div class="table-cell table-cell--text cell-reports">
-                <pd-reports-report-title display-link report="[[report]]"></pd-reports-report-title>
-              </div>
-              <div class="table-cell table-cell--text">
-                <report-status status="[[report.status]]" report-type="[[report.report_type]]"> </report-status>
-              </div>
-              <div class="table-cell table-cell--text">[[_withDefault(report.due_date, '-')]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(report.submission_date)]]</div>
-              <div class="table-cell table-cell--text">[[_withDefault(report.reporting_period)]]</div>
-            </div>
-          </etools-data-table-row>
-        </template>
-
-        <list-placeholder data="[[data]]" loading="[[!loaded]]"> </list-placeholder>
-
-        <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
-        >
-        </etools-data-table-footer>
-
-        <etools-loading active="[[!loaded]]"></etools-loading>
       </etools-content-panel>
     `;
   }
 
-  @property({type: Boolean})
-  loaded!: boolean;
-
-  @property({type: Object, notify: true})
-  filters!: GenericObject;
-
-  @property({type: Object})
-  permissions!: GenericObject;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
-  pdId!: string;
-
-  @property({type: Array, computed: '_programmeDocumentReportsAll(rootState)'})
-  data!: any[];
-
-  @property({type: Number, computed: '_programmeDocumentReportsCount(rootState)'})
-  totalResults!: any[];
-
-  _getLink(report: GenericObject, permissions: GenericObject) {
-    const suffix = this._getMode(report, permissions);
-    return getLink(report, suffix, this.buildUrl, this._baseUrl);
-  }
-
-  _programmeDocumentReportsAll(rootState: RootState) {
-    return programmeDocumentReportsAll(rootState);
-  }
-
-  _programmeDocumentReportsCount(rootState: RootState) {
-    return programmeDocumentReportsCount(rootState);
+  paginatorChanged() {
+    this._paginatorChanged();
   }
 }
-window.customElements.define('pd-reports-list', PdReportsList);
 
 export {PdReportsList as PdReportsListEl};

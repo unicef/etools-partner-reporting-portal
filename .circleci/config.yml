@@ -47,7 +47,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: 'postgres://postgres:postgres@127.0.0.1:5432/test_prp'
-          DEPLOY_BRANCHES: 'develop|staging|master|epd_sync_updates'
+          DEPLOY_BRANCHES: 'develop|staging|master|epd_sync_updates|migration-lit'
       - image: cimg/redis:6.2
       - image: cimg/postgres:12.9-postgis
         environment:
@@ -146,6 +146,10 @@ jobs:
             BUILDDATE=$(date -u +%F_%T)
             sed -i "0,/revNo/s//$REVNO/" package.json
             sed -i "0,/bDate/s//$BUILDDATE/" package.json
+            sed -i "0,/revNo/s//$REVNO/" version.json
+            sed -i "0,/bDate/s//$BUILDDATE/" version.json
+            sed -i "0,/revNo/s//$REVNO/" index.html
+            sed -i "0,/bDate/s//$BUILDDATE/" index.html
       - run:
           name: Install Docker client
           command: |
@@ -255,10 +259,8 @@ workflows:
                 - master
                 - staging
                 - develop
-                - locations-name
                 - epd_sync_updates
-                - pd-overview-loading
-                - update-packages-fixes
+                - migration-lit
       - build_and_deploy_fe_cluster:
           filters:
             branches:

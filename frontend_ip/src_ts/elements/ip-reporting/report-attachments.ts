@@ -1,142 +1,66 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {property} from '@polymer/decorators/lib/decorators';
-import {html} from '@polymer/polymer';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import '@polymer/polymer/lib/elements/dom-if';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
+import {connect} from 'pwa-helpers';
+import {store} from '../../redux/store';
 import {
   programmeDocumentReportsAttachmentsPending,
   programmeDocumentReportsAttachmentsCurrent
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import {pdReportsAttachmentsSync} from '../../redux/actions/pdReportsAttachments';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
+import {pdReportsAttachmentsSet} from '../../redux/actions/pdReportsAttachments';
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
-import '@unicef-polymer/etools-file/etools-file';
-// import {EtoolsFile} from '@unicef-polymer/etools-file/etools-file';
-import {RootState} from '../../typings/redux.types';
+import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import {translate, get as getTranslation} from 'lit-translate';
+import {RootState} from '../../typings/redux.types';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import '@unicef-polymer/etools-unicef/src/etools-upload/etools-upload';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 
 /**
- * @polymer
  * @customElement
  * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
  */
-class ReportAttachments extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        #face-container,
-        #other-one-container,
-        #other-two-container,
-        #other-three-container {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-direction: row;
-        }
-      </style>
-
-      <etools-prp-ajax id="upload" method="post" loading="{{loading}}" url="[[attachmentsListUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="replace" method="put" url="[[attachmentDeleteUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="download" method="get" url="[[attachmentsListUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="delete" method="delete" url="[[attachmentDeleteUrl]]"> </etools-prp-ajax>
-
-      <template is="dom-if" if="[[showFace]]">
-        <div id="face-container">
-          <etools-file
-            id="faceAttachmentComponent"
-            files="{{faceAttachment}}"
-            label="[[localize('face')]]"
-            disabled="[[pending]]"
-            readonly="[[readonly]]"
-            use-delete-events
-          >
-          </etools-file>
-
-          <template is="dom-if" if="{{faceLoading}}">
-            <paper-spinner active></paper-spinner>
-          </template>
-        </div>
-      </template>
-
-      <div id="other-one-container">
-        <etools-file
-          id="otherOneAttachmentComponent"
-          files="{{otherOneAttachment}}"
-          label="[[localize('other')]] #1"
-          disabled="[[pending]]"
-          readonly="[[readonly]]"
-          use-delete-events
-        >
-        </etools-file>
-
-        <template is="dom-if" if="{{otherOneLoading}}">
-          <paper-spinner active></paper-spinner>
-        </template>
-      </div>
-
-      <div id="other-two-container">
-        <etools-file
-          id="otherTwoAttachmentComponent"
-          files="{{otherTwoAttachment}}"
-          label="[[localize('other')]] #2"
-          disabled="[[pending]]"
-          readonly="[[readonly]]"
-          use-delete-events
-        >
-        </etools-file>
-
-        <template is="dom-if" if="{{otherTwoLoading}}">
-          <paper-spinner active></paper-spinner>
-        </template>
-      </div>
-
-      <template is="dom-if" if="[[!showFace]]">
-        <div id="other-three-container">
-          <etools-file
-            id="otherThreeAttachmentComponent"
-            files="{{otherThreeAttachment}}"
-            label="[[localize('other')]] #3"
-            disabled="[[pending]]"
-            readonly="[[readonly]]"
-            use-delete-events
-          >
-          </etools-file>
-
-          <template is="dom-if" if="{{otherThreeLoading}}">
-            <paper-spinner active></paper-spinner>
-          </template>
-        </div>
-      </template>
-    `;
-  }
+@customElement('report-attachments')
+export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+    *[hidden] {
+      display: none !important;
+    }
+    #face-container,
+    #other-one-container,
+    #other-two-container,
+    #other-three-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: row;
+    }
+    etools-file {
+      padding-block-end: 8px;
+    }
+    sl-spinner {
+      font-size: 1.5rem;
+    }
+  `;
 
   @property({type: Boolean})
   readonly!: boolean;
 
-  @property({type: Array})
-  faceAttachment!: any[];
+  @property({type: Object})
+  faceAttachment!: any;
 
-  @property({type: Array})
-  otherOneAttachment!: any[];
+  @property({type: Object})
+  otherOneAttachment!: any;
 
-  @property({type: Array})
-  otherTwoAttachment!: any[];
+  @property({type: Object})
+  otherTwoAttachment!: any;
 
-  @property({type: Array})
-  otherThreeAttachment!: any[];
+  @property({type: Object})
+  otherThreeAttachment!: any;
 
   @property({type: Boolean})
   faceLoading!: boolean;
@@ -153,33 +77,162 @@ class ReportAttachments extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
   @property({type: Boolean})
   otherThreeLoading!: boolean;
 
-  @property({type: Boolean, computed: '_programmeDocumentReportsAttachmentsPending(rootState)'})
+  @property({type: Boolean})
   pending!: boolean;
 
-  @property({type: Array, computed: '_programmeDocumentReportsAttachmentsCurrent(rootState)', observer: '_setFiles'})
-  attachments!: GenericObject[];
-
-  @property({type: String, computed: '_computeListUrl(locationId, reportId)', observer: '_getReportAttachments'})
-  attachmentsListUrl!: string;
+  @property({type: Array})
+  attachments!: any[];
 
   @property({type: String})
-  attachmentDeleteUrl!: string;
+  attachmentsListUrl?: string;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  @property({type: String})
+  attachmentDeleteUrl?: string;
+
+  @property({type: String})
   locationId!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
+  @property({type: String})
   reportId!: string;
 
-  filesChanged!: Debouncer | null;
+  @state() mapKeyToLoading;
 
-  static get observers() {
-    return [
-      '_filesChanged(faceAttachment.*)',
-      '_filesChanged(otherOneAttachment.*)',
-      '_filesChanged(otherTwoAttachment.*)',
-      '_filesChanged(otherThreeAttachment.*)'
-    ];
+  connectedCallback(): void {
+    super.connectedCallback();
+
+    this.mapKeyToLoading = {
+      faceAttachmentComponent: this.faceLoading,
+      otherOneAttachmentComponent: this.otherOneLoading,
+      otherTwoAttachmentComponent: this.otherTwoLoading,
+      otherThreeAttachmentComponent: this.otherThreeLoading
+    };
+  }
+
+  stateChanged(state: RootState) {
+    if (this.pending !== this._programmeDocumentReportsAttachmentsPending(state)) {
+      this.pending = this._programmeDocumentReportsAttachmentsPending(state);
+    }
+    if (this.attachments !== this._programmeDocumentReportsAttachmentsCurrent(state)) {
+      this.attachments = this._programmeDocumentReportsAttachmentsCurrent(state);
+    }
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+    if (this.reportId !== state.programmeDocumentReports.current.id) {
+      this.reportId = state.programmeDocumentReports.current.id;
+    }
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('attachmentsListUrl')) {
+      this._getReportAttachments();
+    }
+
+    if (changedProperties.has('attachments')) {
+      this._setFiles();
+    }
+
+    if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
+      this.attachmentsListUrl = this._computeListUrl(this.locationId, this.reportId);
+    }
+  }
+
+  render() {
+    return html`
+      ${this.showFace
+        ? html`<div id="face-container">
+            <etools-upload
+              id="faceAttachmentComponent"
+              label="${translate('FACE')}"
+              .fileUrl="${this.faceAttachment?.path}"
+              .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.faceAttachment?.id)}"
+              @upload-started="${() => this._uploadStarted('faceAttachmentComponent')}"
+              @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'faceAttachmentComponent')}"
+              @delete-file="${() => this._deleteFile('faceAttachmentComponent', this.faceAttachment?.id)}"
+              .endpointInfo="${{
+                rawFilePropertyName: 'path',
+                extraInfo: {type: 'FACE'},
+                rejectWithRequest: true,
+                method: this.faceAttachment?.id ? 'PUT' : 'POST'
+              }}"
+              ?disabled="${this.pending}"
+              ?readonly="${this.readonly}"
+            >
+            </etools-upload>
+            <sl-spinner ?hidden="${!this.faceLoading}"></sl-spinner>
+          </div>`
+        : ''}
+
+      <div id="other-one-container">
+        <etools-upload
+          id="otherOneAttachmentComponent"
+          label="${translate('OTHER')} #1"
+          .fileUrl="${this.otherOneAttachment?.path}"
+          .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherOneAttachment?.id)}"
+          @upload-started="${() => this._uploadStarted('otherOneAttachmentComponent')}"
+          @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherOneAttachmentComponent')}"
+          @delete-file="${() => this._deleteFile('otherOneAttachmentComponent', this.otherOneAttachment?.id)}"
+          .endpointInfo="${{
+            rawFilePropertyName: 'path',
+            extraInfo: {type: 'Other'},
+            rejectWithRequest: true,
+            method: this.otherOneAttachment?.id ? 'PUT' : 'POST'
+          }}"
+          ?disabled="${this.pending}"
+          ?readonly="${this.readonly}"
+        >
+        </etools-upload>
+        <sl-spinner ?hidden="${!this.otherOneLoading}"></sl-spinner>
+      </div>
+
+      <div id="other-two-container">
+        <etools-upload
+          id="otherTwoAttachmentComponent"
+          label="${translate('OTHER')} #2"
+          .fileUrl="${this.otherTwoAttachment?.path}"
+          .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherTwoAttachment?.id)}"
+          @upload-started="${() => this._uploadStarted('otherTwoAttachmentComponent')}"
+          @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherTwoAttachmentComponent')}"
+          @delete-file="${() => this._deleteFile('otherTwoAttachmentComponent', this.otherTwoAttachment?.id)}"
+          .endpointInfo="${{
+            rawFilePropertyName: 'path',
+            extraInfo: {type: 'Other'},
+            rejectWithRequest: true,
+            method: this.otherTwoAttachment?.id ? 'PUT' : 'POST'
+          }}"
+          ?disabled="${this.pending}"
+          ?readonly="${this.readonly}"
+        >
+        </etools-upload>
+        <sl-spinner ?hidden="${!this.otherTwoLoading}"></sl-spinner>
+      </div>
+
+      ${!this.showFace
+        ? html` <div id="other-three-container">
+            <etools-upload
+              id="otherTwoAttachmentComponent"
+              label="${translate('OTHER')} #3"
+              .fileUrl="${this.otherThreeAttachment?.path}"
+              .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
+              @upload-started="${() => this._uploadStarted('otherThreeAttachmentComponent')}"
+              @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherThreeAttachmentComponent')}"
+              @delete-file="${() => this._deleteFile('otherThreeAttachmentComponent', this.otherThreeAttachment?.id)}"
+              .endpointInfo="${{
+                rawFilePropertyName: 'path',
+                extraInfo: {type: 'Other'},
+                rejectWithRequest: true,
+                method: this.otherThreeAttachment?.id ? 'PUT' : 'POST'
+              }}"
+              ?disabled="${this.pending}"
+              ?readonly="${this.readonly}"
+            >
+            </etools-upload>
+            <sl-spinner ?hidden="${!this.otherThreeLoading}"></sl-spinner>
+          </div>`
+        : ''}
+    `;
   }
 
   _programmeDocumentReportsAttachmentsPending(rootState: RootState) {
@@ -197,35 +250,64 @@ class ReportAttachments extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
     return computeListUrl(locationId, reportId);
   }
 
+  _uploadStarted(type: string) {
+    this.mapKeyToLoading[type] = true;
+    this.pending = true;
+    this.requestUpdate();
+  }
+
+  _uploadFinished(e: CustomEvent, type: string) {
+    if (e.detail.success) {
+      const uploadResponse = e.detail.success;
+      switch (type) {
+        case 'faceAttachmentComponent':
+          this.faceAttachment = uploadResponse;
+          break;
+        case 'otherOneAttachmentComponent':
+          this.otherOneAttachment = uploadResponse;
+          break;
+        case 'otherTwoAttachmentComponent':
+          this.otherTwoAttachment = uploadResponse;
+          break;
+        case 'otherThreeAttachmentComponent':
+          this.otherThreeAttachment = uploadResponse;
+          break;
+      }
+    }
+    this.pending = false;
+    this.mapKeyToLoading[type] = false;
+    this.requestUpdate();
+  }
+
+  getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
+    if (!attachmentsListUrl) return '';
+
+    return id ? `${attachmentsListUrl}${id}/` : attachmentsListUrl;
+  }
+
   _setFiles() {
-    this.set('faceAttachment', []);
-    this.set('otherOneAttachment', []);
-    this.set('otherTwoAttachment', []);
-    this.set('otherThreeAttachment', []);
+    this.faceAttachment = undefined;
+    this.otherOneAttachment = undefined;
+    this.otherTwoAttachment = undefined;
+    this.otherThreeAttachment = undefined;
     if (!this.attachments) {
       this.attachments = [];
     }
-    this.set('showFace', this.attachments.find((attachment) => attachment.type === 'FACE') ? true : false);
+    this.showFace = this.attachments.find((attachment) => attachment.type === 'FACE') ? true : false;
 
-    this.dispatchEvent(
-      new CustomEvent('attachments-loaded', {
-        detail: {hasFaceAttachment: this.showFace},
-        bubbles: true,
-        composed: true
-      })
-    );
+    fireEvent(this, 'attachments-loaded', {hasFaceAttachment: this.showFace});
 
-    setFiles(this.attachments).forEach((attachment: GenericObject) => {
+    setFiles(this.attachments).forEach((attachment: any) => {
       if (attachment.type === 'Other') {
-        if (!this.get('otherOneAttachment').length) {
-          this.set('otherOneAttachment', [attachment]);
-        } else if (!this.get('otherTwoAttachment').length) {
-          this.set('otherTwoAttachment', [attachment]);
-        } else if (!this.get('otherThreeAttachment').length) {
-          this.set('otherThreeAttachment', [attachment]);
+        if (!this.otherOneAttachment || !Object.keys(this.otherOneAttachment).length) {
+          this.otherOneAttachment = attachment;
+        } else if (!this.otherTwoAttachment || !Object.keys(this.otherTwoAttachment).length) {
+          this.otherTwoAttachment = attachment;
+        } else if (!this.otherThreeAttachment || !Object.keys(this.otherThreeAttachment).length) {
+          this.otherThreeAttachment = attachment;
         }
       } else if (attachment.type === 'FACE') {
-        this.set('faceAttachment', [attachment]);
+        this.faceAttachment = attachment;
       }
     });
   }
@@ -234,227 +316,61 @@ class ReportAttachments extends LocalizeMixin(UtilsMixin(ReduxConnectedElement))
     return getDeleteUrl(locationId, reportId, attachmentId);
   }
 
-  _onDeleteFile(e: CustomEvent) {
-    const deleteUrl = this._getDeleteUrl(this.locationId, this.reportId, e.detail.file.id);
+  _deleteFile(type: string, id: string | undefined) {
+    if (!type || !id) {
+      return;
+    }
 
-    this.set('attachmentDeleteUrl', deleteUrl);
+    const attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, id);
 
-    e.stopPropagation();
+    sendRequest({
+      method: 'DELETE',
+      endpoint: {url: attachmentDeleteUrl}
+    })
+      .then((_res) => {
+        store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id)));
 
-    const deleteThunk = (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).thunk();
+        fireEvent(this, 'toast', {text: getTranslation('FILE_DELETED')});
 
-    (this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl).abort();
-
-    // @ts-ignore
-    return (
-      this.reduxStore
-        .dispatch(pdReportsAttachmentsSync(deleteThunk, this.reportId))
-        // @ts-ignore
-        .then(() => {
-          fireEvent(this, 'toast', {
-            text: this.localize('file_deleted'),
-            showCloseBtn: true
-          });
-
-          this.set('attachmentDeleteUrl', undefined);
-
-          if (this.get('faceAttachment').length !== 0 && e.detail.file.id === this.get('faceAttachment')[0].id) {
-            (this.$.faceAttachmentComponent as any).fileInput.value = null;
-            (this.$.faceAttachmentComponent as any).set('files', []);
-          } else if (
-            this.get('otherOneAttachment').length !== 0 &&
-            e.detail.file.id === this.get('otherOneAttachment')[0].id
-          ) {
-            (this.$.otherOneAttachmentComponent as any).fileInput.value = null;
-            (this.$.otherOneAttachmentComponent as any).set('files', []);
-          } else if (
-            this.get('otherTwoAttachment').length !== 0 &&
-            e.detail.file.id === this.get('otherTwoAttachment')[0].id
-          ) {
-            (this.$.otherTwoAttachmentComponent as any).fileInput.value = null;
-            (this.$.otherTwoAttachmentComponent as any).set('files', []);
-          } else if (
-            this.get('otherThreeAttachment').length !== 0 &&
-            e.detail.file.id === this.get('otherThreeAttachment')[0].id
-          ) {
-            (this.$.otherThreeAttachmentComponent as any).fileInput.value = null;
-            (this.$.otherThreeAttachmentComponent as any).set('files', []);
-          }
-        })
-        // @ts-ignore
-        .catch((_err) => {
-          // TODO: error handling
-        })
-    );
+        switch (type) {
+          case 'faceAttachmentComponent':
+            this.faceAttachment = undefined;
+            break;
+          case 'otherOneAttachmentComponent':
+            this.otherOneAttachment = undefined;
+            break;
+          case 'otherTwoAttachmentComponent':
+            this.otherTwoAttachment = undefined;
+            break;
+          case 'otherThreeAttachmentComponent':
+            this.otherThreeAttachment = undefined;
+            break;
+        }
+        this.requestUpdate();
+      })
+      .catch((err) => {
+        console.log(err);
+        fireEvent(this, 'toast', {text: getTranslation('AN_ERROR_OCCURRED')});
+      });
   }
 
-  replaceCharsThatAreNotLetterDigitDotOrUnderline(files: GenericObject[]) {
-    (files || []).forEach((file: GenericObject) => {
+  replaceCharsThatAreNotLetterDigitDotOrUnderline(files: any[]) {
+    (files || []).forEach((file: any) => {
       if (/[^a-zA-Z0-9-_\\.]+/.test(file.file_name)) {
         file.file_name = file.file_name.replace(/[^a-zA-Z0-9-_\\.]+/g, '_');
       }
     });
   }
 
-  _filesChanged(change: GenericObject) {
-    let attachmentPropertyName = change.path.replace('.length', '');
-    const isEmpty = change.value === 0 ? true : false;
-    const attachment = isEmpty ? undefined : change.base[0];
-
-    if (attachment === undefined) {
-      return;
-    }
-
-    const files = isEmpty ? [] : change.base;
-    this.replaceCharsThatAreNotLetterDigitDotOrUnderline(files);
-    const attachmentType = attachmentPropertyName.toLowerCase().indexOf('face') !== -1 ? 'FACE' : 'Other';
-
-    if (isEmpty || (!isEmpty && attachment.path !== null)) {
-      return;
-    }
-
-    this.filesChanged = Debouncer.debounce(this.filesChanged, timeOut.after(100), () => {
-      if (change.path.split('.').length < 2 || !files.length) {
-        return;
-      }
-
-      const data = new FormData();
-      let thunk;
-
-      files.forEach((file: GenericObject) => {
-        data.append('path', file.raw, file.file_name);
-        data.append('type', attachmentType);
-      });
-
-      if (attachment.id === null) {
-        thunk = (this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl).thunk();
-        const uplodCtrl = this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl;
-        uplodCtrl.abort();
-        uplodCtrl.body = data;
-
-        if (attachmentPropertyName === 'faceAttachment') {
-          this.set('faceLoading', true);
-        } else if (attachmentPropertyName === 'otherOneAttachment') {
-          this.set('otherOneLoading', true);
-        } else if (attachmentPropertyName === 'otherTwoAttachment') {
-          this.set('otherTwoLoading', true);
-        } else if (attachmentPropertyName === 'otherThreeAttachment') {
-          this.set('otherThreeLoading', true);
-        }
-      } else {
-        const replaceUrl = this._getDeleteUrl(this.locationId, this.reportId, attachment.id);
-        this.set('attachmentDeleteUrl', replaceUrl);
-
-        thunk = (this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl).thunk();
-        const replaceCtrl = this.shadowRoot!.querySelector('#replace') as EtoolsPrpAjaxEl;
-        replaceCtrl.abort();
-        replaceCtrl.body = data;
-
-        attachmentPropertyName = attachmentPropertyName.split('.')[0];
-      }
-
-      this.reduxStore
-        .dispatch(pdReportsAttachmentsSync(thunk, this.reportId))
-        // @ts-ignore
-        .then(() => {
-          fireEvent(this, 'toast', {
-            text: this.localize('file_uploaded'),
-            showCloseBtn: true
-          });
-          this.set('faceLoading', false);
-          this.set('otherOneLoading', false);
-          this.set('otherTwoLoading', false);
-          this.set('otherThreeLoading', false);
-
-          const attachments = this.get('attachments');
-
-          attachments.forEach((item: GenericObject) => {
-            if (attachment.id !== null && item.id === attachment.id) {
-              this.set(attachmentPropertyName, [item]);
-              return;
-            }
-          });
-
-          if (attachment.id === null) {
-            const duplicates = attachments.filter((item: GenericObject) => {
-              const tokens = attachment.file_name.split('.');
-              if (tokens.length === 0) {
-                return item.file_name.indexOf(attachment.file_name) !== -1;
-              } else {
-                return item.file_name.indexOf(tokens[0]) !== -1 && item.file_name.indexOf(tokens[1]) !== -1;
-              }
-            });
-
-            if (duplicates.length === 1) {
-              this.set(attachmentPropertyName, [duplicates[0]]);
-            } else if (duplicates.length > 1) {
-              let correctedItem;
-
-              duplicates.forEach((item: GenericObject) => {
-                if (item.file_name !== attachment.file_name) {
-                  correctedItem = item;
-                  return;
-                }
-              });
-
-              if (correctedItem) {
-                this.set(attachmentPropertyName, [correctedItem]);
-              }
-            }
-          }
-
-          this.set('attachmentDeleteUrl', undefined);
-        })
-        .catch((_err: GenericObject) => {
-          // TODO: error handling
-        });
-    });
-  }
-
-  _addEventListeners() {
-    this._onDeleteFile = this._onDeleteFile.bind(this);
-    this.addEventListener('delete-file', this._onDeleteFile as any);
-  }
-
-  _removeEventListeners() {
-    this.removeEventListener('delete-file', this._onDeleteFile as any);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-
-    this._addEventListeners();
-  }
-
   _getReportAttachments() {
     if (!this.attachmentsListUrl) {
       return;
     }
-    const downloadThunk = (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).thunk();
-    (this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl).abort();
-    this.reduxStore
-      .dispatch(pdReportsAttachmentsSync(downloadThunk, this.reportId))
-      // @ts-ignore
-      .catch((_err) => {
-        // TODO: error handling
-      });
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._removeEventListeners();
-    [
-      this.shadowRoot!.querySelector('#download') as EtoolsPrpAjaxEl,
-      this.shadowRoot!.querySelector('#upload') as EtoolsPrpAjaxEl,
-      this.shadowRoot!.querySelector('#delete') as EtoolsPrpAjaxEl
-    ].forEach((req: EtoolsPrpAjaxEl) => {
-      req.abort();
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.attachmentsListUrl}
+    }).then((data) => {
+      store.dispatch(pdReportsAttachmentsSet(this.reportId, data));
     });
-
-    if (this.filesChanged && this.filesChanged.isActive()) {
-      this.filesChanged.cancel();
-    }
   }
 }
-
-window.customElements.define('report-attachments', ReportAttachments);

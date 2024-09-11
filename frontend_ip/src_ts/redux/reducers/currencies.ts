@@ -1,8 +1,7 @@
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Constants from '../../etools-prp-common/constants';
 
 export class CurrenciesDataState {
-  currenciesData: GenericObject[] = [];
+  currenciesData: any[] = [];
 }
 
 const INITIAL_STATE = new CurrenciesDataState();
@@ -16,7 +15,7 @@ const formatCurrencies = (currencies: any[]) => {
 export const CurrenciesData = (state = INITIAL_STATE, action: any) => {
   switch (action.type) {
     case Constants.SET_CURRENCIES:
-      return formatCurrencies(action.currenciesData);
+      return {...state, currenciesData: formatCurrencies(action.currenciesData)};
 
     default:
       return state;
