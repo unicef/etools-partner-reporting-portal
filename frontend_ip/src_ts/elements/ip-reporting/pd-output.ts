@@ -463,21 +463,13 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
 
   _handleOpenedChanged(e: CustomEvent, indicator: any, index: number) {
     e.stopPropagation();
-    // @dci
-    // if (data.value) {
-    // @ts-ignore
+
     this.openedArr[index] = !this.openedArr[index];
     this.openedArr = [...this.openedArr];
     const indicatorDetails = this.shadowRoot?.querySelector(`#collapse-${index}`) as any;
-    // e.srcElement!.querySelector('indicator-details');
 
-    // try {
     indicatorDetails.init();
     (this.shadowRoot!.querySelector(`#collapse-${indicator.id}-${index}`) as any).toggle();
-    // } catch (err) {
-    //  console.error('pd-output.ts', err);
-    // }
-    // }
   }
 
   _updateMeta(e: CustomEvent) {
