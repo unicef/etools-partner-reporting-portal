@@ -1,3 +1,4 @@
+import {translate} from 'lit-translate';
 import Endpoints from '../../../endpoints';
 
 export function computeIndicatorsUrl(locationId: string, pdId: string) {
@@ -14,7 +15,7 @@ export function computeFormattedData(data: any) {
     if (!curr.indicators.length) {
       acc.push({
         type: 'missingIndicators',
-        text: 'missing_active_indicators'
+        text: translate('MISSING_ACTIVE_INDICATORS')
       });
     }
 

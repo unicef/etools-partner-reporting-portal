@@ -1,6 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {repeat} from 'lit/directives/repeat.js';
+import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
@@ -32,6 +33,8 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
 
   @property({type: String})
   baseUrl!: string;
+
+  @property({type: Boolean}) lowResolutionLayout = false;
 
   stateChanged(state: RootState) {
     if (state.app?.routeDetails.subSubRouteName !== 'pd') {
@@ -74,13 +77,19 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
         }
 
         .cell-reports {
-          text-align: right;
           text-transform: uppercase;
         }
       </style>
+      <etools-media-query
+        query="(max-width: 1200px)"
+        @query-matches-changed="${(e: CustomEvent) => {
+          this.lowResolutionLayout = e.detail.value;
+        }}"
+      ></etools-media-query>
       <etools-content-panel panel-title="${translate('LIST_PDS')}">
         <etools-data-table-header
           no-collapse
+          .lowResolutionLayout="${this.lowResolutionLayout}"
           .label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
@@ -118,9 +127,12 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
           this.data || [],
           (pd: any) => pd.id,
           (pd, _index) => html`
-            <etools-data-table-row no-collapse>
+            <etools-data-table-row no-collapse .lowResolutionLayout="${this.lowResolutionLayout}">
               <div slot="row-data">
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('PD_REF_NUMBER')}"
+                >
                   <sl-tooltip placement="top-end" .content="${pd.title}">
                     <a
                       @click="${this.trackAnalytics}"
@@ -132,28 +144,58 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                     </a>
                   </sl-tooltip>
                 </div>
-                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.status, '')}</div>
-                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.start_date)}</div>
-                <div class="col-data col-1 table-cell table-cell--text">${this._withDefault(pd.end_date)}</div>
-                <div class="col-data col-1 table-cell table-cell--text">
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('PD_SSFA_STATUS')}"
+                >
+                  ${this._withDefault(pd.status, '')}
+                </div>
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('START_DATE')}"
+                >
+                  ${this._withDefault(pd.start_date)}
+                </div>
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('END_DATE')}"
+                >
+                  ${this._withDefault(pd.end_date)}
+                </div>
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('CSO_CONTRIBUTION')}"
+                >
                   <etools-prp-currency value="${pd.cso_contribution}" currency="${pd.cso_contribution_currency}">
                   </etools-prp-currency>
                 </div>
-                <div class="col-data col-1 table-cell table-cell--text">
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('UNICEF_CASH')}"
+                >
                   <etools-prp-currency value="${pd.total_unicef_cash}" currency="${pd.total_unicef_cash_currency}">
                   </etools-prp-currency>
                 </div>
-                <div class="col-data col-1 table-cell table-cell--text">
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('UNICEF_SUPPLIES')}"
+                >
                   <etools-prp-currency
                     value="${pd.total_unicef_supplies}"
                     currency="${pd.total_unicef_supplies_currency}"
                   >
                   </etools-prp-currency>
                 </div>
-                <div class="col-data col-1 table-cell table-cell--text">
+                <div
+                  class="col-data col-1 table-cell table-cell--text"
+                  data-col-header-label="${translate('PLANNED_BUDGET')}"
+                >
                   <etools-prp-currency value="${pd.budget}" currency="${pd.budget_currency}"> </etools-prp-currency>
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('CASH_TRANSFERS')}"
+                >
                   <etools-prp-currency
                     value="${pd.funds_received_to_date}"
                     currency="${pd.funds_received_to_date_currency}"

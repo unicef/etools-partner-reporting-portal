@@ -61,7 +61,7 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
       // is not active page
       return;
     }
-     
+
     if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
       this.queryParams = state.app?.routeDetails.queryParams;
     }
@@ -90,7 +90,7 @@ export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
       this.pdReportsParams = computePDReportsParams(this.pdId, this.queryParams);
     }
 
-    if (changedProperties.has('pdReportsUrl') || changedProperties.has('pdReportsParams')) {   
+    if (changedProperties.has('pdReportsUrl') || changedProperties.has('pdReportsParams')) {
       this._handleInputChange();
     }
   }

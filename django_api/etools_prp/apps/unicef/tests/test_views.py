@@ -2012,6 +2012,11 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
 
 
 class TestEToolsRolesSynchronization(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GroupFactory(name='IP_VIEWER')
+        GroupFactory(name='IP_EDITOR')
+
     def test_sync(self):
         user = PartnerUserFactory(realms__data=['IP_VIEWER'])
         self.assertIsNotNone(user.workspace.external_id)
@@ -2034,22 +2039,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    'group': 'Partnership Manager',
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': "IP Editor",
-                },
-                {
-                    'country': "unknown country code",
-                    'organization': user.partner.vendor_number,
-                    'group': "IP Editor",
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': "unknown organization vendor number",
-                    'group': "IP Editor",
+                    'group': "IP_EDITOR",
                 },
                 {
                     'country': user.workspace.external_id,
@@ -2079,7 +2069,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         workspace = WorkspaceFactory()
         partner = PartnerFactory()
         self.assertFalse(get_user_model().objects.filter(email=user.email).exists())
-        GroupFactory(name='IP_VIEWER')
+
         input_data = {
             'email': user.email,
             'first_name': user.first_name,
@@ -2087,14 +2077,14 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
             'last_name': user.last_name,
             'realms': [
                 {
-                    'country': "unknown country code",
-                    'organization': "unknown organization vendor number",
-                    'group': "IP Editor",
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP_EDITOR",
                 },
                 {
                     'country': workspace.external_id,
                     'organization': partner.vendor_number,
-                    'group': "IP Viewer",
+                    'group': "IP_VIEWER",
                 },
             ]
         }
@@ -2107,6 +2097,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
             list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
             [
                 (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, True),
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_EDITOR').name, True),
             ]
         )
 
@@ -2117,8 +2108,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
 
     def test_empty_realms(self):
         """
-        Invalid realms payload is reduced to empty list, therefore no user realms will be active
-        and user is deactivated as well
+        If realms is an empty list, no user realms will be active and user is deactivated as well
         """
         user = PartnerUserFactory(realms__data=['IP_VIEWER'])
         input_data = {
@@ -2126,23 +2116,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
             'first_name': user.first_name,
             'middle_name': user.middle_name,
             'last_name': user.last_name,
-            'realms': [
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': 'Partnership Manager',
-                },
-                {
-                    'country': "unknown country code",
-                    'organization': user.partner.vendor_number,
-                    'group': "IP Editor",
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': "unknown organization vendor number",
-                    'group': "IP Editor",
-                },
-            ]
+            'realms': []
         }
         self.client.force_authenticate(factories.NonPartnerUserFactory())
         response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')

@@ -1,5 +1,6 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
 import {connect} from 'pwa-helpers';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
@@ -52,6 +53,9 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
   @property({type: Boolean})
   showProjectContextColumn!: boolean;
 
+  @property({type: Boolean})
+  lowResolutionLayout = false;
+
   render() {
     return html`
       ${tableStyles}
@@ -65,7 +69,16 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
         message-box {
           margin: 25px 25px 0;
         }
+        .table-column {
+          line-height: normal;
+        }
       </style>
+      <etools-media-query
+        query="(max-width: 1200px)"
+        @query-matches-changed="${(e: CustomEvent) => {
+          this.lowResolutionLayout = e.detail.value;
+        }}"
+      ></etools-media-query>
 
       <etools-prp-permissions
         .permissions="${this.permissions}"
@@ -74,6 +87,7 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
 
       <etools-content-panel panel-title="${translate('LIST_OF_INDICATORS')}">
         <etools-data-table-header
+          .lowResolutionLayout="${this.lowResolutionLayout}"
           .label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
@@ -127,12 +141,14 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
             .isCustom="${this.isCustom}"
             .canEdit="${this.canEdit}"
             .type="${this.type}"
+            .lowResolutionLayout="${this.lowResolutionLayout}"
           ></list-view-single-indicator> `
         )}
 
         <list-placeholder .data="${this.data}"></list-placeholder>
 
         <etools-data-table-footer
+          .lowResolutionLayout="${this.lowResolutionLayout}"
           .pageSize="${this.paginator.page_size}"
           .pageNumber="${this.paginator.page}"
           .totalResults="${this.paginator.count}"

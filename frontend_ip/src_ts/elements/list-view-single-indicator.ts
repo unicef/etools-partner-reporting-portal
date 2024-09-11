@@ -67,6 +67,9 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
     .locations-warning {
       color: #ffcc00;
     }
+    .middle {
+      vertical-align: middle;
+    }
   `;
 
   @property({type: Object})
@@ -99,6 +102,9 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
   @property({type: String})
   currentPlan!: string;
 
+  @property({type: Boolean})
+  lowResolutionLayout = false;
+
   render() {
     return html`
       ${tableStyles} ${sharedStyles}
@@ -111,6 +117,7 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
       ></etools-prp-permissions>
 
       <etools-data-table-row
+        .lowResolutionLayout="${this.lowResolutionLayout}"
         @opened-changed=${(e) => {
           this.detailsOpened = e.detail.opened;
         }}
@@ -118,13 +125,14 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
         <div slot="row-data" class="layout-horizontal editable-row">
           <span
             class="col-data col-2 table-cell table-cell--text self-center"
+            data-col-header-label="${translate('INDICATOR')}"
             class=${classMap({
-              'col-3': this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext'),
-              'col-4': !this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
+              'col-data col-3': this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext'),
+              'col-data col-4': !this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
             })}
           >
             <sl-tooltip content="${this.indicator?.blueprint?.title}">
-              <span>
+              <span class="middle">
                 ${this._flagIndicator(this.indicator?.target, this.indicator?.baseline, this.isCustom)
                   ? html`<status-badge type="error"></status-badge>`
                   : html``}
@@ -133,17 +141,26 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
             </sl-tooltip>
           </span>
           ${this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
-            ? html`<span class="col-data col-1 table-cell table-cell--text self-center"
+            ? html`<span
+                class="col-data col-1 table-cell table-cell--text self-center"
+                data-col-header-label="${translate('PROJECT_CONTEXT')}"
                 >${this.indicator?.content_object_title}</span
               >`
             : html``}
-          <span class="col-data col-1 table-cell table-cell--text self-center"
+          <span
+            class="col-data col-1 table-cell table-cell--text self-center"
+            data-col-header-label="${translate('CALC_ACROSS_LOCATIONS')}"
             >${this.indicator?.blueprint?.calculation_formula_across_locations}</span
           >
-          <span class="col-data col-1 table-cell table-cell--text self-center"
+          <span
+            class="col-data col-1 table-cell table-cell--text self-center"
+            data-col-header-label="${translate('CALC_ACROSS_PERIODS')}"
             >${this.indicator?.blueprint?.calculation_formula_across_periods}</span
           >
-          <span class="col-data col-1 table-cell table-cell--text self-center">
+          <span
+            class="col-data col-1 table-cell table-cell--text self-center"
+            data-col-header-label="${translate('BASELINE')}"
+          >
             ${this._equals(this.indicator?.blueprint?.display_type, 'number')
               ? html`<etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>`
               : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
@@ -156,7 +173,10 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
                 ></span>`
               : html``}
           </span>
-          <span class="col-data col-1 table-cell table-cell--text self-center">
+          <span
+            class="col-data col-1 table-cell table-cell--text self-center"
+            data-col-header-label="${translate('TARGET')}"
+          >
             ${this._equals(this.indicator?.blueprint?.display_type, 'number')
               ? html`<etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>`
               : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
@@ -169,10 +189,15 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
                 ></span>`
               : html``}
           </span>
-          <span class="col-data col-1 table-cell table-cell--text self-center"
+          <span
+            class="col-data col-1 table-cell table-cell--text self-center"
+            data-col-header-label="${translate('ACHIEVED')}"
             ><etools-prp-number .value=${this.indicator?.achieved.c}></etools-prp-number
           ></span>
-          <span class="col-data col-2 table-cell table-cell--text self-center flex-2">
+          <span
+            class="col-data col-2 table-cell table-cell--text self-center flex-2"
+            data-col-header-label="${translate('CURRENT_PROGRESS')}"
+          >
             <div class="self-center flex-none">
               <dl class="indicator-progress layout-horizontal">
                 <dt class="flex-none self-center">${translate('AGAINST_TARGET')}</dt>
