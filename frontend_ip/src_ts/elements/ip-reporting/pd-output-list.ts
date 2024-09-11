@@ -90,7 +90,7 @@ export class PdOutputList extends connect(store)(LitElement) {
     `;
   }
 
-  stateChanged(state: RootState) {   
+  stateChanged(state: RootState) {
     this.currentPd = currentProgrammeDocument(state);
 
     if (this.loading !== state.programmeDocumentReports.current.loading) {

@@ -1,5 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
@@ -55,6 +56,8 @@ export class ProgressReportsList extends SortingMixin(
   @property({type: String})
   baseUrl!: string;
 
+  @property({type: Boolean}) lowResolutionLayout = false;
+
   stateChanged(state: RootState) {
     if (state.app?.routeDetails.subSubRouteName !== 'progress-reports') {
       return;
@@ -91,9 +94,16 @@ export class ProgressReportsList extends SortingMixin(
       <style>
         ${dataTableStylesLit}
       </style>
+      <etools-media-query
+        query="(max-width: 1300px)"
+        @query-matches-changed="${(e: CustomEvent) => {
+          this.lowResolutionLayout = e.detail.value;
+        }}"
+      ></etools-media-query>
       <etools-content-panel panel-title="${translate('LIST_OF_REPORTS')}">
         <etools-data-table-header
           no-collapse
+          .lowResolutionLayout="${this.lowResolutionLayout}"
           label="${this.paginator.visible_range[0]} - ${this.paginator.visible_range[1]} of ${this.paginator
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
@@ -119,16 +129,22 @@ export class ProgressReportsList extends SortingMixin(
 
         ${(this.data || []).map(
           (report: any) => html`
-            <etools-data-table-row no-collapse>
+            <etools-data-table-row no-collapse .lowResolutionLayout="${this.lowResolutionLayout}">
               <div slot="row-data">
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('PD_REF_NUMBER')}"
+                >
                   <sl-tooltip content="${report.programme_document?.title}">
                     <span class="truncate">
                       ${this._withDefault(report.programme_document?.reference_number, '-')}
                     </span>
                   </sl-tooltip>
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('REPORT_NUMBER')}"
+                >
                   <pd-reports-report-title
                     display-link
                     display-link-icon
@@ -136,14 +152,28 @@ export class ProgressReportsList extends SortingMixin(
                     .baseUrl="${this.baseUrl}"
                   ></pd-reports-report-title>
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('REPORT_STATUS')}"
+                >
                   <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('DUE_DATE')}"
+                >
+                  ${this._withDefault(report.due_date, '-')}
+                </div>
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('DATE_OF_SUBMISSION')}"
+                >
                   ${this._withDefault(report.submission_date, '-')}
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text truncate">
+                <div
+                  class="col-data col-2 table-cell table-cell--text truncate"
+                  data-col-header-label="${translate('REPORTING_PERIOD')}"
+                >
                   ${this._withDefault(report.reporting_period, '-')}
                 </div>
               </div>

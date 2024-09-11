@@ -1,5 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -59,6 +60,9 @@ export class PdReportsList extends PaginationMixin(
   @property({type: Array})
   data: any[] = [];
 
+  @property({type: Boolean})
+  lowResolutionLayout = false;
+
   stateChanged(state: RootState) {
     super.stateChanged(state);
     if (state.app?.routeDetails?.params?.activeTab !== 'reports') {
@@ -101,6 +105,12 @@ export class PdReportsList extends PaginationMixin(
       <style>
         ${dataTableStylesLit}
       </style>
+      <etools-media-query
+        query="(max-width: 1100px)"
+        @query-matches-changed="${(e: CustomEvent) => {
+          this.lowResolutionLayout = e.detail.value;
+        }}"
+      ></etools-media-query>
 
       <etools-prp-permissions
         .permissions="${this.permissions}"
@@ -112,6 +122,7 @@ export class PdReportsList extends PaginationMixin(
 
         <etools-data-table-header
           no-collapse
+          .lowResolutionLayout="${this.lowResolutionLayout}"
           label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
@@ -134,23 +145,40 @@ export class PdReportsList extends PaginationMixin(
 
         ${(this.data || []).map(
           (report: any) => html`
-            <etools-data-table-row no-collapse>
+            <etools-data-table-row no-collapse .lowResolutionLayout="${this.lowResolutionLayout}">
               <div slot="row-data">
-                <div class="col-data col-3 table-cell table-cell--text cell-reports">
+                <div
+                  class="col-data col-3 table-cell table-cell--text cell-reports"
+                  data-col-header-label="${translate('REPORT_NUMBER')}"
+                >
                   <pd-reports-report-title
                     .displayLink="${true}"
                     .report="${report}"
                     .baseUrl="${this.baseUrl}"
                   ></pd-reports-report-title>
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('REPORT_STATUS')}"
+                >
                   <report-status .status="${report.status}" .reportType="${report.report_type}"></report-status>
                 </div>
-                <div class="col-data col-2 table-cell table-cell--text">${this._withDefault(report.due_date, '-')}</div>
-                <div class="col-data col-2 table-cell table-cell--text">
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('DUE_DATE')}"
+                >
+                  ${this._withDefault(report.due_date, '-')}
+                </div>
+                <div
+                  class="col-data col-2 table-cell table-cell--text"
+                  data-col-header-label="${translate('DATE_OF_SUBMISSION')}"
+                >
                   ${this._withDefault(report.submission_date)}
                 </div>
-                <div class="col-data col-3 table-cell table-cell--text">
+                <div
+                  class="col-data col-3 table-cell table-cell--text"
+                  data-col-header-label="${translate('REPORTING_PERIOD')}"
+                >
                   ${this._withDefault(report.reporting_period)}
                 </div>
               </div>
@@ -161,6 +189,7 @@ export class PdReportsList extends PaginationMixin(
         <list-placeholder .data="${this.data}" ?loading="${this.loading}"></list-placeholder>
 
         <etools-data-table-footer
+          .lowResolutionLayout="${this.lowResolutionLayout}"
           .pageSize="${this.paginator.page_size}"
           .pageNumber="${this.paginator.page}"
           .totalResults="${this.paginator.count}"

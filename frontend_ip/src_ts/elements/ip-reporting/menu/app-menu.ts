@@ -32,7 +32,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
       <div class="menu-header">
         <span id="app-name"> IP Reporting </span>
 
-        <sl-tooltip for="menu-header-top-icon" placement="right" content="ePD">
+        <sl-tooltip for="menu-header-top-icon" placement="right" content="IP Reporting">
           <span class="ripple-wrapper main">
             <etools-icon
               id="menu-header-top-icon"
