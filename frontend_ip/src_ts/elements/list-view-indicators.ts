@@ -1,132 +1,30 @@
-import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@unicef-polymer/etools-content-panel/etools-content-panel';
-import '@unicef-polymer/etools-data-table/etools-data-table';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
-import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/polymer/lib/elements/dom-repeat';
-
+import {LitElement, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
+import {connect} from 'pwa-helpers';
+import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import {tableStyles} from '../etools-prp-common/styles/table-styles';
 import DataTableMixin from '../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
-import PaginationMixin from '../etools-prp-common/mixins/pagination-mixin';
-
+import {translate} from 'lit-translate';
+import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import './list-view-single-indicator';
 import '../etools-prp-common/elements/list-placeholder';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/etools-prp-permissions';
-import {GenericObject} from '../etools-prp-common/typings/globals.types';
-import {tableStyles} from '../etools-prp-common/styles/table-styles';
-
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin DataTableMixin
- * @appliesMixin PaginationMixin
- * @appliesMixin LocalizeMixin
- */
-class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(LocalizeMixin(ReduxConnectedElement)))) {
-  public static get template() {
-    return html`
-      ${tableStyles}
-      <style include="iron-flex iron-flex-factors data-table-styles">
-        etools-content-panel::part(ecp-content) {
-          padding: 1px 0 0;
-        }
-        message-box {
-          margin: 25px 25px 0;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
-
-      <etools-content-panel panel-title="[[localize('list_of_indicators')]]">
-        <etools-data-table-header
-          id="listHeader"
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] [[localize('results_to_show')]]"
-        >
-          <etools-data-table-column field="indicator">
-            <div class="table-column">[[localize('indicator')]]</div>
-          </etools-data-table-column>
-
-          <template is="dom-if" if="[[showProjectContextColumn]]" restamp="[[true]]">
-            <etools-data-table-column field="content_object_title">
-              <div class="table-column">[[localize('project_context')]]</div>
-            </etools-data-table-column>
-          </template>
-
-          <etools-data-table-column field="blueprint.calculation_formula_across_locations">
-            <div class="table-column">[[localize('calc_across_locations')]]</div>
-          </etools-data-table-column>
-
-          <etools-data-table-column field="blueprint.calculation_formula_across_periods">
-            <div class="table-column">[[localize('calc_across_periods')]]</div>
-          </etools-data-table-column>
-
-          <etools-data-table-column field="indicator">
-            <div class="table-column">[[localize('baseline')]]</div>
-          </etools-data-table-column>
-
-          <etools-data-table-column field="indicator">
-            <div class="table-column">[[localize('target')]]</div>
-          </etools-data-table-column>
-
-          <etools-data-table-column field="indicator">
-            <div class="table-column">[[localize('achieved')]]</div>
-          </etools-data-table-column>
-
-          <etools-data-table-column field="progress_percentage" sortable flex-2>
-            <div class="table-column">[[localize('current_progress')]]</div>
-          </etools-data-table-column>
-        </etools-data-table-header>
-
-        <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
-        >
-        </etools-data-table-footer>
-
-        <template id="list" is="dom-repeat" items="[[data]]" initial-count="[[pageSize]]" as="indicator">
-          <list-view-single-indicator
-            indicator="{{indicator}}"
-            is-custom="[[isCustom]]"
-            can-edit="[[canEdit]]"
-            type="[[type]]"
-          >
-          </list-view-single-indicator>
-        </template>
-
-        <list-placeholder data="[[data]]"></list-placeholder>
-
-        <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged"
-        >
-        </etools-data-table-footer>
-      </etools-content-panel>
-    `;
-  }
-
+import {store} from '../redux/store';
+import {RootState} from '../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {repeat} from 'lit/directives/repeat.js';
+import {classMap} from 'lit/directives/class-map.js';
+@customElement('list-view-indicators')
+export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(connect(store)(LitElement)))) {
   @property({type: Array})
-  data!: any[];
+  data: any[] = [];
 
   @property({type: Boolean})
   loading!: boolean;
@@ -137,58 +35,168 @@ class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(Local
   @property({type: Boolean})
   canEdit!: boolean;
 
-  @property({type: Number})
-  totalResults!: number;
-
   @property({type: Object})
-  queryParams!: GenericObject;
+  queryParams!: any;
 
   @property({type: String})
   query!: string;
 
-  @property({type: Number})
-  pageSize!: number;
-
-  @property({type: Number})
-  pageNumber!: number;
-
   @property({type: Object})
-  permissions!: GenericObject;
+  permissions!: any;
 
   @property({type: String})
   type!: string;
 
-  @property({type: Array})
-  openedDetails = [];
+  @property({type: String})
+  appName?: string;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
-  appName!: string;
-
-  @property({type: Boolean, computed: '_computeShowProjectContextColumn(type)'})
+  @property({type: Boolean})
   showProjectContextColumn!: boolean;
 
-  connectedCallback() {
-    super.connectedCallback();
-    this._addEventListeners();
+  @property({type: Boolean})
+  lowResolutionLayout = false;
+
+  render() {
+    return html`
+      ${tableStyles}
+      <style>
+        ${layoutStyles} ${dataTableStylesLit} :host {
+          display: block;
+        }
+        etools-content-panel::part(ecp-content) {
+          padding: 1px 0 0;
+        }
+        message-box {
+          margin: 25px 25px 0;
+        }
+        .table-column {
+          line-height: normal;
+        }
+      </style>
+      <etools-media-query
+        query="(max-width: 1200px)"
+        @query-matches-changed="${(e: CustomEvent) => {
+          this.lowResolutionLayout = e.detail.value;
+        }}"
+      ></etools-media-query>
+
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      ></etools-prp-permissions>
+
+      <etools-content-panel panel-title="${translate('LIST_OF_INDICATORS')}">
+        <etools-data-table-header
+          .lowResolutionLayout="${this.lowResolutionLayout}"
+          .label="${this.paginator.visible_range?.[0]}-${this.paginator.visible_range?.[1]} of ${this.paginator
+            .count} ${translate('RESULTS_TO_SHOW')}"
+        >
+          <etools-data-table-column
+            field="indicator"
+            class=${classMap({'col-3': this.showProjectContextColumn, 'col-4': !this.showProjectContextColumn})}
+          >
+            <div class="table-column">${translate('INDICATOR')}</div>
+          </etools-data-table-column>
+
+          ${this.showProjectContextColumn
+            ? html`
+                <etools-data-table-column field="content_object_title" class="col-1">
+                  <div class="table-column">${translate('PROJECT_CONTEXT')}</div>
+                </etools-data-table-column>
+              `
+            : ''}
+
+          <etools-data-table-column field="blueprint.calculation_formula_across_locations" class="col-1">
+            <div class="table-column">${translate('CALC_ACROSS_LOCATIONS')}</div>
+          </etools-data-table-column>
+
+          <etools-data-table-column field="blueprint.calculation_formula_across_periods" class="col-1">
+            <div class="table-column">${translate('CALC_ACROSS_PERIODS')}</div>
+          </etools-data-table-column>
+
+          <etools-data-table-column field="baseline" class="col-1">
+            <div class="table-column">${translate('BASELINE')}</div>
+          </etools-data-table-column>
+
+          <etools-data-table-column field="target" class="col-1">
+            <div class="table-column">${translate('TARGET')}</div>
+          </etools-data-table-column>
+
+          <etools-data-table-column field="achieved" class="col-1">
+            <div class="table-column">${translate('ACHIEVED')}</div>
+          </etools-data-table-column>
+
+          <etools-data-table-column field="progress_percentage" sortable class="col-2">
+            <div class="table-column">${translate('CURRENT_PROGRESS')}</div>
+          </etools-data-table-column>
+
+          <etools-data-table-column class="col-1"></etools-data-table-column>
+        </etools-data-table-header>
+
+        ${repeat(
+          this.data || [],
+          (indicator) => indicator.id,
+          (indicator) => html`<list-view-single-indicator
+            .indicator="${indicator}"
+            .isCustom="${this.isCustom}"
+            .canEdit="${this.canEdit}"
+            .type="${this.type}"
+            .lowResolutionLayout="${this.lowResolutionLayout}"
+          ></list-view-single-indicator> `
+        )}
+
+        <list-placeholder .data="${this.data}"></list-placeholder>
+
+        <etools-data-table-footer
+          .lowResolutionLayout="${this.lowResolutionLayout}"
+          .pageSize="${this.paginator.page_size}"
+          .pageNumber="${this.paginator.page}"
+          .totalResults="${this.paginator.count}"
+          .visibleRange="${this.paginator.visible_range}"
+          @visible-range-changed="${this.visibleRangeChanged}"
+          @page-size-changed="${this.pageSizeChanged}"
+          @page-number-changed="${this.pageNumberChanged}"
+        >
+        </etools-data-table-footer>
+      </etools-content-panel>
+    `;
   }
 
-  _addEventListeners() {
-    this.addEventListener('details-opened-changed', this._detailsChange as any);
+  paginatorChanged() {
+    this._paginatorChanged();
   }
 
-  _removeEventListeners() {
-    this.removeEventListener('details-opened-changed', this._detailsChange as any);
+  stateChanged(state: RootState) {
+    if (state.app?.routeDetails.subSubRouteName !== 'indicators') {
+      return;
+    }
+
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+      if (parseInt(this.queryParams?.page) === 1 && this.paginator.page !== 1) {
+        // reset paginator because of search
+        this.paginator = {...this.paginator, page: 1};
+      }
+    }
+
+    if (state.indicators.all !== undefined && !isJsonStrMatch(this.data, state.indicators.all)) {
+      this.data = state.indicators.all;
+    }
+
+    if (state.indicators?.count !== undefined && this.paginator?.count !== state.indicators.count) {
+      this.paginator = {...this.paginator, count: state.indicators.count};
+    }
+
+    if (this.appName !== state.app.current) {
+      this.appName = state.app.current;
+    }
   }
 
-  _computeShowProjectContextColumn(type: string) {
-    return type === 'pa';
-  }
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._removeEventListeners();
-    this.openedDetails.length = 0;
+    if (changedProperties.has('type')) {
+      this.showProjectContextColumn = this.type === 'pa';
+    }
   }
 }
-
-window.customElements.define('list-view-indicators', ListViewIndicators);

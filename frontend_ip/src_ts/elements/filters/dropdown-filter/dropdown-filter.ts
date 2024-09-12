@@ -1,54 +1,55 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-dropdown/etools-dropdown';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin FilterMixin
- * @appliesMixin LocalizeMixin
- */
-class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-        #field {
-          width: 100%;
-        }
-      </style>
+@customElement('dropdown-filter')
+export class DropdownFilter extends FilterMixin(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+    #field {
+      width: 100%;
+    }
+  `;
 
+  @property({type: Boolean})
+  disabled = false;
+
+  @property({type: String})
+  value = '';
+
+  @property({type: Array})
+  data: any[] = [];
+
+  render() {
+    return html`
       <etools-dropdown
         id="field"
-        label="[[label]]"
-        options="[[data]]"
+        .label="${this.label}"
+        .options="${this.data}"
         option-value="id"
         option-label="title"
-        selected="{{value}}"
-        disabled="[[disabled]]"
+        .selected="${this.value}"
+        .disabled="${this.disabled}"
         trigger-value-change-event
-        on-etools-selected-item-changed="_handleFilterChange"
+        @etools-selected-item-changed="${this._handleFilterChange}"
       >
       </etools-dropdown>
     `;
   }
 
-  @property({type: Boolean})
-  disabled!: boolean;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: String})
-  value = '';
+    if (changedProperties.has('data')) {
+      this._handleData(this.data);
+    }
+  }
 
-  @property({type: Array, observer: '_handleData'})
-  data!: any[];
-
-  _handleFilterChange(e: CustomEvent) {
+  _handleFilterChange(e) {
     if (!e.detail.selectedItem) {
       return;
     }
@@ -60,11 +61,11 @@ class DropdownFilter extends LocalizeMixin(FilterMixin(ReduxConnectedElement)) {
     });
   }
 
-  _handleData(data: any) {
+  _handleData(data) {
     if (data) {
       this._filterReady();
     }
   }
 }
 
-window.customElements.define('dropdown-filter', DropdownFilter);
+export {DropdownFilter as DropdownFilterEl};

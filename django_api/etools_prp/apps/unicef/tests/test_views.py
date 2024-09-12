@@ -18,6 +18,7 @@ from rest_framework import status
 from unicef_notification.models import Notification
 
 from etools_prp.apps.core.common import (
+    FINAL_OVERALL_STATUS,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     PD_STATUS,
@@ -1101,8 +1102,10 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         self.assertTrue('final_review' in response.data)
         self.assertEqual(response.data['final_review']['respond_requests_in_time_choice'], None)
         self.assertEqual(response.data['final_review']['respond_requests_in_time_comment'], None)
-        self.assertEquals(response.data['final_review']['respond_requests_in_time_comment'],
-                          getattr(progress_report.final_review, 'respond_requests_in_time_comment'))
+        self.assertEqual(response.data['final_review']['respond_requests_in_time_comment'],
+                         getattr(progress_report.final_review, 'respond_requests_in_time_comment'))
+        for indicator_report in response.data['indicator_reports']:
+            self.assertEqual(indicator_report['overall_status_display'], FINAL_OVERALL_STATUS[indicator_report['overall_status']])
 
     def test_detail_update_not_final(self):
         progress_report = self.pd.progress_reports.filter(is_final=False).first()
@@ -1270,6 +1273,178 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         )
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
+
+    def test_review_accept_regular_qpr_report(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.status = PROGRESS_REPORT_STATUS.submitted
+        progress_report.save(update_fields=['status'])
+
+        url = reverse(
+            'progress-reports-review',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        default_unicef_user.jwt_payload = {'email': default_unicef_user.email, 'user_id': default_unicef_user.id}
+        data = {
+            "status": "Acc",
+            "overall_status": OVERALL_STATUS.met,
+            "reviewed_by_name": f"{default_unicef_user.first_name} {default_unicef_user.last_name}",
+            "review_date": datetime.datetime.now().date()
+        }
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
+        self.assertEqual(progress_report.review_overall_status, OVERALL_STATUS.met)
+        self.assertEqual(progress_report.review_date, datetime.datetime.now().date())
+        self.assertEqual(progress_report.reviewed_by_name, f"{default_unicef_user.first_name} {default_unicef_user.last_name}")
+        self.assertEqual(progress_report.reviewed_by_email, default_unicef_user.email)
+        self.assertEqual(progress_report.reviewed_by_external_id, default_unicef_user.id)
+        # for non-final reports, the met status is mapped to 'Met'
+        self.assertEqual(progress_report.indicator_reports.last().get_overall_status_display(), 'Met')
+
+    def test_review_accept_final_qpr_report_invalid(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.is_final = True
+        progress_report.status = PROGRESS_REPORT_STATUS.submitted
+        progress_report.save(update_fields=['status', 'is_final'])
+
+        url = reverse(
+            'progress-reports-review',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        default_unicef_user.jwt_payload = {'email': default_unicef_user.email, 'user_id': default_unicef_user.id}
+        data = {
+            "status": "Acc",
+            "overall_status": OVERALL_STATUS.no_progress,
+            "reviewed_by_name": f"{default_unicef_user.first_name} {default_unicef_user.last_name}",
+            "review_date": datetime.datetime.now().date()
+        }
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('Overall status for a final report is invalid.' in response.data['overall_status'])
+
+    def test_review_accept_final_qpr_report(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.is_final = True
+        progress_report.status = PROGRESS_REPORT_STATUS.submitted
+        progress_report.save(update_fields=['status', 'is_final'])
+
+        url = reverse(
+            'progress-reports-review',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        default_unicef_user.jwt_payload = {'email': default_unicef_user.email, 'user_id': default_unicef_user.id}
+        data = {
+            "status": "Acc",
+            "overall_status": OVERALL_STATUS.met,
+            "reviewed_by_name": f"{default_unicef_user.first_name} {default_unicef_user.last_name}",
+            "review_date": datetime.datetime.now().date()
+        }
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
+        self.assertEqual(progress_report.review_overall_status, OVERALL_STATUS.met)
+        self.assertEqual(progress_report.review_date, datetime.datetime.now().date())
+        self.assertEqual(progress_report.reviewed_by_name, f"{default_unicef_user.first_name} {default_unicef_user.last_name}")
+        self.assertEqual(progress_report.reviewed_by_email, default_unicef_user.email)
+        self.assertEqual(progress_report.reviewed_by_external_id, default_unicef_user.id)
+        # for final reports, the met status is mapped to 'Achieved as planned'
+        self.assertEqual(progress_report.indicator_reports.last().get_overall_status_display(), 'Achieved as planned')
+
+    def test_review_accept_final_qpr_report_send_back(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+        progress_report.is_final = True
+        progress_report.status = PROGRESS_REPORT_STATUS.submitted
+        progress_report.save(update_fields=['status', 'is_final'])
+
+        url = reverse(
+            'progress-reports-review',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        default_unicef_user.jwt_payload = {'email': default_unicef_user.email, 'user_id': default_unicef_user.id}
+        data = {
+            "status": "Sen",
+            "comment": "Comment when sending back",
+            "reviewed_by_name": f"{default_unicef_user.first_name} {default_unicef_user.last_name}",
+            "review_date": datetime.datetime.now().date()
+        }
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.sent_back)
+        self.assertEqual(progress_report.sent_back_feedback, data['comment'])
+        self.assertEqual(progress_report.review_date, datetime.datetime.now().date())
+        self.assertEqual(progress_report.reviewed_by_name, f"{default_unicef_user.first_name} {default_unicef_user.last_name}")
+        self.assertEqual(progress_report.reviewed_by_email, default_unicef_user.email)
+        self.assertEqual(progress_report.reviewed_by_external_id, default_unicef_user.id)
+
+    def test_review_accept_sr_report(self):
+        progress_report = factories.ProgressReportFactory(
+            report_number=random.randint(1, 50),
+            report_type=REPORTING_TYPES.SR,
+            status=PROGRESS_REPORT_STATUS.submitted,
+            programme_document=self.pd,
+        )
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.save(update_fields=['status'])
+
+        url = reverse(
+            'progress-reports-review',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+        default_unicef_user.jwt_payload = {'email': default_unicef_user.email, 'user_id': default_unicef_user.id}
+        data = {
+            "status": "Acc",
+            "overall_status": "Met",
+            "comment": "",
+            "reviewed_by_name": f"{default_unicef_user.first_name} {default_unicef_user.last_name}",
+            "review_date": datetime.datetime.now().date()
+        }
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
+        self.assertEqual(progress_report.accepted_comment, "")
+        self.assertEqual(progress_report.review_date, datetime.datetime.now().date())
+        self.assertEqual(progress_report.reviewed_by_name, f"{default_unicef_user.first_name} {default_unicef_user.last_name}")
+        self.assertEqual(progress_report.reviewed_by_email, default_unicef_user.email)
+        self.assertEqual(progress_report.reviewed_by_external_id, default_unicef_user.id)
 
 
 class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
@@ -1837,6 +2012,11 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
 
 
 class TestEToolsRolesSynchronization(BaseAPITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GroupFactory(name='IP_VIEWER')
+        GroupFactory(name='IP_EDITOR')
+
     def test_sync(self):
         user = PartnerUserFactory(realms__data=['IP_VIEWER'])
         self.assertIsNotNone(user.workspace.external_id)
@@ -1859,22 +2039,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    'group': 'Partnership Manager',
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': "IP Editor",
-                },
-                {
-                    'country': "unknown country code",
-                    'organization': user.partner.vendor_number,
-                    'group': "IP Editor",
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': "unknown organization vendor number",
-                    'group': "IP Editor",
+                    'group': "IP_EDITOR",
                 },
                 {
                     'country': user.workspace.external_id,
@@ -1904,7 +2069,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         workspace = WorkspaceFactory()
         partner = PartnerFactory()
         self.assertFalse(get_user_model().objects.filter(email=user.email).exists())
-        GroupFactory(name='IP_VIEWER')
+
         input_data = {
             'email': user.email,
             'first_name': user.first_name,
@@ -1912,14 +2077,14 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
             'last_name': user.last_name,
             'realms': [
                 {
-                    'country': "unknown country code",
-                    'organization': "unknown organization vendor number",
-                    'group': "IP Editor",
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP_EDITOR",
                 },
                 {
                     'country': workspace.external_id,
                     'organization': partner.vendor_number,
-                    'group': "IP Viewer",
+                    'group': "IP_VIEWER",
                 },
             ]
         }
@@ -1932,6 +2097,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
             list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
             [
                 (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, True),
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_EDITOR').name, True),
             ]
         )
 
@@ -1942,8 +2108,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
 
     def test_empty_realms(self):
         """
-        Invalid realms payload is reduced to empty list, therefore no user realms will be active
-        and user is deactivated as well
+        If realms is an empty list, no user realms will be active and user is deactivated as well
         """
         user = PartnerUserFactory(realms__data=['IP_VIEWER'])
         input_data = {
@@ -1951,23 +2116,7 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
             'first_name': user.first_name,
             'middle_name': user.middle_name,
             'last_name': user.last_name,
-            'realms': [
-                {
-                    'country': user.workspace.external_id,
-                    'organization': user.partner.vendor_number,
-                    'group': 'Partnership Manager',
-                },
-                {
-                    'country': "unknown country code",
-                    'organization': user.partner.vendor_number,
-                    'group': "IP Editor",
-                },
-                {
-                    'country': user.workspace.external_id,
-                    'organization': "unknown organization vendor number",
-                    'group': "IP Editor",
-                },
-            ]
+            'realms': []
         }
         self.client.force_authenticate(factories.NonPartnerUserFactory())
         response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')

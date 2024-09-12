@@ -11,6 +11,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from etools_prp.apps.account.validators import EmailValidator
 from etools_prp.apps.core.common import (
     CURRENCIES,
+    FINAL_OVERALL_STATUS,
     OVERALL_STATUS,
     PD_DOCUMENT_TYPE,
     PD_STATUS,
@@ -27,7 +28,6 @@ from etools_prp.apps.indicator.serializers import (
 from etools_prp.apps.partner.models import Partner
 
 from ..core.models import Realm
-from ..utils.serializers import OptionalElementsListSerializer
 from .models import (
     FinalReview,
     LowerLevelOutput,
@@ -422,6 +422,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_date',
             'review_overall_status',
             'review_overall_status_display',
+            'accepted_comment',
             'sent_back_feedback',
             'programme_document',
             'funds_received_to_date',
@@ -596,7 +597,7 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.sent_back,
         PROGRESS_REPORT_STATUS.accepted
     ])
-    comment = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False, allow_blank=True)
     overall_status = serializers.ChoiceField(required=False, choices=OVERALL_STATUS)
     reviewed_by_name = serializers.CharField(required=True)
     review_date = serializers.DateField()
@@ -619,6 +620,12 @@ class ProgressReportReviewSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'overall_status': 'Invalid overall status'
             })
+        if self.instance.is_final and overall_status and \
+                overall_status not in [FINAL_OVERALL_STATUS.met, FINAL_OVERALL_STATUS.constrained]:
+            raise serializers.ValidationError({
+                'overall_status': 'Overall status for a final report is invalid.'
+            })
+
         if status == PROGRESS_REPORT_STATUS.accepted and overall_status is None:
             raise serializers.ValidationError({
                 'overall_status': 'Overall status required when accepting a report'
@@ -1018,7 +1025,7 @@ class ImportRealmSerializer(serializers.Serializer):
 
 class ImportUserRealmsSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
-    realms = OptionalElementsListSerializer(child=ImportRealmSerializer(), allow_empty=True)
+    realms = serializers.ListSerializer(child=ImportRealmSerializer(), allow_empty=True)
 
     class Meta:
         model = get_user_model()
@@ -1077,6 +1084,8 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
         validated_data['username'] = validated_data['email']
 
         realms = validated_data.pop('realms')
+        if not realms:
+            raise ValidationError('Cannot create a user without realms.')
 
         first_realm = realms[0]
         validated_data['workspace_id'] = first_realm['country'].id

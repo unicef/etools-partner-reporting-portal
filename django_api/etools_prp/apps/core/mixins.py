@@ -98,7 +98,7 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
 
         # TODO: In case of password reset the state can't be verified figure out a way to log the user in after reset
         if error is None:
-            return "/landing"
+            return "/landing/"
 
         strategy = getattr(request, 'social_strategy', None)
         redirect_url = strategy.setting('LOGIN_ERROR_URL') + "?msgc=loginerror"
