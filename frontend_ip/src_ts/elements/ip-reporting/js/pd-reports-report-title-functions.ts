@@ -12,11 +12,11 @@ export function shouldDisplayLink(
 export function getReportTitleFull(report: any) {
   let title = '';
   if (report.report_type === 'QPR') {
-    title += getTranslation('qpr_short') + report.report_number + ' ' + getTranslation('qpr_long');
+    title += getTranslation('QPR_SHORT') + report.report_number + ' ' + getTranslation('QPR_LONG');
   } else if (report.report_type === 'HR') {
-    title += getTranslation('hr_short') + report.report_number + ' ' + getTranslation('hr_long');
+    title += getTranslation('HR_SHORT') + report.report_number + ' ' + getTranslation('HR_LONG');
   } else if (report.report_type === 'SR') {
-    title += getTranslation('sr_short') + report.report_number + ' ' + getTranslation('sr_long');
+    title += getTranslation('SR_SHORT') + report.report_number + ' ' + getTranslation('SR_LONG');
   }
   return title;
 }
@@ -24,11 +24,11 @@ export function getReportTitleFull(report: any) {
 export function getReportTitle(report: any) {
   let title = '';
   if (report.report_type === 'QPR') {
-    title += getTranslation('qpr_short') + report.report_number;
+    title += getTranslation('QPR_SHORT') + report.report_number;
   } else if (report.report_type === 'HR') {
-    title += getTranslation('hr_short') + report.report_number;
+    title += getTranslation('HR_SHORT') + report.report_number;
   } else if (report.report_type === 'SR') {
-    title += getTranslation('sr_short') + report.report_number;
+    title += getTranslation('SR_SHORT') + report.report_number;
   }
   return title;
 }

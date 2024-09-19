@@ -4,7 +4,7 @@ import {get as getTranslation} from 'lit-translate';
 export function calculationFormulaAcrossPeriods(indicator: any) {
   const localized =
     indicator.reportable.blueprint.display_type === 'ratio'
-      ? getTranslation('latest')
+      ? getTranslation('LATEST')
       : getTranslation(indicator.reportable.blueprint.calculation_formula_across_periods);
   if (localized) {
     return localized.toLowerCase();
