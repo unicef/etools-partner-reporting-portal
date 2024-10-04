@@ -1,11 +1,10 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
-declare const dayjs: any;
+import dayjs from 'dayjs';
 
-export function computeLoaded(pd: GenericObject) {
+export function computeLoaded(pd: any) {
   return !!pd.id;
 }
 
-export function hasAmendments(pd: GenericObject) {
+export function hasAmendments(pd: any) {
   return pd.amendments && !!pd.amendments.length;
 }
 
@@ -24,8 +23,8 @@ export function computeReportingRequirements(reportingPeriods: any[], dateFormat
 
   Object.keys(byType).forEach(function (type) {
     byType[type].sort(function (a: any, b: any) {
-      const dateA = dayjs(a.start_date, dateFormat).toDate();
-      const dateB = dayjs(b.start_date, dateFormat).toDate();
+      const dateA = dayjs(a.start_date, dateFormat).unix();
+      const dateB = dayjs(b.start_date, dateFormat).unix();
 
       return dateA - dateB;
     });

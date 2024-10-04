@@ -1,4 +1,3 @@
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Constants from '../../etools-prp-common/constants';
 import {combineReducers} from 'redux';
 
@@ -7,7 +6,7 @@ export class IndicatorsState {
   loading = false;
   loadingDetails = false;
   count = 0;
-  details: GenericObject = {};
+  details: any = {};
 }
 
 export const Indicators = combineReducers({

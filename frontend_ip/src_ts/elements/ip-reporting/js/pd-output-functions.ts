@@ -1,11 +1,11 @@
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
 import Endpoints from '../../../endpoints';
+import {get as getTranslation} from 'lit-translate';
 
-export function calculationFormulaAcrossPeriods(indicator: GenericObject, localize: (x: string) => string) {
+export function calculationFormulaAcrossPeriods(indicator: any) {
   const localized =
     indicator.reportable.blueprint.display_type === 'ratio'
-      ? localize('latest')
-      : localize(indicator.reportable.blueprint.calculation_formula_across_periods);
+      ? getTranslation('LATEST')
+      : getTranslation(indicator.reportable.blueprint.calculation_formula_across_periods);
   if (localized) {
     return localized.toLowerCase();
   }
@@ -31,6 +31,6 @@ export function computeCompleteIndicator(complete: boolean) {
   return complete ? 'Met' : 'Ove';
 }
 
-export function computeReportableUrl(reportId: string, data: GenericObject) {
+export function computeReportableUrl(reportId: string, data: any) {
   return Endpoints.reportable(reportId, data.id);
 }

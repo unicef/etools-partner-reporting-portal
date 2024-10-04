@@ -208,8 +208,8 @@ OVERALL_STATUS = Choices(
 )
 
 FINAL_OVERALL_STATUS = Choices(
-    (OVERALL_STATUS.met, "met", "Met results as planned"),
-    (OVERALL_STATUS.constrained, 'constrained', 'Constrained (partially met result)'),
+    (OVERALL_STATUS.met, "met", "Achieved as planned"),
+    (OVERALL_STATUS.constrained, 'constrained', 'Not achieved as planned'),
 )
 
 PARTNER_PROJECT_STATUS = Choices(
