@@ -854,6 +854,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
         allow_blank=True,
         allow_null=True)
     address = serializers.CharField(source='street_address', allow_blank=True, allow_null=True)
+    type_of_assessment = serializers.CharField(allow_blank=True, allow_null=True)
     basis_for_risk_rating = serializers.CharField(allow_blank=True, allow_null=True)
     unicef_vendor_number = serializers.CharField(source="vendor_number")
 

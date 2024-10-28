@@ -154,6 +154,7 @@ PD_DOCUMENT_TYPE = Choices(
     ('SPD', 'SPD', 'Simplified Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
     ('SSFA', 'SSFA', 'SSFA'),
+    ('GDD', 'GDD', 'Government Digital Document'),
 )
 
 PROGRESS_REPORT_STATUS = Choices(
@@ -178,6 +179,8 @@ PD_STATUS = Choices(
     ("review", "review", "Review"),
     ("signature", "signature", "Signature"),
     ("signed", "signed", "Signed"),
+    ("pending_approval", "pending_approval", "Pending Approval"),  # GDD
+    ("approved", "approved", "Approved"),  # GDD
     ("active", "active", "Active"),
     ("cancelled", "cancelled", "Cancelled"),
     ('ended', 'ended', 'Ended'),
