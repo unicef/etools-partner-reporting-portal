@@ -142,7 +142,9 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
         EtoolsRouter.updateAppLocation([state.workspaces.baseUrl, 'overview'].join('/'));
       } else if (
         state.app.routeDetails.subSubRouteName &&
-        !['overview', 'progress-reports', 'indicators', 'pd'].includes(state.app.routeDetails.subSubRouteName as string)
+        !['overview', 'progress-reports', 'indicators', 'pd', 'gdd'].includes(
+          state.app.routeDetails.subSubRouteName as string
+        )
       ) {
         EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
         return;
