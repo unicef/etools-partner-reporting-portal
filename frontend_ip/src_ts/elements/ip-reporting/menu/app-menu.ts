@@ -76,7 +76,17 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
             </sl-tooltip>
             <div class="name">${translate('PROGRAMME_DOCUMENTS')}</div>
           </a>
-
+          <a
+            class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gdd')}"
+            href="${this._appendQuery(this.gddUrl, this.pdQuery)}"
+            @click="${this.trackAnalytics}"
+            tracker="Government Digital Document"
+          >
+            <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('GDD')}">
+              <etools-icon id="programme_documents-icon" name="description"></etools-icon>
+            </sl-tooltip>
+            <div class="name">${translate('GDD')}</div>
+          </a>
           <a
             class="nav-menu-item ${this.getItemClass(this.selectedOption, 'progress-reports')}"
             href="${this._appendQuery(this.progressReportsUrl, this.reportsQuery)}"
@@ -153,6 +163,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   pdUrl!: string;
 
   @property({type: String})
+  gddUrl!: string;
+
+  @property({type: String})
   progressReportsUrl!: string;
 
   @property({type: String})
@@ -177,6 +190,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
       this.baseUrl = state.workspaces.baseUrl;
       this.overviewUrl = buildUrl(this.baseUrl, 'overview');
       this.pdUrl = buildUrl(this.baseUrl, 'pd');
+      this.gddUrl = buildUrl(this.baseUrl, 'gdd');
       this.progressReportsUrl = buildUrl(this.baseUrl, 'progress-reports');
       this.indicatorsReportsUrl = buildUrl(this.baseUrl, 'indicators');
     }

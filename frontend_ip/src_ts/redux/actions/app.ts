@@ -84,9 +84,42 @@ const importPdRoutes = (routeDetails: EtoolsRouteDetails) => {
   return imported;
 };
 
-const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
+const importGddSubRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
 
+  switch (routeDetails.params?.pdRoute) {
+    case 'details':
+      imported = import('../../pages/app/ip-reporting/gdd/gdd-details.js');
+      break;
+    case 'report':
+      imported = import('../../pages/app/ip-reporting/gdd/gdd-report.js');
+      break;
+    default:
+      imported = import('../../pages/app/ip-reporting/gdd/gdd-details.js');
+      break;
+  }
+  return imported;
+};
+
+const importGddRoutes = (routeDetails: EtoolsRouteDetails) => {
+  let imported: Promise<any> | undefined;
+
+  if (routeDetails.params?.pdID) {
+    imported = import('../../pages/app/ip-reporting/gdd/gdd-router.js')
+      .then(() => {
+        importGddSubRoutes(routeDetails);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    imported = import('../../pages/app/ip-reporting/gdd/gdd-index.js');
+  }
+  return imported;
+};
+
+const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
+  let imported: Promise<any> | undefined;
   switch (routeDetails.subSubRouteName) {
     case 'overview':
       imported = import('../../pages/app/ip-reporting/overview.js');
@@ -98,6 +131,15 @@ const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
       imported = import('../../pages/app/ip-reporting/pd.js').then(() => {
         importPdRoutes(routeDetails);
       });
+      break;
+    case 'gdd':
+      imported = import('../../pages/app/ip-reporting/gdd.js')
+        .then(() => {
+          importGddRoutes(routeDetails);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       break;
     case 'progress-reports':
       imported = import('../../pages/app/ip-reporting/progress-reports.js');

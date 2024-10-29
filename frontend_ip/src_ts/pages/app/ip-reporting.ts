@@ -120,6 +120,7 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
             ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
             : ''}
           ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
+          ${this._equals(this.page, 'gdd') ? html` <page-ip-reporting-gdd name="gdd"> </page-ip-reporting-gdd>` : ''}
           ${this._equals(this.page, 'indicators')
             ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
             : ''}

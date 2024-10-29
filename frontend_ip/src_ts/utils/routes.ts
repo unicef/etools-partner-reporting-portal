@@ -179,4 +179,78 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
         }
       };
     }
+  )
+  .addRoute(
+    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}$`),
+    (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
+      return {
+        routeName: 'app',
+        subRouteName: params.matchDetails[2],
+        subSubRouteName: 'gdd',
+        path: params.matchDetails[0],
+        queryParams: params.queryParams,
+        params: {
+          workspaceId: params.matchDetails[1],
+          pdID: params.matchDetails[3]
+        }
+      };
+    }
+  )
+  .addRoute(
+    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}/edit$`),
+    (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
+      return {
+        routeName: 'app',
+        subRouteName: params.matchDetails[2],
+        subSubRouteName: 'gdd',
+        path: params.matchDetails[0],
+        queryParams: params.queryParams,
+        params: {
+          workspaceId: params.matchDetails[1],
+          pdID: params.matchDetails[3],
+          mode: 'edit'
+        }
+      };
+    }
+  )
+  .addRoute(
+    new RegExp(
+      `^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$`
+    ),
+    (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
+      return {
+        routeName: 'app',
+        subRouteName: params.matchDetails[2],
+        subSubRouteName: 'gdd',
+        path: params.matchDetails[0],
+        queryParams: params.queryParams,
+        params: {
+          workspaceId: params.matchDetails[1],
+          pdID: params.matchDetails[3],
+          pdRoute: params.matchDetails[4],
+          activeTab: params.matchDetails[5]
+        }
+      };
+    }
+  )
+  .addRoute(
+    new RegExp(
+      `^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$` // eslint-disable-line
+    ),
+    (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
+      return {
+        routeName: 'app',
+        subRouteName: params.matchDetails[2],
+        subSubRouteName: 'gdd',
+        path: params.matchDetails[0],
+        queryParams: params.queryParams,
+        params: {
+          workspaceId: params.matchDetails[1],
+          pdID: params.matchDetails[3],
+          pdRoute: params.matchDetails[4],
+          mode: params.matchDetails[6],
+          reportId: params.matchDetails[5]
+        }
+      };
+    }
   );
