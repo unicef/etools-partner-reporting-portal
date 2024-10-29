@@ -92,6 +92,16 @@ class PMP_API:
         data = self._push_request(timeout=300)
         return data
 
+    def government_documents(self, business_area_code, page=0, limit=10, url=None, **kwargs):
+        if url:
+            self.url = url
+        else:
+            kwargs.update({'page': page, 'limit': limit, 'workspace': business_area_code})
+            querystring = urlencode(kwargs)
+            self.url = self.url_prototype + "/gdd/prp-gdds/?" + querystring
+        data = self._push_request(timeout=300)
+        return data
+
     def partners(self, business_area_code, url=None):
         self.url = self.url_prototype + "/prp/v1/partners/?workspace=%s" % (
             business_area_code) if not url else url
