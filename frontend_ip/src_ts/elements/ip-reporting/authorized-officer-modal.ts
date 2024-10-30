@@ -30,6 +30,9 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
   @property({type: Boolean})
   busy = false;
 
+  @property({type: Boolean})
+  isGdd = false;
+
   @property({type: String})
   selectedFocalPoint = '';
 
@@ -55,12 +58,13 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
   baseUrl = '';
 
   set dialogData(data: any) {
-    const {pdId, reportId, currentReport, submitUrl}: any = data;
+    const {pdId, reportId, currentReport, submitUrl, isGdd}: any = data;
 
     this.pdId = pdId;
     this.reportId = reportId;
     this.data = currentReport;
     this.submitUrl = submitUrl;
+    this.isGdd = isGdd;
   }
 
   render() {
@@ -146,7 +150,8 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
         store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
         this.busy = false;
         fireEvent(this, 'dialog-closed', {confirmed: true});
-        EtoolsRouter.updateAppLocation(`${this.baseUrl}/pd/${this.pdId}/view/reports`);
+        const prefix = this.isGdd ? '/gdd/' : '/pd/';
+        EtoolsRouter.updateAppLocation(`${this.baseUrl}${prefix}${this.pdId}/view/reports`);
       })
       .catch((err: any) => {
         fireEvent(this, 'dialog-closed', {confirmed: false});

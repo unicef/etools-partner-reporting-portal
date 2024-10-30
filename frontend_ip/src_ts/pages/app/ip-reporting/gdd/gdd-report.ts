@@ -496,7 +496,8 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
               pdId: this.pdId,
               reportId: this.reportId,
               data: this.currentReport,
-              submitUrl: this.submitUrl
+              submitUrl: this.submitUrl,
+              isGdd: true
             }
           });
           return;
