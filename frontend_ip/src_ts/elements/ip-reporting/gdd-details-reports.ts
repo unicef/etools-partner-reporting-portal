@@ -46,7 +46,7 @@ export class GddDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
       <page-body>
         <pd-report-filters></pd-report-filters>
         <pd-reports-toolbar></pd-reports-toolbar>
-        <pd-reports-list></pd-reports-list>
+        <pd-reports-list is-gdd></pd-reports-list>
       </page-body>
     `;
   }

@@ -7,11 +7,11 @@ import './gdd-report-hr-qpr/info.js'; // Assuming this is the correct path to yo
 @customElement('page-gdd-report-qpr')
 export class PageGddReportQpr extends UtilsMixin(LitElement) {
   @property({type: String, attribute: true, reflect: true})
-  selectedTab = 'reporting';
+  selectedTab = 'info';
 
   render() {
     return html`
-      ${this.selectedTab === 'reporting' ? html`<page-gdd-report-reporting></page-gdd-report-reporting>` : ''}
+      <!-- ${this.selectedTab === 'reporting' ? html`<page-gdd-report-reporting></page-gdd-report-reporting>` : ''} -->
       ${this.selectedTab === 'info' ? html`<page-gdd-report-info></page-gdd-report-info>` : ''}
     `;
   }

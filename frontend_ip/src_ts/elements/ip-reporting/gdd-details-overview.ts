@@ -132,11 +132,11 @@ export class GddDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
           </div>
         </etools-content-panel>
 
-        <etools-content-panel panel-title="${translate('PD_SSFA_DETAILS')}">
+        <etools-content-panel panel-title="${translate('GDD_DETAILS')}">
           <etools-loading ?active="${!this.loaded}"></etools-loading>
           <div class="row padding-v">
             <div class="col-2">
-              <labelled-item label="${translate('PD_SSFA_DOCUMENT')}">
+              <labelled-item label="${translate('DOCUMENT')}">
                 <pd-details-doc-download></pd-details-doc-download>
               </labelled-item>
             </div>

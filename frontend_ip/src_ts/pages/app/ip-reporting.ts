@@ -125,7 +125,8 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
             ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
             : ''}
           ${this._equals(this.page, 'progress-reports')
-            ? html` <page-ip-progress-reports name="progress-reports"> </page-ip-progress-reports>`
+            ? html` <page-ip-progress-reports name="progress-reports" ?isGdd="${this._equals(this.page, 'gdd')}">
+              </page-ip-progress-reports>`
             : ''}
         </app-header-layout>
       </app-drawer-layout>

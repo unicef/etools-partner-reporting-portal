@@ -84,7 +84,7 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
   currentPd: any;
 
   @property({type: String})
-  selectedTab = 'reporting';
+  selectedTab = 'info';
 
   @property({type: String})
   mode!: string;
@@ -145,7 +145,11 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
 
       <page-header title=${this.headingPrefix} back=${this.backLink}>
         <reporting-period slot="above-title" .range=${this.currentReport?.reporting_period}></reporting-period>
-        <pd-reports-report-title slot="above-title" .report=${this.currentReport}></pd-reports-report-title>
+        <pd-reports-report-title
+          slot="above-title"
+          .report=${this.currentReport}
+          ?isGdd="${true}"
+        ></pd-reports-report-title>
         <etools-button variant="text" slot="in-title" role="button" @click=${this._showPdDetails}>
           ${this.currentReport?.programme_document?.reference_number}
         </etools-button>
@@ -198,22 +202,22 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
 
       <page-body>
         ${this._equals(this.currentReport?.report_type, 'HR')
-          ? html`<page-pd-report-hr
+          ? html`<page-gdd-report-hr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-pd-report-hr>`
+            ></page-gdd-report-hr>`
           : html``}
         ${this._equals(this.currentReport?.report_type, 'QPR')
-          ? html`<page-pd-report-qpr
+          ? html`<page-gdd-report-qpr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-pd-report-qpr>`
+            ></page-gdd-report-qpr>`
           : html``}
         ${this._equals(this.currentReport?.report_type, 'SR')
-          ? html`<page-pd-report-sr
+          ? html`<page-gdd-report-sr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-pd-report-sr>`
+            ></page-gdd-report-sr>`
           : html``}
       </page-body>
     `;
@@ -249,27 +253,11 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
       this.currentReport = programmeDocumentReportsCurrent(state);
       this.tabs = [
         {
-          tab: 'reporting',
-          tabLabel:
-            this.currentReport.report_type === 'HR'
-              ? translate('REPORTING_ON_INDICATORS')
-              : this.currentReport.report_type === 'QPR'
-              ? translate('REPORTING_ON_RESULTS')
-              : (translate('REPORTING_ON_DATA') as any as string),
+          tab: 'info',
+          tabLabel: translate('REPORTING_ON_DATA') as any as string,
           hidden: false
         }
       ];
-
-      if (this.currentReport.report_type === 'QPR') {
-        this.tabs = [
-          ...this.tabs,
-          {
-            tab: 'info',
-            tabLabel: translate('OTHER_INFO') as any as string,
-            hidden: false
-          }
-        ];
-      }
     }
 
     if (this.mode !== state.programmeDocumentReports.current.mode) {
@@ -420,7 +408,7 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
   }
 
   _computeBackLink(pdId: string) {
-    return 'pd/' + pdId + '/view/reports';
+    return 'gdd/' + pdId + '/view/reports';
   }
 
   _showPdDetails(e: CustomEvent) {

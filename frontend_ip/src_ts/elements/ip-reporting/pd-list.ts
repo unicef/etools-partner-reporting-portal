@@ -22,7 +22,7 @@ import {store} from '../../redux/store';
 import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
 import {buildUrl} from '../../etools-prp-common/utils/util';
-import { isJsonStrMatch } from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-list')
 export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
@@ -47,8 +47,8 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
     }
 
     if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
-      this.queryParams = state.app?.routeDetails.queryParams;      
-      if (parseInt(this.queryParams?.page) === 1 && this.paginator.page !== 1) {        
+      this.queryParams = state.app?.routeDetails.queryParams;
+      if (parseInt(this.queryParams?.page) === 1 && this.paginator.page !== 1) {
         // reset paginator because of search
         this.paginator = {...this.paginator, page: 1};
       }

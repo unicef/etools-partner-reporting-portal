@@ -18,7 +18,6 @@ import {translate} from 'lit-translate';
 
 const DETAILS = 'details';
 const REPORTS = 'reports';
-const CALCULATION_METHODS = 'calculation_methods';
 
 const NAVIGATION_TABS: any[] = [
   {
@@ -29,11 +28,6 @@ const NAVIGATION_TABS: any[] = [
   {
     tab: REPORTS,
     tabLabel: translate('REPORTS') as any as string,
-    hidden: false
-  },
-  {
-    tab: CALCULATION_METHODS,
-    tabLabel: translate('CALCULATION_METHODS') as any as string,
     hidden: false
   }
 ];
@@ -62,13 +56,13 @@ export class PageIpReportingGddDetails extends UtilsMixin(connect(store)(LitElem
   pageTabs: any[] = NAVIGATION_TABS;
 
   @property({type: Object})
-  pdQuery = {status: String(['signed', 'active', 'suspended'])};
+  pdQuery = {status: String(['approved', 'active', 'suspended'])};
 
   render() {
     return html`
       ${sharedStyles}
 
-      <page-header title="${this.pd.title}" back="${this._appendQuery('pd', this.pdQuery)}">
+      <page-header title="${this.pd.title}" back="${this._appendQuery('gdd', this.pdQuery)}">
         ${this.pd?.status === 'Suspended'
           ? html` <message-box slot="header-content" type="warning">
               PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.

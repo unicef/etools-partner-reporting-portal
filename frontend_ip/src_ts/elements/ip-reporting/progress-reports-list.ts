@@ -41,6 +41,9 @@ export class ProgressReportsList extends SortingMixin(
   @property({type: Boolean})
   loading!: boolean;
 
+  @property({type: Boolean, attribute: 'is-gdd'})
+  isGdd = false;
+
   @property({type: Array})
   data: any[] = [];
 
@@ -154,6 +157,7 @@ export class ProgressReportsList extends SortingMixin(
                     display-link-icon
                     .report="${report}"
                     .baseUrl="${this.baseUrl}"
+                    .isGdd="${this.isGdd}"
                   ></pd-reports-report-title>
                 </div>
                 <div

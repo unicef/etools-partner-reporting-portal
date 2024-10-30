@@ -160,7 +160,6 @@ class PageIpReportingGdd extends SortingMixin(UtilsMixin(connect(store)(LitEleme
         store.dispatch(pdSetCurrentId(pd_id));
       }
     }
-    debugger;
     this.page = this.pdId ? 'gdd-router' : 'gdd-index';
   }
 

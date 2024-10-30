@@ -78,7 +78,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
           </a>
           <a
             class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gdd')}"
-            href="${this._appendQuery(this.gddUrl, this.pdQuery)}"
+            href="${this._appendQuery(this.gddUrl, this.gddQuery)}"
             @click="${this.trackAnalytics}"
             tracker="Government Digital Document"
           >
@@ -149,6 +149,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
 
   @property({type: Object})
   pdQuery = {status: String(['signed', 'active', 'suspended'])};
+
+  @property({type: Object})
+  gddQuery = {status: String(['approved', 'active', 'suspended'])};
 
   @property({type: Object})
   reportsQuery = {status: String(['Due', 'Ove', 'Sen'])};

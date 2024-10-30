@@ -63,6 +63,9 @@ export class PdReportsList extends PaginationMixin(
   @property({type: Boolean})
   lowResolutionLayout = false;
 
+  @property({type: Boolean, attribute: 'is-gdd'})
+  isGdd = false;
+
   stateChanged(state: RootState) {
     super.stateChanged(state);
     if (state.app?.routeDetails?.params?.activeTab !== 'reports') {
@@ -155,6 +158,7 @@ export class PdReportsList extends PaginationMixin(
                     .displayLink="${true}"
                     .report="${report}"
                     .baseUrl="${this.baseUrl}"
+                    .isGdd="${this.isGdd}"
                   ></pd-reports-report-title>
                 </div>
                 <div
