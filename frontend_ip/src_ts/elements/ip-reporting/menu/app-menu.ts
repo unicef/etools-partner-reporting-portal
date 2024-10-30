@@ -13,6 +13,8 @@ import {store} from '../../../redux/store';
 import {translate} from 'lit-translate';
 import {RootState} from '../../../typings/redux.types';
 import {buildUrl} from '../../../etools-prp-common/utils/util';
+import {AnyObject} from '@unicef-polymer/etools-utils/dist/types/global.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 /**
  * main menu
@@ -64,29 +66,35 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
             </sl-tooltip>
             <div class="name">${translate('OVERVIEW')}</div>
           </a>
-
-          <a
-            class="nav-menu-item ${this.getItemClass(this.selectedOption, 'pd')}"
-            href="${this._appendQuery(this.pdUrl, this.pdQuery)}"
-            @click="${this.trackAnalytics}"
-            tracker="Programme Documents"
-          >
-            <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('PROGRAMME_DOCUMENTS')}">
-              <etools-icon id="programme_documents-icon" name="description"></etools-icon>
-            </sl-tooltip>
-            <div class="name">${translate('PROGRAMME_DOCUMENTS')}</div>
-          </a>
-          <a
-            class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gdd')}"
-            href="${this._appendQuery(this.gddUrl, this.gddQuery)}"
-            @click="${this.trackAnalytics}"
-            tracker="Government Digital Document"
-          >
-            <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('GDD')}">
-              <etools-icon id="programme_documents-icon" name="description"></etools-icon>
-            </sl-tooltip>
-            <div class="name">${translate('GDD')}</div>
-          </a>
+          ${this.partner?.partner_type === 'Gov'
+            ? html`
+                <a
+                  class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gdd')}"
+                  href="${this._appendQuery(this.gddUrl, this.gddQuery)}"
+                  @click="${this.trackAnalytics}"
+                  tracker="Government Digital Document"
+                >
+                  <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('GDD')}">
+                    <etools-icon id="programme_documents-icon" name="description"></etools-icon>
+                  </sl-tooltip>
+                  <div class="name">${translate('GDD')}</div>
+                </a>
+              `
+            : html` <a
+                class="nav-menu-item ${this.getItemClass(this.selectedOption, 'pd')}"
+                href="${this._appendQuery(this.pdUrl, this.pdQuery)}"
+                @click="${this.trackAnalytics}"
+                tracker="Programme Documents"
+              >
+                <sl-tooltip
+                  for="programme_documents-icon"
+                  placement="right"
+                  content="${translate('PROGRAMME_DOCUMENTS')}"
+                >
+                  <etools-icon id="programme_documents-icon" name="description"></etools-icon>
+                </sl-tooltip>
+                <div class="name">${translate('PROGRAMME_DOCUMENTS')}</div>
+              </a>`}
           <a
             class="nav-menu-item ${this.getItemClass(this.selectedOption, 'progress-reports')}"
             href="${this._appendQuery(this.progressReportsUrl, this.reportsQuery)}"
@@ -177,6 +185,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   @property({type: String})
   indicatorsReportsUrl!: string;
 
+  @property({type: Object})
+  partner!: AnyObject;
+
   public _toggleSmallMenu(): void {
     this.smallMenu = !this.smallMenu;
     const localStorageVal: number = this.smallMenu ? 1 : 0;
@@ -189,6 +200,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   }
 
   stateChanged(state: RootState): void {
+    if (!isJsonStrMatch(state.partner?.current, this.partner)) {
+      this.partner = {...state.partner?.current};
+    }
     if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
       this.baseUrl = state.workspaces.baseUrl;
       this.overviewUrl = buildUrl(this.baseUrl, 'overview');
