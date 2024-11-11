@@ -1,53 +1,37 @@
 import datetime
 import logging
 
+from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-
-from celery import shared_task
-from rest_framework.exceptions import ValidationError
-
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
+from etools_prp.apps.core.common import (EXTERNAL_DATA_SOURCES,
+                                         PARTNER_ACTIVITY_STATUS,
+                                         PRP_ROLE_TYPES)
 from etools_prp.apps.core.models import Location, Realm, Workspace
 from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
-    create_papc_reportables_from_ca,
-    create_reportable_for_pp_from_ca_reportable,
-    Disaggregation,
-    DisaggregationValue,
-    IndicatorBlueprint,
-    Reportable,
-    ReportableLocationGoal,
-)
+    Disaggregation, DisaggregationValue, IndicatorBlueprint, Reportable,
+    ReportableLocationGoal, create_papc_reportables_from_ca,
+    create_reportable_for_pp_from_ca_reportable)
 from etools_prp.apps.indicator.serializers import (
-    PMPDisaggregationSerializer,
-    PMPDisaggregationValueSerializer,
-    PMPIndicatorBlueprintSerializer,
-    PMPReportableSerializer,
-)
-from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+    PMPDisaggregationSerializer, PMPDisaggregationValueSerializer,
+    PMPIndicatorBlueprintSerializer, PMPReportableSerializer)
+from etools_prp.apps.partner.models import (Partner, PartnerActivity,
+                                            PartnerActivityProjectContext,
+                                            PartnerProject)
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
-from etools_prp.apps.unicef.models import (
-    LowerLevelOutput,
-    PDResultLink,
-    Person,
-    ProgrammeDocument,
-    ReportingPeriodDates,
-    Section,
-)
+from etools_prp.apps.unicef.models import (LowerLevelOutput, PDResultLink,
+                                           Person, ProgrammeDocument,
+                                           ReportingPeriodDates, Section)
 from etools_prp.apps.unicef.serializers import (
-    PMPLLOSerializer,
-    PMPPDPersonSerializer,
-    PMPPDResultLinkSerializer,
-    PMPProgrammeDocumentSerializer,
-    PMPReportingPeriodDatesSerializer,
-    PMPReportingPeriodDatesSRSerializer,
-    PMPSectionSerializer,
-)
+    PMPLLOSerializer, PMPPDPersonSerializer, PMPPDResultLinkSerializer,
+    PMPProgrammeDocumentSerializer, PMPReportingPeriodDatesSerializer,
+    PMPReportingPeriodDatesSRSerializer, PMPSectionSerializer)
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
+from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -241,6 +225,23 @@ def process_programme_documents(fast=False, area=False):
                             person.active = True
                             person.save()
                             pd.unicef_focal_point.add(person)
+
+                            user.partner = partner
+                            user.save()
+
+                            obj, created = Realm.objects.get_or_create(
+                                user=user,
+                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
+                                workspace=workspace,
+                                partner=partner
+                            )
+                            if created:
+                                obj.send_email_notification()
+
+                            is_active = person_data.get('active')
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
 
                         # Create agreement_auth_officers
                         person_data_list = item['agreement_auth_officers']
@@ -865,14 +866,29 @@ def process_government_documents(fast=False, area=False):
                         # Create focal_points
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
+                            person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
 
                             person.active = True
                             person.save()
                             pd.partner_focal_point.add(person)
+                            user.partner = partner
+                            user.save()
 
+                            obj, created = Realm.objects.get_or_create(
+                                user=user,
+                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
+                                workspace=workspace,
+                                partner=partner
+                            )
+                            if created:
+                                obj.send_email_notification()
+
+                            is_active = person_data.get('active')
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:
