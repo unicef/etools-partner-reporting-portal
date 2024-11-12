@@ -1,37 +1,53 @@
 import datetime
 import logging
 
-from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+
+from celery import shared_task
+from rest_framework.exceptions import ValidationError
+
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import (EXTERNAL_DATA_SOURCES,
-                                         PARTNER_ACTIVITY_STATUS,
-                                         PRP_ROLE_TYPES)
+from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
 from etools_prp.apps.core.models import Location, Realm, Workspace
 from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
-    Disaggregation, DisaggregationValue, IndicatorBlueprint, Reportable,
-    ReportableLocationGoal, create_papc_reportables_from_ca,
-    create_reportable_for_pp_from_ca_reportable)
+    create_papc_reportables_from_ca,
+    create_reportable_for_pp_from_ca_reportable,
+    Disaggregation,
+    DisaggregationValue,
+    IndicatorBlueprint,
+    Reportable,
+    ReportableLocationGoal,
+)
 from etools_prp.apps.indicator.serializers import (
-    PMPDisaggregationSerializer, PMPDisaggregationValueSerializer,
-    PMPIndicatorBlueprintSerializer, PMPReportableSerializer)
-from etools_prp.apps.partner.models import (Partner, PartnerActivity,
-                                            PartnerActivityProjectContext,
-                                            PartnerProject)
+    PMPDisaggregationSerializer,
+    PMPDisaggregationValueSerializer,
+    PMPIndicatorBlueprintSerializer,
+    PMPReportableSerializer,
+)
+from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
-from etools_prp.apps.unicef.models import (LowerLevelOutput, PDResultLink,
-                                           Person, ProgrammeDocument,
-                                           ReportingPeriodDates, Section)
+from etools_prp.apps.unicef.models import (
+    LowerLevelOutput,
+    PDResultLink,
+    Person,
+    ProgrammeDocument,
+    ReportingPeriodDates,
+    Section,
+)
 from etools_prp.apps.unicef.serializers import (
-    PMPLLOSerializer, PMPPDPersonSerializer, PMPPDResultLinkSerializer,
-    PMPProgrammeDocumentSerializer, PMPReportingPeriodDatesSerializer,
-    PMPReportingPeriodDatesSRSerializer, PMPSectionSerializer)
+    PMPLLOSerializer,
+    PMPPDPersonSerializer,
+    PMPPDResultLinkSerializer,
+    PMPProgrammeDocumentSerializer,
+    PMPReportingPeriodDatesSerializer,
+    PMPReportingPeriodDatesSRSerializer,
+    PMPSectionSerializer,
+)
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
-from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
