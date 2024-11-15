@@ -85,7 +85,7 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
         ?disableDismissBtn="${this.busy}"
       >
         <div class="dialog-content">
-          <h3>${translate('COULD_NOT_BE_SUBMITTED')}</h3>
+          <h3>${translate(this.isGdd ? 'GPD_COULD_NOT_BE_SUBMITTED' : 'COULD_NOT_BE_SUBMITTED')}</h3>
           <etools-dropdown
             id="officerDropdown"
             class="validate"

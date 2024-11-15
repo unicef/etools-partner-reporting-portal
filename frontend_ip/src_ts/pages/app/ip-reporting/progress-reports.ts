@@ -42,8 +42,8 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
     return html`
       <page-header .title="${translate('PROGRESS_REPORTS')}"></page-header>
       <page-body>
-        <progress-reports-filters></progress-reports-filters>
-        <progress-reports-toolbar></progress-reports-toolbar>
+        <progress-reports-filters ?isGdd="${this.isGdd}"></progress-reports-filters>
+        <progress-reports-toolbar ?isGdd="${this.isGdd}"></progress-reports-toolbar>
         <progress-reports-list ?isGdd="${this.isGdd}"></progress-reports-list>
       </page-body>
     `;

@@ -158,7 +158,7 @@ export class PdReportsList extends PaginationMixin(
                     .displayLink="${true}"
                     .report="${report}"
                     .baseUrl="${this.baseUrl}"
-                    .isGdd="${this.isGdd}"
+                    ?isGdd="${this.isGdd}"
                   ></pd-reports-report-title>
                 </div>
                 <div

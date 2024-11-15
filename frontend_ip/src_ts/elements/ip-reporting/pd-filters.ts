@@ -47,7 +47,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
           </text-filter>
           <dropdown-filter-multi
             class="col-lg-5 col-12"
-            label="${translate(this.isGdd ? 'STATUS' : 'PD_SSFA_STATUS')}"
+            label="${translate(this.isGdd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
             .data="${this.statuses}"
