@@ -43,7 +43,7 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
   @property({type: String})
   baseUrl!: string;
 
-  @property({type: Boolean, attribute: 'is-gdd'})
+  @property({type: Boolean})
   isGdd = false;
 
   @property({type: Boolean, attribute: 'display-link'})

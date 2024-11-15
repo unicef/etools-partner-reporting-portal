@@ -69,6 +69,9 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Boolean})
   smallMenu: boolean;
 
+  @property({type: Boolean})
+  isGdd = false;
+
   @property({type: Object})
   route!: Route;
 
@@ -122,10 +125,11 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
           ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
           ${this._equals(this.page, 'gdd') ? html` <page-ip-reporting-gdd name="gdd"> </page-ip-reporting-gdd>` : ''}
           ${this._equals(this.page, 'indicators')
-            ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
+            ? html` <page-ip-reporting-indicators name="indicators" ?isGdd="${this.isGdd}">
+              </page-ip-reporting-indicators>`
             : ''}
           ${this._equals(this.page, 'progress-reports')
-            ? html` <page-ip-progress-reports name="progress-reports" ?isGdd="${this._equals(this.page, 'gdd')}">
+            ? html` <page-ip-progress-reports name="progress-reports" ?isGdd="${this.isGdd}">
               </page-ip-progress-reports>`
             : ''}
         </app-header-layout>

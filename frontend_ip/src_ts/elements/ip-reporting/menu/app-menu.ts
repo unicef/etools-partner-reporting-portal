@@ -72,7 +72,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
                   class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gdd')}"
                   href="${this._appendQuery(this.gddUrl, this.gddQuery)}"
                   @click="${this.trackAnalytics}"
-                  tracker="Government Digital Document"
+                  tracker="Government Programme Document"
                 >
                   <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('GDD')}">
                     <etools-icon id="programme_documents-icon" name="description"></etools-icon>
