@@ -276,7 +276,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     }
     this.pending = false;
     this.mapKeyToLoading[type] = false;
-    this.requestUpdate();
+    this._getReportAttachments();
   }
 
   getUploadUrl(attachmentsListUrl: string | undefined, id: any) {
