@@ -273,7 +273,6 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
           this.otherThreeAttachment = uploadResponse;
           break;
       }
-      this.attachments.push(uploadResponse);
     }
     this.pending = false;
     this.mapKeyToLoading[type] = false;
@@ -323,12 +322,15 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     }
 
     const attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, id);
+    const isAlreadySaved = (this.attachments || []).some((x) => String(x.id) === String(id));
     sendRequest({
       method: 'DELETE',
       endpoint: {url: attachmentDeleteUrl}
     })
       .then((_res) => {
-        this.attachments = this.attachments.filter((x) => String(x.id) !== String(id));
+        if (isAlreadySaved) {
+          store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id)));
+        }
 
         fireEvent(this, 'toast', {text: getTranslation('FILE_DELETED')});
 
