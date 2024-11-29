@@ -13,9 +13,9 @@ import '../../../../elements/ip-reporting/pd-reports-report-title.js';
 import '../../../../elements/ip-reporting/pd-report-export-button.js';
 import '../../../../elements/ip-reporting/pd-modal.js';
 import '../../../../elements/ip-reporting/authorized-officer-modal.js';
-import './gdd-report-sr.js';
-import './gdd-report-hr.js';
-import './gdd-report-qpr.js';
+import './gpd-report-sr.js';
+import './gpd-report-hr.js';
+import './gpd-report-qpr.js';
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports.js';
 import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments.js';
 import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '../../../../redux/actions/pdReports.js';
@@ -33,8 +33,8 @@ import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {buildUrl} from '../../../../etools-prp-common/utils/util.js';
 
-@customElement('page-ip-reporting-gdd-report')
-export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
+@customElement('page-ip-reporting-gpd-report')
+export class PageIpReportingGpdReport extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = [
     css`
       :host {
@@ -148,7 +148,7 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
         <pd-reports-report-title
           slot="above-title"
           .report=${this.currentReport}
-          ?isGdd="${true}"
+          ?isGpd="${true}"
         ></pd-reports-report-title>
         <etools-button variant="text" slot="in-title" role="button" @click=${this._showPdDetails}>
           ${this.currentReport?.programme_document?.reference_number}
@@ -202,22 +202,22 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
 
       <page-body>
         ${this._equals(this.currentReport?.report_type, 'HR')
-          ? html`<page-gdd-report-hr
+          ? html`<page-gpd-report-hr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-gdd-report-hr>`
+            ></page-gpd-report-hr>`
           : html``}
         ${this._equals(this.currentReport?.report_type, 'QPR')
-          ? html`<page-gdd-report-qpr
+          ? html`<page-gpd-report-qpr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-gdd-report-qpr>`
+            ></page-gpd-report-qpr>`
           : html``}
         ${this._equals(this.currentReport?.report_type, 'SR')
-          ? html`<page-gdd-report-sr
+          ? html`<page-gpd-report-sr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-gdd-report-sr>`
+            ></page-gpd-report-sr>`
           : html``}
       </page-body>
     `;
@@ -408,7 +408,7 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
   }
 
   _computeBackLink(pdId: string) {
-    return 'gdd/' + pdId + '/view/reports';
+    return 'gpd/' + pdId + '/view/reports';
   }
 
   _showPdDetails(e: CustomEvent) {
@@ -497,7 +497,7 @@ export class PageIpReportingGddReport extends ProgressReportUtilsMixin(UtilsMixi
               reportId: this.reportId,
               data: this.currentReport,
               submitUrl: this.submitUrl,
-              isGdd: true
+              isGpd: true
             }
           });
           return;

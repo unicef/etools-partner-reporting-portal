@@ -24,8 +24,8 @@ import {RootState} from '../../typings/redux.types';
 import {buildUrl} from '../../etools-prp-common/utils/util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
-@customElement('gdd-list')
-export class GddList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
+@customElement('gpd-list')
+export class GpdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
   @property({type: Boolean})
   loading = false;
 
@@ -38,7 +38,7 @@ export class GddList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMix
   @property({type: Boolean}) lowResolutionLayout = false;
 
   stateChanged(state: RootState) {
-    if (state.app?.routeDetails.subSubRouteName !== 'gdd') {
+    if (state.app?.routeDetails.subSubRouteName !== 'gpd') {
       return;
     }
     if (this.loading !== state.programmeDocuments?.loading) {
@@ -247,7 +247,7 @@ export class GddList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMix
   }
 
   getLinkUrl(baseUrl, id, page) {
-    return buildUrl(baseUrl, `gdd/${id}/view/${page}`);
+    return buildUrl(baseUrl, `gpd/${id}/view/${page}`);
   }
 
   _getPdRefNumberTracker(pdRefNumber) {
@@ -255,4 +255,4 @@ export class GddList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMix
   }
 }
 
-export {GddList as GddListEl};
+export {GpdList as GpdListEl};

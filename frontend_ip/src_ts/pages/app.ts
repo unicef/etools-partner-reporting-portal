@@ -70,7 +70,7 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
   userHasPrpRolesOrAccess = false;
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: String})
   locationId?: string;
@@ -93,7 +93,7 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
           </div>`
         : html``}
       ${this.page === 'ip-reporting'
-        ? html`<page-ip-reporting name="ip-reporting" ?isGdd="${this.isGdd}"> </page-ip-reporting>`
+        ? html`<page-ip-reporting name="ip-reporting" ?isGpd="${this.isGpd}"> </page-ip-reporting>`
         : html``}
 
       <etools-toasts></etools-toasts>
@@ -141,7 +141,7 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
 
     if (state.userProfile.profile?.partner && !isJsonStrMatch(this.userPartner, state.userProfile.profile?.partner)) {
       this.userPartner = state.userProfile.profile?.partner;
-      this.isGdd = this.userPartner?.partner_type === 'Gov';
+      this.isGpd = this.userPartner?.partner_type === 'Gov';
     }
 
     if (state.userProfile.profile?.prp_roles && !isJsonStrMatch(this.prpRoles, state.userProfile.profile?.prp_roles)) {

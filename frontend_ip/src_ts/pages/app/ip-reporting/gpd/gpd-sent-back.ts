@@ -8,8 +8,8 @@ import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 
-@customElement('gdd-sent-back')
-export class GddSentBack extends UtilsMixin(connect(store)(LitElement)) {
+@customElement('gpd-sent-back')
+export class GpdSentBack extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   currentReport: any = {};
 

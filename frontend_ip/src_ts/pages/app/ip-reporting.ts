@@ -70,7 +70,7 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
   smallMenu: boolean;
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: Object})
   route!: Route;
@@ -123,13 +123,13 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
             ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
             : ''}
           ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
-          ${this._equals(this.page, 'gdd') ? html` <page-ip-reporting-gdd name="gdd"> </page-ip-reporting-gdd>` : ''}
+          ${this._equals(this.page, 'gpd') ? html` <page-ip-reporting-gpd name="gpd"> </page-ip-reporting-gpd>` : ''}
           ${this._equals(this.page, 'indicators')
-            ? html` <page-ip-reporting-indicators name="indicators" ?isGdd="${this.isGdd}">
+            ? html` <page-ip-reporting-indicators name="indicators" ?isGpd="${this.isGpd}">
               </page-ip-reporting-indicators>`
             : ''}
           ${this._equals(this.page, 'progress-reports')
-            ? html` <page-ip-progress-reports name="progress-reports" ?isGdd="${this.isGdd}">
+            ? html` <page-ip-progress-reports name="progress-reports" ?isGpd="${this.isGpd}">
               </page-ip-progress-reports>`
             : ''}
         </app-header-layout>
@@ -147,7 +147,7 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
         EtoolsRouter.updateAppLocation([state.workspaces.baseUrl, 'overview'].join('/'));
       } else if (
         state.app.routeDetails.subSubRouteName &&
-        !['overview', 'progress-reports', 'indicators', 'pd', 'gdd'].includes(
+        !['overview', 'progress-reports', 'indicators', 'pd', 'gpd'].includes(
           state.app.routeDetails.subSubRouteName as string
         )
       ) {

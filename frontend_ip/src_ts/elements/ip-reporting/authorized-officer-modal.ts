@@ -31,7 +31,7 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
   busy = false;
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: String})
   selectedFocalPoint = '';
@@ -58,13 +58,13 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
   baseUrl = '';
 
   set dialogData(data: any) {
-    const {pdId, reportId, currentReport, submitUrl, isGdd}: any = data;
+    const {pdId, reportId, currentReport, submitUrl, isGpd}: any = data;
 
     this.pdId = pdId;
     this.reportId = reportId;
     this.data = currentReport;
     this.submitUrl = submitUrl;
-    this.isGdd = isGdd;
+    this.isGpd = isGpd;
   }
 
   render() {
@@ -85,7 +85,7 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
         ?disableDismissBtn="${this.busy}"
       >
         <div class="dialog-content">
-          <h3>${translate(this.isGdd ? 'GPD_COULD_NOT_BE_SUBMITTED' : 'COULD_NOT_BE_SUBMITTED')}</h3>
+          <h3>${translate(this.isGpd ? 'GPD_COULD_NOT_BE_SUBMITTED' : 'COULD_NOT_BE_SUBMITTED')}</h3>
           <etools-dropdown
             id="officerDropdown"
             class="validate"
@@ -150,7 +150,7 @@ export class AuthorizedOfficerModal extends UtilsMixin(connect(store)(LitElement
         store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
         this.busy = false;
         fireEvent(this, 'dialog-closed', {confirmed: true});
-        const prefix = this.isGdd ? '/gdd/' : '/pd/';
+        const prefix = this.isGpd ? '/gpd/' : '/pd/';
         EtoolsRouter.updateAppLocation(`${this.baseUrl}${prefix}${this.pdId}/view/reports`);
       })
       .catch((err: any) => {

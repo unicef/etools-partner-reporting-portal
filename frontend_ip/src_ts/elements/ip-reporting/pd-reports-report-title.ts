@@ -44,7 +44,7 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
   baseUrl!: string;
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: Boolean, attribute: 'display-link'})
   displayLink = false;
@@ -64,7 +64,7 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
 
       ${this.showLink
         ? html`
-            <a href="${this._getReportLink(this.report, this.permissions, this.baseUrl, this.isGdd)}">
+            <a href="${this._getReportLink(this.report, this.permissions, this.baseUrl, this.isGpd)}">
               ${this.displayLinkIcon
                 ? html`<etools-icon
                     class="link-mode-icon"
@@ -107,12 +107,12 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
     return getReportTitle(report);
   }
 
-  _getReportLink(report: any, permissions: any, baseUrl: any, isGdd: boolean) {
+  _getReportLink(report: any, permissions: any, baseUrl: any, isGpd: boolean) {
     if (!permissions || !report || !baseUrl) {
       return '';
     }
     const suffix = this._getMode(report, permissions);
-    return getReportLink(report, suffix, buildUrl, baseUrl, isGdd);
+    return getReportLink(report, suffix, buildUrl, baseUrl, isGpd);
   }
 
   _getReportIcon(report: any, permissions: any) {

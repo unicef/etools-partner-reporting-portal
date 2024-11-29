@@ -5,8 +5,8 @@ import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments.js';
 import {pdFetch, pdSetCurrent, pdSetCurrentId} from '../../../redux/actions/pd.js';
-import './gdd/gdd-index.js';
-import './gdd/gdd-router.js';
+import './gpd/gpd-index.js';
+import './gpd/gpd-router.js';
 import {RootState} from '../../../typings/redux.types.js';
 import {store} from '../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
@@ -15,8 +15,8 @@ import {connect} from 'pwa-helpers';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
-@customElement('page-ip-reporting-gdd')
-class PageIpReportingGdd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
+@customElement('page-ip-reporting-gpd')
+class PageIpReportingGpd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = css`
     :host {
       display: block;
@@ -55,11 +55,11 @@ class PageIpReportingGdd extends SortingMixin(UtilsMixin(connect(store)(LitEleme
 
   render() {
     return html`
-      ${this.page === 'gdd-index'
-        ? html` <page-ip-reporting-gdd-index name="gdd-index"></page-ip-reporting-gdd-index> `
+      ${this.page === 'gpd-index'
+        ? html` <page-ip-reporting-gpd-index name="gpd-index"></page-ip-reporting-gpd-index> `
         : ''}
-      ${this.page === 'gdd-router'
-        ? html` <page-ip-reporting-gdd-router name="gdd-router"></page-ip-reporting-gdd-router> `
+      ${this.page === 'gpd-router'
+        ? html` <page-ip-reporting-gpd-router name="gpd-router"></page-ip-reporting-gpd-router> `
         : ''}
     `;
   }
@@ -160,7 +160,7 @@ class PageIpReportingGdd extends SortingMixin(UtilsMixin(connect(store)(LitEleme
         store.dispatch(pdSetCurrentId(pd_id));
       }
     }
-    this.page = this.pdId ? 'gdd-router' : 'gdd-index';
+    this.page = this.pdId ? 'gpd-router' : 'gpd-index';
   }
 
   _routePathChanged(path) {
@@ -202,4 +202,4 @@ class PageIpReportingGdd extends SortingMixin(UtilsMixin(connect(store)(LitEleme
   }
 }
 
-export {PageIpReportingGdd as PageIpReportingGddEl};
+export {PageIpReportingGpd as PageIpReportingGpdEl};

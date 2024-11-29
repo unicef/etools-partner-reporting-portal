@@ -181,12 +181,12 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
     }
   )
   .addRoute(
-    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}$`),
+    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/gpd\\/${routeParamRegex}$`),
     (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
       return {
         routeName: 'app',
         subRouteName: params.matchDetails[2],
-        subSubRouteName: 'gdd',
+        subSubRouteName: 'gpd',
         path: params.matchDetails[0],
         queryParams: params.queryParams,
         params: {
@@ -197,12 +197,12 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
     }
   )
   .addRoute(
-    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}/edit$`),
+    new RegExp(`^${routeParamRegex}\\/${routeParamRegex}\\/gpd\\/${routeParamRegex}/edit$`),
     (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
       return {
         routeName: 'app',
         subRouteName: params.matchDetails[2],
-        subSubRouteName: 'gdd',
+        subSubRouteName: 'gpd',
         path: params.matchDetails[0],
         queryParams: params.queryParams,
         params: {
@@ -215,13 +215,13 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
   )
   .addRoute(
     new RegExp(
-      `^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$`
+      `^${routeParamRegex}\\/${routeParamRegex}\\/gpd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$`
     ),
     (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
       return {
         routeName: 'app',
         subRouteName: params.matchDetails[2],
-        subSubRouteName: 'gdd',
+        subSubRouteName: 'gpd',
         path: params.matchDetails[0],
         queryParams: params.queryParams,
         params: {
@@ -235,13 +235,13 @@ EtoolsRouter.addRoute(new RegExp(`^login$`), (params: EtoolsRouteCallbackParams)
   )
   .addRoute(
     new RegExp(
-      `^${routeParamRegex}\\/${routeParamRegex}\\/gdd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$` // eslint-disable-line
+      `^${routeParamRegex}\\/${routeParamRegex}\\/gpd\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}\\/${routeParamRegex}$` // eslint-disable-line
     ),
     (params: EtoolsRouteCallbackParams): EtoolsRouteDetails => {
       return {
         routeName: 'app',
         subRouteName: params.matchDetails[2],
-        subSubRouteName: 'gdd',
+        subSubRouteName: 'gpd',
         path: params.matchDetails[0],
         queryParams: params.queryParams,
         params: {

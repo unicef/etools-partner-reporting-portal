@@ -14,8 +14,8 @@ import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
-@customElement('gdd-details-reports')
-export class GddDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
+@customElement('gpd-details-reports')
+export class GpdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -46,7 +46,7 @@ export class GddDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
       <page-body>
         <pd-report-filters></pd-report-filters>
         <pd-reports-toolbar></pd-reports-toolbar>
-        <pd-reports-list is-gdd></pd-reports-list>
+        <pd-reports-list is-gpd></pd-reports-list>
       </page-body>
     `;
   }

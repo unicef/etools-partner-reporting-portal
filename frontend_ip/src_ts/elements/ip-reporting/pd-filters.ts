@@ -20,8 +20,8 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
     return [layoutStyles];
   }
 
-  @property({type: Boolean, attribute: 'is-gdd'})
-  isGdd = false;
+  @property({type: Boolean, attribute: 'is-gpd'})
+  isGpd = false;
 
   @property({type: Object})
   queryParams!: any;
@@ -39,7 +39,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
         <div class="row">
           <text-filter
             class="col-lg-2 col-12"
-            label="${translate(this.isGdd ? 'REFERENCE_NUMBER' : 'PD_REF_AND_TITLE')}"
+            label="${translate(this.isGpd ? 'REFERENCE_NUMBER' : 'PD_REF_AND_TITLE')}"
             name="ref_title"
             .value="${this.queryParams?.ref_title || ''}"
             @value-changed="${this._handleFilterChange}"
@@ -47,7 +47,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
           </text-filter>
           <dropdown-filter-multi
             class="col-lg-5 col-12"
-            label="${translate(this.isGdd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
+            label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
             .data="${this.statuses}"
@@ -93,7 +93,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
       {title: getTranslation('CLOSED'), id: 'closed'},
       {title: getTranslation('TERMINATED'), id: 'terminated'}
     ];
-    if (this.isGdd) {
+    if (this.isGpd) {
       statuses.unshift({title: getTranslation('APPROVED'), id: 'approved'});
     } else {
       statuses.unshift({title: getTranslation('SIGNED'), id: 'signed'});

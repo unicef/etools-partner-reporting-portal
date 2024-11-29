@@ -27,7 +27,7 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
   loading = false;
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: String})
   workspaceId = '';
@@ -42,9 +42,9 @@ export class PageIpReportingIndicators extends SortingMixin(connect(store)(LitEl
     return html`
       <page-header .title="${translate('INDICATORS')}"></page-header>
       <page-body>
-        <indicators-filters ?isGdd="${this.isGdd}"></indicators-filters>
-        <indicators-toolbar ?isGdd="${this.isGdd}"></indicators-toolbar>
-        <list-view-indicators ?isGdd="${this.isGdd}"></list-view-indicators>
+        <indicators-filters ?isGpd="${this.isGpd}"></indicators-filters>
+        <indicators-toolbar ?isGpd="${this.isGpd}"></indicators-toolbar>
+        <list-view-indicators ?isGpd="${this.isGpd}"></list-view-indicators>
       </page-body>
     `;
   }

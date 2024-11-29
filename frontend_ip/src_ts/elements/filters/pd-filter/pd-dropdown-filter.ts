@@ -23,7 +23,7 @@ export class PDDropdownFilter extends connect(store)(LitElement) {
   locationId = '';
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: String})
   computedValue = '';
@@ -38,7 +38,7 @@ export class PDDropdownFilter extends connect(store)(LitElement) {
     return html`
       <dropdown-filter-multi
         class="item"
-        .label="${translate(this.isGdd ? 'GPD_TITLE' : 'PD_TITLE')}"
+        .label="${translate(this.isGpd ? 'GPD_TITLE' : 'PD_TITLE')}"
         name="pds"
         .value="${this.value}"
         .data="${this.data}"

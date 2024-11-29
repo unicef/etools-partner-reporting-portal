@@ -4,7 +4,7 @@ import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-pa
 import '../../../../../etools-prp-common/elements/labelled-item.js';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../../elements/ip-reporting/report-attachments.js';
-import '../gdd-sent-back.js';
+import '../gpd-sent-back.js';
 
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../../../../../endpoints.js';
@@ -21,8 +21,8 @@ import {translate, get as getTranslation} from 'lit-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles.js';
 
-@customElement('page-gd-report-sr-reporting')
-export class PageGddReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
+@customElement('page-gpd-report-sr-reporting')
+export class PageGdpReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     ${layoutStyles}
     :host {

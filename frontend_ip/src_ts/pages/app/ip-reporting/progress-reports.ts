@@ -33,7 +33,7 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
   queryParams = {};
 
   @property({type: Boolean})
-  isGdd = false;
+  isGpd = false;
 
   @property({type: Object})
   routeDetails: any;
@@ -42,9 +42,9 @@ export class PageIpProgressReports extends connect(store)(LitElement) {
     return html`
       <page-header .title="${translate('PROGRESS_REPORTS')}"></page-header>
       <page-body>
-        <progress-reports-filters ?isGdd="${this.isGdd}"></progress-reports-filters>
-        <progress-reports-toolbar ?isGdd="${this.isGdd}"></progress-reports-toolbar>
-        <progress-reports-list ?isGdd="${this.isGdd}"></progress-reports-list>
+        <progress-reports-filters ?isGpd="${this.isGpd}"></progress-reports-filters>
+        <progress-reports-toolbar ?isGpd="${this.isGpd}"></progress-reports-toolbar>
+        <progress-reports-list ?isGpd="${this.isGpd}"></progress-reports-list>
       </page-body>
     `;
   }

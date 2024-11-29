@@ -23,8 +23,8 @@ import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from 'lit-translate';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
-@customElement('gdd-details-overview')
-export class GddDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
+@customElement('gpd-details-overview')
+export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   pd: any = {};
 

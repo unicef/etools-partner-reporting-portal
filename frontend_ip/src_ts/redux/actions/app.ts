@@ -84,36 +84,36 @@ const importPdRoutes = (routeDetails: EtoolsRouteDetails) => {
   return imported;
 };
 
-const importGddSubRoutes = (routeDetails: EtoolsRouteDetails) => {
+const importGpdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
 
   switch (routeDetails.params?.pdRoute) {
     case 'details':
-      imported = import('../../pages/app/ip-reporting/gdd/gdd-details.js');
+      imported = import('../../pages/app/ip-reporting/gpd/gpd-details.js');
       break;
     case 'report':
-      imported = import('../../pages/app/ip-reporting/gdd/gdd-report.js');
+      imported = import('../../pages/app/ip-reporting/gpd/gpd-report.js');
       break;
     default:
-      imported = import('../../pages/app/ip-reporting/gdd/gdd-details.js');
+      imported = import('../../pages/app/ip-reporting/gpd/gpd-details.js');
       break;
   }
   return imported;
 };
 
-const importGddRoutes = (routeDetails: EtoolsRouteDetails) => {
+const importGpdRoutes = (routeDetails: EtoolsRouteDetails) => {
   let imported: Promise<any> | undefined;
 
   if (routeDetails.params?.pdID) {
-    imported = import('../../pages/app/ip-reporting/gdd/gdd-router.js')
+    imported = import('../../pages/app/ip-reporting/gpd/gpd-router.js')
       .then(() => {
-        importGddSubRoutes(routeDetails);
+        importGpdSubRoutes(routeDetails);
       })
       .catch((err) => {
         console.log(err);
       });
   } else {
-    imported = import('../../pages/app/ip-reporting/gdd/gdd-index.js');
+    imported = import('../../pages/app/ip-reporting/gpd/gpd-index.js');
   }
   return imported;
 };
@@ -132,10 +132,10 @@ const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
         importPdRoutes(routeDetails);
       });
       break;
-    case 'gdd':
-      imported = import('../../pages/app/ip-reporting/gdd.js')
+    case 'gpd':
+      imported = import('../../pages/app/ip-reporting/gpd.js')
         .then(() => {
-          importGddRoutes(routeDetails);
+          importGpdRoutes(routeDetails);
         })
         .catch((err) => {
           console.log(err);

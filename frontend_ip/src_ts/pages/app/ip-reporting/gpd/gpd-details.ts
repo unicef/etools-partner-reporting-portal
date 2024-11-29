@@ -6,8 +6,8 @@ import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import '../../../../etools-prp-common/elements/page-body.js';
 import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../etools-prp-common/elements/message-box.js';
-import '../../../../elements/ip-reporting/gdd-details-overview.js';
-import '../../../../elements/ip-reporting/gdd-details-reports.js';
+import '../../../../elements/ip-reporting/gpd-details-overview.js';
+import '../../../../elements/ip-reporting/gpd-details-reports.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
@@ -32,8 +32,8 @@ const NAVIGATION_TABS: any[] = [
   }
 ];
 
-@customElement('page-ip-reporting-gdd-details')
-export class PageIpReportingGddDetails extends UtilsMixin(connect(store)(LitElement)) {
+@customElement('page-ip-reporting-gpd-details')
+export class PageIpReportingGpdDetails extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -62,7 +62,7 @@ export class PageIpReportingGddDetails extends UtilsMixin(connect(store)(LitElem
     return html`
       ${sharedStyles}
 
-      <page-header title="${this.pd.title}" back="${this._appendQuery('gdd', this.pdQuery)}">
+      <page-header title="${this.pd.title}" back="${this._appendQuery('gpd', this.pdQuery)}">
         ${this.pd?.status === 'Suspended'
           ? html` <message-box slot="header-content" type="warning">
               PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
@@ -106,9 +106,9 @@ export class PageIpReportingGddDetails extends UtilsMixin(connect(store)(LitElem
   getTabElement(): TemplateResult {
     switch (this.activeTab) {
       case DETAILS:
-        return html` <gdd-details-overview name="details"></gdd-details-overview> `;
+        return html` <gpd-details-overview name="details"></gpd-details-overview> `;
       case REPORTS:
-        return html` <gdd-details-reports name="reports"></gdd-details-reports> `;
+        return html` <gpd-details-reports name="reports"></gpd-details-reports> `;
       default:
         return html` Tab Not Found `;
     }

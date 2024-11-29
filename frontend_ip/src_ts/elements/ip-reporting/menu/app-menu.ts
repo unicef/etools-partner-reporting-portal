@@ -69,8 +69,8 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
           ${this.partner?.partner_type === 'Gov'
             ? html`
                 <a
-                  class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gdd')}"
-                  href="${this._appendQuery(this.gddUrl, this.gddQuery)}"
+                  class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gpd')}"
+                  href="${this._appendQuery(this.gpdUrl, this.gpdQuery)}"
                   @click="${this.trackAnalytics}"
                   tracker="Government Programme Document"
                 >
@@ -159,7 +159,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   pdQuery = {status: String(['signed', 'active', 'suspended'])};
 
   @property({type: Object})
-  gddQuery = {status: String(['approved', 'active', 'suspended'])};
+  gpdQuery = {status: String(['approved', 'active', 'suspended'])};
 
   @property({type: Object})
   reportsQuery = {status: String(['Due', 'Ove', 'Sen'])};
@@ -174,7 +174,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   pdUrl!: string;
 
   @property({type: String})
-  gddUrl!: string;
+  gpdUrl!: string;
 
   @property({type: String})
   progressReportsUrl!: string;
@@ -207,7 +207,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
       this.baseUrl = state.workspaces.baseUrl;
       this.overviewUrl = buildUrl(this.baseUrl, 'overview');
       this.pdUrl = buildUrl(this.baseUrl, 'pd');
-      this.gddUrl = buildUrl(this.baseUrl, 'gdd');
+      this.gpdUrl = buildUrl(this.baseUrl, 'gpd');
       this.progressReportsUrl = buildUrl(this.baseUrl, 'progress-reports');
       this.indicatorsReportsUrl = buildUrl(this.baseUrl, 'indicators');
     }
