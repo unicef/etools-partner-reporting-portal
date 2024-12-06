@@ -233,6 +233,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'funds_received_to_date_percentage',
             'total_unicef_supplies',
             'total_unicef_supplies_currency',
+            'had_signed_document'
 
         )
 
