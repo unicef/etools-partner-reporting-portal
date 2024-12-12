@@ -6,6 +6,10 @@ import terser from '@rollup/plugin-terser';
 import path from 'path';
 import { generateSW } from 'rollup-plugin-workbox';
 import { workboxConfig } from './workbox-config.js';
+import {fileURLToPath} from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Files to remove before doing new src
 const deleteConfig = {

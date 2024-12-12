@@ -1,6 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {partnerLoading} from '../../redux/selectors/partner';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
@@ -9,7 +9,7 @@ import '../../etools-prp-common/elements/labelled-item';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 @customElement('risk-rating')
 export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {

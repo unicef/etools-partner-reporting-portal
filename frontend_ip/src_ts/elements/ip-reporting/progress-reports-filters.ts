@@ -3,14 +3,14 @@ import {customElement, property} from 'lit/decorators.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter/location-filter';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {RootState} from '../../typings/redux.types';
 

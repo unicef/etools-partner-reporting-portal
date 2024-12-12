@@ -22,12 +22,12 @@ import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '
 import Endpoints from '../../../../endpoints.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
@@ -43,7 +43,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
           position: absolute;
           left: 0;
           top: -23px;
-        }
+        };
       }
 
       pd-reports-report-title {
@@ -254,8 +254,8 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
             this.currentReport.report_type === 'HR'
               ? translate('REPORTING_ON_INDICATORS')
               : this.currentReport.report_type === 'QPR'
-              ? translate('REPORTING_ON_RESULTS')
-              : (translate('REPORTING_ON_DATA') as any as string),
+                ? translate('REPORTING_ON_RESULTS')
+                : (translate('REPORTING_ON_DATA') as any as string),
           hidden: false
         }
       ];

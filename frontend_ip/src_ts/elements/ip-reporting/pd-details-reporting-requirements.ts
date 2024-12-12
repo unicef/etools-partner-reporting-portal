@@ -1,9 +1,9 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';

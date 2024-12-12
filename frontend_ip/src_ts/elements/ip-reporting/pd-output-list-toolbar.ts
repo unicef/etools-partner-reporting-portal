@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import Endpoints from '../../endpoints';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {
@@ -18,7 +18,7 @@ import '../../etools-prp-common/elements/download-button';
 import '../../etools-prp-common/elements/upload-button';
 import {RootState} from '../../typings/redux.types';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';

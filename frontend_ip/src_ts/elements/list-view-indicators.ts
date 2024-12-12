@@ -1,7 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -10,7 +10,7 @@ import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import {tableStyles} from '../etools-prp-common/styles/table-styles';
 import DataTableMixin from '../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import './list-view-single-indicator';
 import '../etools-prp-common/elements/list-placeholder';
@@ -136,13 +136,14 @@ export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixi
         ${repeat(
           this.data || [],
           (indicator) => indicator.id,
-          (indicator) => html`<list-view-single-indicator
-            .indicator="${indicator}"
-            .isCustom="${this.isCustom}"
-            .canEdit="${this.canEdit}"
-            .type="${this.type}"
-            .lowResolutionLayout="${this.lowResolutionLayout}"
-          ></list-view-single-indicator> `
+          (indicator) =>
+            html`<list-view-single-indicator
+              .indicator="${indicator}"
+              .isCustom="${this.isCustom}"
+              .canEdit="${this.canEdit}"
+              .type="${this.type}"
+              .lowResolutionLayout="${this.lowResolutionLayout}"
+            ></list-view-single-indicator> `
         )}
 
         <list-placeholder .data="${this.data}"></list-placeholder>

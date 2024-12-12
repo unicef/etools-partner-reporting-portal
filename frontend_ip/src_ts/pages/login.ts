@@ -4,9 +4,9 @@ import '@unicef-polymer/etools-unicef/src/etools-media-query/etools-media-query.
 import '@unicef-polymer/etools-unicef/src/etools-button/etools-button.js';
 import Endpoints from '../endpoints.js';
 import '../etools-prp-common/elements/page-title.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../redux/store.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import {BASE_PATH} from '../etools-prp-common/config.js';

@@ -4,7 +4,7 @@ import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import './pd-details.js';
 import './pd-report.js';
 import {RootState} from '../../../../typings/redux.types.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';

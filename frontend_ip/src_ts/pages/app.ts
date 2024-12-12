@@ -7,14 +7,14 @@ import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions.js';
 import {fetchCurrencies} from '../redux/actions/currencies.js';
 import {Route} from '../etools-prp-common/typings/globals.types.js';
 import {locationSet} from '../redux/actions/location.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../redux/store.js';
 import {RootState} from '../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
 @customElement('page-app')

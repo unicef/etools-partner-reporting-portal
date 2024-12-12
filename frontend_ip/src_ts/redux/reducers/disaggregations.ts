@@ -35,7 +35,7 @@ function disaggregationsByIndicatorReducer(state = {}, action: any) {
 
           locations[index] = Object.assign(locations[index], action.data);
           // eslint-disable-next-line no-empty
-        } catch (err) {}
+        } catch {}
 
         return newState;
       })();
