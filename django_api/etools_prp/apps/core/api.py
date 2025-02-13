@@ -113,3 +113,9 @@ class PMP_API:
                                                                                           business_area_code)
         data = self._simple_get_request(timeout=300)
         return data
+
+    def get_gpd_document_url(self, business_area_code, gpd_external_id):
+        self.url = self.url_prototype + "/gdd/prp-get-gpd-document/{}/?workspace={}".format(gpd_external_id,
+                                                                                            business_area_code)
+        data = self._simple_get_request(timeout=300)
+        return data
