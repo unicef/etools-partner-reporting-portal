@@ -328,6 +328,7 @@ CURRENCIES = Choices(
     ("MNT", "mnt", "mnt"),
     ("MOP", "mop", "mop"),
     ("MRO", "mro", "mro"),
+    ("MRU", "mru", "mru"),
     ("MUR", "mur", "mur"),
     ("MVR", "mvr", "mvr"),
     ("MWK", "mwk", "mwk"),
