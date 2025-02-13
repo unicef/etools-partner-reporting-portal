@@ -243,6 +243,8 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     amendments = models.JSONField(default=list)
 
+    has_signed_document = models.BooleanField(default=False)
+
     # TODO:
     # cron job will create new report with due period !!!
     #

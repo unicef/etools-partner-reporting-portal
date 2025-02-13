@@ -21,6 +21,7 @@ from etools_prp.apps.core.api_error_codes import APIErrorCode
 from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
     PD_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
@@ -1318,7 +1319,10 @@ class InterventionPMPDocumentView(APIView):
 
         api = PMP_API()
         try:
-            document_url = api.get_pd_document_url(pd.workspace.business_area_code, pd.external_id)
+            if pd.document_type == PD_DOCUMENT_TYPE.GDD:
+                document_url = api.get_gpd_document_url(pd.workspace.business_area_code, pd.external_id)
+            else:
+                document_url = api.get_pd_document_url(pd.workspace.business_area_code, pd.external_id)
         except HTTPError as e:
             return Response(e.response)
         except (ConnectionError, ConnectTimeout, ReadTimeout):
