@@ -9,7 +9,7 @@ import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
@@ -19,7 +19,7 @@ import '../../etools-prp-common/elements/etools-prp-number';
 import '../etools-prp-currency';
 import '../../etools-prp-common/elements/list-placeholder';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {RootState} from '../../typings/redux.types';
 import {buildUrl} from '../../etools-prp-common/utils/util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';

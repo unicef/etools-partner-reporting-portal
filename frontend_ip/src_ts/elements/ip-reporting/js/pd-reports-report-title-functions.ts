@@ -1,4 +1,4 @@
-import {get as getTranslation} from 'lit-translate';
+import {get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 export function shouldDisplayLink(
   displayLink: boolean,

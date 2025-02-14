@@ -1,6 +1,6 @@
 import {LitElement, css, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
@@ -15,7 +15,7 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
 import '../../etools-prp-common/elements/filter-list';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
@@ -182,7 +182,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
   render() {
     return html`
       <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
-      (this.permissions = e.detail.value)}"> </etools-prp-permissions>
+        (this.permissions = e.detail.value)}"> </etools-prp-permissions>
 
       <etools-content-panel panel-title="Other info" ?no-header="${this.noHeader}">
         <div class="row">

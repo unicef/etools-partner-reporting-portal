@@ -3,11 +3,11 @@ import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/download-button';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {computePdUrl} from './js/pd-list-toolbar-functions.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
 @customElement('pd-list-toolbar')

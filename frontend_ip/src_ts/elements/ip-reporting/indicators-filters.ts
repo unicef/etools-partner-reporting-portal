@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import '../../etools-prp-common/elements/filter-list';
 import '../filters/text-filter/text-filter';
@@ -10,7 +10,7 @@ import '../filters/pd-filter/pd-dropdown-filter';
 import '../filters/checkbox-filter/checkbox-filter';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';

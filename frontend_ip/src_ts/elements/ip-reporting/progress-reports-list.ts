@@ -15,10 +15,10 @@ import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 

@@ -1,10 +1,10 @@
 import {LitElement, PropertyValues, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/filter-list.js';
 import '../../elements/filters/text-filter/text-filter.js';

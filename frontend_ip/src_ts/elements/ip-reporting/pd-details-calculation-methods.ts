@@ -1,6 +1,6 @@
 import {LitElement, css, html} from 'lit';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-radio/etools-radio-group';
 import '@shoelace-style/shoelace/dist/components/radio/radio.js';
@@ -9,7 +9,7 @@ import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
 import '../../etools-prp-common/elements/page-body';
@@ -119,76 +119,76 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
                     </etools-data-table-row>
                   `
                 : item.type === 'missingIndicators'
-                ? html`
-                    <etools-data-table-row class="pd-output" no-collapse>
-                      <div slot="row-data">
-                        <div class="table-cell table-cell--text missing-indicator">${translate(item.text)}</div>
-                      </div>
-                    </etools-data-table-row>
-                  `
-                : item.type === 'data'
-                ? html`
-                    <etools-data-table-row no-collapse>
-                      <div slot="row-data">
-                        <div class="col-data col-4 table-cell">${item.data?.title}</div>
-                        <div class="col-data col-4 table-cell">
-                          ${this._canEdit(item, this.permissions)
-                            ? html`
-                                <etools-radio-group
-                                  data-id="${item.data?.id}"
-                                  data-llo-id="${item.llo_id}"
-                                  data-scope="calculation_formula_across_locations"
-                                  @sl-change="${this._onValueChanged}"
-                                  .value="${computeSelected(item.data, 'calculation_formula_across_locations')}"
-                                >
-                                  <sl-radio value="sum" ?disabled="${computeDisabled(item.data?.display_type)}">
-                                    ${translate('SUM')}
-                                  </sl-radio>
-                                  <sl-radio value="max" ?disabled="${computeDisabled(item.data?.display_type)}">
-                                    ${translate('MAX')}
-                                  </sl-radio>
-                                  <sl-radio value="avg" ?disabled="${computeDisabled(item.data?.display_type)}">
-                                    ${translate('AVG')}
-                                  </sl-radio>
-                                </etools-radio-group>
-                              `
-                            : html` ${item.data.calculation_formula_across_locations} `}
+                  ? html`
+                      <etools-data-table-row class="pd-output" no-collapse>
+                        <div slot="row-data">
+                          <div class="table-cell table-cell--text missing-indicator">${translate(item.text)}</div>
                         </div>
-                        <div class="col-data col-4 table-cell">
-                          ${this._canEdit(item, this.permissions)
-                            ? html`
-                                <etools-radio-group
-                                  data-id="${item.data?.id}"
-                                  data-llo-id="${item.llo_id}"
-                                  data-scope="calculation_formula_across_periods"
-                                  @sl-change="${this._onValueChanged}"
-                                  .value="${computeSelected(item.data, 'calculation_formula_across_periods')}"
-                                  ?disabled="${computeDisabled(item.data)}"
-                                >
-                                  <sl-radio value="sum" ?disabled="${computeDisabled(item.data.display_type)}">
-                                    ${translate('SUM')}
-                                  </sl-radio>
-                                  <sl-radio value="max" ?disabled="${computeDisabled(item.data.display_type)}">
-                                    ${translate('MAX')}
-                                  </sl-radio>
-                                  <sl-radio value="avg" ?disabled="${computeDisabled(item.data.display_type)}">
-                                    ${translate('AVG')}
-                                  </sl-radio>
-                                  <sl-radio
-                                    value="latest"
-                                    ?hidden="${!this._hasTypeRatioOrPercentage(item.data)}"
-                                    ?disabled="${computeDisabled(item.data.display_type)}"
-                                  >
-                                    ${translate('LATEST')}
-                                  </sl-radio>
-                                </etools-radio-group>
-                              `
-                            : html` ${item.data.calculation_formula_across_periods} `}
-                        </div>
-                      </div>
-                    </etools-data-table-row>
-                  `
-                : html``}
+                      </etools-data-table-row>
+                    `
+                  : item.type === 'data'
+                    ? html`
+                        <etools-data-table-row no-collapse>
+                          <div slot="row-data">
+                            <div class="col-data col-4 table-cell">${item.data?.title}</div>
+                            <div class="col-data col-4 table-cell">
+                              ${this._canEdit(item, this.permissions)
+                                ? html`
+                                    <etools-radio-group
+                                      data-id="${item.data?.id}"
+                                      data-llo-id="${item.llo_id}"
+                                      data-scope="calculation_formula_across_locations"
+                                      @sl-change="${this._onValueChanged}"
+                                      .value="${computeSelected(item.data, 'calculation_formula_across_locations')}"
+                                    >
+                                      <sl-radio value="sum" ?disabled="${computeDisabled(item.data?.display_type)}">
+                                        ${translate('SUM')}
+                                      </sl-radio>
+                                      <sl-radio value="max" ?disabled="${computeDisabled(item.data?.display_type)}">
+                                        ${translate('MAX')}
+                                      </sl-radio>
+                                      <sl-radio value="avg" ?disabled="${computeDisabled(item.data?.display_type)}">
+                                        ${translate('AVG')}
+                                      </sl-radio>
+                                    </etools-radio-group>
+                                  `
+                                : html` ${item.data.calculation_formula_across_locations} `}
+                            </div>
+                            <div class="col-data col-4 table-cell">
+                              ${this._canEdit(item, this.permissions)
+                                ? html`
+                                    <etools-radio-group
+                                      data-id="${item.data?.id}"
+                                      data-llo-id="${item.llo_id}"
+                                      data-scope="calculation_formula_across_periods"
+                                      @sl-change="${this._onValueChanged}"
+                                      .value="${computeSelected(item.data, 'calculation_formula_across_periods')}"
+                                      ?disabled="${computeDisabled(item.data)}"
+                                    >
+                                      <sl-radio value="sum" ?disabled="${computeDisabled(item.data.display_type)}">
+                                        ${translate('SUM')}
+                                      </sl-radio>
+                                      <sl-radio value="max" ?disabled="${computeDisabled(item.data.display_type)}">
+                                        ${translate('MAX')}
+                                      </sl-radio>
+                                      <sl-radio value="avg" ?disabled="${computeDisabled(item.data.display_type)}">
+                                        ${translate('AVG')}
+                                      </sl-radio>
+                                      <sl-radio
+                                        value="latest"
+                                        ?hidden="${!this._hasTypeRatioOrPercentage(item.data)}"
+                                        ?disabled="${computeDisabled(item.data.display_type)}"
+                                      >
+                                        ${translate('LATEST')}
+                                      </sl-radio>
+                                    </etools-radio-group>
+                                  `
+                                : html` ${item.data.calculation_formula_across_periods} `}
+                            </div>
+                          </div>
+                        </etools-data-table-row>
+                      `
+                    : html``}
             `
           )}
           <etools-loading ?active="${this.loading}"></etools-loading>

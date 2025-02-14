@@ -4,10 +4,10 @@ import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styl
 import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/dropdown-filter/dropdown-filter';
-import {get as getTranslation, translate} from 'lit-translate';
+import {get as getTranslation, translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
