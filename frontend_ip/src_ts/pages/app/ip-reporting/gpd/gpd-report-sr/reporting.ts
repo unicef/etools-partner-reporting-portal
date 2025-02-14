@@ -17,14 +17,13 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {store} from '../../../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {connect} from 'pwa-helpers';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles.js';
 
 @customElement('page-gpd-report-sr-reporting')
 export class PageGdpReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
   static styles = css`
-    ${layoutStyles}
     :host {
       display: block;
       margin-bottom: 25px;
@@ -147,6 +146,9 @@ export class PageGdpReportSrReporting extends UtilsMixin(connect(store)(LitEleme
 
   render() {
     return html`
+      <style>
+        ${layoutStyles}
+      </style>
       <pd-sent-back></pd-sent-back>
 
       <etools-prp-permissions

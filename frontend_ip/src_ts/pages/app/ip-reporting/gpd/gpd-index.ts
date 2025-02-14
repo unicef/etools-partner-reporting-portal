@@ -5,7 +5,7 @@ import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../elements/ip-reporting/pd-filters.js';
 import '../../../../elements/ip-reporting/pd-list-toolbar.js';
 import '../../../../elements/ip-reporting/gpd-list.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 

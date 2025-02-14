@@ -1,4 +1,4 @@
-import {html, css, LitElement} from 'lit';
+import {html, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
@@ -20,7 +20,7 @@ import '../etools-prp-currency';
 import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import Settings from '../../etools-prp-common/settings';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('gpd-details-overview')
@@ -47,44 +47,38 @@ export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   reportingRequirements: any = {};
 
-  static styles = [
-    layoutStyles,
-    css`     
-      :host {
-        display: block;
-        margin-bottom: 25px;
-
-      .field-value {
-        display: block;
-        word-wrap: break-word;
-      }
-
-      .field-value[has-icon] {
-        position: relative;
-        padding-left: 2em;
-      }
-
-      .field-value etools-icon {
-        position: absolute;
-        left: 0;
-        top: 0;
-        color: var(--sl-color-neutral-600);
-      }
-      page-body > * {
-        display: block;
-        margin-bottom: 25px;
-      }
-      pd-details-reporting-requirements:not(:last-of-type) {
-        margin-bottom: 50px;
-      }
-    `
-  ];
-
   render() {
     return html`
       ${tableStyles}
       <style>
-        ${dataTableStylesLit}
+        ${layoutStyles} ${dataTableStylesLit}
+          :host {
+            display: block;
+            margin-bottom: 25px;
+
+          .field-value {
+            display: block;
+            word-wrap: break-word;
+          }
+
+          .field-value[has-icon] {
+            position: relative;
+            padding-left: 2em;
+          }
+
+          .field-value etools-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--sl-color-neutral-600);
+          }
+          page-body > * {
+            display: block;
+            margin-bottom: 25px;
+          }
+          pd-details-reporting-requirements:not(:last-of-type) {
+            margin-bottom: 50px;
+          }
       </style>
       <page-body>
         <etools-content-panel panel-title="${translate('PARTNERSHIP_INFO')}">

@@ -9,7 +9,7 @@ import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
@@ -59,7 +59,6 @@ export class GpdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMix
 
     if (state.programmeDocuments?.all !== undefined && this.data !== state.programmeDocuments?.all) {
       this.data = state.programmeDocuments.all;
-      console.log(this.data);
     }
 
     if (state.programmeDocuments?.count !== undefined && this.paginator?.count !== state.programmeDocuments.count) {
@@ -69,15 +68,11 @@ export class GpdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMix
     super.stateChanged(state);
   }
 
-  static get styles() {
-    return [layoutStyles];
-  }
-
   render() {
     return html`
       ${tableStyles}
       <style>
-        ${dataTableStylesLit} :host {
+        ${layoutStyles} ${dataTableStylesLit} :host {
           display: block;
         }
 

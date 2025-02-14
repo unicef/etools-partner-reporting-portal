@@ -27,7 +27,7 @@ import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
@@ -43,7 +43,7 @@ export class PageIpReportingGpdReport extends ProgressReportUtilsMixin(UtilsMixi
           position: absolute;
           left: 0;
           top: -23px;
-        }
+        };
       }
 
       pd-reports-report-title {
