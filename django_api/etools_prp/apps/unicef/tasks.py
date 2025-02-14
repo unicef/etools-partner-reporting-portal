@@ -242,6 +242,23 @@ def process_programme_documents(fast=False, area=False):
                             person.save()
                             pd.unicef_focal_point.add(person)
 
+                            user.partner = partner
+                            user.save()
+
+                            obj, created = Realm.objects.get_or_create(
+                                user=user,
+                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
+                                workspace=workspace,
+                                partner=partner
+                            )
+                            if created:
+                                obj.send_email_notification()
+
+                            is_active = person_data.get('active')
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
+
                         # Create agreement_auth_officers
                         person_data_list = item['agreement_auth_officers']
                         for person_data in person_data_list:
@@ -865,14 +882,29 @@ def process_government_documents(fast=False, area=False):
                         # Create focal_points
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
+                            person, user = save_person_and_user(person_data, create_user=True)
                             if not person:
                                 continue
 
                             person.active = True
                             person.save()
                             pd.partner_focal_point.add(person)
+                            user.partner = partner
+                            user.save()
 
+                            obj, created = Realm.objects.get_or_create(
+                                user=user,
+                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
+                                workspace=workspace,
+                                partner=partner
+                            )
+                            if created:
+                                obj.send_email_notification()
+
+                            is_active = person_data.get('active')
+                            if not created and obj.is_active and is_active is False:
+                                obj.is_active = is_active
+                                obj.save()
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:

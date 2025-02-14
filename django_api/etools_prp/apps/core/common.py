@@ -154,7 +154,7 @@ PD_DOCUMENT_TYPE = Choices(
     ('SPD', 'SPD', 'Simplified Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
     ('SSFA', 'SSFA', 'SSFA'),
-    ('GDD', 'GDD', 'Government Digital Document'),
+    ('GDD', 'GDD', 'Government Programme Document'),
 )
 
 PROGRESS_REPORT_STATUS = Choices(
