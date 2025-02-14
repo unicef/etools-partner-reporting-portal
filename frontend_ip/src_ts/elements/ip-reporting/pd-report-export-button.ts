@@ -3,7 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import Endpoints from '../../endpoints';
 import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
 import {RootState} from '../../typings/redux.types';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 
 @customElement('pd-report-export-button')

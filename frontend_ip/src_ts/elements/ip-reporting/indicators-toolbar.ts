@@ -5,7 +5,7 @@ import '../../etools-prp-common/elements/download-button';
 import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
 @customElement('indicators-toolbar')

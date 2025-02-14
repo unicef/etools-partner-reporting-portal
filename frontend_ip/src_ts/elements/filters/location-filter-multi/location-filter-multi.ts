@@ -1,9 +1,9 @@
 import {html, css, LitElement} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../redux/store';
 import '../dropdown-filter/dropdown-filter-multi';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import FilterDependenciesMixin from '../../../etools-prp-common/mixins/filter-dependencies-mixin';
 import Endpoints from '../../../endpoints';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';

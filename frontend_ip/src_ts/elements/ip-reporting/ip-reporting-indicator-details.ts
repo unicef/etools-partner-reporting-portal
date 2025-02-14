@@ -1,9 +1,9 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/report-status';
@@ -161,35 +161,36 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
           ></etools-tabs-lit> `
         : html``}
       ${(this.locations || []).map(
-        (location) => html` <div
-          name="location-${location.current.id}"
-          ?hidden="${this.selected.toString() !== location.current.id.toString()}"
-        >
-          <div class="layout-horizontal row">
-            ${location.current
-              ? html`
-                  <div class="item col-6">
-                    <disaggregation-table
-                      .data="${location.current}"
-                      .mapping="${location.reportInfo.current.disagg_lookup_map}"
-                    >
-                    </disaggregation-table>
-                  </div>
-                `
-              : html``}
-            ${location.previous
-              ? html`
-                  <div class="item col-6">
-                    <disaggregation-table
-                      .data="${location.previous}"
-                      .mapping="${location.reportInfo.previous.disagg_lookup_map}"
-                    >
-                    </disaggregation-table>
-                  </div>
-                `
-              : html``}
-          </div>
-        </div>`
+        (location) =>
+          html` <div
+            name="location-${location.current.id}"
+            ?hidden="${this.selected.toString() !== location.current.id.toString()}"
+          >
+            <div class="layout-horizontal row">
+              ${location.current
+                ? html`
+                    <div class="item col-6">
+                      <disaggregation-table
+                        .data="${location.current}"
+                        .mapping="${location.reportInfo.current.disagg_lookup_map}"
+                      >
+                      </disaggregation-table>
+                    </div>
+                  `
+                : html``}
+              ${location.previous
+                ? html`
+                    <div class="item col-6">
+                      <disaggregation-table
+                        .data="${location.previous}"
+                        .mapping="${location.reportInfo.previous.disagg_lookup_map}"
+                      >
+                      </disaggregation-table>
+                    </div>
+                  `
+                : html``}
+            </div>
+          </div>`
       )}
     `;
   }
