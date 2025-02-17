@@ -1,6 +1,7 @@
+from django.contrib.gis import admin
+
 from admin_extra_urls.decorators import button
 from admin_extra_urls.mixins import ExtraUrlMixin
-from django.contrib.gis import admin
 from leaflet.admin import LeafletGeoAdmin
 from unicef_locations.models import CartoDBTable
 

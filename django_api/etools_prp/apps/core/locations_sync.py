@@ -1,17 +1,19 @@
 import logging
 from datetime import datetime
 
-from apps.core.api import PMP_API
-from carto.exceptions import CartoException
-from celery.utils.log import get_task_logger
 from django.db import IntegrityError, transaction
 from django.db.models import F, Value
 from django.db.models.functions import Concat
-from etools_prp.apps.core.models import Workspace
-from etools_prp.apps.utils.query import has_related_records
+
+from apps.core.api import PMP_API
+from carto.exceptions import CartoException
+from celery.utils.log import get_task_logger
 from unicef_locations.exceptions import InvalidRemap
 from unicef_locations.synchronizers import LocationSynchronizer
 from unicef_locations.utils import get_location_model
+
+from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.utils.query import has_related_records
 
 logger = get_task_logger(__name__)
 
