@@ -1,5 +1,6 @@
+from admin_extra_urls.decorators import button
+from admin_extra_urls.mixins import ExtraUrlMixin
 from django.contrib.gis import admin
-
 from leaflet.admin import LeafletGeoAdmin
 from unicef_locations.models import CartoDBTable
 
@@ -62,11 +63,15 @@ class CartoDBTableAdmin(admin.ModelAdmin):
         rebuild_tree.delay()
 
 
-class WorkspaceAdmin(admin.ModelAdmin):
+class WorkspaceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('title', 'workspace_code', 'business_area_code',
                     'external_id')
     search_fields = ('title', 'workspace_code', 'business_area_code',
                      'external_id')
+
+    @button(label='Sync locations from eTools')
+    def sync_locations(self, request, pk):
+        return ''
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):

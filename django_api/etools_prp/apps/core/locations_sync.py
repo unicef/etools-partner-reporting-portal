@@ -1,18 +1,17 @@
 import logging
 from datetime import datetime
 
-from django.db import IntegrityError
-from django.db.models import F, Value
-from django.db.models.functions import Concat
-
+from apps.core.api import PMP_API
 from carto.exceptions import CartoException
 from celery.utils.log import get_task_logger
+from django.db import IntegrityError, transaction
+from django.db.models import F, Value
+from django.db.models.functions import Concat
+from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.utils.query import has_related_records
 from unicef_locations.exceptions import InvalidRemap
 from unicef_locations.synchronizers import LocationSynchronizer
 from unicef_locations.utils import get_location_model
-
-from etools_prp.apps.core.models import Workspace
-from etools_prp.apps.utils.query import has_related_records
 
 logger = get_task_logger(__name__)
 
@@ -196,3 +195,35 @@ class PRPLocationSynchronizer(LocationSynchronizer):
         # on subsequent children updates.
         get_location_model().objects.filter(parent__in=loc_qs).update(parent=None)
         loc_qs.exclude(pk__in=affected).delete()
+
+
+class EToolsLocationSynchronizer:
+    """eTools version of synchronizer with use the VisionSyncLog to store log execution"""
+
+    def __init__(self, pk) -> None:
+        super().__init__(pk)
+        self.workspace = Workspace.objects.get(pk=pk)
+        self.qs = get_location_model().objects.filter(workspaces=self.workspace)
+
+    @transaction.atomic
+    def sync(self):
+        try:
+            page_url = None
+            api = PMP_API()
+
+            while True:
+                try:
+                    list_data = api.locations(
+                        business_area_code=str(self.workspace.business_area_code), url=page_url)
+                except Exception as e:
+                    logger.exception("API Endpoint error: %s" % e)
+                    break
+                if list_data['next']:
+                    logger.info("Found new page")
+                    page_url = list_data['next']
+                else:
+                    logger.info("End of workspace")
+                    break
+        except Exception as e:
+            logger.error(str(e))
+            raise

@@ -2,9 +2,8 @@ import base64
 import json
 from urllib.parse import urlencode
 
-from django.conf import settings
-
 import requests
+from django.conf import settings
 
 
 class PMP_API:
@@ -118,4 +117,14 @@ class PMP_API:
         self.url = self.url_prototype + "/gdd/prp-get-gpd-document/{}/?workspace={}".format(gpd_external_id,
                                                                                             business_area_code)
         data = self._simple_get_request(timeout=300)
+        return data
+
+    def locations(self, business_area_code, page=0, limit=10, admin_level=0, url=None, **kwargs):
+        if url:
+            self.url = url
+        else:
+            kwargs.update({'page': page, 'limit': limit, 'workspace': business_area_code, 'admin_level': admin_level})
+            querystring = urlencode(kwargs)
+            self.url = self.url_prototype + "/prp-locations?" + querystring
+        data = self._push_request(timeout=300)
         return data
