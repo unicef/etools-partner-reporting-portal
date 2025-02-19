@@ -8,6 +8,7 @@ from unicef_locations.models import CartoDBTable
 from .cartodb import import_locations, rebuild_tree
 from .forms import CartoDBTableForm
 from .models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
+from .tasks import import_etools_locations
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -72,7 +73,7 @@ class WorkspaceAdmin(ExtraUrlMixin, admin.ModelAdmin):
 
     @button(label='Sync locations from eTools')
     def sync_locations(self, request, pk):
-        return ''
+        import_etools_locations.delay(pk)
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):

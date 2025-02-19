@@ -82,21 +82,21 @@ class PMP_API:
         data = self._push_request(timeout=300)
         return data
 
-    def programme_documents(self, business_area_code, page=0, limit=10, url=None, **kwargs):
+    def programme_documents(self, business_area_code, limit=10, offset=0, url=None, **kwargs):
         if url:
             self.url = url
         else:
-            kwargs.update({'page': page, 'limit': limit, 'workspace': business_area_code})
+            kwargs.update({'limit': limit, 'offset': offset, 'workspace': business_area_code})
             querystring = urlencode(kwargs)
-            self.url = self.url_prototype + "/prp/v1/interventions?" + querystring
+            self.url = self.url_prototype + "/prp/v1/interventions/?" + querystring
         data = self._push_request(timeout=300)
         return data
 
-    def government_documents(self, business_area_code, page=0, limit=10, url=None, **kwargs):
+    def government_documents(self, business_area_code, limit=10, offset=0, url=None, **kwargs):
         if url:
             self.url = url
         else:
-            kwargs.update({'page': page, 'limit': limit, 'workspace': business_area_code})
+            kwargs.update({'limit': limit, 'offset': offset, 'workspace': business_area_code})
             querystring = urlencode(kwargs)
             self.url = self.url_prototype + "/gdd/prp-gdds/?" + querystring
         data = self._push_request(timeout=300)
@@ -120,12 +120,12 @@ class PMP_API:
         data = self._simple_get_request(timeout=300)
         return data
 
-    def locations(self, business_area_code, page=0, limit=10, admin_level=0, url=None, **kwargs):
+    def locations(self, business_area_code, offset=0, limit=10, admin_level=0, url=None, **kwargs):
         if url:
             self.url = url
         else:
-            kwargs.update({'page': page, 'limit': limit, 'workspace': business_area_code, 'admin_level': admin_level})
+            kwargs.update({'workspace': business_area_code, 'admin_level': admin_level, 'limit': limit, 'offset': offset})
             querystring = urlencode(kwargs)
-            self.url = self.url_prototype + "/prp-locations?" + querystring
+            self.url = self.url_prototype + "/prp-locations/?" + querystring
         data = self._push_request(timeout=300)
         return data
