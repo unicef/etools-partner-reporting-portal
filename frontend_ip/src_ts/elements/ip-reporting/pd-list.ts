@@ -69,12 +69,11 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
     super.stateChanged(state);
   }
 
-  static get styles() {
-    return [layoutStyles];
-  }
-
   render() {
     return html`
+      <style>
+        ${layoutStyles}
+      </style>
       ${tableStyles}
       <style>
         ${dataTableStylesLit} :host {

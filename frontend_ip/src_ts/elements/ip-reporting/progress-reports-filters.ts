@@ -1,4 +1,4 @@
-import {html, css, LitElement} from 'lit';
+import {html, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
@@ -16,21 +16,6 @@ import {RootState} from '../../typings/redux.types';
 
 @customElement('progress-reports-filters')
 export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement)) {
-  static get styles() {
-    return [
-      layoutStyles,
-      css`
-        :host {
-          display: block;
-          background: white;
-        }
-        checkbox-filter {
-          margin-top: 2em;
-        }
-      `
-    ];
-  }
-
   @property({type: Object})
   queryParams!: any;
 
@@ -51,6 +36,15 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
 
   render() {
     return html`
+      <style>
+        ${layoutStyles} :host {
+          display: block;
+          background: white;
+        }
+        checkbox-filter {
+          margin-top: 2em;
+        }
+      </style>
       ${filterStyles}
       <filter-list .filters="${this.filters}">
         <div class="row">

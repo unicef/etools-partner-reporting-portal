@@ -1,4 +1,4 @@
-import {LitElement, html, css} from 'lit';
+import {LitElement, html} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
@@ -17,21 +17,6 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('indicators-filters')
 export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
-  static get styles() {
-    return [
-      layoutStyles,
-      css`
-        :host {
-          display: block;
-          background: white;
-        }
-        checkbox-filter {
-          margin-top: 2em;
-        }
-      `
-    ];
-  }
-
   @property({type: Object})
   queryParams!: any;
 
@@ -46,6 +31,16 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
   render() {
     return html`
       ${filterStyles}
+
+      <style>
+        ${layoutStyles} :host {
+          display: block;
+          background: white;
+        }
+        checkbox-filter {
+          margin-top: 2em;
+        }
+      </style>
 
       <filter-list .filters="${this.filters}">
         <div class="row">

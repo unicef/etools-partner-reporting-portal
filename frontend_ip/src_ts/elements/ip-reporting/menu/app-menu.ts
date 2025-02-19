@@ -21,14 +21,13 @@ import {buildUrl} from '../../../etools-prp-common/utils/util';
  */
 @customElement('app-menu')
 export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
-  static get styles() {
-    return [navMenuStyles];
-  }
-
   public render() {
     // main template
     // language=HTML
     return html`
+      <style>
+        ${navMenuStyles}
+      </style>
       <div class="menu-header">
         <span id="app-name"> IP Reporting </span>
 

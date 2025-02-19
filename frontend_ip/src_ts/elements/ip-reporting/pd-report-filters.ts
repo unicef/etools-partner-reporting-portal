@@ -13,10 +13,6 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('pd-report-filters')
 export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
-  static get styles() {
-    return [layoutStyles];
-  }
-
   @property({type: Object})
   queryParams: any = {};
 
@@ -40,6 +36,10 @@ export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
 
   render() {
     return html`
+      <style>
+        ${layoutStyles}
+      </style>
+
       ${filterStyles}
 
       <filter-list .filters=${this.filters} @filters-changed=${(e) => (this.filters = e.detail.value)}>
