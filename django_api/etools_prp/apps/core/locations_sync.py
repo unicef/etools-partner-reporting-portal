@@ -310,15 +310,16 @@ class EToolsLocationSynchronizer:
             'error': 0
         }
         try:
-            for admin_level in range(0, 11):
+            for admin_level in range(0, 10):
                 page_url = None
                 has_next = True
                 while has_next:
                     try:
-                        list_data = api.locations(
+                        list_data = api.get_locations(
                             business_area_code=str(self.workspace.business_area_code),
                             admin_level=admin_level,
-                            url=page_url)
+                            url=page_url, limit=50
+                        )
                         if list_data['results']:
                             new, updated, skipped, error = self.create_update_locations(list_data['results'])
                             status['new'] += new

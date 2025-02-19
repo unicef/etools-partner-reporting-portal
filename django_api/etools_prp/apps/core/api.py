@@ -120,7 +120,7 @@ class PMP_API:
         data = self._simple_get_request(timeout=300)
         return data
 
-    def locations(self, business_area_code, offset=0, limit=10, admin_level=0, url=None, **kwargs):
+    def get_locations(self, business_area_code, offset=0, limit=10, admin_level=0, url=None, **kwargs):
         if url:
             self.url = url
         else:
