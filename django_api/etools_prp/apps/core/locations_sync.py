@@ -230,7 +230,7 @@ class EToolsLocationSynchronizer:
             point = etools_loc['point'].__str__() if etools_loc['point'] else None
             geom = etools_loc['geom'].__str__() if etools_loc['geom'] else None
             parent_code = etools_loc['parent_p_code']
-            if all([name, pcode, geom]):
+            if all([name, pcode]):
                 existing_loc.admin_level = etools_loc['admin_level']
                 existing_loc.admin_level_name = etools_loc['admin_level_name']
                 existing_loc.name = name
@@ -327,17 +327,17 @@ class EToolsLocationSynchronizer:
                             status['skipped'] += skipped
                             status['error'] += error
                     except Exception as e:
-                        logging.exception("API Endpoint error: %s" % e)
+                        logger.exception("API Endpoint error: %s" % e)
                         break
                     if list_data['next']:
-                        logging.info("Found new page")
+                        logger.info("Found new page")
                         page_url = list_data['next']
                         has_next = True
                     else:
-                        logging.info("End of workspace")
+                        logger.info("End of workspace")
                         has_next = False
         except Exception as e:
             logger.error(str(e))
             raise
 
-        logging.info(f'Etools Location sync status: {status}')
+        logger.info(f'Etools Location sync status: {status}')
