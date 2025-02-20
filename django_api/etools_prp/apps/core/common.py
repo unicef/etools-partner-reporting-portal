@@ -231,6 +231,7 @@ EXTERNAL_DATA_SOURCES = Choices(
     ("HPC", "HPC"),
     ("OPS", "OPS"),
     ("UNICEF", "UNICEF"),
+    ("ETOOLS", "ETOOLS")
 )
 
 CURRENCIES = Choices(
