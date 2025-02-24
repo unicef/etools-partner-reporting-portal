@@ -1,5 +1,5 @@
 import Endpoints from '../../../endpoints';
-import {get as getTranslation} from 'lit-translate';
+import {get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 export function calculationFormulaAcrossPeriods(indicator: any) {
   const localized =

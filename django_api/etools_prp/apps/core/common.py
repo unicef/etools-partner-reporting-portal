@@ -154,6 +154,7 @@ PD_DOCUMENT_TYPE = Choices(
     ('SPD', 'SPD', 'Simplified Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
     ('SSFA', 'SSFA', 'SSFA'),
+    ('GDD', 'GDD', 'Government Programme Document'),
 )
 
 PROGRESS_REPORT_STATUS = Choices(
@@ -178,6 +179,8 @@ PD_STATUS = Choices(
     ("review", "review", "Review"),
     ("signature", "signature", "Signature"),
     ("signed", "signed", "Signed"),
+    ("pending_approval", "pending_approval", "Pending Approval"),  # GDD
+    ("approved", "approved", "Approved"),  # GDD
     ("active", "active", "Active"),
     ("cancelled", "cancelled", "Cancelled"),
     ('ended', 'ended', 'Ended'),
@@ -228,6 +231,7 @@ EXTERNAL_DATA_SOURCES = Choices(
     ("HPC", "HPC"),
     ("OPS", "OPS"),
     ("UNICEF", "UNICEF"),
+    ("ETOOLS", "ETOOLS")
 )
 
 CURRENCIES = Choices(
@@ -325,6 +329,7 @@ CURRENCIES = Choices(
     ("MNT", "mnt", "mnt"),
     ("MOP", "mop", "mop"),
     ("MRO", "mro", "mro"),
+    ("MRU", "mru", "mru"),
     ("MUR", "mur", "mur"),
     ("MVR", "mvr", "mvr"),
     ("MWK", "mwk", "mwk"),

@@ -4,7 +4,7 @@ import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 

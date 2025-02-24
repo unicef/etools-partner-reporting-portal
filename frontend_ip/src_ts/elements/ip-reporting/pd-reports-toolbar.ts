@@ -7,10 +7,10 @@ import {programmeDocumentReportsCount} from '../../redux/selectors/programmeDocu
 import {computePdReportsUrl, canExport, computePdQuery} from './js/pd-reports-toolbar-functions';
 import {RootState} from '../../typings/redux.types';
 import {store} from '../../redux/store';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 @customElement('pd-reports-toolbar')
 class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {

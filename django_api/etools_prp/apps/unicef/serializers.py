@@ -233,6 +233,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'funds_received_to_date_percentage',
             'total_unicef_supplies',
             'total_unicef_supplies_currency',
+            'has_signed_document'
 
         )
 
@@ -832,6 +833,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "disbursement",
             "disbursement_percent",
             "document_type",
+            "has_signed_document"
         )
         validators = [
             UniqueTogetherValidator(

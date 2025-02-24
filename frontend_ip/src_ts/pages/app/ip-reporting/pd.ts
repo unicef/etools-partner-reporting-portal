@@ -11,7 +11,7 @@ import {RootState} from '../../../typings/redux.types.js';
 import {store} from '../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 

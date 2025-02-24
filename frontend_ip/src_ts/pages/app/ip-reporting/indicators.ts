@@ -9,10 +9,10 @@ import Endpoints from '../../../endpoints.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
 import {fetchIndicators} from '../../../redux/actions/indicators.js';
 import {store} from '../../../redux/store.js';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
 @customElement('page-ip-reporting-indicators')

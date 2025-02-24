@@ -4,7 +4,7 @@ import '@unicef-polymer/etools-unicef/src/etools-input/etools-input';
 import '@unicef-polymer/etools-unicef/src/etools-dialog/etools-dialog';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown-multi';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import EtoolsDialog from '@unicef-polymer/etools-unicef/src/etools-dialog/etools-dialog';
 
 /**
@@ -67,7 +67,7 @@ export class EtoolsUserProfileDialog extends LitElement {
           pointer-events: none;
           --etools-input-container-underline: {
             display: none;
-          }
+          };
         }
 
         #profile-content {

@@ -8,9 +8,9 @@ import {customElement, property} from 'lit/decorators.js';
 import {getCorrespondingEtoolsEnvironment, SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY} from '../../../etools-prp-common/config';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../redux/store';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {RootState} from '../../../typings/redux.types';
 import {buildUrl} from '../../../etools-prp-common/utils/util';
 
@@ -21,14 +21,13 @@ import {buildUrl} from '../../../etools-prp-common/utils/util';
  */
 @customElement('app-menu')
 export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
-  static get styles() {
-    return [navMenuStyles];
-  }
-
   public render() {
     // main template
     // language=HTML
     return html`
+      <style>
+        ${navMenuStyles}
+      </style>
       <div class="menu-header">
         <span id="app-name"> IP Reporting </span>
 

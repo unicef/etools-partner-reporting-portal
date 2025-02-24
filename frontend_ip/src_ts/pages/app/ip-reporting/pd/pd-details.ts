@@ -11,11 +11,11 @@ import '../../../../elements/ip-reporting/pd-details-reports.js';
 import '../../../../elements/ip-reporting/pd-details-calculation-methods.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 const DETAILS = 'details';
 const REPORTS = 'reports';

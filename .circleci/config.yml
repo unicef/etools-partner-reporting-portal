@@ -129,7 +129,7 @@ jobs:
     working_directory: ~/code/frontend_ip
     # The primary container is an instance of the first list image listed. Your build commands run in this container.
     docker:
-      - image: node:12.22.7
+      - image: node:20.18.1
     steps:
       - checkout:
           path: ~/code
@@ -261,6 +261,7 @@ workflows:
                 - develop
                 - epd_sync_updates
                 - migration-lit
+                - node_20.18.0_shoelace_2.18.0
       - build_and_deploy_fe_cluster:
           filters:
             branches:

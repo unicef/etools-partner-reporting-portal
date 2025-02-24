@@ -2,10 +2,10 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../elements/etools-prp-currency';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {RootState} from '../../typings/redux.types';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
