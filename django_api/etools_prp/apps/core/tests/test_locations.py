@@ -122,10 +122,13 @@ class TestEToolsLocationSynchronizer(TestCase):
         first_call.assert_called_with(
             business_area_code=str(self.workspace.business_area_code),
             admin_level=0,
-            url=None,
-            limit=50
+            url=None
         )
         # The api is called 10 times for each admin level between 0-9, each call being mock,
         # it creates 1 obj and update it 9 times
-        mock_logger.info.assert_called_with(
-            "Etools Location sync status: {'new': 1, 'updated': 9, 'skipped': 0, 'error': 0}")
+        status_logger = mock_logger.info.call_args_list[-3]
+        self.assertEqual(
+            status_logger,
+            call("Etools Location sync status: {'new': 1, 'updated': 9, 'skipped': 0, 'error': 0}")
+        )
+        mock_logger.info.assert_called_with("Rebuilt")
