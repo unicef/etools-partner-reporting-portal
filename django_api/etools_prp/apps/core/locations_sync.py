@@ -296,9 +296,6 @@ class EToolsLocationSynchronizer:
             for loc in newly_created:
                 loc.workspaces.add(self.workspace)
 
-        logger.info("Rebuilding the tree....")
-        get_location_model().objects.rebuild()
-        logger.info("Rebuilt")
         return new, updated, skipped, error
 
     def sync(self):
@@ -318,7 +315,7 @@ class EToolsLocationSynchronizer:
                         list_data = api.get_locations(
                             business_area_code=str(self.workspace.business_area_code),
                             admin_level=admin_level,
-                            url=page_url, limit=20
+                            url=page_url
                         )
                         if list_data['results']:
                             new, updated, skipped, error = self.create_update_locations(list_data['results'])
@@ -341,3 +338,7 @@ class EToolsLocationSynchronizer:
             raise
 
         logger.info(f'Etools Location sync status: {status}')
+
+        logger.info("Rebuilding the tree....")
+        get_location_model().objects.rebuild()
+        logger.info("Rebuilt")
