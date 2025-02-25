@@ -318,7 +318,7 @@ class EToolsLocationSynchronizer:
                         list_data = api.get_locations(
                             business_area_code=str(self.workspace.business_area_code),
                             admin_level=admin_level,
-                            url=page_url, limit=50
+                            url=page_url, limit=20
                         )
                         if list_data['results']:
                             new, updated, skipped, error = self.create_update_locations(list_data['results'])
