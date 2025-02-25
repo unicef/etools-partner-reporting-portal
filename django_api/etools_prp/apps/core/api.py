@@ -127,5 +127,5 @@ class PMP_API:
             kwargs.update({'workspace': business_area_code, 'admin_level': admin_level, 'limit': limit, 'offset': offset})
             querystring = urlencode(kwargs)
             self.url = self.url_prototype + "/prp-locations/?" + querystring
-        data = self._push_request(timeout=3000)
+        data = self._push_request(timeout=None)  # wait indefinitely for the response
         return data
