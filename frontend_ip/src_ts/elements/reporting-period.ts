@@ -1,8 +1,8 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import {translate} from 'lit-translate';
-import {connect} from 'pwa-helpers';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../redux/store';
 
 @customElement('reporting-period')

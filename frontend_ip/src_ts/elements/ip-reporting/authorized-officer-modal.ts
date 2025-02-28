@@ -1,6 +1,6 @@
 import {LitElement, html} from 'lit';
 import {property, customElement} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import '@unicef-polymer/etools-unicef/src/etools-dropdown/etools-dropdown';
 import '@unicef-polymer/etools-unicef/src/etools-dialog/etools-dialog';
@@ -9,7 +9,7 @@ import {pdReportsUpdateSingle} from '../../redux/actions/pdReports';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {computePostBody, computeAuthorizedPartners} from './js/authorized-officer-modal-functions';
 import {RootState} from '../../typings/redux.types';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';

@@ -14,13 +14,13 @@ import {RootState} from '../../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {store} from '../../redux/store.js';
-import {connect, installMediaQueryWatcher} from 'pwa-helpers';
+import {connect, installMediaQueryWatcher} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import '../../elements/ip-reporting/menu/app-menu.js';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY} from '../../etools-prp-common/config.js';
 import {appDrawerStyles} from '../../elements/ip-reporting/menu/styles/app-drawer-styles.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 // import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 
 @customElement('page-ip-reporting')

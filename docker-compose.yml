@@ -189,6 +189,7 @@ services:
       dockerfile: ./Dockerfile-dev
     image: etoolsdev/etools-ip:rollup
     container_name: prp_ip_local
+    tty: true
     labels:
       - traefik.http.routers.prp_ip.rule=PathPrefix(`/ip/`) && Host(`prp.localhost`)
       - traefik.http.routers.prp_ip.middlewares=prp_ip-stripprefix

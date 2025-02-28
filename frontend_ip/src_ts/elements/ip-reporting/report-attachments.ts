@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {
   programmeDocumentReportsAttachmentsPending,
@@ -11,7 +11,7 @@ import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-fu
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-upload';
@@ -322,13 +322,15 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     }
 
     const attachmentDeleteUrl = this._getDeleteUrl(this.locationId, this.reportId, id);
-
+    const isAlreadySaved = (this.attachments || []).some((x) => String(x.id) === String(id));
     sendRequest({
       method: 'DELETE',
       endpoint: {url: attachmentDeleteUrl}
     })
       .then((_res) => {
-        store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id)));
+        if (isAlreadySaved) {
+          store.dispatch(pdReportsAttachmentsSet(this.reportId, null, parseInt(id)));
+        }
 
         fireEvent(this, 'toast', {text: getTranslation('FILE_DELETED')});
 

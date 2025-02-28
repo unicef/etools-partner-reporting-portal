@@ -16,8 +16,8 @@ import {RootState} from '../../../../../typings/redux.types.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {store} from '../../../../../redux/store.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
-import {connect} from 'pwa-helpers';
-import {translate, get as getTranslation} from 'lit-translate';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles.js';
 

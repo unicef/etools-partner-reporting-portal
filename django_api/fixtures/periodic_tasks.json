@@ -34,7 +34,7 @@
     "pk": 1,
     "fields": {
         "name": "Due/Overdue report checker",
-        "task": "indicator.tasks.process_due_reports",
+        "task": "etools_prp.apps.indicator.tasks.process_due_reports",
         "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 3
@@ -44,7 +44,7 @@
     "pk": 2,
     "fields": {
         "name": "Report generator",
-        "task": "core.tasks.process_period_reports",
+        "task": "etools_prp.apps.core.tasks.process_period_reports",
         "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 3
@@ -54,7 +54,7 @@
     "pk": 3,
     "fields": {
         "name": "Workspace sync",
-        "task": "core.tasks.process_workspaces",
+        "task": "etools_prp.apps.core.tasks.process_workspaces",
         "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 2
@@ -64,7 +64,7 @@
     "pk": 4,
     "fields": {
         "name": "Partner sync",
-        "task": "partner.tasks.process_partners",
+        "task": "etools_prp.apps.partner.tasks.process_partners",
         "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 2
@@ -74,7 +74,7 @@
     "pk": 5,
     "fields": {
         "name": "ProgrammeDocument sync",
-        "task": "unicef.tasks.process_programme_documents",
+        "task": "etools_prp.apps.unicef.tasks.process_programme_documents",
         "enabled": false,
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "interval": 1
@@ -89,4 +89,15 @@
         "date_changed": "2018-06-05 04:02:39.033672+00:00",
         "crontab": 1
     }
-}]
+}, {
+    "model": "django_celery_beat.periodictask",
+    "pk": 7,
+    "fields": {
+        "name": "GovernmentDocument sync",
+        "task": "etools_prp.apps.unicef.tasks.process_government_documents",
+        "enabled": false,
+        "date_changed": "2018-06-05 04:02:39.033672+00:00",
+        "interval": 1
+    }
+}
+]

@@ -7,7 +7,7 @@ import '@unicef-polymer/etools-unicef/src/etools-collapse/etools-collapse';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
-import {translate, get as getTranslation} from 'lit-translate';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {
   computeReportableUrl,
   computeCompleteIndicator,
@@ -23,7 +23,7 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import '../../etools-prp-common/elements/indicator-details';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
@@ -281,10 +281,12 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                             this._equals(indicator.reportable.blueprint.display_type, 'number')
                               ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
                               : this._equals(indicator.reportable.blueprint.display_type, 'percentage')
-                              ? html` <span>${indicator.reportable.target.v}%</span> `
-                              : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
-                              ? html` <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span> `
-                              : html``
+                                ? html` <span>${indicator.reportable.target.v}%</span> `
+                                : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
+                                  ? html`
+                                      <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span>
+                                    `
+                                  : html``
                           }
                         </dd>
                       </dl>

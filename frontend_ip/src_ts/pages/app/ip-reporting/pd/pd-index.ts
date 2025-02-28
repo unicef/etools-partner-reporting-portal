@@ -5,8 +5,8 @@ import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../elements/ip-reporting/pd-filters.js';
 import '../../../../elements/ip-reporting/pd-list-toolbar.js';
 import '../../../../elements/ip-reporting/pd-list.js';
-import {translate} from 'lit-translate';
-import {connect} from 'pwa-helpers';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store';
 
 @customElement('page-ip-reporting-pd-index')

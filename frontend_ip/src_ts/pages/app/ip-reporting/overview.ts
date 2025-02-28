@@ -4,9 +4,9 @@ import '../../../etools-prp-common/elements/page-header.js';
 import '../../../etools-prp-common/elements/page-body.js';
 import '../../../elements/ip-reporting/partner-details.js';
 import '../../../elements/ip-reporting/risk-rating.js';
-import {connect} from 'pwa-helpers/connect-mixin.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../redux/store.js';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 @customElement('page-ip-reporting-overview')
 export class PageIpReportingOverview extends connect(store)(LitElement) {

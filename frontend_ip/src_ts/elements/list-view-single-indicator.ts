@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {connect} from 'pwa-helpers';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
@@ -17,7 +17,7 @@ import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 
 import {store} from '../redux/store';
-import {translate} from 'lit-translate';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
 import {buildUrl} from '../etools-prp-common/utils/util';
@@ -164,14 +164,14 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
             ${this._equals(this.indicator?.blueprint?.display_type, 'number')
               ? html`<etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>`
               : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
-              ? html`<span><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>%</span>`
-              : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
-              ? html`<span
-                  ><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>
-                  /
-                  <etools-prp-number .value="${this.indicator?.baseline.d}"></etools-prp-number
-                ></span>`
-              : html``}
+                ? html`<span><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>%</span>`
+                : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
+                  ? html`<span
+                      ><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>
+                      /
+                      <etools-prp-number .value="${this.indicator?.baseline.d}"></etools-prp-number
+                    ></span>`
+                  : html``}
           </span>
           <span
             class="col-data col-1 table-cell table-cell--text self-center"
@@ -180,14 +180,14 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
             ${this._equals(this.indicator?.blueprint?.display_type, 'number')
               ? html`<etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>`
               : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
-              ? html`<span><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>%</span>`
-              : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
-              ? html`<span
-                  ><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>
-                  /
-                  <etools-prp-number .value="${this.indicator?.target.d}"></etools-prp-number
-                ></span>`
-              : html``}
+                ? html`<span><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>%</span>`
+                : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
+                  ? html`<span
+                      ><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>
+                      /
+                      <etools-prp-number .value="${this.indicator?.target.d}"></etools-prp-number
+                    ></span>`
+                  : html``}
           </span>
           <span
             class="col-data col-1 table-cell table-cell--text self-center"
@@ -208,11 +208,11 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
                         .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar-cluster>`
                     : this._equals(this.progressBarType, 'default')
-                    ? html`<etools-prp-progress-bar
-                        .displayType=${this.indicator?.blueprint?.display_type}
-                        .number=${this.indicator?.total_against_target}
-                      ></etools-prp-progress-bar>`
-                    : html``}
+                      ? html`<etools-prp-progress-bar
+                          .displayType=${this.indicator?.blueprint?.display_type}
+                          .number=${this.indicator?.total_against_target}
+                        ></etools-prp-progress-bar>`
+                      : html``}
                 </dd>
               </dl>
 
