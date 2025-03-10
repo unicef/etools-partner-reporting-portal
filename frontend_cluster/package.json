@@ -102,7 +102,7 @@
     "polymer-cli": "^1.9.11",
     "prettier": "^2.5.1",
     "typescript": "^4.5.4",
-    "prismjs": ">=1.27.0",
+    "prismjs": ">=1.30.0",
     "urijs": ">=1.19.9"
   },
   "husky": {
