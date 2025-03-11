@@ -1006,17 +1006,19 @@ class ImportRealmSerializer(serializers.Serializer):
     organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
     group = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name')
 
+    group_map = {
+        "IP Authorized Officer": PRP_IP_ROLE_TYPES.ip_authorized_officer,
+        "IP Editor": PRP_IP_ROLE_TYPES.ip_editor,
+        "IP Viewer": PRP_IP_ROLE_TYPES.ip_viewer,
+        "IP Admin": PRP_IP_ROLE_TYPES.ip_admin,
+    }
+
     @cached_property
     def allowed_groups(self):
         return [t[0] for t in PRP_IP_ROLE_TYPES]
 
     def map_group(self, value):
-        return {
-            "IP Authorized Officer": PRP_IP_ROLE_TYPES.ip_authorized_officer,
-            "IP Editor": PRP_IP_ROLE_TYPES.ip_editor,
-            "IP Viewer": PRP_IP_ROLE_TYPES.ip_viewer,
-            "IP Admin": PRP_IP_ROLE_TYPES.ip_admin,
-        }.get(value, value)
+        return self.group_map.get(value, value)
 
     def run_validation(self, data=None):
         if 'group' in data:
@@ -1038,6 +1040,12 @@ class ImportUserRealmsSerializer(serializers.ModelSerializer):
             'last_name',
             'realms',
         )
+
+    def run_validation(self, data):
+        # filter out any non-PRP groups
+        if data.get('realms'):
+            data['realms'] = [item for item in data['realms'] if item['group'] in ImportRealmSerializer.group_map.keys()]
+        return super().run_validation(data)
 
     def validate_email(self, value):
         if value.endswith('@unicef.org'):
