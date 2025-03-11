@@ -251,7 +251,7 @@ class EToolsLocationSynchronizer:
             point = loc['point'].__str__() if loc['point'] else None
             geom = loc['geom'].__str__() if loc['geom'] else None
             parent_code = loc['parent_p_code']
-            if all([name, p_code, geom]):
+            if all([name, p_code]):
                 values = {
                     'external_id': loc['id'],
                     'external_source': EXTERNAL_DATA_SOURCES.ETOOLS,
