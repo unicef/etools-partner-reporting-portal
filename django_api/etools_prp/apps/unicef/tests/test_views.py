@@ -2039,12 +2039,12 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    'group': "IP_EDITOR",
+                    'group': "IP Editor",
                 },
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    'group': "IP_AUTHORIZED_OFFICER",
+                    'group': "IP Authorized Officer",
                 },
             ]
         }
@@ -2079,12 +2079,12 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 {
                     'country': workspace.external_id,
                     'organization': partner.vendor_number,
-                    'group': "IP_EDITOR",
+                    'group': "IP Editor",
                 },
                 {
                     'country': workspace.external_id,
                     'organization': partner.vendor_number,
-                    'group': "IP_VIEWER",
+                    'group': "IP Viewer",
                 },
             ]
         }
@@ -2124,3 +2124,45 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         user.refresh_from_db()
         self.assertFalse(user.is_active)
         self.assertFalse(user.realms.filter(is_active=True).exists())
+
+    def test_issue_email(self):
+        user = PartnerUserFactory.build(realms__data=[], email='new_user@domain-with-dash.org')
+        workspace = WorkspaceFactory()
+        partner = PartnerFactory()
+        self.assertFalse(get_user_model().objects.filter(email=user.email).exists())
+        input_data = {
+            'email': user.email,
+            'first_name': user.first_name,
+            'middle_name': user.middle_name,
+            'last_name': user.last_name,
+            'realms': [
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP Viewer",
+                },
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP LM Editor",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+        self.assertTrue(get_user_model().objects.filter(email=user.email).exists())
+        user = get_user_model().objects.get(email=user.email)
+        self.assertCountEqual(
+            list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
+            [
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, True),
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_EDITOR').name, True),
+            ]
+        )

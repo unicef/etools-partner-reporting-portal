@@ -1176,7 +1176,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                 )
 
         return Response(ProgrammeDocumentCalculationMethodsSerializer(
-            self.get_response_data(pd_to_notify)).data)
+            self.get_response_data(pd)).data)
 
 
 class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
