@@ -56,11 +56,21 @@ class TestEToolsLocationSynchronizer(TestCase):
                 'admin_level': 1,
                 'admin_level_name': 'Level 1',
                 'id': 3
+            },
+            {
+                'p_code': '1002',
+                'name': 'Location 2',
+                'point': None,
+                "geom": None,
+                'parent_p_code': '000',
+                'admin_level': 1,
+                'admin_level_name': 'Level 1',
+                'id': 3
             }
         ]
         new, updated, skipped, error = self.synchronizer.create_update_locations(list_data)
 
-        self.assertEqual(new, 1)  # 1 new locations should be created p_code 0001
+        self.assertEqual(new, 2)  # 2 new locations should be created p_code 0001 and 1002 no geom
         self.assertEqual(updated, 1)  # One location should be updated
         self.assertEqual(skipped, 1)  # One location should be skipped due to missing name
         self.assertEqual(error, 0)  # No errors expected
