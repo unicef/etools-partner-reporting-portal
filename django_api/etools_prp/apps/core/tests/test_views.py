@@ -33,7 +33,7 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.assertEquals(
             len(response.data),
             Workspace.objects.prefetch_related('locations').filter(
-                locations__isnull=False).distinct().count()
+                locations__isnull=False, response_plans=self.response_plan).distinct().count()
         )
 
         # Cluster system admin should also be able to query workspaces
@@ -48,7 +48,7 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.assertEquals(
             len(response.data),
             Workspace.objects.prefetch_related('locations').filter(
-                locations__isnull=False).distinct().count()
+                locations__isnull=False, response_plans=self.response_plan).distinct().count()
         )
 
     def test_api_filtering(self):
