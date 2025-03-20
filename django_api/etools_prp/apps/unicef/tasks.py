@@ -38,6 +38,7 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.ppd_utils.item_get_partner import process_programme_item_get_partner
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDPersonSerializer,
@@ -154,37 +155,11 @@ def process_programme_documents(fast=False, area=False):
                          workspace.business_area_code))
 
                     for item in list_data['results']:
+                        # here is the start of the transaction
+
                         logger.info("Processing PD: %s" % item['id'])
 
-                        # Get partner data
-                        partner_data = item['partner_org']
 
-                        # Skip entries without unicef_vendor_number
-                        if not partner_data['unicef_vendor_number']:
-                            logger.warning("No unicef_vendor_number - skipping!")
-                            continue
-
-                        # Create/Assign Partner
-                        if not partner_data['name']:
-                            logger.warning("No partner name - skipping!")
-                            continue
-
-                        partner_data['external_id'] = partner_data.get('id', '#')
-
-                        try:
-                            partner = process_model(
-                                Partner,
-                                PMPPartnerSerializer,
-                                partner_data, {
-                                    'vendor_number': partner_data['unicef_vendor_number']
-                                }
-                            )
-                        except ValidationError:
-                            logger.exception('Error trying to save Partner model with {}'.format(partner_data))
-                            continue
-
-                        # Assign partner
-                        item['partner'] = partner.id
 
                         # Assign workspace
                         item['workspace'] = workspace.id
@@ -200,6 +175,18 @@ def process_programme_documents(fast=False, area=False):
                         if not item['end_date']:
                             logger.warning("End date is required - skipping!")
                             continue
+
+
+
+                        # [Process stage 1 - get partner]
+                        partner = process_programme_item_get_partner(item['partner_org'])
+
+                        if not partner:
+                            continue
+
+                        item['partner'] = partner.id
+
+
 
                         # Create PD
                         item['status'] = item['status']
