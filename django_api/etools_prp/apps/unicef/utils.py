@@ -39,3 +39,10 @@ def convert_string_values_to_numeric(d):
         if type(v) == str:
             d[k] = d[k].replace(',', '')
             d[k] = float(d[k]) if '.' in d[k] else int(d[k])
+
+
+def process_model(model_to_process, process_serializer, data, filter_dict):
+    instance = model_to_process.objects.filter(**filter_dict).first()
+    serializer = process_serializer(instance=instance, data=data)
+    serializer.is_valid(raise_exception=True)
+    return serializer.save()

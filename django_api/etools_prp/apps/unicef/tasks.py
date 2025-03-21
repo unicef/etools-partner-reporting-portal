@@ -38,7 +38,7 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
-from etools_prp.apps.unicef.ppd_utils.item_get_partner import process_programme_item_get_partner
+from etools_prp.apps.unicef.ppd_sync.item_get_partner import update_create_partner
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDPersonSerializer,
@@ -49,18 +49,12 @@ from etools_prp.apps.unicef.serializers import (
     PMPSectionSerializer,
 )
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
+from etools_prp.apps.unicef.utils import process_model
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
 LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
-
-
-def process_model(model_to_process, process_serializer, data, filter_dict):
-    instance = model_to_process.objects.filter(**filter_dict).first()
-    serializer = process_serializer(instance=instance, data=data)
-    serializer.is_valid(raise_exception=True)
-    return serializer.save()
 
 
 def create_user_for_person(person):
@@ -175,9 +169,9 @@ def process_programme_documents(fast=False, area=False):
                             continue
 
                         # [Process stage 1 - get partner]
-                        partner = process_programme_item_get_partner(item['partner_org'])
+                        partner = update_create_partner(item['partner_org'])
 
-                        if not partner:
+                        if partner is None:
                             continue
 
                         item['partner'] = partner.id
