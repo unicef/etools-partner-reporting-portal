@@ -1,9 +1,9 @@
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.partner.models import Partner
-from etools_prp.apps.unicef.ppd_sync.item_get_partner import update_create_partner
+from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 
 
-class TestProgrammeDocumentProcess(BaseAPITestCase):
+class TestItemCreateUpdatePartner(BaseAPITestCase):
     def test_get_partner(self):
         filter_dict = {'vendor_number': '777999777'}
         partner_qs = Partner.objects.filter(**filter_dict)

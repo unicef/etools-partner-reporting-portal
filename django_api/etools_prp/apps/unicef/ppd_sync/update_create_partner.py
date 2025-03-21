@@ -14,12 +14,12 @@ def update_create_partner(partner_data: dict) -> Optional[Partner]:
 
     # Skip entries without unicef_vendor_number
     if not partner_data['unicef_vendor_number']:
-        logger.warning(f"No unicef_vendor_number for PD - skipping!")
+        logger.warning("No unicef_vendor_number for PD - skipping!")
         return None
 
     # Create/Assign Partner
     if not partner_data['name']:
-        logger.warning(f"No partner name for PD - skipping!")
+        logger.warning("No partner name for PD - skipping!")
         return None
 
     partner_data['external_id'] = partner_data.get('id', '#')

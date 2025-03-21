@@ -38,7 +38,7 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
-from etools_prp.apps.unicef.ppd_sync.item_get_partner import update_create_partner
+from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDPersonSerializer,
