@@ -9,13 +9,13 @@ from etools_prp.apps.indicator.serializers import PMPIndicatorBlueprintSerialize
 from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import Person, ProgrammeDocument, Section
+from etools_prp.apps.unicef.ppd_utils.item_get_partner import process_programme_item_get_partner
 from etools_prp.apps.unicef.serializers import (
     PMPPDPersonSerializer,
     PMPProgrammeDocumentSerializer,
     PMPSectionSerializer,
 )
 from etools_prp.apps.unicef.tasks import process_model
-from etools_prp.apps.unicef.ppd_utils.item_get_partner import process_programme_item_get_partner
 
 
 class TestProcessModel(BaseAPITestCase):
