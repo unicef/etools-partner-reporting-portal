@@ -159,8 +159,6 @@ def process_programme_documents(fast=False, area=False):
 
                         logger.info("Processing PD: %s" % item['id'])
 
-
-
                         # Assign workspace
                         item['workspace'] = workspace.id
 
@@ -176,8 +174,6 @@ def process_programme_documents(fast=False, area=False):
                             logger.warning("End date is required - skipping!")
                             continue
 
-
-
                         # [Process stage 1 - get partner]
                         partner = process_programme_item_get_partner(item['partner_org'])
 
@@ -185,8 +181,6 @@ def process_programme_documents(fast=False, area=False):
                             continue
 
                         item['partner'] = partner.id
-
-
 
                         # Create PD
                         item['status'] = item['status']

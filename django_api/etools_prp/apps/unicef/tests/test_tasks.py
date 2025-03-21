@@ -250,6 +250,7 @@ class TestProcessModel(BaseAPITestCase):
         )
         self.assertTrue(location_qs.exists())
 
+
 class TestProgrammeDocumentProcess(BaseAPITestCase):
     def test_get_partner(self):
         filter_dict = {'vendor_number': '777999777'}
