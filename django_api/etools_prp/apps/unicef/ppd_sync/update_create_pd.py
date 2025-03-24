@@ -4,8 +4,8 @@ from typing import Any, Optional
 
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import ProgrammeDocument
+from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import PMPProgrammeDocumentSerializer
-from etools_prp.apps.unicef.utils import process_model
 
 logger = logging.getLogger(__name__)
 

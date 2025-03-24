@@ -14,7 +14,7 @@ from etools_prp.apps.unicef.serializers import (
     PMPProgrammeDocumentSerializer,
     PMPSectionSerializer,
 )
-from etools_prp.apps.unicef.utils import process_model
+from etools_prp.apps.unicef.ppd_sync.utils import process_model
 
 
 class TestProcessModel(BaseAPITestCase):

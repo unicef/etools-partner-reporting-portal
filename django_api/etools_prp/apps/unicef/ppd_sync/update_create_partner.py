@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
-from etools_prp.apps.unicef.utils import process_model
+from etools_prp.apps.unicef.ppd_sync.utils import process_model
 
 logger = logging.getLogger(__name__)
 

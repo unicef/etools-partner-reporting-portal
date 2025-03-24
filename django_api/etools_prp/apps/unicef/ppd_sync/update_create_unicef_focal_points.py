@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from etools_prp.apps.unicef.models import ProgrammeDocument
-from etools_prp.apps.unicef.utils import save_person_and_user
+from etools_prp.apps.unicef.ppd_sync.utils import save_person_and_user
 
 logger = logging.getLogger(__name__)
 

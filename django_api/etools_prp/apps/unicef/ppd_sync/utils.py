@@ -1,6 +1,9 @@
 import logging
+
 from django.contrib.auth import get_user_model
+
 from jsonschema.exceptions import ValidationError
+
 from etools_prp.apps.unicef.models import Person
 from etools_prp.apps.unicef.serializers import PMPPDPersonSerializer
 
@@ -8,6 +11,7 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
 LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
+
 
 def process_model(model_to_process, process_serializer, data, filter_dict):
     instance = model_to_process.objects.filter(**filter_dict).first()
