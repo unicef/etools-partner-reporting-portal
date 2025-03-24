@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from rest_framework.exceptions import ValidationError
 
@@ -10,31 +10,33 @@ from etools_prp.apps.unicef.utils import process_model
 logger = logging.getLogger(__name__)
 
 
-def update_create_partner(partner_data: dict) -> Optional[Partner]:
+def update_create_partner(item: Any) -> (Optional[Any], Optional[Partner]):
 
     # Skip entries without unicef_vendor_number
-    if not partner_data['unicef_vendor_number']:
+    if not item['partner_org']['unicef_vendor_number']:
         logger.warning("No unicef_vendor_number for PD - skipping!")
-        return None
+        return item, None
 
     # Create/Assign Partner
-    if not partner_data['name']:
+    if not item['partner_org']['name']:
         logger.warning("No partner name for PD - skipping!")
-        return None
+        return item, None
 
-    partner_data['external_id'] = partner_data.get('id', '#')
+    item['partner_org']['external_id'] = item['partner_org'].get('id', '#')
 
     try:
         partner = process_model(
             Partner,
             PMPPartnerSerializer,
-            partner_data, {
-                'vendor_number': partner_data['unicef_vendor_number']
+            item['partner_org'], {
+                'vendor_number': item['partner_org']['unicef_vendor_number']
             }
         )
 
-        return partner
+        item['partner'] = partner.id
+
+        return item, partner
     except ValidationError:
         logger.exception('Error trying to save Partner model with {}'
-                         .format(partner_data))
-        return None
+                         .format(item['partner_org']))
+        return item, None
