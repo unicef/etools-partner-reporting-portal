@@ -50,8 +50,8 @@ from etools_prp.apps.unicef.serializers import (
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
 )
-from etools_prp.apps.unicef.utils import convert_string_values_to_numeric, process_model, save_person_and_user
-
+from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
+from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 logger = logging.getLogger(__name__)
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
