@@ -33,7 +33,6 @@ from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
-    Person,
     ProgrammeDocument,
     ReportingPeriodDates,
     Section,
@@ -43,7 +42,6 @@ from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_unicef_focal_points import update_create_unicef_focal_points
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
-    PMPPDPersonSerializer,
     PMPPDResultLinkSerializer,
     PMPProgrammeDocumentSerializer,
     PMPReportingPeriodDatesSerializer,
