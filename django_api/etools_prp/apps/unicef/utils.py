@@ -1,8 +1,10 @@
 import logging
 import tempfile
+
 from django.contrib.auth import get_user_model
 from django.http import FileResponse
 from django.template.loader import render_to_string
+
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
 

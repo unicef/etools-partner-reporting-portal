@@ -40,6 +40,7 @@ from etools_prp.apps.unicef.models import (
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_unicef_focal_points import update_create_unicef_focal_points
+from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDResultLinkSerializer,
@@ -49,7 +50,7 @@ from etools_prp.apps.unicef.serializers import (
     PMPSectionSerializer,
 )
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
-from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
+
 logger = logging.getLogger(__name__)
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
