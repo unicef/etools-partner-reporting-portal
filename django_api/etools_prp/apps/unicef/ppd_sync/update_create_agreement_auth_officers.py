@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 def update_create_agreement_auth_officers(item: Any, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> (Any, ProgrammeDocument):
 
+    # Create agreement_auth_officers
     person_data_list = item['agreement_auth_officers']
     for person_data in person_data_list:
         person, user = save_person_and_user(person_data, create_user=True)

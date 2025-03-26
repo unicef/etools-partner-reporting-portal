@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 def update_create_focal_points(item: Any, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> (Any, ProgrammeDocument):
 
+    # Create focal_points
     person_data_list = item['focal_points']
     for person_data in person_data_list:
         person, user = save_person_and_user(person_data, create_user=True)
