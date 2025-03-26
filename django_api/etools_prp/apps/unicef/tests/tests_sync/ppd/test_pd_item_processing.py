@@ -10,6 +10,7 @@ from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import prepare_item
 
 
 class TestPDItemProcessing(BaseAPITestCase):
+
     def test_item_get_partner(self):
 
         (_workspace,
@@ -22,14 +23,31 @@ class TestPDItemProcessing(BaseAPITestCase):
          _item) = (
             prepare_item())
 
-        filter_dict = {
-            'vendor_number': _partner.vendor_number
-        }
-        partner_qs = Partner.objects.filter(**filter_dict)
+        partner_qs = Partner.objects.filter(vendor_number=_partner.vendor_number)
 
         update_create_partner(_item)
 
         self.assertTrue(partner_qs.exists())
+
+    def test_item_get_partner_returns_none_when_partner_org_incomplete(self):
+
+        (_workspace,
+         _partner,
+         _sections,
+         _unicef_officer_list,
+         _unicef_focal_point_list,
+         _partner_focal_point_list,
+         _locations_list,
+         _item) = (
+            prepare_item())
+
+        # Error inducing action
+        _item['partner_org']['unicef_vendor_number'] = ""
+        _item['partner_org']['name'] = ""
+
+        _item, partner = update_create_partner(_item)
+
+        self.assertIsNone(partner)
 
     def test_item_get_pd(self):
 
@@ -43,12 +61,9 @@ class TestPDItemProcessing(BaseAPITestCase):
          _item) = (
             prepare_item())
 
-        filter_dict = {
-            'external_id': _item['id'],
-            'workspace': _workspace,
-            'external_business_area_code': _workspace.business_area_code,
-        }
-        pd_qs = ProgrammeDocument.objects.filter(**filter_dict)
+        pd_qs = ProgrammeDocument.objects.filter(external_id=_item['id'],
+                                                 workspace=_workspace,
+                                                 external_business_area_code=_workspace.business_area_code)
 
         _item, partner = update_create_partner(_item)
 
@@ -68,21 +83,14 @@ class TestPDItemProcessing(BaseAPITestCase):
          _item) = (
             prepare_item())
 
-        filter_dict = {
-            "email": _unicef_focal_point_list[0].email
-        }
-        person_qs = Person.objects.filter(**filter_dict)
-
-        filter_dict_2 = {
-            "email": _unicef_focal_point_list[1].email
-        }
-        person_qs_2 = Person.objects.filter(**filter_dict_2)
+        person_qs = Person.objects.filter(email=_unicef_focal_point_list[0].email)
+        person_qs_2 = Person.objects.filter(email=_unicef_focal_point_list[1].email)
 
         _item, partner = update_create_partner(_item)
 
         _item, pd = update_create_pd(_item, _workspace)
 
-        pd = update_create_unicef_focal_points(_item, pd)
+        pd = update_create_unicef_focal_points(_item['unicef_focal_points'], pd)
 
         self.assertTrue(person_qs.exists())
         self.assertTrue(person_qs_2.exists())
@@ -98,18 +106,15 @@ class TestPDItemProcessing(BaseAPITestCase):
          _item) = (
             prepare_item())
 
-        filter_dict = {
-            "email": _unicef_officer_list[0].email
-        }
-        person_qs = Person.objects.filter(**filter_dict)
+        person_qs = Person.objects.filter(email=_unicef_officer_list[0].email)
 
         _item, partner = update_create_partner(_item)
 
         _item, pd = update_create_pd(_item, _workspace)
 
-        pd = update_create_unicef_focal_points(_item, pd)
+        pd = update_create_unicef_focal_points(_item['unicef_focal_points'], pd)
 
-        _item, pd = update_create_agreement_auth_officers(_item, pd, _workspace, partner)
+        pd = update_create_agreement_auth_officers(_item['agreement_auth_officers'], pd, _workspace, partner)
 
         self.assertTrue(person_qs.exists())
 
@@ -124,30 +129,19 @@ class TestPDItemProcessing(BaseAPITestCase):
          _item) = (
             prepare_item())
 
-        filter_dict = {
-            "email": _partner_focal_point_list[0].email
-        }
-        person_qs = Person.objects.filter(**filter_dict)
-
-        filter_dict_2 = {
-            "email": _partner_focal_point_list[1].email
-        }
-        person_qs_2 = Person.objects.filter(**filter_dict_2)
-
-        filter_dict_3 = {
-            "email": _partner_focal_point_list[2].email
-        }
-        person_qs_3 = Person.objects.filter(**filter_dict_3)
+        person_qs = Person.objects.filter(email=_partner_focal_point_list[0].email)
+        person_qs_2 = Person.objects.filter(email=_partner_focal_point_list[1].email)
+        person_qs_3 = Person.objects.filter(email=_partner_focal_point_list[2].email)
 
         _item, partner = update_create_partner(_item)
 
         _item, pd = update_create_pd(_item, _workspace)
 
-        pd = update_create_unicef_focal_points(_item, pd)
+        pd = update_create_unicef_focal_points(_item['unicef_focal_points'], pd)
 
-        _item, pd = update_create_agreement_auth_officers(_item, pd, _workspace, partner)
+        pd = update_create_agreement_auth_officers(_item['agreement_auth_officers'], pd, _workspace, partner)
 
-        _item, pd = update_create_focal_points(_item, pd, _workspace, partner)
+        pd = update_create_focal_points(_item['focal_points'], pd, _workspace, partner)
 
         self.assertTrue(person_qs.exists())
         self.assertTrue(person_qs_2.exists())

@@ -12,9 +12,6 @@ logger = logging.getLogger(__name__)
 
 def update_create_pd(item: Any, workspace: Workspace) -> (Optional[Any], Optional[ProgrammeDocument]):
 
-    # This was before me
-    item['status'] = item['status']
-
     item['external_business_area_code'] = workspace.business_area_code
     # Amendment date formatting
     for idx in range(len(item['amendments'])):

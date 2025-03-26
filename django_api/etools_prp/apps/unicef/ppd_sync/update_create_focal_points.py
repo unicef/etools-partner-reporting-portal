@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from django.contrib.auth.models import Group
 
@@ -12,11 +11,10 @@ from etools_prp.apps.unicef.ppd_sync.utils import save_person_and_user
 logger = logging.getLogger(__name__)
 
 
-def update_create_focal_points(item: Any, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> (Any, ProgrammeDocument):
+def update_create_focal_points(focal_points: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
 
     # Create focal_points
-    person_data_list = item['focal_points']
-    for person_data in person_data_list:
+    for person_data in focal_points:
         person, user = save_person_and_user(person_data, create_user=True)
         if not person:
             continue
@@ -44,4 +42,4 @@ def update_create_focal_points(item: Any, pd: ProgrammeDocument, workspace: Work
             obj.is_active = is_active
             obj.save()
 
-    return item, pd
+    return pd

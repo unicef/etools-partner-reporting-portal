@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from django.contrib.auth.models import Group
 
@@ -12,11 +11,10 @@ from etools_prp.apps.unicef.ppd_sync.utils import save_person_and_user
 logger = logging.getLogger(__name__)
 
 
-def update_create_agreement_auth_officers(item: Any, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> (Any, ProgrammeDocument):
+def update_create_agreement_auth_officers(agreement_auth_officers: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
 
     # Create agreement_auth_officers
-    person_data_list = item['agreement_auth_officers']
-    for person_data in person_data_list:
+    for person_data in agreement_auth_officers:
         person, user = save_person_and_user(person_data, create_user=True)
         if not person:
             continue
@@ -44,4 +42,4 @@ def update_create_agreement_auth_officers(item: Any, pd: ProgrammeDocument, work
             obj.is_active = is_active
             obj.save()
 
-    return item, pd
+    return pd

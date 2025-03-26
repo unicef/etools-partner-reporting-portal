@@ -87,7 +87,7 @@ def process_programme_documents(fast=False, area=False):
     else:
         workspaces = Workspace.objects.all()
 
-    with ((transaction.atomic())):
+    with transaction.atomic():
         for workspace in workspaces:
             # Skip global workspace and Syria Cross Border / MENARO
             if workspace.business_area_code in ("0", "234R"):
@@ -145,13 +145,13 @@ def process_programme_documents(fast=False, area=False):
                             continue
 
                         # Get Unicef Focal Points
-                        pd = update_create_unicef_focal_points(item, pd)
+                        pd = update_create_unicef_focal_points(item['unicef_focal_points'], pd)
 
                         # Create Agreement Auth Officers
-                        item, pd = update_create_agreement_auth_officers(item, pd, workspace, partner)
+                        pd = update_create_agreement_auth_officers(item['agreement_auth_officers'], pd, workspace, partner)
 
                         # Create Focal Points
-                        item, pd = update_create_focal_points(item, pd, workspace, partner)
+                        pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
                         # Create sections
                         section_data_list = item['sections']
