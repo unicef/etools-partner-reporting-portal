@@ -1,10 +1,17 @@
+import logging
 import tempfile
 
+from django.contrib.auth import get_user_model
 from django.http import FileResponse
 from django.template.loader import render_to_string
 
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
+
+logger = logging.getLogger(__name__)
+User = get_user_model()
+FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
+LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
 
 def render_pdf_to_response(request, template, data):
@@ -39,10 +46,3 @@ def convert_string_values_to_numeric(d):
         if type(v) == str:
             d[k] = d[k].replace(',', '')
             d[k] = float(d[k]) if '.' in d[k] else int(d[k])
-
-
-def process_model(model_to_process, process_serializer, data, filter_dict):
-    instance = model_to_process.objects.filter(**filter_dict).first()
-    serializer = process_serializer(instance=instance, data=data)
-    serializer.is_valid(raise_exception=True)
-    return serializer.save()

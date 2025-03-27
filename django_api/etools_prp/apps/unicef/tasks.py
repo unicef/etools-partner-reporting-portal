@@ -33,65 +33,32 @@ from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
-    Person,
     ProgrammeDocument,
     ReportingPeriodDates,
     Section,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
+from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
+from etools_prp.apps.unicef.ppd_sync.update_create_person import (
+    update_create_agreement_auth_officers,
+    update_create_focal_points,
+    update_create_unicef_focal_points,
+)
+from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
-    PMPPDPersonSerializer,
     PMPPDResultLinkSerializer,
     PMPProgrammeDocumentSerializer,
     PMPReportingPeriodDatesSerializer,
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
 )
-from etools_prp.apps.unicef.utils import convert_string_values_to_numeric, process_model
+from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
 LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
-
-
-def create_user_for_person(person):
-    # Check if given person already exists in user model (by email)
-    user, created = User.objects.get_or_create(username=person.email, defaults={
-        'email': person.email
-    })
-    if created:
-        user.set_unusable_password()
-        user.send_email_notification_on_create('IP')
-
-    if person.name:
-        name_parts = person.name.split()
-        if len(name_parts) == 2:
-            user.first_name = name_parts[0][:FIRST_NAME_MAX_LENGTH]
-            user.last_name = name_parts[1][:LAST_NAME_MAX_LENGTH]
-        else:
-            user.first_name = person.name[:FIRST_NAME_MAX_LENGTH]
-
-    user.save()
-    return user
-
-
-def save_person_and_user(person_data, create_user=False):
-    try:
-        person = process_model(
-            Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
-        )
-    except ValidationError:
-        logger.debug('Error trying to save Person model with {}'.format(person_data))
-        return None, None
-
-    if create_user:
-        user = create_user_for_person(person)
-    else:
-        user = None
-
-    return person, user
 
 
 @shared_task
@@ -167,112 +134,26 @@ def process_programme_documents(fast=False, area=False):
                             logger.warning("End date is required - skipping!")
                             continue
 
-                        # [Process stage 1 - get partner]
-                        partner = update_create_partner(item['partner_org'])
+                        # Get partner
+                        item, partner = update_create_partner(item)
 
                         if partner is None:
                             continue
 
-                        item['partner'] = partner.id
+                        # Get PD
+                        item, pd = update_create_pd(item, workspace)
 
-                        # Create PD
-                        item['status'] = item['status']
-                        item['external_business_area_code'] = workspace.business_area_code
-                        # Amendment date formatting
-                        for idx in range(len(item['amendments'])):
-                            if item['amendments'][idx]['signed_date'] is None:
-                                # no signed date yet, so formatting is not required
-                                continue
-
-                            item['amendments'][idx]['signed_date'] = datetime.datetime.strptime(
-                                item['amendments'][idx]['signed_date'], "%Y-%m-%d"
-                            ).strftime("%d-%b-%Y")
-
-                        try:
-                            pd = process_model(
-                                ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                                {
-                                    'external_id': item['id'],
-                                    'workspace': workspace,
-                                    'external_business_area_code': workspace.business_area_code,
-                                }
-                            )
-                        except KeyError as e:
-                            logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
+                        if pd is None:
                             continue
 
-                        pd.unicef_focal_point.all().update(active=False)
-                        pd.unicef_officers.all().update(active=False)
-                        pd.partner_focal_point.all().update(active=False)
+                        # Get Unicef Focal Points
+                        pd = update_create_unicef_focal_points(item['unicef_focal_points'], pd)
 
-                        # Create unicef_focal_points
-                        person_data_list = item['unicef_focal_points']
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
-                            if not person:
-                                continue
+                        # Create Agreement Auth Officers
+                        pd = update_create_agreement_auth_officers(item['agreement_auth_officers'], pd, workspace, partner)
 
-                            person.active = True
-                            person.save()
-                            pd.unicef_focal_point.add(person)
-
-                        # Create agreement_auth_officers
-                        person_data_list = item['agreement_auth_officers']
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data, create_user=True)
-                            if not person:
-                                continue
-
-                            person.active = True
-                            person.save()
-                            pd.unicef_officers.add(person)
-
-                            user.partner = partner
-                            user.save()
-
-                            obj, created = Realm.objects.get_or_create(
-                                user=user,
-                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
-                                workspace=workspace,
-                                partner=partner
-                            )
-
-                            if created:
-                                obj.send_email_notification()
-
-                            is_active = person_data.get('active')
-
-                            if not created and obj.is_active and is_active is False:
-                                obj.is_active = is_active
-                                obj.save()
-
-                        # Create focal_points
-                        person_data_list = item['focal_points']
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data, create_user=True)
-                            if not person:
-                                continue
-
-                            person.active = True
-                            person.save()
-                            pd.partner_focal_point.add(person)
-
-                            user.partner = partner
-                            user.save()
-
-                            obj, created = Realm.objects.get_or_create(
-                                user=user,
-                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
-                                workspace=workspace,
-                                partner=partner
-                            )
-                            if created:
-                                obj.send_email_notification()
-
-                            is_active = person_data.get('active')
-                            if not created and obj.is_active and is_active is False:
-                                obj.is_active = is_active
-                                obj.save()
+                        # Create Focal Points
+                        pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
                         # Create sections
                         section_data_list = item['sections']
