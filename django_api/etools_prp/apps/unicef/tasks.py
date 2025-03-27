@@ -37,11 +37,13 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_person import update_create_agreement_auth_officers
-from etools_prp.apps.unicef.ppd_sync.update_create_person import update_create_focal_points
-from etools_prp.apps.unicef.ppd_sync.update_create_person import update_create_unicef_focal_points
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
+from etools_prp.apps.unicef.ppd_sync.update_create_person import (
+    update_create_agreement_auth_officers,
+    update_create_focal_points,
+    update_create_unicef_focal_points,
+)
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,

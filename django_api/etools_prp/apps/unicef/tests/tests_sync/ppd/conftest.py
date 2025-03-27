@@ -76,7 +76,7 @@ def item_reference():
                 "name": "Ana Maria Locsin",
                 "title": "Country Director",
                 "phone_num": "",
-                "email": "annie.locsin@plan-international.org",
+                "email": "annie.mariennie@plan-international.org",
                 "active": True
             }
         ],
