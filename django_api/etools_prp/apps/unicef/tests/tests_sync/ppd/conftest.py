@@ -126,7 +126,9 @@ def item_reference():
         "expected_results": [
             {
                 "id": 455,
-                "title": "PD Output 1: Enhanced capacity of the DepEd Bureau of Alternative Education (BAE) in developing and implementing of localized Social Behavior Change (SBC) Strategies to increase enrolment in and improve local support for the Alternative Learning System",
+                "title": "PD Output 1: Enhanced capacity of the DepEd Bureau of Alternative Education (BAE) in developing "
+                         "and implementing of localized Social Behavior Change (SBC) Strategies to "
+                         "increase enrolment in and improve local support for the Alternative Learning System",
                 "result_link": 217,
                 "cp_output": {
                     "id": 700,
@@ -214,7 +216,8 @@ def item_reference():
                         "title": "Number of youth-led advocacy plans developed",
                         "blueprint_id": 1310,
                         "cluster_indicator_id": None,
-                        "means_of_verification": "School Division-level ALS SBC Strategies (Implementation details (including fund source, key actors, workplan, etc.) will be part of the plan itself)",
+                        "means_of_verification": "School Division-level ALS SBC Strategies (Implementation details "
+                                                 "(including fund source, key actors, workplan, etc.) will be part of the plan itself)",
                         "baseline": {
                             "d": 1,
                             "v": "0"
@@ -267,10 +270,13 @@ def item_reference():
                 "indicators": [
                     {
                         "id": 1428,
-                        "title": "Percentage of Out-of-School Children, Youth, and Adults (OSCYA) and/or parents/guardians reached with increased interest in ALS enrolment",
+                        "title": "Percentage of Out-of-School Children, Youth, and Adults (OSCYA) and/or "
+                                 "parents/guardians reached with increased interest in ALS enrolment",
                         "blueprint_id": 1311,
                         "cluster_indicator_id": None,
-                        "means_of_verification": "Baseline data compared with ALS SDO Reports (Note: estimates on OSCYA numbers and disaggregation will be taken from existing locally generated reports, if available) - see details in approved RM",
+                        "means_of_verification": "Baseline data compared with ALS SDO Reports (Note: estimates on "
+                                                 "OSCYA numbers and disaggregation will be taken from existing "
+                                                 "locally generated reports, if available) - see details in approved RM",
                         "baseline": {
                             "d": 100,
                             "v": 0
@@ -315,7 +321,8 @@ def item_reference():
                         "title": "% of barangays covered with written expressions of support for ALS at the LGU level",
                         "blueprint_id": 1312,
                         "cluster_indicator_id": None,
-                        "means_of_verification": "Written expression of commitments/ petitions to LGUs (Written official expressions of commitment may be in the form of letters, policy documents, etc.)",
+                        "means_of_verification": "Written expression of commitments/ petitions to LGUs (Written official "
+                                                 "expressions of commitment may be in the form of letters, policy documents, etc.)",
                         "baseline": {
                             "d": 100,
                             "v": 0
@@ -368,10 +375,12 @@ def item_reference():
                 "indicators": [
                     {
                         "id": 1430,
-                        "title": "Project achieved intended results and completed on time and within budget (Project technical support, coordination, and administrative costs) via quarterly reports",
+                        "title": "Project achieved intended results and completed on time and within budget (Project "
+                                 "technical support, coordination, and administrative costs) via quarterly reports",
                         "blueprint_id": 1313,
                         "cluster_indicator_id": None,
-                        "means_of_verification": "Timely completion of activities; documentation/reports with clear evidence of success to inform national scale up",
+                        "means_of_verification": "Timely completion of activities; documentation/reports with clear "
+                                                 "evidence of success to inform national scale up",
                         "baseline": {
                             "d": 1,
                             "v": "0"
@@ -422,7 +431,9 @@ def item_reference():
             },
             {
                 "id": 564,
-                "title": "PD Output 1: Enhanced capacity of the the Ministry of Basic, Higher, and Technical Education (MBHTE)  in developing and implementing of localized Social Behavior Change (SBC) Strategies to increase enrolment in and improve local support for the Alternative Learning System",
+                "title": "PD Output 1: Enhanced capacity of the the Ministry of Basic, Higher, and Technical Education "
+                         "(MBHTE)  in developing and implementing of localized Social Behavior Change (SBC) Strategies "
+                         "to increase enrolment in and improve local support for the Alternative Learning System",
                 "result_link": 257,
                 "cp_output": {
                     "id": 701,
