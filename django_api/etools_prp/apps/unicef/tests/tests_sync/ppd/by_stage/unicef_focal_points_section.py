@@ -1,6 +1,6 @@
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.unicef.models import Person
-from etools_prp.apps.unicef.ppd_sync.person_related.update_create_unicef_focal_points import (
+from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner

@@ -12,10 +12,15 @@ class TestCreateUpdatePartner(BaseAPITestCase):
          _item) = (
             item_reference())
 
+        # Creating static object [filter], before executing
         partner_qs = Partner.objects.filter(vendor_number=_item["partner_org"]['unicef_vendor_number'])
+
+        # Executing search on filter
+        self.assertFalse(partner_qs.exists())
 
         _item, partner = update_create_partner(_item)
 
+        # Executing search on filter, now, as we have that object created
         self.assertTrue(partner_qs.exists())
 
     def test_create_update_partner_returns_none_when_partner_org_incomplete(self):

@@ -1,9 +1,9 @@
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.unicef.models import Person
-from etools_prp.apps.unicef.ppd_sync.person_related.update_create_agreement_auth_officers import (
+from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_agreement_auth_officers,
 )
-from etools_prp.apps.unicef.ppd_sync.person_related.update_create_unicef_focal_points import (
+from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
@@ -26,6 +26,8 @@ class TestCreateUpdateAgreementAuthOfficers(BaseAPITestCase):
         pd = update_create_unicef_focal_points(_item['unicef_focal_points'], pd)
 
         person_aao_qs = Person.objects.filter(email=_item['agreement_auth_officers'][0]['email'])
+
+        self.assertFalse(person_aao_qs.exists())
 
         pd = update_create_agreement_auth_officers(_item['agreement_auth_officers'], pd, _workspace, partner)
 
