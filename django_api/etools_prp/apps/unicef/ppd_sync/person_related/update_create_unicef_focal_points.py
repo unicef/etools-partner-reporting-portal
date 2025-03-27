@@ -19,4 +19,6 @@ def update_create_unicef_focal_points(unicef_focal_points: dict, pd: ProgrammeDo
 
         pd.unicef_focal_point.add(unicef_focal_point)
 
+    pd.unicef_focal_point.all().update(active=False)
+
     return pd

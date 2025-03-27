@@ -11,17 +11,17 @@ from etools_prp.apps.unicef.ppd_sync.utils import save_person_and_user
 logger = logging.getLogger(__name__)
 
 
-def update_create_focal_points(focal_points: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
+def update_create_agreement_auth_officers(agreement_auth_officers: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
 
-    # Create focal_points
-    for person_data in focal_points:
+    # Create agreement_auth_officers
+    for person_data in agreement_auth_officers:
         person, user = save_person_and_user(person_data, create_user=True)
         if not person:
             continue
 
         person.active = True
         person.save()
-        pd.partner_focal_point.add(person)
+        pd.unicef_officers.add(person)
 
         user.partner = partner
         user.save()
@@ -41,5 +41,7 @@ def update_create_focal_points(focal_points: dict, pd: ProgrammeDocument, worksp
         if not created and obj.is_active and is_active is False:
             obj.is_active = is_active
             obj.save()
+
+    pd.unicef_officers.all().update(active=False)
 
     return pd

@@ -33,10 +33,6 @@ def update_create_pd(item: Any, workspace: Workspace) -> (Optional[Any], Optiona
             }
         )
 
-        pd.unicef_focal_point.all().update(active=False)
-        pd.unicef_officers.all().update(active=False)
-        pd.partner_focal_point.all().update(active=False)
-
         return item, pd
     except KeyError as e:
         logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
