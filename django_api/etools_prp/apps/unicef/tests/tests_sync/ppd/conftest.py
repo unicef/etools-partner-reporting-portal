@@ -354,7 +354,29 @@ def item_reference():
                                 "admin_level": 2
                             }
                         ],
-                        "disaggregation": [],
+                        'disaggregation': [
+                            {
+                                'id': 1,
+                                'name': 'Gender',
+                                'disaggregation_values': [
+                                    {
+                                        'value': 'Male',
+                                        'active': True,
+                                        'id': 1
+                                    },
+                                    {
+                                        'value': 'Female',
+                                        'active': True,
+                                        'id': 2
+                                    },
+                                    {
+                                        'value': 'Other',
+                                        'active': True,
+                                        'id': 3
+                                    }
+                                ]
+                            }
+                        ],
                         "is_high_frequency": False,
                         "is_active": True,
                         "numerator_label": "barangays",
