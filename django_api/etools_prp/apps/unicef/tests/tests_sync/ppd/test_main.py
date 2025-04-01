@@ -117,5 +117,6 @@ class TestMain(BaseAPITestCase):
 
                 # # # Reportable Location Goal step testing
                 for location in indicator["locations"]:
-                    reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(location__name=location['name'], reportable=reportable_qs_index[0])
+                    reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(location__name=location['name'],
+                                                                                              reportable=reportable_qs_index[0])
                     self.assertTrue(reportable_location_goal_qs_index.exists())
