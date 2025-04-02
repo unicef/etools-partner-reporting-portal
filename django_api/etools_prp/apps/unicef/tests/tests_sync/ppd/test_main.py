@@ -22,11 +22,82 @@ from etools_prp.apps.unicef.tasks import process_programme_documents
 from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import item_reference
 
 
-class TestMain(BaseAPITestCase):
+def _for_loop_reporting_period_dates_qpr_n_hr(reporting_requirements):
+    for reporting_requirement in reporting_requirements:
+
+        reporting_period_date_qpr_n_hr_qs_index = ReportingPeriodDates.objects.filter(external_id=reporting_requirement['id'])
+        if not reporting_period_date_qpr_n_hr_qs_index.exists():
+            return False
+
+    return True
+
+
+def _for_loop_pd_result_links_and_llos(expected_results):
+    for expected_result in expected_results:
+
+        # # PD Result Link step testing
+        pd_result_link_qs_index = PDResultLink.objects.filter(external_id=expected_result['result_link'])
+        if not pd_result_link_qs_index.exists():
+            return False
+
+        # # LLO step testing
+        llo_qs_index = LowerLevelOutput.objects.filter(external_id=expected_result['id'])
+        if not llo_qs_index.exists():
+            return False
+
+    return True
+
+
+def _for_loop_indicators(expected_results):
+    for expected_result in expected_results:
+        for indicator in expected_result['indicators']:
+
+            # # # Indicator Blueprint step testing
+            indicator_blueprint_qs_index = IndicatorBlueprint.objects.filter(title=indicator['title'])
+            if not indicator_blueprint_qs_index.exists():
+                return False
+
+            # # # Locations step testing
+            for location in indicator["locations"]:
+                location_qs_index = Location.objects.filter(name=location['name'], p_code=location['p_code'])
+                if not location_qs_index.exists():
+                    return False
+
+            for disaggregation in indicator["disaggregation"]:
+
+                # # # Disaggregations step testing
+                disaggregation_qs_index = Disaggregation.objects.filter(name=disaggregation['name'])
+                if not disaggregation_qs_index.exists():
+                    return False
+
+                for disaggregation_value in disaggregation["disaggregation_values"]:
+                    # # # Disaggregation Values step testing
+                    disaggregation_value_qs_index = DisaggregationValue.objects.filter(
+                        value=disaggregation_value['value'])
+                    if not disaggregation_value_qs_index.exists():
+                        return False
+
+            # # # Reportable step testing
+            reportable_qs_index = Reportable.objects.filter(external_id=indicator['id'])
+            if not reportable_qs_index.exists():
+                return False
+
+            # # # Reportable Location Goal step testing
+            for location in indicator["locations"]:
+                reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(
+                    location__name=location['name'],
+                    reportable=reportable_qs_index[0])
+                if not reportable_location_goal_qs_index.exists():
+                    return False
+
+    return True
+
+
+class TestProcessProgrammeDocuments(BaseAPITestCase):
 
     # Test for non-cluster-indicator-containing object
     @patch('etools_prp.apps.unicef.tasks.PMP_API')
-    def test_main(self, simulation_pmp_api_programme_documents):
+    def test_process_programme_documents(self, simulation_pmp_api_programme_documents):
 
         (_workspace,
          _item) = (
@@ -67,56 +138,14 @@ class TestMain(BaseAPITestCase):
         self.assertTrue(section_qs.exists())
 
         # Reporting period dates QPR and HR section testing
-        for reporting_requirement in _item['reporting_requirements']:
-            reporting_period_date_qpr_n_hr_qs_index = ReportingPeriodDates.objects.filter(external_id=reporting_requirement['id'])
-            self.assertTrue(reporting_period_date_qpr_n_hr_qs_index.exists())
+        self.assertTrue(_for_loop_reporting_period_dates_qpr_n_hr(_item['reporting_requirements']))
 
         # Reporting period dates SR section testing
         reporting_period_date_sr_qs = ReportingPeriodDates.objects.filter(external_id=_item['special_reports'][0]['id'])
         self.assertTrue(reporting_period_date_sr_qs.exists())
 
         # # Expected results loop testing
-        for expected_result in _item['expected_results']:
-
-            # # PD Result Link step testing
-            pd_result_link_qs_index = PDResultLink.objects.filter(external_id=expected_result['result_link'])
-            self.assertTrue(pd_result_link_qs_index.exists())
-
-            # # LLO step testing
-            llo_qs_index = LowerLevelOutput.objects.filter(external_id=expected_result['id'])
-            self.assertTrue(llo_qs_index.exists())
+        self.assertTrue(_for_loop_pd_result_links_and_llos(_item['expected_results']))
 
         # # # Indicators loop testing
-        for expected_result in _item['expected_results']:
-            for indicator in expected_result['indicators']:
-
-                # # # Indicator Blueprint step testing
-                indicator_blueprint_qs_index = IndicatorBlueprint.objects.filter(title=indicator['title'])
-                self.assertTrue(indicator_blueprint_qs_index.exists())
-
-                # # # Locations step testing
-                for location in indicator["locations"]:
-                    location_qs_index = Location.objects.filter(name=location['name'], p_code=location['p_code'])
-                    self.assertTrue(location_qs_index.exists())
-
-                for disaggregation in indicator["disaggregation"]:
-
-                    # # # Disaggregations step testing
-                    disaggregation_qs_index = Disaggregation.objects.filter(name=disaggregation['name'])
-                    self.assertTrue(disaggregation_qs_index.exists())
-
-                    for disaggregation_value in disaggregation["disaggregation_values"]:
-
-                        # # # Disaggregation Values step testing
-                        disaggregation_value_qs_index = DisaggregationValue.objects.filter(value=disaggregation_value['value'])
-                        self.assertTrue(disaggregation_value_qs_index.exists())
-
-                # # # Reportable step testing
-                reportable_qs_index = Reportable.objects.filter(external_id=indicator['id'])
-                self.assertTrue(reportable_qs_index.exists())
-
-                # # # Reportable Location Goal step testing
-                for location in indicator["locations"]:
-                    reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(location__name=location['name'],
-                                                                                              reportable=reportable_qs_index[0])
-                    self.assertTrue(reportable_location_goal_qs_index.exists())
+        self.assertTrue(_for_loop_indicators(_item['expected_results']))
