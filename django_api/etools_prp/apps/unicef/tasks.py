@@ -37,6 +37,10 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
+    update_create_qpr_n_hr_date_periods,
+    update_create_sr_date_periods,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -44,6 +48,7 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_focal_points,
     update_create_unicef_focal_points,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
@@ -156,51 +161,13 @@ def process_programme_documents(fast=False, area=False):
                         pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
                         # Create sections
-                        section_data_list = item['sections']
-                        for section_data in section_data_list:
-                            section_data['external_business_area_code'] = workspace.business_area_code
-                            section = process_model(
-                                Section, PMPSectionSerializer, section_data, {
-                                    'external_id': section_data['id'],
-                                    'external_business_area_code': workspace.business_area_code,
-                                }
-                            )  # Is section unique globally or per workspace?
-                            pd.sections.add(section)
+                        item, pd = update_create_section(item, pd, workspace)
 
                         # Create Reporting Date Periods for QPR and HR report type
-                        reporting_requirements = item['reporting_requirements']
-                        for reporting_requirement in reporting_requirements:
-                            reporting_requirement['programme_document'] = pd.id
-                            reporting_requirement['external_business_area_code'] = workspace.business_area_code
-                            process_model(
-                                ReportingPeriodDates,
-                                PMPReportingPeriodDatesSerializer,
-                                reporting_requirement,
-                                {
-                                    'external_id': reporting_requirement['id'],
-                                    'report_type': reporting_requirement['report_type'],
-                                    'programme_document': pd.id,
-                                    'external_business_area_code': workspace.business_area_code,
-                                },
-                            )
+                        item = update_create_qpr_n_hr_date_periods(item, pd, workspace)
 
                         # Create Reporting Date Periods for SR report type
-                        special_reports = item['special_reports'] if 'special_reports' in item else []
-                        for special_report in special_reports:
-                            special_report['programme_document'] = pd.id
-                            special_report['report_type'] = 'SR'
-                            special_report['external_business_area_code'] = workspace.business_area_code
-                            process_model(
-                                ReportingPeriodDates,
-                                PMPReportingPeriodDatesSRSerializer,
-                                special_report,
-                                {
-                                    'external_id': special_report['id'],
-                                    'report_type': 'SR',
-                                    'programme_document': pd.id,
-                                    'external_business_area_code': workspace.business_area_code,
-                                },
-                            )
+                        item = update_create_sr_date_periods(item, pd, workspace)
 
                         if item['status'] not in ("draft", "signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
