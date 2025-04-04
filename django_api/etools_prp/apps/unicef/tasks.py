@@ -41,6 +41,8 @@ from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import update_create_expected_result_llos, \
+    update_create_expected_result_rl
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -49,6 +51,7 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
+from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
@@ -170,47 +173,18 @@ def process_programme_documents(fast=False, area=False):
                         item = update_create_sr_date_periods(item, pd, workspace)
 
                         if item['status'] not in ("draft", "signed",):
-                            # Mark all LLO/reportables assigned to this PD as inactive
-                            llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
-                            llos.update(active=False)
-                            Reportable.objects.filter(lower_level_outputs__in=llos).update(active=False)
 
-                            # Mark all ReportableLocationGoal instances referred in LLO Reportables as inactive
-                            ReportableLocationGoal.objects.filter(reportable__lower_level_outputs__in=llos).update(is_active=False)
+                            # Update LLOs and Reportable entities
+                            update_llos_and_reportables(pd)
 
                             # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
+
                                 # Create PDResultLink
-                                rl = d['cp_output']
-                                rl['programme_document'] = pd.id
-                                rl['result_link'] = d['result_link']
-                                rl['external_business_area_code'] = workspace.business_area_code
-                                pdresultlink = process_model(
-                                    PDResultLink, PMPPDResultLinkSerializer,
-                                    rl, {
-                                        'external_id': rl['result_link'],
-                                        'external_cp_output_id': rl['id'],
-                                        'programme_document': pd.id,
-                                        'external_business_area_code': workspace.business_area_code,
-                                    }
-                                )
+                                pdresultlink = update_create_expected_result_rl(d, workspace, pd)
 
                                 # Create LLO
-                                d['cp_output'] = pdresultlink.id
-                                d['external_business_area_code'] = workspace.business_area_code
-
-                                llo = process_model(
-                                    LowerLevelOutput, PMPLLOSerializer, d,
-                                    {
-                                        'external_id': d['id'],
-                                        'cp_output__programme_document': pd.id,
-                                        'external_business_area_code': workspace.business_area_code,
-                                    }
-                                )
-
-                                # Mark LLO as active
-                                llo.active = True
-                                llo.save()
+                                d, llo = update_create_expected_result_llos(d, workspace, pd, pdresultlink)
 
                                 # Iterate over indicators
                                 for i in d['indicators']:
