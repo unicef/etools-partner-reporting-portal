@@ -113,3 +113,5 @@ class TestPDItem(BaseAPITestCase):
         item = update_create_sr_date_periods(item, pd, _workspace)
 
         self.assertTrue(reporting_period_date_sr_qs.exists())
+
+        # Indicator for loop
