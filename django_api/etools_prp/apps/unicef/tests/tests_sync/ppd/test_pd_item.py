@@ -20,8 +20,10 @@ from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import update_create_expected_result_rl, \
-    update_create_expected_result_llos
+from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
+    update_create_expected_result_llos,
+    update_create_expected_result_rl,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
