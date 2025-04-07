@@ -56,7 +56,7 @@ def _for_loop_pd_result_links_and_llos(expected_results, flag_needs_not_to_exist
     for expected_result in expected_results:
 
         # # PD Result Link step testing
-        pd_result_link_qs_index = PDResultLink.objects.filter(external_id=expected_result['id'])
+        pd_result_link_qs_index = PDResultLink.objects.filter(external_id=expected_result['result_link'])
 
         if flag_needs_not_to_exist and pd_result_link_qs_index.exists():
             return True
@@ -64,7 +64,7 @@ def _for_loop_pd_result_links_and_llos(expected_results, flag_needs_not_to_exist
             return False
 
         # # LLO step testing
-        llo_qs_index = LowerLevelOutput.objects.filter(external_id=expected_result['id'])
+        llo_qs_index = LowerLevelOutput.objects.filter(external_id=expected_result['id'], active=True)
 
         if flag_needs_not_to_exist and llo_qs_index.exists():
             return True
@@ -226,7 +226,7 @@ class TestPDItem(BaseAPITestCase):
         # Expected results loop section
         if item['status'] not in ("draft", "signed",):
 
-            self.assertFalse(_for_loop_pd_result_links_and_llos(_item['reporting_requirements'], True))
+            self.assertFalse(_for_loop_pd_result_links_and_llos(_item['expected_results'], True))
 
             # Update LLOs and Reportable entities
             update_llos_and_reportables(pd)
@@ -239,4 +239,4 @@ class TestPDItem(BaseAPITestCase):
                 # Create LLO
                 d, llo = update_create_expected_result_llos(d, _workspace, pd, pdresultlink)
 
-            self.assertFalse(_for_loop_pd_result_links_and_llos(_item['reporting_requirements']))
+            self.assertTrue(_for_loop_pd_result_links_and_llos(_item['expected_results']))
