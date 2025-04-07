@@ -41,7 +41,7 @@ def _for_loop_pd_result_links_and_llos(expected_results):
             return False
 
         # # LLO step testing
-        llo_qs_index = LowerLevelOutput.objects.filter(external_id=expected_result['id'])
+        llo_qs_index = LowerLevelOutput.objects.filter(external_id=expected_result['id'], active=True)
         if not llo_qs_index.exists():
             return False
 
