@@ -1,145 +1,181 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route';
-import '@polymer/app-layout/app-drawer-layout/app-drawer-layout';
-import '@polymer/app-layout/app-drawer/app-drawer';
-import '@polymer/app-layout/app-header/app-header';
-import '@polymer/app-layout/app-toolbar/app-toolbar';
-import '@polymer/iron-pages/iron-pages';
-import '../../elements/ip-reporting/nav';
-import '../../elements/ip-reporting/app-header';
-import '../../etools-prp-common/elements/page-title';
-import {appThemeIpStyles} from '../../styles/app-theme-ip-styles';
-import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/iron-overlay-behavior/iron-overlay-backdrop';
+import {LitElement, html, css} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-drawer-layout.js';
+import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-drawer.js';
+import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header-layout.js';
+import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header.js';
 
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import OverlayHelperMixin from '../../etools-prp-common/mixins/overlay-helper-mixin';
-import {getDomainByEnv} from '../../etools-prp-common/config';
+import '../../elements/ip-reporting/header/app-header.js';
+import '../../etools-prp-common/elements/page-title.js';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PageIpReporting extends OverlayHelperMixin(LocalizeMixin(UtilsMixin(ReduxConnectedElement))) {
-  static get template() {
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin.js';
+import {Route} from '../../etools-prp-common/typings/globals.types.js';
+import {RootState} from '../../typings/redux.types.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {store} from '../../redux/store.js';
+import {connect, installMediaQueryWatcher} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import '../../elements/ip-reporting/menu/app-menu.js';
+import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
+import {SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY} from '../../etools-prp-common/config.js';
+import {appDrawerStyles} from '../../elements/ip-reporting/menu/styles/app-drawer-styles.js';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+// import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
+
+@customElement('page-ip-reporting')
+export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = [
+    css`
+      ${appDrawerStyles}
+
+      :host {
+        display: block;
+      }
+
+      app-toolbar {
+        background: var(--theme-primary-color);
+      }
+      .mode {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--theme-primary-text-color-light);
+        cursor: default;
+        user-select: none;
+      }
+      .content-align {
+        display: flex;
+        align-items: center;
+      }
+      #page-container {
+        margin-left: -30px;
+      }
+      #pageOverlay.opened {
+        opacity: 0.6 !important;
+        transition: opacity 0.2s linear;
+      }
+    `
+  ];
+
+  @property({type: String})
+  page = '';
+
+  @property({type: Boolean})
+  narrow = true;
+
+  @property({type: Boolean})
+  drawerOpened = false;
+
+  @property({type: Boolean})
+  smallMenu: boolean;
+
+  @property({type: Object})
+  route!: Route;
+
+  @property({type: Object})
+  routeData!: {page: string};
+
+  @query('#drawer') private drawer!: LitElement;
+
+  constructor() {
+    super();
+    const menuTypeStoredVal: string | null = localStorage.getItem(SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY);
+    if (!menuTypeStoredVal) {
+      this.smallMenu = false;
+    } else {
+      this.smallMenu = !!parseInt(menuTypeStoredVal, 10);
+    }
+  }
+
+  render() {
     return html`
-      ${appThemeIpStyles}
-      <style>
-        :host {
-          display: block;
-        }
-        app-drawer {
-          --app-drawer-width: 225px;
-          --app-drawer-content-container: {
-            box-shadow: 1px 0 2px 1px rgba(0, 0, 0, 0.1);
-          }
-          z-index: 0 !important;
-        }
-        app-toolbar {
-          background: var(--theme-primary-color);
-        }
-        .mode {
-          font-size: 16px;
-          text-transform: uppercase;
-          color: var(--theme-primary-text-color-light);
-          cursor: default;
-          user-select: none;
-        }
-        .content-align {
-          @apply --layout-horizontal;
-          @apply --layout-center;
-        }
-        #page-container {
-          margin-left: -30px;
-        }
-        #pageOverlay.opened {
-          opacity: 0.6 !important;
-          transition: opacity 0.2s linear;
-        }
-      </style>
+      <page-title .title="${translate('IP_REPORTING')}"></page-title>
 
-      <page-title title="[[localize('ip_reporting')]]"></page-title>
-
-      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"> </app-route>
-
-      <app-drawer-layout fullbleed responsive-width="0px">
-        <app-drawer id="drawer" slot="drawer">
-          <app-header fixed>
-            <app-toolbar sticky class="content-align">
-              <div class="mode">
-                IP
-                <br />
-                Reporting
-              </div>
-            </app-toolbar>
-          </app-header>
-
-          <ip-reporting-nav selected="{{page}}" role="navigation"> </ip-reporting-nav>
+      <app-drawer-layout
+        id="layout"
+        responsive-width="850px"
+        fullbleed
+        ?narrow="${this.narrow}"
+        ?small-menu="${this.smallMenu}"
+      >
+        <!-- Drawer content -->
+        <app-drawer
+          id="drawer"
+          slot="drawer"
+          transition-duration="350"
+          @app-drawer-transitioned="${this.onDrawerToggle}"
+          ?opened="${this.drawerOpened}"
+          ?swipe-open="${this.narrow}"
+          ?small-menu="${this.smallMenu}"
+        >
+          <!-- App main menu(left sidebar) -->
+          <app-menu .selectedOption="${this.page}" ?small-menu="${this.smallMenu}"></app-menu>
         </app-drawer>
 
-        <main role="main" id="page-container">
-          <iron-overlay-backdrop id="pageOverlay"></iron-overlay-backdrop>
-
+        <!-- Main content -->
+        <app-header-layout id="appHeadLayout" fullbleed has-scrolling-region>
           <ip-reporting-app-header></ip-reporting-app-header>
 
-          <iron-pages selected="[[page]]" attr-for-selected="name">
-            <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
-              <page-ip-reporting-overview name="overview" route="{{subroute}}"> </page-ip-reporting-overview>
-            </template>
-
-            <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
-              <page-ip-reporting-pd name="pd" route="{{subroute}}"> </page-ip-reporting-pd>
-            </template>
-
-            <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
-              <page-ip-reporting-indicators name="indicators" route="{{subroute}}"> </page-ip-reporting-indicators>
-            </template>
-
-            <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
-              <page-ip-progress-reports name="progress-reports" route="{{subroute}}"> </page-ip-progress-reports>
-            </template>
-          </iron-pages>
-        </main>
+          ${this._equals(this.page, 'overview')
+            ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
+            : ''}
+          ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
+          ${this._equals(this.page, 'indicators')
+            ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
+            : ''}
+          ${this._equals(this.page, 'progress-reports')
+            ? html` <page-ip-progress-reports name="progress-reports"> </page-ip-progress-reports>`
+            : ''}
+        </app-header-layout>
       </app-drawer-layout>
     `;
   }
 
-  @property({type: String, observer: '_pageChanged'})
-  page!: string;
+  stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      if (state.app.routeDetails.subRouteName !== 'ip-reporting') {
+        return;
+      }
 
-  static get observers() {
-    return ['_routePageChanged(routeData.page)'];
-  }
-
-  _routePageChanged(page: string) {
-    if (!page) {
-      this.set('route.path', '/overview'); // FIXME: correct default?
-    } else {
-      this.page = page;
+      if (!state.app.routeDetails.subSubRouteName && state.workspaces.current) {
+        EtoolsRouter.updateAppLocation([state.workspaces.baseUrl, 'overview'].join('/'));
+      } else if (
+        state.app.routeDetails.subSubRouteName &&
+        !['overview', 'progress-reports', 'indicators', 'pd'].includes(state.app.routeDetails.subSubRouteName as string)
+      ) {
+        EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
+        return;
+      } else {
+        this.page = state.app.routeDetails.subSubRouteName || '';
+      }
     }
-  }
-
-  async _pageChanged(page: string) {
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/${page}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
-  }
-
-  _notFound() {
-    window.location.href = '/not-found';
   }
 
   connectedCallback() {
     super.connectedCallback();
+    this.addEventListener('change-drawer-state', this.changeDrawerState);
+    this.addEventListener('app-drawer-transitioned', this.syncWithDrawerState);
+    this.addEventListener('toggle-small-menu', this.toggleMenu as any);
+    installMediaQueryWatcher(`(min-width: 460px)`, () => fireEvent(this, 'change-drawer-state'));
+  }
+
+  public changeDrawerState() {
+    this.drawerOpened = !this.drawerOpened;
+  }
+
+  public syncWithDrawerState() {
+    this.drawerOpened = Boolean((this.shadowRoot?.querySelector('#drawer') as any).opened);
+  }
+
+  public onDrawerToggle() {
+    if (this.drawerOpened !== (this.drawer as any).opened) {
+      this.drawerOpened = Boolean((this.drawer as any).opened);
+    }
+  }
+
+  public toggleMenu(e: CustomEvent) {
+    this.smallMenu = e.detail.value;
   }
 }
-window.customElements.define('page-ip-reporting', PageIpReporting);
 
 export {PageIpReporting as PageIpReportingEl};

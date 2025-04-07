@@ -1,108 +1,125 @@
-import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators/lib/decorators';
-import '@polymer/paper-tabs/paper-tab';
-import '@polymer/paper-tabs/paper-tabs';
-import '@polymer/iron-pages/iron-pages';
-import '../../../../etools-prp-common/elements/page-body';
-import '../../../../etools-prp-common/elements/page-header';
-import '../../../../etools-prp-common/elements/message-box';
-import '../../../../elements/ip-reporting/pd-details-overview';
-import '../../../../elements/ip-reporting/pd-details-reports';
-import '../../../../elements/ip-reporting/pd-details-calculation-methods';
+import {LitElement, html, css, TemplateResult} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles.js';
+import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments.js';
+import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
+import '../../../../etools-prp-common/elements/page-body.js';
+import '../../../../etools-prp-common/elements/page-header.js';
+import '../../../../etools-prp-common/elements/message-box.js';
+import '../../../../elements/ip-reporting/pd-details-overview.js';
+import '../../../../elements/ip-reporting/pd-details-reports.js';
+import '../../../../elements/ip-reporting/pd-details-calculation-methods.js';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
+import {RootState} from '../../../../typings/redux.types.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../../../redux/store.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../../etools-prp-common/typings/globals.types';
-import {sharedStyles} from '../../../../etools-prp-common/styles/shared-styles';
-import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments';
-import {RootState} from '../../../../typings/redux.types';
-import {IronPagesElement} from '@polymer/iron-pages/iron-pages';
+const DETAILS = 'details';
+const REPORTS = 'reports';
+const CALCULATION_METHODS = 'calculation_methods';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
- * @appliesMixin UtilsMixin
- */
-class PageIpReportingPdDetails extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
+const NAVIGATION_TABS: any[] = [
+  {
+    tab: DETAILS,
+    tabLabel: translate('DETAILS') as any as string,
+    hidden: false
+  },
+  {
+    tab: REPORTS,
+    tabLabel: translate('REPORTS') as any as string,
+    hidden: false
+  },
+  {
+    tab: CALCULATION_METHODS,
+    tabLabel: translate('CALCULATION_METHODS') as any as string,
+    hidden: false
+  }
+];
+
+@customElement('page-ip-reporting-pd-details')
+export class PageIpReportingPdDetails extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+    .header-content {
+      margin: 0.5em 0;
+    }
+  `;
+
+  @property({type: String})
+  pagePath = '';
+
+  @property({type: Object})
+  pd: any = {};
+
+  @property()
+  activeTab: string = DETAILS;
+
+  @property()
+  pageTabs: any[] = NAVIGATION_TABS;
+
+  @property({type: Object})
+  pdQuery = {status: String(['signed', 'active', 'suspended'])};
+
+  render() {
     return html`
       ${sharedStyles}
-      <style>
-        :host {
-          display: block;
-        }
 
-        .header-content {
-          margin: 0.5em 0;
-        }
-      </style>
+      <page-header title="${this.pd.title}" back="${this._appendQuery('pd', this.pdQuery)}">
+        ${this.pd?.status === 'Suspended'
+          ? html` <message-box slot="header-content" type="warning">
+              PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
+            </message-box>`
+          : html``}
 
-      <app-route route="{{route}}" pattern="/:dashTab" data="{{routeData}}"> </app-route>
-
-      <page-header title="[[pd.title]]" back="pd?&status=Sig%2CAct%2CSus">
-        <template is="dom-if" if="[[_equals(pd.status, 'Suspended')]]" restamp="true">
-          <message-box slot="header-content" type="warning">
-            PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
-          </message-box>
-        </template>
-
-        <div slot="tabs">
-          <paper-tabs selected="{{routeData.dashTab}}" attr-for-selected="name" scrollable hide-scroll-buttons>
-            <paper-tab name="details">[[localize('details')]]</paper-tab>
-            <paper-tab name="reports">[[localize('reports')]]</paper-tab>
-            <paper-tab name="calculation-methods">[[localize('calculation_methods')]]</paper-tab>
-          </paper-tabs>
-        </div>
+        <etools-tabs-lit
+          id="tabs"
+          slot="tabs"
+          .tabs="${this.pageTabs}"
+          @sl-tab-show="${({detail}: any) => this.onTabSelect(detail.name)}"
+          .activeTab="${this.activeTab}"
+        ></etools-tabs-lit>
       </page-header>
 
-      <iron-pages
-        id="tabContent"
-        attr-for-selected="name"
-        fallback-selection="details"
-        on-iron-items-changed="_updateTabSelection"
-      >
-        <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details"></pd-details-overview>
-        </template>
-
-        <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports"></pd-details-reports>
-        </template>
-
-        <template is="dom-if" if="[[_equals(pdTab, 'calculation-methods')]]" restamp="true">
-          <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods>
-        </template>
-      </iron-pages>
+      ${this.getTabElement()}
     `;
   }
 
-  @property({type: String})
-  pdTab!: string;
-
-  @property({type: Object})
-  routeData!: GenericObject;
-
-  @property({type: Object, computed: '_currentProgrammeDocument(rootState)'})
-  pd: GenericObject = {};
-
-  public static get observers() {
-    return ['_updateUrlTab(routeData.dashTab)'];
+  stateChanged(state: RootState) {
+    if (this.state !== currentProgrammeDocument(state)) {
+      this.pd = currentProgrammeDocument(state);
+    }
+    if (state.app.routeDetails.params) {
+      if (!isJsonStrMatch(this.activeTab, state.app.routeDetails.params.activeTab)) {
+        this.activeTab = String(state.app.routeDetails.params.activeTab);
+      }
+      if (!isJsonStrMatch(this.pagePath, state.app.routeDetails.path)) {
+        this.pagePath = state.app.routeDetails.path;
+      }
+    }
   }
 
-  _updateTabSelection() {
-    (this.$.tabContent as IronPagesElement).select(this.pdTab);
+  onTabSelect(newTabName: string): void {
+    if (this.activeTab === newTabName) {
+      return;
+    }
+    EtoolsRouter.updateAppLocation(this.pagePath.replace(this.activeTab, newTabName));
   }
 
-  _updateUrlTab(dashTab: string) {
-    this.set('pdTab', dashTab);
-  }
-
-  _currentProgrammeDocument(rootState: RootState) {
-    return currentProgrammeDocument(rootState);
+  getTabElement(): TemplateResult {
+    switch (this.activeTab) {
+      case DETAILS:
+        return html` <pd-details-overview name="details"></pd-details-overview> `;
+      case REPORTS:
+        return html` <pd-details-reports name="reports"></pd-details-reports> `;
+      case CALCULATION_METHODS:
+        return html` <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods> `;
+      default:
+        return html` Tab Not Found `;
+    }
   }
 }
-
-window.customElements.define('page-ip-reporting-pd-details', PageIpReportingPdDetails);

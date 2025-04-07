@@ -1,93 +1,43 @@
-import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route';
-import '@polymer/iron-pages/iron-pages';
-import '@polymer/paper-toast/paper-toast';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-toasts/etools-toasts';
+import UtilsMixin from '../etools-prp-common/mixins/utils-mixin.js';
+import Endpoints from '../endpoints.js';
+import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions.js';
+import {fetchCurrencies} from '../redux/actions/currencies.js';
+import {Route} from '../etools-prp-common/typings/globals.types.js';
+import {locationSet} from '../redux/actions/location.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../redux/store.js';
+import {RootState} from '../typings/redux.types.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
+import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
+import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
-import '../elements/etools-prp-workspaces';
-import '../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
-import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
-import Endpoints from '../endpoints';
-import {fetchWorkspaces, setWorkspace, fetchUserProfile, setApp} from '../redux/actions';
-import {fetchCurrencies} from '../redux/actions/currencies';
-import {GenericObject, Route} from '../etools-prp-common/typings/globals.types';
-import '../pages/app/ip-reporting';
-import {locationSet} from '../redux/actions/location';
-import {getDomainByEnv} from '../etools-prp-common/config';
-// import {reset} from '../redux/actions';  (dci) TODO check use of reset
+@customElement('page-app')
+export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
+    .no-groups-notification {
+      margin-top: 20%;
+      width: 100%;
+      text-align: center;
+    }
 
-        .no-groups-notification {
-          margin-top: 20%;
-          width: 100%;
-          text-align: center;
-        }
+    .no-groups-notification h3 {
+      font-size: 36px;
+    }
 
-        .no-groups-notification h3 {
-          font-size: 36px;
-        }
-
-        .no-groups-notification p {
-          font-size: 24px;
-        }
-      </style>
-
-      <etools-prp-workspaces id="workspaces" all="{{workspaces}}" current="{{currentWorkspace}}">
-      </etools-prp-workspaces>
-
-      <etools-prp-ajax id="interventions" url="[[interventionsUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="currenciesData" url="[[currenciesUrl]]"> </etools-prp-ajax>
-
-      <app-route route="{{route}}" pattern="/:workspace_code/:app" data="{{routeData}}" tail="{{subroute}}">
-      </app-route>
-
-      <template is="dom-if" if="[[!userHasPrpRolesOrAccess]]">
-        <div class="no-groups-notification">
-          <h3>[[localize('account_created')]]</h3>
-          <p>[[localize('please_wait_business_days')]]</p>
-        </div>
-      </template>
-
-      <iron-pages selected="[[page]]" attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
-          <page-ip-reporting name="ip-reporting" route="{{subroute}}"> </page-ip-reporting>
-        </template>
-      </iron-pages>
-
-      <paper-toast id="changes-saved" text="[[localize('changes_saved')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="server-error" text="[[localize('an_error_occurred')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="file-uploaded" text="[[localize('file_uploaded')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="file-deleted" text="[[localize('file_deleted')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="ocha-timeout" text="[[localize('request_ocha_timed_out')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="message-sent" text="[[localize('message_sent')]]" duration="3000"> </paper-toast>
-
-      <paper-toast id="error-message" duration="5000"> </paper-toast>
-    `;
-  }
+    .no-groups-notification p {
+      font-size: 24px;
+    }
+  `;
 
   @property({type: Object})
   route!: Route;
@@ -95,69 +45,154 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
   @property({type: Object})
   routeData!: {workspace_code: string; app: string};
 
-  @property({type: String, observer: '_pageChanged'})
-  page!: string;
+  @property({type: String})
+  page = '';
 
   @property({type: String})
-  interventionsUrl: string = Endpoints.interventions();
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.workspaces.current)'})
-  _workspaceCode!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.localize.language)'})
-  _language!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.app.current)'})
-  _app!: string;
+  profileUrl = Endpoints.userProfile();
 
   @property({type: String})
-  profileUrl: string = Endpoints.userProfile();
+  currenciesUrl = Endpoints.currencies();
 
   @property({type: String})
-  currenciesUrl: string = Endpoints.currencies();
+  userPartner = '';
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.prp_roles)'})
-  prpRoles!: any[];
+  @property({type: Array})
+  prpRoles: any[] = [];
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.userProfile.profile.access)'})
-  access!: [];
+  @property({type: Array})
+  access: any[] = [];
 
-  @property({type: Array, computed: 'getReduxStateArray(rootState.workspaces.all)'})
-  workspaces!: any[];
+  @property({type: Array})
+  workspaces: any[] = [];
 
-  @property({type: Boolean, computed: '_computeUserHasPrpRolesOrAccess(prpRoles, access)'})
-  userHasPrpRolesOrAccess!: boolean;
+  @property({type: Boolean})
+  userHasPrpRolesOrAccess = false;
 
   @property({type: String})
-  locationId!: string;
+  locationId?: string;
 
-  public static get observers() {
-    return [
-      '_routeWorkspaceChanged(routeData.workspace_code, workspaces)',
-      '_routeAppChanged(routeData.app)',
-      '_handleWorkspaceChange(currentWorkspace, workspaces)',
-      '_languageChanged(language)'
-    ];
+  @property({type: String})
+  _workspaceCode?: string;
+
+  @property({type: String})
+  _language?: string;
+
+  @property({type: String})
+  _app?: string;
+
+  render() {
+    return html`
+      ${!this.userHasPrpRolesOrAccess
+        ? html`<div class="no-groups-notification">
+            <h3>${translate('ACCOUNT_CREATED')}</h3>
+            <p>${translate('PLEASE_WAIT_BUSINESS_DAYS')}</p>
+          </div>`
+        : html``}
+      ${this.page === 'ip-reporting' ? html`<page-ip-reporting name="ip-reporting"> </page-ip-reporting>` : html``}
+
+      <etools-toasts></etools-toasts>
+    `;
   }
 
-  _redirectToWorkspace(workspace: GenericObject) {
-    const code = workspace.code;
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    if (changedProperties.has('prpRoles') || changedProperties.has('access') || changedProperties.has('userPartner')) {
+      this.userHasPrpRolesOrAccess = this._computeUserHasPrpRolesOrAccess(this.prpRoles, this.access, this.userPartner);
+    }
 
-    this.set('route.path', '/' + code + '/');
-    // this.set('routeData.workspace_code', code);
+    if (changedProperties.has('language')) {
+      this._languageChanged(this.language);
+    }
+
+    if (changedProperties.has('_workspaceCode') || changedProperties.has('workspaces')) {
+      this._handleWorkspaceChange(this._workspaceCode, this.workspaces);
+      this._routeWorkspaceChanged(this.routeDetails.params?.workspaceId);
+    }
+  }
+
+  stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      if (state.app.routeDetails.routeName !== 'app') {
+        return;
+      }
+
+      this.routeDetails = state.app.routeDetails;
+      this._routeWorkspaceChanged(this.routeDetails.params?.workspaceId);
+      this._routeAppChanged(state.app?.routeDetails);
+    }
+
+    if (this._workspaceCode !== state.workspaces.current) {
+      this._workspaceCode = state.workspaces.current;
+    }
+
+    if (this._language !== state.activeLanguage.activeLanguage) {
+      this._language = state.activeLanguage.activeLanguage;
+    }
+
+    if (this._app !== state.app.current) {
+      this._app = state.app.current;
+    }
+
+    if (state.userProfile.profile?.partner && !isJsonStrMatch(this.userPartner, state.userProfile.profile?.partner)) {
+      this.userPartner = state.userProfile.profile?.partner;
+    }
+
+    if (state.userProfile.profile?.prp_roles && !isJsonStrMatch(this.prpRoles, state.userProfile.profile?.prp_roles)) {
+      this.prpRoles = state.userProfile.profile?.prp_roles;
+    }
+
+    if (state.userProfile.profile?.access && !isJsonStrMatch(this.access, state.userProfile.profile?.access)) {
+      this.access = state.userProfile.profile?.access;
+    }
+
+    if (state.workspaces?.all && !isJsonStrMatch(this.workspaces, state.workspaces?.all)) {
+      this.workspaces = state.workspaces?.all || [];
+    }
+  }
+
+  async connectedCallback() {
+    super.connectedCallback();
+    this._addEventListeners();
+    setTimeout(async () => {
+      await Promise.all([this._fetchProfile()]).catch((_err: any) => {
+        window.location.href = '/landing';
+      });
+    }, 300);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._removeEventListeners();
+  }
+
+  _addEventListeners() {
+    this._fetchProfile = this._fetchProfile.bind(this);
+    this.addEventListener('fetch-profile', this._fetchProfile);
+  }
+
+  _removeEventListeners() {
+    this.removeEventListener('fetch-profile', this._fetchProfile);
+  }
+
+  _redirectToWorkspace(workspace_code: string) {
+    EtoolsRouter.updateAppLocation(`/${workspace_code}/`);
   }
 
   _redirectToApp(app: string) {
-    this.set('route.path', `/${this.routeData.workspace_code}/${app}`);
+    EtoolsRouter.updateAppLocation(`/${this._workspaceCode}/${app}`);
   }
 
   _handleWorkspacesAsync(e: CustomEvent) {
     const change = e.detail;
     try {
       if (change.value.length) {
-        this.$.workspaces.removeEventListener('all-changed', this._handleWorkspacesAsync as any);
+        this.shadowRoot!.querySelector('#workspaces')!.removeEventListener(
+          'all-changed',
+          this._handleWorkspacesAsync as any
+        );
         const workspace = change.value[0];
-        this._redirectToWorkspace(workspace);
+        this._redirectToWorkspace(workspace.code);
       }
     } catch (err) {
       console.log(err);
@@ -166,52 +201,51 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
 
   _routeWorkspaceChanged(workspaceCodeFromUrl: any) {
     if (!workspaceCodeFromUrl) {
-      // this.reduxStore.dispatch(reset()); // Switch workspace === wipe all the data
-      if (this.workspaces && this.workspaces.length) {
+      // store.dispatch(reset()); // Switch workspace === wipe all the data
+      if ((this.workspaces && this.workspaces.length) || this._workspaceCode) {
         // Default to first
-        this._redirectToWorkspace(this.workspaces[0]);
-      } else {
-        // Wait until workspaces are available, then pick one & redirect
-        // this._handleWorkspacesAsync = this._handleWorkspacesAsync.bind(this);
-        // this.$.workspaces.addEventListener('all-changed', this._handleWorkspacesAsync as any);
+        this._redirectToWorkspace(this._workspaceCode ? this._workspaceCode : this.workspaces?.[0]?.code);
       }
     } else if (!this._workspaceCode) {
-      this.reduxStore.dispatch(setWorkspace(workspaceCodeFromUrl));
+      store.dispatch(setWorkspace(workspaceCodeFromUrl));
+    } else if (this._workspaceCode && this._workspaceCode !== workspaceCodeFromUrl) {
+      this._redirectToWorkspace(this._workspaceCode);
     }
   }
 
-  _routeAppChanged(app: string) {
-    setTimeout(() => {
-      const defaultApp = 'ip-reporting';
-      if (!this.routeData.workspace_code) {
+  private _routeAppChanged(routeDetails: EtoolsRouteDetails) {
+    const defaultApp = 'ip-reporting';
+
+    if (!this._workspaceCode) {
+      return;
+    }
+
+    if (!routeDetails.subRouteName) {
+      this._redirectToApp(defaultApp);
+    } else if (!this._app) {
+      if (routeDetails.subRouteName !== 'ip-reporting') {
+        EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
         return;
       }
-      if (!app) {
-        this._redirectToApp(defaultApp!);
-      } else if (!this._app) {
-        this.reduxStore.dispatch(setApp(app));
-
-        this._fetchCurrencies(app);
-
-        // Render
-        this.page = app;
+      if (this.page !== routeDetails.subRouteName) {
+        this.page = routeDetails.subRouteName;
+        store.dispatch(setApp(routeDetails.subRouteName));
+        this._fetchCurrencies();
       }
-    });
+    }
   }
 
-  _languageChanged(_language: string) {
+  private _languageChanged(_language: string) {
     this.setHtmlDirAttribute();
   }
 
-  setHtmlDirAttribute() {
+  private setHtmlDirAttribute() {
     setTimeout(() => {
-      if (this.language) {
-        const htmlTag = document.querySelector('html');
-        if (this.language === 'ar') {
-          htmlTag!.setAttribute('dir', 'rtl');
-        } else if (htmlTag!.getAttribute('dir')) {
-          htmlTag!.removeAttribute('dir');
-        }
+      const htmlTag = document.querySelector('html');
+      if (this._language === 'ar') {
+        htmlTag!.setAttribute('dir', 'rtl');
+      } else if (htmlTag!.getAttribute('dir')) {
+        htmlTag!.removeAttribute('dir');
       }
     }, 300);
   }
@@ -223,97 +257,46 @@ class PageApp extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
     return val;
   }
 
-  _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[]) {
-    return !!prpRoles.length || !!access.length;
+  _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[], userPartner: string) {
+    return userPartner ? !!prpRoles.length || !!access.length : true;
   }
 
-  _pageChanged(page: string) {
-    if (page === 'pages') {
-      return;
-    }
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/${page}.js`;
-    import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
-  }
-
-  _notFound() {
-    window.location.href = '/not-found';
-  }
-
-  _handleWorkspaceChange(currentWorkspace: string, workspaces: any[]) {
+  _handleWorkspaceChange(currentWorkspace?: string, workspaces?: any[]) {
     if (!currentWorkspace || !workspaces || !workspaces.length) {
       return;
     }
+    const currentWorkspaceData = workspaces.find((workspace) => workspace.code === currentWorkspace);
 
-    const currentWorkspaceData = workspaces.filter((workspace) => {
-      return workspace.code === currentWorkspace;
-    });
-
-    if (!currentWorkspaceData.length) {
+    if (!currentWorkspaceData) {
       return;
     }
-    const workspaceId = currentWorkspaceData[0].id;
+    const workspaceId = currentWorkspaceData.id;
 
     if (this.locationId !== workspaceId) {
       this.locationId = workspaceId;
-      this.reduxStore.dispatch(locationSet(workspaceId));
+      store.dispatch(locationSet(workspaceId));
     }
   }
 
-  _notify(e: CustomEvent) {
-    e.stopPropagation();
-    const options = e.detail;
-    try {
-      if (options.text) {
-        (this.$[options.type] as any).text = options.text;
-      }
-      (this.$[options.type] as any).open();
-      // eslint-disable-next-line no-empty
-    } catch (err) {}
-  }
-
-  _fetchProfile() {
-    const userProfileThunk = (this.$.userProfile as EtoolsPrpAjaxEl).thunk();
-    return this.reduxStore.dispatch(fetchUserProfile(userProfileThunk));
-  }
-
-  _fetchCurrencies(app: string) {
-    if (this.page !== app && app === 'ip-reporting') {
-      const currenciesDataThunk = (this.$.currenciesData as EtoolsPrpAjaxEl).thunk();
-      this.reduxStore.dispatch(fetchCurrencies(currenciesDataThunk));
-    }
-  }
-
-  _addEventListeners() {
-    this._notify = this._notify.bind(this);
-    this.addEventListener('notify', this._notify as any);
-    this._fetchProfile = this._fetchProfile.bind(this);
-    this.addEventListener('fetch-profile', this._fetchProfile);
-  }
-
-  _removeEventListeners() {
-    this.removeEventListener('notify', this._notify as any);
-    this.removeEventListener('fetch-profile', this._fetchProfile);
-  }
-
-  async connectedCallback() {
-    super.connectedCallback();
-
-    this._addEventListeners();
-    const interventionsThunk = (this.$.interventions as EtoolsPrpAjaxEl).thunk();
-    await Promise.all([this.reduxStore.dispatch(fetchWorkspaces(interventionsThunk)), this._fetchProfile()]).catch(
-      (_err: GenericObject) => {
-        window.location.href = '/landing';
-      }
+  private _fetchProfile() {
+    return store.dispatch(
+      fetchUserProfile(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.profileUrl}
+        })
+      )
     );
   }
 
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this._removeEventListeners();
+  private _fetchCurrencies() {
+    store.dispatch(
+      fetchCurrencies(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.currenciesUrl}
+        })
+      )
+    );
   }
 }
-
-window.customElements.define('page-app', PageApp);

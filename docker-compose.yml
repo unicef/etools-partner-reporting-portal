@@ -5,6 +5,8 @@ volumes:
 
 services:
   proxy:
+    networks:
+      - etools-network
     image: traefik:v2.4
     command:
       - --api.insecure=true
@@ -41,6 +43,8 @@ services:
       - traefik.http.services.prp_backend.loadBalancer.server.port=8080
       - traefik.enable=true
       - project.label=prp
+    networks:
+      - etools-network
 
   ###### BUILT VERSION
   #  prp_backend:
@@ -65,23 +69,25 @@ services:
   #    depends_on:
   #      - prp_backend
   #      - prp_redis
-  ##
-  #  worker-prp:
-  #    image: unicef/etools-prp:local
-  #    env_file:
-  #      - .env
-  #    build:
-  #      context: ./django_api
-  #      dockerfile: ./Dockerfile
-  #      args:
-  #        ENV: dev
-  #    volumes:
-  #      - './django_api:/code/'
-  #      - './data/etools_prp_logs:/data/etools_prp/logs'
-  #      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
-  #    depends_on:
-  #      - db
-  #    command: bash -c "celery -A etools_prp worker -l ${CELERY_LOG_LEVEL:-info}"
+  #
+  worker-prp:
+    image: unicef/etools-prp:local
+    env_file:
+      - .env
+    build:
+      context: ./django_api
+      dockerfile: ./Dockerfile
+      args:
+        ENV: dev
+    volumes:
+      - './django_api:/code/'
+      - './data/etools_prp_logs:/data/etools_prp/logs'
+      - './data/etools_prp_uploads_unicef_progress_reports:/data/etools_prp/uploads/unicef/progress_reports'
+    depends_on:
+      - db
+    command: bash -c "celery -A etools_prp worker -l ${CELERY_LOG_LEVEL:-info}"
+    networks:
+      - etools-network
 
   db:
     image: unicef/etools-prp-db
@@ -95,11 +101,17 @@ services:
       - ./db/db_dump.bz2:/tmp/psql_data/db_dump.bz2
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - etools-network
 
   # Make sure the django .env file has the correct path for redis url set to:
   prp_redis:
     image: redis:6.2-alpine
     container_name: prp_redis
+    ports: 
+      - "6379:6379"
+    networks:
+      - etools-network
 
   #  id-management:
   #    image: unicef/etools-prp-id-management-frontend:1307dc7
@@ -130,16 +142,16 @@ services:
   #     - ./react/id_management_frontend/:/code
   #    command: bash -c "npm run start"
 
-  cluster:
-    image: unicef/etools-prp-cluster-fe:develop
-    container_name: prp_cl
-    labels:
-      - traefik.http.routers.prp_cl.rule=PathPrefix(`/cluster/`) && Host(`prp.localhost`)
-      - traefik.http.services.prp_cl.loadBalancer.server.port=8082
-      - traefik.http.routers.prp_cl.service=prp_cl
-      - traefik.enable=true
-      - project.label=prp
-    command: node express.js
+  # cluster:
+  #   image: unicef/etools-prp-cluster-fe:develop
+  #   container_name: prp_cl
+  #   labels:
+  #     - traefik.http.routers.prp_cl.rule=PathPrefix(`/cluster/`) && Host(`prp.localhost`)
+  #     - traefik.http.services.prp_cl.loadBalancer.server.port=8082
+  #     - traefik.http.routers.prp_cl.service=prp_cl
+  #     - traefik.enable=true
+  #     - project.label=prp
+  #   command: node express.js
   #
   #  cluster:
   #    build:
@@ -175,8 +187,9 @@ services:
     build:
       context: ./frontend_ip
       dockerfile: ./Dockerfile-dev
-    image: etoolsdev/etools-ip:dev
+    image: etoolsdev/etools-ip:rollup
     container_name: prp_ip_local
+    tty: true
     labels:
       - traefik.http.routers.prp_ip.rule=PathPrefix(`/ip/`) && Host(`prp.localhost`)
       - traefik.http.routers.prp_ip.middlewares=prp_ip-stripprefix
@@ -185,6 +198,16 @@ services:
       - traefik.http.routers.prp_ip.service=prp_ip
       - traefik.enable=true
       - project.label=prp
+    ports:
+      - "4001:4001"
     volumes:
       - './frontend_ip:/code'
-    command: ${FE_COMMAND:-sh -c "npm run devPoly3"}
+    command: ${FE_COMMAND:-sh -c "npm start"}
+    networks:
+      - etools-network
+
+
+networks:
+  etools-network:
+    external:
+      name: etools_network

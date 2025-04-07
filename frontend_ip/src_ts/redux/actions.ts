@@ -1,13 +1,4 @@
 import Constants from '../etools-prp-common/constants';
-import {GenericObject} from '../etools-prp-common/typings/globals.types';
-
-// L11N
-export const setL11NResources = function (resources: GenericObject) {
-  return {
-    type: Constants.SET_L11N_RESOURCES,
-    resources: resources
-  };
-};
 
 // Localization
 export const setLanguage = function (language: string) {
@@ -52,7 +43,7 @@ export const setUserProfile = function (data: any) {
   };
 };
 
-export const setAccountType = function (data: GenericObject) {
+export const setAccountType = function (data: any) {
   return {
     type: Constants.SET_ACCOUNT_TYPE,
     data: data
@@ -67,16 +58,6 @@ export const setPartner = function (partnerData: any) {
   };
 };
 
-export const fetchUserProfile = function (profileThunk: any) {
-  return function (dispatch: any) {
-    return profileThunk().then(function (res: any) {
-      dispatch(setUserProfile(res.data));
-      dispatch(setAccountType(res.data));
-      dispatch(setPartner(res.data.partner));
-    });
-  };
-};
-
 export const setWorkspaces = function (workspaces: any) {
   return {
     type: Constants.SET_WORKSPACES,
@@ -84,11 +65,43 @@ export const setWorkspaces = function (workspaces: any) {
   };
 };
 
+export const setWorkspace = function (newWorkspace: any) {
+  return {
+    type: Constants.SET_WORKSPACE,
+    workspace: newWorkspace,
+    app: 'ip-reporting'
+  };
+};
+
+const mapWorkspaces = function (workspaces: []) {
+  return (workspaces || []).map((workspace: any) => {
+    return {
+      id: workspace.id,
+      code: workspace.workspace_code,
+      name: workspace.title,
+      latitude: workspace.latitude,
+      longitude: workspace.longitude
+    };
+  });
+};
+
+export const fetchUserProfile = function (profileThunk: any) {
+  return function (dispatch: any) {
+    return profileThunk.then(function (res: any) {
+      dispatch(setUserProfile(res));
+      dispatch(setWorkspace(res.workspace?.workspace_code));
+      dispatch(setWorkspaces(mapWorkspaces(res.workspaces_available)));
+      dispatch(setAccountType(res));
+      dispatch(setPartner(res.partner));
+    });
+  };
+};
+
 // Workspaces
 export const fetchWorkspaces = function (interventionsThunk: any) {
   return function (dispatch: any) {
-    return interventionsThunk().then((res: any) => {
-      const workspaces = (res.data || []).map((workspace: any) => {
+    return interventionsThunk.then((res: any) => {
+      const workspaces = (res || []).map((workspace: any) => {
         return {
           id: workspace.id,
           code: workspace.workspace_code,
@@ -100,13 +113,6 @@ export const fetchWorkspaces = function (interventionsThunk: any) {
 
       dispatch(setWorkspaces(workspaces));
     });
-  };
-};
-
-export const setWorkspace = function (newWorkspace: any) {
-  return {
-    type: Constants.SET_WORKSPACE,
-    workspace: newWorkspace
   };
 };
 
@@ -172,7 +178,7 @@ export const fetchProgrammeDocuments = function (pdThunk: any) {
   };
 };
 
-export const setProgrammeDocumentDetails = function (pdDetailsData: GenericObject) {
+export const setProgrammeDocumentDetails = function (pdDetailsData: any) {
   return {
     type: Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
     pdDetailsData: pdDetailsData

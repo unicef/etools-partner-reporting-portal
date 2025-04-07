@@ -1,11 +1,14 @@
 from django.contrib.gis import admin
 
+from admin_extra_urls.decorators import button
+from admin_extra_urls.mixins import ExtraUrlMixin
 from leaflet.admin import LeafletGeoAdmin
 from unicef_locations.models import CartoDBTable
 
-from .cartodb import update_sites_from_cartodb
+from .cartodb import import_locations, rebuild_tree
 from .forms import CartoDBTableForm
-from .models import Location, PRPRole, ResponsePlan, Workspace
+from .models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
+from .tasks import import_etools_locations
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -48,7 +51,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
         'parent_table_name',
     )
 
-    actions = ('import_sites',)
+    actions = ('import_sites', 'rebuild_tree')
     raw_id_fields = ('parent', )
 
     def parent_table_name(self, obj):
@@ -56,14 +59,21 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
     def import_sites(self, request, queryset):
         for table in queryset:
-            update_sites_from_cartodb.delay(table.pk)
+            import_locations.delay(table.pk)
+
+    def rebuild_tree(self, request, queryset):
+        rebuild_tree.delay()
 
 
-class WorkspaceAdmin(admin.ModelAdmin):
+class WorkspaceAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('title', 'workspace_code', 'business_area_code',
                     'external_id')
     search_fields = ('title', 'workspace_code', 'business_area_code',
                      'external_id')
+
+    @button(label='Sync locations from eTools')
+    def sync_locations(self, request, pk):
+        import_etools_locations.delay(pk)
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):
@@ -79,9 +89,20 @@ class PRPRoleAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'cluster')
 
 
+class RealmAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', )
+    search_fields = ('user__email', 'user__first_name', 'user__last_name',
+                     'workspace__title', 'workspace__workspace_code',
+                     'workspace__business_area_code', 'workspace__external_id',
+                     'partner__title', 'partner__short_title',
+                     'group__name')
+    autocomplete_fields = ('partner', 'workspace', 'group')
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
 admin.site.unregister(CartoDBTable)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
-admin.site.register(PRPRole, PRPRoleAdmin)
+admin.site.register(PRPRoleOld, PRPRoleAdmin)
+admin.site.register(Realm, RealmAdmin)

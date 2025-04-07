@@ -4,6 +4,7 @@ import sys
 
 import environ
 import sentry_sdk
+from corsheaders.defaults import default_headers
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_pem_x509_certificate
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -139,6 +140,11 @@ CORS_ORIGIN_WHITELIST = [
     'https://etools-dev.unicef.org',
 ]
 
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "language",
+)
+
 ROOT_URLCONF = 'etools_prp.config.urls'
 
 TEMPLATES = [
@@ -178,7 +184,7 @@ DATABASES = {
         'USER': env('POSTGRES_USER', default='postgres'),
         'PASSWORD': env('POSTGRES_PASSWORD', default=''),
         'HOST': env('POSTGRES_HOST', default='localhost'),
-        'PORT': 5432,
+        'PORT': env('POSTGRES_PORT', default=5432),
     }
 }
 
@@ -441,8 +447,8 @@ SOCIAL_AUTH_JSONFIELD_ENABLED = True
 # TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
 # SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
 
-LOGIN_URL = "/landing"
-LOGIN_ERROR_URL = "/unauthorized"
+LOGIN_URL = "/landing/"
+LOGIN_ERROR_URL = "/unauthorized/"
 LOGOUT_URL = "/api/account/user-logout/"
 
 SOCIAL_AUTH_PIPELINE = (
@@ -537,7 +543,7 @@ if SENTRY_DSN:
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration(), CeleryIntegration()],)
 
 if DEBUG:
-    CORS_ORIGIN_WHITELIST += ('http://localhost:8082', 'http://localhost:8081')
+    CORS_ORIGIN_WHITELIST += ('http://etools.localhost:8082', 'http://prp.localhost:8081')
     FIXTURE_DIRS += ["fixtures"]
     INSTALLED_APPS += [
         'debug_toolbar',
@@ -552,3 +558,9 @@ UNICEF_LOCATIONS_MODEL = 'core.Location'
 MATOMO_HOST_URL = env('MATOMO_HOST_URL', default='https://unisitetracker.unicef.io/')
 MATOMO_TRACKER_URL = env('MATOMO_TRACKER_URL', default='matomo.php')
 MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)
+
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SAMESITE = 'Strict'

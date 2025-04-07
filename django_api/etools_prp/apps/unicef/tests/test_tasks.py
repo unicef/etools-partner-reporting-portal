@@ -9,12 +9,12 @@ from etools_prp.apps.indicator.serializers import PMPIndicatorBlueprintSerialize
 from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import Person, ProgrammeDocument, Section
+from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import (
     PMPPDPersonSerializer,
     PMPProgrammeDocumentSerializer,
     PMPSectionSerializer,
 )
-from etools_prp.apps.unicef.tasks import process_model
 
 
 class TestProcessModel(BaseAPITestCase):
@@ -118,6 +118,12 @@ class TestProcessModel(BaseAPITestCase):
                     'other_description': None,
                     'signed_date': '24-Jul-2019',
                     'amendment_number': '1',
+                },
+                {
+                    'types': ['budget_gt_20'],
+                    'other_description': None,
+                    'signed_date': None,
+                    'amendment_number': '2',
                 }
             ]
         }

@@ -1,39 +1,48 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {property} from '@polymer/decorators';
-import {html} from '@polymer/polymer';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
-import '../ip-reporting/pd-report-filters';
-import '../ip-reporting/pd-reports-toolbar';
-import '../ip-reporting/pd-reports-list';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../redux/store';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
-import {pdReportsFetch} from '../../redux/actions/pdReports';
-import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions';
+import '../ip-reporting/pd-report-filters.js';
+import '../ip-reporting/pd-reports-toolbar.js';
+import '../ip-reporting/pd-reports-list.js';
+import {pdReportsFetch} from '../../redux/actions/pdReports.js';
+import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions.js';
+import {RootState} from '../../typings/redux.types';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
-/**
- * @polymer
- * @customElement
- */
-class PdDetailsReport extends ReduxConnectedElement {
-  static get template() {
+@customElement('pd-details-reports')
+export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: Object})
+  queryParams!: any;
+
+  @property({type: String})
+  locationId!: string;
+
+  @property({type: String})
+  pdId!: string;
+
+  @property({type: String})
+  pdReportsUrl!: string;
+
+  @property({type: Object})
+  pdReportsParams!: any;
+
+  @property({type: String})
+  pdReportsId!: string;
+
+  render() {
     return html`
       ${tableStyles}
-      <style include="data-table-styles">
-        :host {
-          display: block;
-        }
-      </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <etools-prp-ajax id="pdReports" url="[[pdReportsUrl]]" params="[[pdReportsParams]]"> </etools-prp-ajax>
-
       <page-body>
         <pd-report-filters></pd-report-filters>
         <pd-reports-toolbar></pd-reports-toolbar>
@@ -42,60 +51,64 @@ class PdDetailsReport extends ReduxConnectedElement {
     `;
   }
 
-  @property({type: String})
-  query!: string;
-
-  @property({type: Object})
-  queryParams!: GenericObject;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
-  pdId!: string;
-
-  @property({type: String, computed: '_computePDReportsUrl(locationId)'})
-  pdReportsUrl!: string;
-
-  @property({type: Object, computed: '_computePDReportsParams(pdId, queryParams)'})
-  pdReportsParams!: GenericObject;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
-  pdReportsId!: string;
-
-  private _debouncer!: Debouncer;
-
-  public static get observers() {
-    return ['_handleInputChange(pdReportsUrl, pdReportsParams)'];
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._handleInputChange = debounce(this._handleInputChange.bind(this), 250);
   }
 
-  _computePDReportsUrl(locationId: string) {
-    return computePDReportsUrl(locationId);
-  }
-
-  _computePDReportsParams(pdId: string, queryParams: GenericObject) {
-    return computePDReportsParams(pdId, queryParams);
-  }
-
-  _handleInputChange(url: string) {
-    if (!url || !this.queryParams || !Object.keys(this.queryParams).length) {
+  stateChanged(state: RootState) {
+    if (!state.app?.routeDetails?.path?.includes('/view/reports')) {
+      // is not active page
       return;
     }
 
-    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(250), () => {
-      const pdReportsThunk = (this.$.pdReports as EtoolsPrpAjaxEl).thunk();
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
 
-      // Cancel the pending request, if any
-      (this.$.pdReports as EtoolsPrpAjaxEl).abort();
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
 
-      this.reduxStore
-        .dispatch(pdReportsFetch(pdReportsThunk, this.pdId))
-        // @ts-ignore
-        .catch(function (err) {
-          console.log(err);
-        });
-    });
+    if (this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
+    }
+
+    if (this.pdReportsId !== state.programmeDocumentReports.current.id) {
+      this.pdReportsId = state.programmeDocumentReports.current.id;
+    }
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('locationId')) {
+      this.pdReportsUrl = computePDReportsUrl(this.locationId);
+    }
+
+    if (changedProperties.has('pdId') || changedProperties.has('queryParams')) {
+      this.pdReportsParams = computePDReportsParams(this.pdId, this.queryParams);
+    }
+
+    if (changedProperties.has('pdReportsUrl') || changedProperties.has('pdReportsParams')) {
+      this._handleInputChange();
+    }
+  }
+
+  private _handleInputChange() {
+    if (!this.pdReportsUrl || !this.pdReportsParams || !Object.keys(this.pdReportsParams).length) {
+      return;
+    }
+
+    store.dispatch(
+      pdReportsFetch(
+        sendRequest({
+          method: 'GET',
+          endpoint: {url: this.pdReportsUrl},
+          params: this.pdReportsParams
+        }),
+        this.pdId
+      )
+    );
   }
 }
-
-window.customElements.define('pd-details-reports', PdDetailsReport);

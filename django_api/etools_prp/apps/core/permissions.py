@@ -72,7 +72,18 @@ class HasAnyRole(HasConditionalPermission):
         return self
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role__in=self.roles).exists()
+        return request.user.prp_roles.filter(name__in=self.roles).exists()
+
+
+class HasAnyClusterRole(HasConditionalPermission):
+    def __init__(self, *roles):
+        self.roles = roles
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def condition_check(self, request):
+        return request.user.old_prp_roles.filter(role__in=self.roles).exists()
 
 
 class IsSafe(BasePermission):
@@ -100,9 +111,7 @@ class IsPartnerAuthorizedOfficerForCurrentWorkspace(HasWorkspacePermission):
 
     def condition_check(self, request):
         return request.user.prp_roles.filter(
-            role=PRP_ROLE_TYPES.ip_authorized_officer,
-            workspace__id=self.workspace_id,
-            is_active=True
+            name=PRP_ROLE_TYPES.ip_authorized_officer,
         ).exists()
 
 
@@ -110,8 +119,7 @@ class IsPartnerAdminForCurrentWorkspace(HasWorkspacePermission):
 
     def condition_check(self, request):
         return request.user.prp_roles.filter(
-            role=PRP_ROLE_TYPES.ip_admin,
-            workspace__id=self.workspace_id,
+            name=PRP_ROLE_TYPES.ip_admin,
         ).exists()
 
 
@@ -119,8 +127,7 @@ class IsPartnerEditorForCurrentWorkspace(HasWorkspacePermission):
 
     def condition_check(self, request):
         return request.user.prp_roles.filter(
-            role=PRP_ROLE_TYPES.ip_editor,
-            workspace__id=self.workspace_id,
+            name=PRP_ROLE_TYPES.ip_editor,
         ).exists()
 
 
@@ -128,15 +135,14 @@ class IsPartnerViewerForCurrentWorkspace(HasWorkspacePermission):
 
     def condition_check(self, request):
         return request.user.prp_roles.filter(
-            role=PRP_ROLE_TYPES.ip_viewer,
-            workspace__id=self.workspace_id,
+            name=PRP_ROLE_TYPES.ip_viewer,
         ).exists()
 
 
 class IsIMOForCurrentWorkspace(HasWorkspacePermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(
+        return request.user.old_prp_roles.filter(
             role=PRP_ROLE_TYPES.cluster_imo,
             cluster__response_plan__workspace__id=self.workspace_id,
         ).exists()
@@ -145,36 +151,36 @@ class IsIMOForCurrentWorkspace(HasWorkspacePermission):
 class IsClusterSystemAdmin(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
+        return request.user.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists()
 
 
 class IsIMO(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists()
+        return request.user.old_prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists()
 
 
 class IsIPAuthorizedOfficer(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer, is_active=True).exists()
+        return request.user.prp_roles.filter(name=PRP_ROLE_TYPES.ip_authorized_officer).exists()
 
 
 class IsIPAdmin(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_admin).exists()
+        return request.user.prp_roles.filter(name=PRP_ROLE_TYPES.ip_admin).exists()
 
 
 class IsIPEditor(HasConditionalPermission):
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_editor).exists()
+        return request.user.prp_roles.filter(name=PRP_ROLE_TYPES.ip_editor).exists()
 
 
 class IsIPViewer(HasConditionalPermission):
 
     def condition_check(self, request):
-        return request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists()
+        return request.user.prp_roles.filter(name=PRP_ROLE_TYPES.ip_viewer).exists()
 
 
 class HasPartnerAccessForProgressReport(HasConditionalPermission, PermissionGetObjectMixin):
@@ -202,7 +208,7 @@ def has_permission_for_clusters_check(request, cluster_ids, roles):
         return True
 
     cluster_ids = set(cluster_ids)
-    cluster_role_count = request.user.prp_roles.filter(cluster__in=cluster_ids, role__in=roles).distinct().count()
+    cluster_role_count = request.user.old_prp_roles.filter(cluster__in=cluster_ids, role__in=roles).distinct().count()
 
     if cluster_role_count == len(cluster_ids):
         return True

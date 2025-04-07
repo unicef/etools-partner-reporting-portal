@@ -1,119 +1,102 @@
-import {ReduxConnectedElement} from '../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@polymer/paper-styles/typography';
-import Endpoints from '../endpoints';
-import LocalizeMixin from '../etools-prp-common/mixins/localize-mixin';
-import '../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import '../etools-prp-common/elements/message-box';
 import '../etools-prp-common/elements/page-body';
-import '../etools-prp-common/elements/user-profile/profile-dropdown';
-import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
 import {BASE_PATH} from '../etools-prp-common/config';
+import Endpoints from '../endpoints';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../redux/store';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- */
-class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        .item {
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-
-          padding: 18px 54px 18px 0px;
-        }
-
-        .sign-out-button {
-          cursor: pointer;
-        }
-
-        message-box {
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        message-box span {
-          @apply --paper-font-subhead;
-        }
-
-        .loader {
-          text-align: center;
-        }
-      </style>
-
-      <etools-prp-ajax id="userProfile" url="[[profileUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax id="workspaces" url="[[workspacesUrl]]"> </etools-prp-ajax>
-
-      <page-body>
-        <div class="item">
-          <span class="sign-out-button" on-tap="_logout">
-            <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
-            [[localize('sign_out')]]
-          </span>
-        </div>
-
-        <template is="dom-if" if="[[loading]]" restamp="true">
-          <div class="loader">
-            <etools-loading no-overlay></etools-loading>
-          </div>
-        </template>
-
-        <template is="dom-if" if="[[!loading]]" restamp="true">
-          <message-box type="warning">
-            <span hidden$="[[isAccessError]]"> It looks like you do not have workspace assigned. </span>
-            <span hidden$="[[!isAccessError]]">
-              It looks like you do not have the permissions assigned to enter the Partner Reporting Portal.
-            </span>
-            <span>
-              Please contact <a href="mailto:support@prphelp.zendesk.com">support@prphelp.zendesk.com</a>
-              and include your full name, email and the name of the organization you are from.
-            </span>
-          </message-box>
-        </template>
-      </page-body>
-    `;
-  }
-
+@customElement('page-unauthorized')
+export class PageUnauthorized extends connect(store)(LitElement) {
   @property({type: Boolean})
   loading = true;
 
   @property({type: String})
   profileUrl = Endpoints.userProfile();
 
-  @property({type: String})
-  workspacesUrl = Endpoints.interventions();
-
   @property({type: Boolean})
   isAccessError = true;
 
-  _logout() {
-    fireEvent(this, 'sign-out');
+  static styles = css`
+    :host {
+      display: block;
+    }
+
+    .item {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 18px 54px 18px 0px;
+    }
+
+    .sign-out-button {
+      cursor: pointer;
+    }
+
+    message-box {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    message-box span {
+      font-size: var(--paper-font-subhead_-_font-size);
+    }
+
+    .loader {
+      text-align: center;
+    }
+  `;
+
+  render() {
+    return html`
+      <page-body>
+        <div class="item">
+          <span class="sign-out-button" @click="${this._logout}">
+            <etools-icon-button id="powerSettings" name="power-settings-new"></etools-icon-button>
+            ${translate('SIGN_OUT')}
+          </span>
+        </div>
+
+        ${this.loading
+          ? html`<div class="loader">
+              <etools-loading no-overlay></etools-loading>
+            </div>`
+          : html`<message-box type="warning">
+              <span ?hidden="${!this.isAccessError}"> It looks like you do not have workspace assigned. </span>
+              <span ?hidden="${this.isAccessError}">
+                It looks like you do not have the permissions assigned to enter the Partner Reporting Portal.
+              </span>
+              <span>
+                Please contact <a href="mailto:support@prphelp.zendesk.com">support@prphelp.zendesk.com</a>
+                and include your full name, email and the name of the organization you are from.
+              </span>
+            </message-box>`}
+      </page-body>
+    `;
   }
 
   connectedCallback() {
     super.connectedCallback();
-
     this.checkAccessRights();
   }
 
   checkAccessRights() {
-    (this.$.userProfile as EtoolsPrpAjaxEl)
-      .thunk()()
+    if (!this.profileUrl) {
+      return;
+    }
+    this.showMessage(true);
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.profileUrl}
+    })
       .then((res: any) => {
-        if (res.data && (res.data.access || []).includes('ip-reporting')) {
-          this.checkWorkspaceExistence();
+        if (res && (res.access || []).includes('ip-reporting')) {
+          this.checkWorkspaceExistence(res.workspace);
         } else {
           this.showMessage(true);
         }
@@ -123,25 +106,20 @@ class PageUnauthorized extends LocalizeMixin(ReduxConnectedElement) {
       });
   }
 
-  checkWorkspaceExistence() {
-    (this.$.workspaces as EtoolsPrpAjaxEl)
-      .thunk()()
-      .then((res: any) => {
-        if (res.data && res.data.length) {
-          window.location.href = `/${BASE_PATH}/`;
-        } else {
-          this.showMessage(false);
-        }
-      })
-      .catch(() => {
-        this.showMessage(false);
-      });
+  checkWorkspaceExistence(workspace: any) {
+    if (workspace && workspace.id) {
+      window.location.href = `/${BASE_PATH}/`;
+    } else {
+      this.showMessage(false);
+    }
   }
 
   showMessage(isAccessError: boolean) {
     this.isAccessError = isAccessError;
-    this.set('loading', false);
+    this.loading = false;
+  }
+
+  _logout() {
+    fireEvent(this, 'sign-out');
   }
 }
-
-window.customElements.define('page-unauthorized', PageUnauthorized);

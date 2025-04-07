@@ -1,20 +1,32 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-route';
-import '@polymer/iron-pages/iron-pages';
-import './pd-details';
-import './pd-report';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin';
-import {getDomainByEnv} from '../../../../etools-prp-common/config';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
+import './pd-details.js';
+import './pd-report.js';
+import {RootState} from '../../../../typings/redux.types.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../../../redux/store.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
+import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- */
-class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
-  public static get template() {
+@customElement('page-ip-reporting-pd-router')
+class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
+  @property({type: String})
+  page = '';
+
+  @property({type: String})
+  pdId = '';
+
+  @property({type: Object})
+  routeDetails!: EtoolsRouteDetails;
+
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  render() {
     return html`
       <style>
         :host {
@@ -22,31 +34,23 @@ class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
         }
       </style>
 
-      <app-route route="{{route}}" pattern="/:tree" data="{{routeData}}" tail="{{subroute}}"> </app-route>
-
-      <iron-pages selected="[[page]]" attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'pd-details')]]" restamp="true">
-          <page-ip-reporting-pd-details name="pd-details" route="{{subroute}}"> </page-ip-reporting-pd-details>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'pd-report')]]" restamp="true">
-          <page-ip-reporting-pd-report name="pd-report" route="{{subroute}}"> </page-ip-reporting-pd-report>
-        </template>
-      </iron-pages>
+      ${this._equals(this.page, 'pd-details')
+        ? html` <page-ip-reporting-pd-details name="pd-details"> </page-ip-reporting-pd-details>`
+        : html``}
+      ${this._equals(this.page, 'pd-report')
+        ? html` <page-ip-reporting-pd-report name="pd-report"> </page-ip-reporting-pd-report>`
+        : html``}
     `;
   }
 
-  @property({type: String, observer: '_pageChanged'})
-  page!: string;
-
-  @property({type: String})
-  pdId!: string;
-
-  public static get observers() {
-    return ['_routeTreeChanged(routeData.tree)'];
+  stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
+      this.routeDetails = state.app.routeDetails;
+      this._routeTreeChanged(state.app.routeDetails.params?.pdRoute);
+    }
   }
 
-  _routeTreeChanged(tree: string) {
+  _routeTreeChanged(tree) {
     switch (tree) {
       case 'view':
         this.page = 'pd-details';
@@ -61,18 +65,6 @@ class PageIpReportingPdRouter extends UtilsMixin(PolymerElement) {
         break;
     }
   }
-
-  async _pageChanged(page: string) {
-    if (!page) {
-      return;
-    }
-
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/app/ip-reporting/pd/${page}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
-  }
 }
 
-window.customElements.define('page-ip-reporting-pd-router', PageIpReportingPdRouter);
+export {PageIpReportingPdRouter};

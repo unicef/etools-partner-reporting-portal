@@ -1,24 +1,10 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import '@polymer/iron-pages/iron-pages';
-import '../../../../../elements/ip-reporting/pd-report-info';
+import {LitElement, html} from 'lit';
+import {customElement} from 'lit/decorators.js';
+import '../../../../../elements/ip-reporting/pd-report-info.js';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- */
-class PagePdReportInfo extends PolymerElement {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <pd-report-info no-header></pd-report-info>
-    `;
+@customElement('page-pd-report-info')
+export class PagePdReportInfo extends LitElement {
+  render() {
+    return html` <pd-report-info no-header></pd-report-info> `;
   }
 }
-
-window.customElements.define('page-pd-report-info', PagePdReportInfo);

@@ -1,82 +1,80 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-layout/app-grid/app-grid-style';
-import '@unicef-polymer/etools-date-time/datepicker-lite';
+import {html, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import '../../etools-prp-common/elements/filter-list';
-import {property} from '@polymer/decorators/lib/decorators';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import '../../elements/filters/text-filter/text-filter';
 import '../../elements/filters/checkbox-filter/checkbox-filter';
 import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
 import '../../elements/filters/location-filter/location-filter';
+import {store} from '../../redux/store';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {RootState} from '../../typings/redux.types';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElement)) {
-  public static get template() {
+@customElement('progress-reports-filters')
+export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement)) {
+  @property({type: Object})
+  queryParams!: any;
+
+  @property({type: Object, attribute: false})
+  filters!: any;
+
+  @property({type: Array, attribute: false})
+  statuses: any[] = [];
+
+  @property({type: Array, attribute: false})
+  types: any[] = [];
+
+  constructor() {
+    super();
+    this.statuses = this._localizeStatuses();
+    this.types = this._localizeTypes();
+  }
+
+  render() {
     return html`
-      ${filterStyles}
-      <style include="app-grid-style">
-        :host {
+      <style>
+        ${layoutStyles} :host {
           display: block;
           background: white;
-
-          --app-grid-columns: 4;
-          --app-grid-item-height: auto;
-          --app-grid-expandible-item-columns: 2;
         }
-
-        .item-2-col {
-          @apply --app-grid-expandible-item;
-        }
-
         checkbox-filter {
           margin-top: 2em;
         }
       </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <filter-list filters="{{filters}}">
-        <div class="app-grid">
+      ${filterStyles}
+      <filter-list .filters="${this.filters}">
+        <div class="row">
           <text-filter
-            class="item"
-            label="[[localize('pd_ref_and_title')]]"
+            class="col-md-3 col-12"
+            label="${translate('PD_REF_AND_TITLE')}"
             name="pd_ref_title"
-            value="[[queryParams.pd_ref_title]]"
+            .value="${this.queryParams?.pd_ref_title}"
           >
           </text-filter>
-
-          <location-filter class="item" value="[[_withDefault(queryParams.location, '-1')]]"> </location-filter>
-
+          <location-filter
+            class="col-md-3 col-12"
+            .value="${this._withDefault(this.queryParams?.location, '-1')}"
+          ></location-filter>
           <dropdown-filter-multi
-            class="item item-2-col"
-            label="[[localize('report_status')]]"
+            class="col-md-6 col-12"
+            label="${translate('REPORT_STATUS')}"
             name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
-            data="[[statuses]]"
-            disabled="[[_equals(queryParams.due, '1')]]"
+            .value="${this._withDefault(this.queryParams?.status, '')}"
+            .data="${this.statuses}"
+            ?disabled="${this._equals(this.queryParams?.due, '1')}"
             hide-search
           >
           </dropdown-filter-multi>
-
           <dropdown-filter-multi
-            class="item item-2-col"
-            label="[[localize('report_type')]]"
+            class="col-md-6 col-12"
+            label="${translate('REPORT_TYPE')}"
             name="report_type"
-            value="[[_withDefault(queryParams.report_type, '')]]"
-            data="[[types]]"
+            .value="${this._withDefault(this.queryParams?.report_type, '')}"
+            .data="${this.types}"
             hide-search
           >
           </dropdown-filter-multi>
@@ -85,39 +83,34 @@ class ProgressReportsFilters extends UtilsMixin(LocalizeMixin(ReduxConnectedElem
     `;
   }
 
-  @property({type: String})
-  query!: string;
+  stateChanged(state: RootState) {
+    if (state.app?.routeDetails?.queryParams && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+  }
 
-  @property({type: Object})
-  queryParams!: GenericObject;
-
-  @property({type: Object, notify: true})
-  filters!: GenericObject;
-
-  @property({type: Array, computed: '_localizeStatuses(resources)'})
-  statuses!: any[];
-
-  @property({type: Array, computed: '_localizeTypes(resources)'})
-  types!: any[];
+  updated(changedProperties) {
+    super.updated(changedProperties);
+  }
 
   _localizeStatuses() {
     return [
-      {title: this.localize('overdue'), id: 'Ove'},
-      {title: this.localize('sent_back'), id: 'Sen'},
-      {title: this.localize('due'), id: 'Due'},
-      {title: this.localize('submitted'), id: 'Sub'},
-      {title: this.localize('accepted'), id: 'Acc'},
-      {title: this.localize('not_yet_due'), id: 'Not'}
+      {title: getTranslation('OVERDUE'), id: 'Ove'},
+      {title: getTranslation('SENT_BACK'), id: 'Sen'},
+      {title: getTranslation('DUE'), id: 'Due'},
+      {title: getTranslation('SUBMITTED'), id: 'Sub'},
+      {title: getTranslation('ACCEPTED'), id: 'Acc'},
+      {title: getTranslation('NOT_YET_DUE'), id: 'Not'}
     ];
   }
 
   _localizeTypes() {
     return [
-      {title: this.localize('qpr'), id: 'QPR'},
-      {title: this.localize('hr'), id: 'HR'},
-      {title: this.localize('sr'), id: 'SR'}
+      {title: getTranslation('QPR'), id: 'QPR'},
+      {title: getTranslation('HR'), id: 'HR'},
+      {title: getTranslation('SR'), id: 'SR'}
     ];
   }
 }
 
-window.customElements.define('progress-reports-filters', ProgressReportsFilters);
+export {ProgressReportsFilters as ProgressReportsFiltersEl};

@@ -1,20 +1,59 @@
-import {PolymerElement, html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/polymer/lib/elements/dom-if';
-import '@polymer/paper-styles/typography';
-import '@polymer/iron-location/iron-location';
-import '../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../etools-prp-common/elements/etools-prp-ajax';
-import Endpoints from '../endpoints';
-import {fireEvent} from '../etools-prp-common/utils/fire-custom-event';
-import {BASE_PATH} from '../etools-prp-common/config';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import Endpoints from '../endpoints.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
+import {BASE_PATH} from '../etools-prp-common/config.js';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
-/**
- * @polymer
- * @customElement
- */
-class PageLoginToken extends PolymerElement {
-  static get template() {
+@customElement('page-login-token')
+export class PageLoginToken extends LitElement {
+  static styles = css`
+    :host {
+      display: block;
+      padding: 25px;
+    }
+
+    h3 {
+      font-size: var(--paper-font-display1_-_font-size);
+    }
+  `;
+
+  @property({type: Object})
+  data = {};
+
+  @property({type: String})
+  tokenUrl = Endpoints.userLoginToken();
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.checkToken();
+  }
+
+  checkToken() {
+    const token = window.location.search.split('=')?.[1];
+
+    if (!token) {
+      fireEvent(this, 'token-error');
+      return;
+    }
+
+    this.data = {token};
+    sendRequest({
+      method: 'POST',
+      endpoint: {url: this.tokenUrl},
+      body: this.data
+    })
+      .then((res: any) => {
+        if (res.success) {
+          window.location.href = `/${BASE_PATH}/`;
+        }
+      })
+      .catch(() => {
+        fireEvent(this, 'token-error');
+      });
+  }
+
+  render() {
     return html`
       <style>
         :host {
@@ -23,48 +62,11 @@ class PageLoginToken extends PolymerElement {
         }
 
         h3 {
-          @apply --paper-font-display1;
+          font-size: var(--paper-font-display1_-_font-size);
         }
       </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <etools-prp-ajax
-        id="validateToken"
-        url="[[tokenUrl]]"
-        body="[[data]]"
-        content-type="application/json"
-        method="post"
-      >
-      </etools-prp-ajax>
 
       <h3>The page is loading...</h3>
     `;
   }
-
-  @property({type: String})
-  query!: string;
-
-  @property({type: Object})
-  data = {};
-
-  @property({type: String})
-  tokenUrl: string = Endpoints.userLoginToken();
-
-  connectedCallback() {
-    super.connectedCallback();
-    const token = this.query.split('=')[1];
-    this.set('data', {token: token});
-    const thunk = (this.$.validateToken as EtoolsPrpAjaxEl).thunk();
-    thunk()
-      .then((res: any) => {
-        if (res.data.success) {
-          window.location.href = `/${BASE_PATH}/`;
-        }
-      })
-      .catch(() => {
-        fireEvent(this, 'token-error');
-      });
-  }
 }
-window.customElements.define('page-login-token', PageLoginToken);

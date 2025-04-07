@@ -1,6 +1,7 @@
 import importlib
 
 from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -15,6 +16,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from social_django.utils import load_strategy
+from social_django.views import disconnect
 
 from etools_prp.apps.core.common import (
     CURRENCIES,
@@ -28,7 +31,7 @@ from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestr
 from etools_prp.apps.utils.serializers import serialize_choices
 
 from .filters import LocationFilter
-from .models import Location, PRPRole, ResponsePlan, Workspace
+from .models import Location, PRPRoleOld, ResponsePlan, Workspace
 from .permissions import AnyPermission, IsAuthenticated, IsClusterSystemAdmin, IsIMOForCurrentWorkspace, IsSuperuser
 from .serializers import (
     ChildrenLocationSerializer,
@@ -123,7 +126,7 @@ class ResponsePlanAPIView(ListAPIView):
         if self.request.user.is_cluster_system_admin:
             return queryset.distinct()
 
-        return queryset.filter(clusters__prp_roles__user=self.request.user).distinct()
+        return queryset.filter(clusters__old_prp_roles__user=self.request.user).distinct()
 
 
 class ResponsePlanCreateAPIView(CreateAPIView):
@@ -207,7 +210,7 @@ class TaskTriggerAPIView(APIView):
                 task_func()
 
         return Response({
-            'task_name': task_name,
+            'task_name': 'task_name',
             'status': 'started'
         })
 
@@ -215,7 +218,7 @@ class TaskTriggerAPIView(APIView):
 class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView):
     serializer_class = PRPRoleUpdateSerializer
     permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
-    queryset = PRPRole.objects.select_related('user', 'workspace', 'cluster')
+    queryset = PRPRoleOld.objects.select_related('user', 'workspace', 'cluster')
 
     def perform_destroy(self, instance):
         super().perform_destroy(instance)
@@ -230,7 +233,7 @@ class PRPRoleCreateAPIView(CreateAPIView):
         user_id = serializer.validated_data['user_id']
 
         for prp_role_data in serializer.validated_data['prp_roles']:
-            self.check_object_permissions(self.request, obj=PRPRole(user_id=user_id, **prp_role_data))
+            self.check_object_permissions(self.request, obj=PRPRoleOld(user_id=user_id, **prp_role_data))
         super().perform_create(serializer)
 
 
@@ -243,12 +246,12 @@ class HomeView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         user = self.request.user
-        if user.prp_roles.filter(role__in=[item for item, _, in PRP_IP_ROLE_TYPES]):
-            redirect_page = '/ip'
-        elif user.prp_roles.filter(role__in=[item for item, _, in PRP_CLUSTER_ROLE_TYPES]):
-            redirect_page = '/cluster'
+        if user.prp_roles.filter(name__in=[item for item, _, in PRP_IP_ROLE_TYPES]):
+            redirect_page = '/ip/'
+        elif user.prp_roles.filter(name__in=[item for item, _, in PRP_CLUSTER_ROLE_TYPES]):
+            redirect_page = '/cluster/'
         else:
-            redirect_page = '/unauthorized'
+            redirect_page = '/unauthorized/'
         return redirect_page
 
 
@@ -279,6 +282,22 @@ class UnauthorizedView(TemplateView):
 # TODO import from unicef-security
 class SocialLogoutView(RedirectView):
 
+    def get(self, request, *args, **kwargs):
+        # Call Django's logout function
+        logout(request)
+
+        # Disconnect social auth association
+        strategy = load_strategy(request)
+        disconnect(request, strategy=strategy)
+
+        # Clear session completely
+        request.session.flush()
+
+        return super().get(request, *args, **kwargs)
+
+    # def get_redirect_url(self, *args, **kwargs):
+    #     return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
+    #         f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
+
     def get_redirect_url(self, *args, **kwargs):
-        return f'https://{settings.TENANT_B2C_URL}/{settings.TENANT_ID}.onmicrosoft.com/{settings.POLICY}/oauth2/' \
-            f'v2.0/logout?post_logout_redirect_uri={settings.FRONTEND_HOST}{settings.LOGOUT_URL}'
+        return settings.LOGIN_URL

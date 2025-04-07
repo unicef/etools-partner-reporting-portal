@@ -1,96 +1,102 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/iron-location/iron-location';
-import '@polymer/iron-location/iron-query-params';
-import '@polymer/app-layout/app-grid/app-grid-style';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {LitElement, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
-import '../../etools-prp-common/elements/filter-list';
-import '../../elements/filters/text-filter/text-filter';
-import '../../elements/filters/dropdown-filter/dropdown-filter-multi';
-import '../../elements/filters/location-filter-multi/location-filter-multi';
+import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import '../../etools-prp-common/elements/filter-list.js';
+import '../../elements/filters/text-filter/text-filter.js';
+import '../../elements/filters/dropdown-filter/dropdown-filter-multi.js';
+import '../../elements/filters/location-filter-multi/location-filter-multi.js';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- */
-class PdFilters extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
+@customElement('pd-filters')
+export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
+  @property({type: Object})
+  queryParams!: any;
+
+  @property({type: Array})
+  statuses: any[] = [];
+
+  @property({type: Object})
+  filters: any[] = [];
+
+  render() {
     return html`
       ${filterStyles}
-      <style include="app-grid-style">
-        :host {
-          display: block;
-          background: white;
-
-          --app-grid-columns: 5;
-          --app-grid-item-height: auto;
-          --app-grid-expandible-item-columns: 2;
-        }
-
-        .filter-2-col {
-          @apply --app-grid-expandible-item;
-        }
+      <style>
+        ${layoutStyles}
       </style>
-
-      <iron-location query="{{query}}"> </iron-location>
-
-      <iron-query-params params-string="{{query}}" params-object="{{queryParams}}"> </iron-query-params>
-
-      <filter-list filters="{{filters}}">
-        <div class="app-grid">
+      <filter-list .filters="${this.filters}" @filters-changed=${(e) => (this.filters = e.detail.value)}>
+        <div class="row">
           <text-filter
-            class="item"
-            label="[[localize('pd_ref_and_title')]]"
+            class="col-lg-2 col-12"
+            label="${translate('PD_REF_AND_TITLE')}"
             name="ref_title"
-            value="[[queryParams.ref_title]]"
+            .value="${this.queryParams?.ref_title || ''}"
+            @value-changed="${this._handleFilterChange}"
           >
           </text-filter>
-
           <dropdown-filter-multi
-            class="item filter-2-col"
-            label="[[localize('pd_ssfa_status')]]"
+            class="col-lg-5 col-12"
+            label="${translate('PD_SSFA_STATUS')}"
             name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
-            data="[[statuses]]"
+            .value="${this._withDefault(this.queryParams?.status, '')}"
+            .data="${this.statuses}"
             hide-search
+            @value-changed="${this._handleFilterChange}"
           >
           </dropdown-filter-multi>
-
-          <location-filter-multi class="item filter-2-col" value="[[_withDefault(queryParams.location, '')]]">
+          <location-filter-multi
+            class="col-lg-5 col-12"
+            .value="${this._withDefault(this.queryParams?.location, '')}"
+            @value-changed="${this._handleFilterChange}"
+          >
           </location-filter-multi>
         </div>
       </filter-list>
     `;
   }
 
-  @property({type: Object})
-  queryParams!: GenericObject;
+  constructor() {
+    super();
+    this.statuses = this._initStatuses();
+  }
 
-  @property({type: Array, computed: '_initStatuses(resources)'})
-  statuses!: GenericObject;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: Object, notify: true})
-  filters!: GenericObject;
+    if (changedProperties.has('resources')) {
+      this.statuses = this._initStatuses();
+    }
+  }
 
-  _initStatuses() {
+  stateChanged(state: RootState) {
+    if (state.app.routeDetails && !isJsonStrMatch(this.queryParams, state.app.routeDetails.queryParams)) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+  }
+
+  private _initStatuses() {
     return [
-      {title: this.localize('signed'), id: 'signed'},
-      {title: this.localize('active'), id: 'active'},
-      {title: this.localize('suspended'), id: 'suspended'},
-      {title: this.localize('ended'), id: 'ended'},
-      {title: this.localize('closed'), id: 'closed'},
-      {title: this.localize('terminated'), id: 'terminated'}
+      {title: getTranslation('SIGNED'), id: 'signed'},
+      {title: getTranslation('ACTIVE'), id: 'active'},
+      {title: getTranslation('SUSPENDED'), id: 'suspended'},
+      {title: getTranslation('ENDED'), id: 'ended'},
+      {title: getTranslation('CLOSED'), id: 'closed'},
+      {title: getTranslation('TERMINATED'), id: 'terminated'}
     ];
   }
-}
 
-window.customElements.define('pd-filters', PdFilters);
+  private _handleFilterChange(event: CustomEvent) {
+    const {name, value} = event.detail;
+    this.queryParams = {...this.queryParams, [name]: value};
+    fireEvent(this, 'filters-changed', this.queryParams);
+  }
+}
 
 export {PdFilters as PdFiltersEl};

@@ -1,32 +1,20 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/paper-radio-group/paper-radio-group';
-import '@polymer/paper-radio-button/paper-radio-button';
-import '@polymer/paper-button/paper-button';
-import '@polymer/iron-flex-layout/iron-flex-layout-classes';
-import '@unicef-polymer/etools-loading/etools-loading';
-import '@unicef-polymer/etools-data-table/etools-data-table';
-import Constants from '../../etools-prp-common/constants';
+import {LitElement, css, html} from 'lit';
+import {store} from '../../redux/store';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {customElement, property} from 'lit/decorators.js';
+import '@unicef-polymer/etools-unicef/src/etools-radio/etools-radio-group';
+import '@shoelace-style/shoelace/dist/components/radio/radio.js';
+import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
+import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
+import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
+import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
-import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import NotificationsMixin from '../../etools-prp-common/mixins/notifications-mixin';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
-import '../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../etools-prp-common/elements/etools-prp-ajax';
 import '../../etools-prp-common/elements/page-body';
 import '../../etools-prp-common/elements/etools-prp-permissions';
-import '../../etools-prp-common/elements/confirm-box';
 import '../../etools-prp-common/elements/calculation-methods-info-bar';
-import {ConfirmBoxEl} from '../../etools-prp-common/elements/confirm-box';
-import {tableStyles} from '../../etools-prp-common/styles/table-styles';
-import {buttonsStyles} from '../../etools-prp-common/styles/buttons-styles';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce';
-import {timeOut} from '@polymer/polymer/lib/utils/async';
-
 import {
   computeIndicatorsUrl,
   computeFormattedData,
@@ -37,309 +25,337 @@ import {
   canSave
 } from './js/pd-details-calculation-methods-functions';
 import {RootState} from '../../typings/redux.types';
-import {includes} from 'lodash-es';
+import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
 
 /**
- * @polymer
  * @customElement
  * @mixinFunction
  * @appliesMixin UtilsMixin
- * @appliesMixin LocalizeMixin
- * @appliesMixin DataTableMixin
- * @appliesMixin NotificationsMixin
  */
-class PdDetailsCalculationMethods extends LocalizeMixin(
-  NotificationsMixin(DataTableMixin(UtilsMixin(ReduxConnectedElement)))
-) {
-  static get template() {
+@customElement('pd-details-calculation-methods')
+export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = [
+    layoutStyles,
+    css`
+      :host {
+        display: block;
+      }
+
+      .wrapper {
+        min-height: 80px;
+        position: relative;
+      }
+
+      .pd-output {
+        --list-bg-color: var(--sl-color-neutral-200);
+        font-weight: bold;
+      }
+
+      sl-radio {
+        padding: 0 !important;
+      }
+
+      sl-radio:not(:first-child) {
+        margin-left: 12px;
+      }
+
+      .buttons {
+        margin: 1em 0;
+      }
+
+      .missing-indicator {
+        margin-left: 40px;
+        font-weight: normal;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      sl-radio[name='latest'] {
+        text-transform: uppercase;
+      }
+    `
+  ];
+
+  render() {
     return html`
-      ${buttonsStyles} ${tableStyles}
-      <style include="data-table-styles iron-flex iron-flex-reverse">
-        :host {
-          display: block;
-
-          --data-table-header: {
-            height: auto;
-          }
-
-          --header-title: {
-            display: none;
-          }
-        }
-
-        .wrapper {
-          min-height: 80px;
-          position: relative;
-        }
-
-        .pd-output {
-          --list-bg-color: var(--paper-grey-200);
-
-          font-weight: bold;
-        }
-
-        paper-radio-button {
-          padding: 0 !important;
-        }
-
-        paper-radio-button:not(:first-child) {
-          margin-left: 12px;
-        }
-
-        .buttons {
-          margin: 1em 0;
-        }
-
-        .missing-indicator {
-          margin-left: 40px;
-          font-weight: normal;
-        }
-
-        [hidden] {
-          display: none !important;
-        }
-
-        paper-radio-button[name='latest'] {
-          text-transform: uppercase;
-        }
+      <style>
+        ${dataTableStylesLit}
       </style>
 
-      <etools-prp-permissions permissions="{{permissions}}"> </etools-prp-permissions>
-
-      <etools-prp-ajax id="indicators" url="[[indicatorsUrl]]"> </etools-prp-ajax>
-
-      <etools-prp-ajax
-        id="update"
-        method="post"
-        url="[[indicatorsUrl]]"
-        body="[[localData]]"
-        content-type="application/json"
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
       >
-      </etools-prp-ajax>
+      </etools-prp-permissions>
 
       <page-body>
         <calculation-methods-info-bar></calculation-methods-info-bar>
         <etools-data-table-header no-collapse>
-          <etools-data-table-column>
-            <div class="table-column">[[localize('indicators_for_pd')]]</div>
+          <etools-data-table-column class="col-4">
+            <div class="table-column">${translate('INDICATORS_FOR_PD')}</div>
           </etools-data-table-column>
-          <etools-data-table-column>
-            <div class="table-column">[[localize('calculation_method_across_locations')]]</div>
+          <etools-data-table-column class="col-4">
+            <div class="table-column">${translate('CALCULATION_METHOD_ACROSS_LOCATIONS')}</div>
           </etools-data-table-column>
-          <etools-data-table-column>
-            <div class="table-column">[[localize('calculation_method_across_reporting')]]</div>
+          <etools-data-table-column class="col-4">
+            <div class="table-column">${translate('CALCULATION_METHOD_ACROSS_REPORTING')}</div>
           </etools-data-table-column>
         </etools-data-table-header>
-
         <div class="wrapper">
-          <template is="dom-repeat" items="[[formattedData]]" initial-count="[[pageSize]]">
-            <template is="dom-if" if="[[_equals(item.type, 'label')]]" restamp="true">
-              <etools-data-table-row class="pd-output" no-collapse>
-                <div slot="row-data">
-                  <div class="table-cell table-cell--text">[[item.text]]</div>
-                </div>
-              </etools-data-table-row>
-            </template>
-            <template is="dom-if" if="[[_equals(item.type, 'missingIndicators')]]" restamp="true">
-              <etools-data-table-row class="pd-output" no-collapse>
-                <div slot="row-data">
-                  <div class="table-cell table-cell--text missing-indicator">[[localize(item.text)]]</div>
-                </div>
-              </etools-data-table-row>
-            </template>
-
-            <template is="dom-if" if="[[_equals(item.type, 'data')]]" restamp="true">
-              <etools-data-table-row no-collapse>
-                <div slot="row-data">
-                  <div class="table-cell">[[item.data.title]]</div>
-                  <div class="table-cell">
-                    <template is="dom-if" if="[[_canEdit(item, permissions)]]">
-                      <paper-radio-group
-                        data-id$="[[item.data.id]]"
-                        data-llo-id$="[[item.llo_id]]"
-                        data-scope="calculation_formula_across_locations"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]"
-                      >
-                        <paper-radio-button name="sum" disabled="[[_computeDisabled(item.data.display_type)]]">
-                          [[localize('sum')]]
-                        </paper-radio-button>
-                        <paper-radio-button name="max" disabled="[[_computeDisabled(item.data.display_type)]]">
-                          [[localize('max')]]
-                        </paper-radio-button>
-                        <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
-                          [[localize('avg')]]
-                        </paper-radio-button>
-                      </paper-radio-group>
-                    </template>
-                    <template is="dom-if" if="[[!_canEdit(item, permissions)]]">
-                      [[item.data.calculation_formula_across_locations]]
-                    </template>
-                  </div>
-                  <div class="table-cell">
-                    <template is="dom-if" if="[[_canEdit(item, permissions)]]">
-                      <paper-radio-group
-                        data-id$="[[item.data.id]]"
-                        data-llo-id$="[[item.llo_id]]"
-                        data-scope="calculation_formula_across_periods"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]"
-                        disabled="[[_computeDisabled(item.data)]]"
-                      >
-                        <paper-radio-button name="sum" disabled="[[_computeDisabled(item.data.display_type)]]">
-                          [[localize('sum')]]
-                        </paper-radio-button>
-                        <paper-radio-button name="max" disabled="[[_computeDisabled(item.data.display_type)]]">
-                          [[localize('max')]]
-                        </paper-radio-button>
-                        <paper-radio-button name="avg" disabled="[[_computeDisabled(item.data.display_type)]]">
-                          [[localize('avg')]]
-                        </paper-radio-button>
-                        <paper-radio-button
-                          name="latest"
-                          hidden$="[[!_hasTypeRatioOrPercentage(item.data)]]"
-                          disabled="[[_computeDisabled(item.data.display_type)]]"
-                        >
-                          [[localize('latest')]]
-                        </paper-radio-button>
-                      </paper-radio-group>
-                    </template>
-                    <template is="dom-if" if="[[!_canEdit(item, permissions)]]">
-                      [[item.data.calculation_formula_across_periods]]
-                    </template>
-                  </div>
-                </div>
-              </etools-data-table-row>
-            </template>
-          </template>
-
-          <etools-loading active="[[loading]]"></etools-loading>
+          ${(this.formattedData || []).map(
+            (item) => html`
+              ${item.type === 'label'
+                ? html`
+                    <etools-data-table-row class="pd-output" no-collapse>
+                      <div slot="row-data">
+                        <div class="table-cell table-cell--text">${item.text}</div>
+                      </div>
+                    </etools-data-table-row>
+                  `
+                : item.type === 'missingIndicators'
+                  ? html`
+                      <etools-data-table-row class="pd-output" no-collapse>
+                        <div slot="row-data">
+                          <div class="table-cell table-cell--text missing-indicator">${translate(item.text)}</div>
+                        </div>
+                      </etools-data-table-row>
+                    `
+                  : item.type === 'data'
+                    ? html`
+                        <etools-data-table-row no-collapse>
+                          <div slot="row-data">
+                            <div class="col-data col-4 table-cell">${item.data?.title}</div>
+                            <div class="col-data col-4 table-cell">
+                              ${this._canEdit(item, this.permissions)
+                                ? html`
+                                    <etools-radio-group
+                                      data-id="${item.data?.id}"
+                                      data-llo-id="${item.llo_id}"
+                                      data-scope="calculation_formula_across_locations"
+                                      @sl-change="${this._onValueChanged}"
+                                      .value="${computeSelected(item.data, 'calculation_formula_across_locations')}"
+                                    >
+                                      <sl-radio value="sum" ?disabled="${computeDisabled(item.data?.display_type)}">
+                                        ${translate('SUM')}
+                                      </sl-radio>
+                                      <sl-radio value="max" ?disabled="${computeDisabled(item.data?.display_type)}">
+                                        ${translate('MAX')}
+                                      </sl-radio>
+                                      <sl-radio value="avg" ?disabled="${computeDisabled(item.data?.display_type)}">
+                                        ${translate('AVG')}
+                                      </sl-radio>
+                                    </etools-radio-group>
+                                  `
+                                : html` ${item.data.calculation_formula_across_locations} `}
+                            </div>
+                            <div class="col-data col-4 table-cell">
+                              ${this._canEdit(item, this.permissions)
+                                ? html`
+                                    <etools-radio-group
+                                      data-id="${item.data?.id}"
+                                      data-llo-id="${item.llo_id}"
+                                      data-scope="calculation_formula_across_periods"
+                                      @sl-change="${this._onValueChanged}"
+                                      .value="${computeSelected(item.data, 'calculation_formula_across_periods')}"
+                                      ?disabled="${computeDisabled(item.data)}"
+                                    >
+                                      <sl-radio value="sum" ?disabled="${computeDisabled(item.data.display_type)}">
+                                        ${translate('SUM')}
+                                      </sl-radio>
+                                      <sl-radio value="max" ?disabled="${computeDisabled(item.data.display_type)}">
+                                        ${translate('MAX')}
+                                      </sl-radio>
+                                      <sl-radio value="avg" ?disabled="${computeDisabled(item.data.display_type)}">
+                                        ${translate('AVG')}
+                                      </sl-radio>
+                                      <sl-radio
+                                        value="latest"
+                                        ?hidden="${!this._hasTypeRatioOrPercentage(item.data)}"
+                                        ?disabled="${computeDisabled(item.data.display_type)}"
+                                      >
+                                        ${translate('LATEST')}
+                                      </sl-radio>
+                                    </etools-radio-group>
+                                  `
+                                : html` ${item.data.calculation_formula_across_periods} `}
+                            </div>
+                          </div>
+                        </etools-data-table-row>
+                      `
+                    : html``}
+            `
+          )}
+          <etools-loading ?active="${this.loading}"></etools-loading>
         </div>
-
-        <template is="dom-if" if="[[_canSave(permissions)]]" restamp="true">
-          <div class="buttons layout horizontal-reverse">
-            <paper-button on-tap="_save" class="btn-primary" disabled="[[loading]]" raised>
-              [[localize('save')]]
-            </paper-button>
-          </div>
-        </template>
+        ${this._canSave(this.permissions)
+          ? html`<div class="buttons layout-horizontal right-align">
+              <etools-button @click="${this._save}" variant="primary" ?disabled="${this.loading}">
+                ${translate('SAVE')}
+              </etools-button>
+            </div>`
+          : html``}
       </page-body>
-
-      <confirm-box id="confirm"></confirm-box>
     `;
   }
 
   @property({type: Object})
-  localData!: GenericObject;
+  localData!: any;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
+  @property({type: String})
   locationId!: string;
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocuments.current)'})
+  @property({type: String})
   pdId!: string;
 
-  @property({type: Boolean, computed: '_pdIndicatorsLoading(rootState)'})
+  @property({type: Boolean})
   loading!: boolean;
 
-  @property({type: Array, computed: '_pdIndicatorsAll(rootState)', observer: '_initLocalData'})
+  @property({type: Array})
   data!: any;
 
-  @property({type: Array, computed: '_computeFormattedData(data)'})
+  @property({type: Array})
   formattedData!: any;
 
-  @property({type: String, computed: '_computeIndicatorsUrl(locationId, pdId)', observer: '_fetchData'})
+  @property({type: String})
   indicatorsUrl!: string;
 
-  private _debouncer!: Debouncer;
-  private _fetchDataDebouncer!: Debouncer;
+  connectedCallback() {
+    super.connectedCallback();
 
-  _initLocalData(data: any) {
-    this.set('localData', this._clone(data));
+    this._fetchData = debounce(this._fetchData.bind(this), 300) as any;
   }
 
-  _computeIndicatorsUrl(locationId: string, pdId: string) {
-    return computeIndicatorsUrl(locationId, pdId);
+  stateChanged(state: RootState) {
+    if (state.location?.id && this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+    if (state.programmeDocuments?.currentPdId && this.pdId !== state.programmeDocuments.currentPdId) {
+      this.pdId = state.programmeDocuments.currentPdId;
+    }
+
+    if (this.loading != pdIndicatorsLoading(state)) {
+      this.loading = pdIndicatorsLoading(state);
+    }
+    if (this.data !== pdIndicatorsAll(state)) {
+      this.data = pdIndicatorsAll(state);
+    }
   }
 
-  _pdIndicatorsAll(rootState: RootState) {
-    return pdIndicatorsAll(rootState);
-  }
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  _pdIndicatorsLoading(rootState: RootState) {
-    return pdIndicatorsLoading(rootState);
-  }
+    if (changedProperties.has('locationId') || changedProperties.has('pdId')) {
+      this.indicatorsUrl = computeIndicatorsUrl(this.locationId, this.pdId);
+    }
 
-  _computeFormattedData(data: any) {
-    return computeFormattedData(data);
-  }
+    if (changedProperties.has('indicatorsUrl')) {
+      this._fetchData(); // Example: Fetch data when indicatorsUrl changes
+    }
 
-  _computeSelected(data: any, scope: any) {
-    return computeSelected(data, scope);
-  }
-
-  _computeDisabled(display_type: any) {
-    return computeDisabled(display_type);
+    if (changedProperties.has('data')) {
+      this.formattedData = computeFormattedData(this.data);
+      this.localData = this._clone(this.data);
+    }
   }
 
   _hasTypeRatioOrPercentage(data: any) {
     return ['ratio', 'percentage'].includes(data.display_type);
   }
 
-  _fetchData(url: string) {
-    if (!url || !this.pdId) {
+  _fetchData() {
+    if (!this.indicatorsUrl || !this.pdId) {
       return;
     }
-    this._fetchDataDebouncer = Debouncer.debounce(this._fetchDataDebouncer, timeOut.after(250), () => {
-      var indicatorsThunk = (this.$.indicators as EtoolsPrpAjaxEl).thunk();
 
-      (this.$.indicators as EtoolsPrpAjaxEl).abort();
-
-      this.reduxStore
-        .dispatch(pdIndicatorsFetch(indicatorsThunk, this.pdId))
-        // @ts-ignore
-        .catch(function (err) {
-          console.log(err);
-        });
-    });
+    store
+      .dispatch(
+        pdIndicatorsFetch(
+          sendRequest({
+            method: 'GET',
+            endpoint: {url: this.indicatorsUrl}
+          }),
+          this.pdId
+        )
+      )
+      // @ts-ignore
+      .catch(function (err) {
+        console.log(err);
+      });
   }
 
   _onValueChanged(e: CustomEvent) {
-    const newValue = (e.target as any).selected;
+    const newValue = (e.target as any).value;
     const data = (e.target as any).dataset;
     const indices = onValueChanged(data, this.localData);
 
-    this.set(
-      ['localData.ll_outputs_and_indicators', indices.lloIndex, 'indicators', indices.indicatorIndex, data.scope],
-      newValue
-    );
+    this.localData.ll_outputs_and_indicators[indices.lloIndex].indicators[indices.indicatorIndex][data.scope] =
+      newValue;
+  }
+
+  getDataForSave(data: any) {
+    // exclude latest because BE will throw error
+    const dataToSave = this._clone(data);
+    (dataToSave.ll_outputs_and_indicators || []).forEach((item) => {
+      if (item.indicators?.length) {
+        item.indicators = item.indicators.filter(
+          (indicator) => indicator.calculation_formula_across_periods !== 'latest'
+        );
+      }
+    });
+    return dataToSave;
   }
 
   _save() {
     this._confirmIntent()
       .then(() => {
-        const updateThunk = (this.$.update as EtoolsPrpAjaxEl).thunk();
-        return this.reduxStore.dispatch(pdIndicatorsUpdate(updateThunk, this.pdId));
+        return store.dispatch(
+          pdIndicatorsUpdate(
+            sendRequest({
+              method: 'POST',
+              endpoint: {url: this.indicatorsUrl},
+              body: this.getDataForSave(this.localData)
+            }),
+            this.pdId
+          )
+        );
       })
-      .then(this._notifyChangesSaved.bind(this))
+      .then(() => {
+        fireEvent(this, 'toast', {
+          text: getTranslation('CHANGES_SAVED'),
+          showCloseBtn: true
+        });
+      })
       .catch((_err: any) => {
         console.log(_err);
       });
   }
 
   _confirmIntent() {
-    const deferred = this._deferred();
-    (this.$.confirm as ConfirmBoxEl).run({
-      body:
-        'Please make sure the calculation methods for your indicators are ' +
-        'properly configured. Changing calculation methods would recalculate ' +
-        'progress reports for your indicators!',
-      result: deferred,
-      maxWidth: '500px',
-      // where to find it?
-      mode: Constants.CONFIRM_MODAL
+    return new Promise((resolve, reject) => {
+      openDialog({
+        dialog: 'are-you-sure',
+        dialogData: {
+          content:
+            'Please make sure the calculation methods for your indicators are ' +
+            'properly configured. Changing calculation methods would recalculate ' +
+            'progress reports for your indicators!',
+          confirmBtnText: translate('CONTINUE'),
+          cancelBtnText: translate('CANCEL')
+        }
+      }).then(({confirmed}) => {
+        if (confirmed) {
+          return resolve(true);
+        } else {
+          return reject();
+        }
+      });
     });
-
-    return deferred.promise;
   }
 
   _canEdit(item: any, permissions: any) {
@@ -352,13 +368,5 @@ class PdDetailsCalculationMethods extends LocalizeMixin(
 
   disconnectedCallback() {
     super.disconnectedCallback();
-
-    (this.$.indicators as EtoolsPrpAjaxEl).abort();
-
-    if (this._debouncer && this._debouncer.isActive()) {
-      this._debouncer.cancel();
-    }
   }
 }
-
-window.customElements.define('pd-details-calculation-methods', PdDetailsCalculationMethods);

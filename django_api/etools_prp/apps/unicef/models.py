@@ -5,7 +5,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -76,7 +76,7 @@ class Person(TimeStampedExternalSyncModelMixin):
     def is_authorized_officer(self):
         return get_user_model().objects.filter(
             email=self.email,
-            prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
+            realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
         ).exists()
 
     def save(self, *args, **kwargs):
@@ -242,6 +242,8 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     )
 
     amendments = models.JSONField(default=list)
+
+    has_signed_document = models.BooleanField(default=False)
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -437,6 +439,7 @@ class ProgressReport(TimeStampedModel):
         null=True
     )
     sent_back_feedback = models.TextField(blank=True, null=True)
+    accepted_comment = models.CharField(verbose_name="Report accepted comment", max_length=50, blank=True, null=True)
     report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
@@ -448,10 +451,11 @@ class ProgressReport(TimeStampedModel):
         ordering = ['-due_date', '-id']
         unique_together = ('programme_document', 'report_type', 'report_number')
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if self.is_final and not hasattr(self, 'final_review'):
             FinalReview.objects.create(progress_report=self)
-        super().save(*args, **kwargs)
 
     @cached_property
     def latest_indicator_report(self):

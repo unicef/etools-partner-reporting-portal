@@ -1,79 +1,112 @@
-import {ReduxConnectedElement} from '../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import '@polymer/paper-tooltip/paper-tooltip';
+import {html, css, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import LocalizeMixin from '../../etools-prp-common/mixins/localize-mixin';
-import '../etools-prp-toolbar';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import '../../etools-prp-common/elements/download-button';
-import {property} from '@polymer/decorators/lib/decorators';
 import {computePdReportsUrl, hasResults} from './js/progress-reports-toolbar-functions';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
+import {store} from '../../redux/store';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {RootState} from '../../typings/redux.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin UtilsMixin
- */
-class ProgressReportsToolbar extends LocalizeMixin(UtilsMixin(ReduxConnectedElement)) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-toolbar query="{{query}}" params="{{params}}" location-id="{{locationId}}">
-        <template is="dom-if" if="[[canExport]]" restamp="true">
-          <download-button id="btnDownloadPdf" url="[[pdfExportUrl]]" tracker="Progress Reports Export Pdf"
-            >PDF</download-button
-          >
-          <paper-tooltip for="btnDownloadPdf">[[localize('progress_reports_export_status')]]</paper-tooltip>
-
-          <download-button id="btnDownloadXLS" url="[[xlsExportUrl]]" tracker="Progress Reports Export Xls"
-            >XLS</download-button
-          >
-          <paper-tooltip for="btnDownloadXLS">[[localize('progress_reports_export_status')]]</paper-tooltip>
-        </template>
-      </etools-prp-toolbar>
-    `;
-  }
-
-  @property({type: String})
-  query!: string;
+@customElement('progress-reports-toolbar')
+export class ProgressReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = css`
+    ${layoutStyles}
+    :host {
+      display: block;
+      position: relative;
+      margin-bottom: 25px;
+    }
+    .right-align {
+      text-align: left;
+    }
+  `;
 
   @property({type: Object})
-  params!: GenericObject;
+  queryParams!: any;
 
   @property({type: String})
   locationId!: string;
 
-  @property({type: Number, computed: 'getReduxStateValue(rootState.progressReports.count)'})
+  @property({type: Number})
   totalResults!: number;
 
-  @property({type: Boolean, computed: '_canExport(totalResults, params)'})
+  @property({type: Boolean})
   canExport!: boolean;
 
-  @property({type: String, computed: '_computePdReportsUrl(locationId)'})
+  @property({type: String})
   pdReportsUrl!: string;
 
-  @property({type: String, computed: "_appendQuery(pdReportsUrl, query, 'export=xlsx')"})
-  xlsExportUrl!: string;
+  @property({type: String})
+  xlsExportUrl?: string;
 
-  @property({type: String, computed: "_appendQuery(pdReportsUrl, query, 'export=pdf')"})
-  pdfExportUrl!: string;
+  @property({type: String})
+  pdfExportUrl?: string;
 
-  _computePdReportsUrl(locationId: string) {
-    return computePdReportsUrl(locationId);
+  stateChanged(state: RootState) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.queryParams, state.app?.routeDetails?.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
+
+    if (this.totalResults !== state.progressReports.count) {
+      this.totalResults = state.progressReports.count;
+    }
+
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
   }
 
-  _canExport(totalResults: number, queryParams: GenericObject) {
-    // show Export buttons if have data and status Accepted or Submitted is selected
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('totalResults') || changedProperties.has('queryParams')) {
+      this.canExport = this._canExport(this.totalResults, this.queryParams);
+    }
+
+    if (changedProperties.has('locationId')) {
+      this.pdReportsUrl = computePdReportsUrl(this.locationId);
+    }
+
+    if (changedProperties.has('pdReportsUrl') || changedProperties.has('queryParams')) {
+      this.xlsExportUrl = this._appendQuery(this.pdReportsUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = this._appendQuery(this.pdReportsUrl, this.queryParams, 'export=pdf');
+    }
+  }
+
+  _canExport(totalResults: number, queryParams: any) {
     const hasData = hasResults(totalResults);
-    const status = queryParams.status;
+    const status = queryParams?.status;
     const hasStatusSubmittedOrAccepted = status ? status.includes('Acc') || status.includes('Sub') : true;
     return hasData && hasStatusSubmittedOrAccepted;
   }
+
+  render() {
+    return html`
+      <div class="layout-horizontal right-align">
+        ${this.canExport
+          ? html`
+              <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+                <download-button id="btnDownloadPdf" .url="${this.pdfExportUrl}" tracker="Progress Reports Export Pdf">
+                  PDF
+                </download-button>
+              </sl-tooltip>
+              <sl-tooltip content="${translate('PROGRESS_REPORTS_EXPORT_STATUS')}">
+                <download-button id="btnDownloadXLS" .url="${this.xlsExportUrl}" tracker="Progress Reports Export Xls">
+                  XLS
+                </download-button>
+              </sl-tooltip>
+            `
+          : html``}
+      </div>
+    `;
+  }
 }
 
-window.customElements.define('progress-reports-toolbar', ProgressReportsToolbar);
+export {ProgressReportsToolbar as ProgressReportsToolbarEl};

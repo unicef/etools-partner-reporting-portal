@@ -1,28 +1,25 @@
-import {ReduxConnectedElement} from '../../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import '../../../../etools-prp-common/elements/page-body';
-import '../../../../etools-prp-common/elements/page-header';
-import '../../../../elements/ip-reporting/pd-filters';
-import '../../../../elements/ip-reporting/pd-list-toolbar';
-import '../../../../elements/ip-reporting/pd-list';
-import LocalizeMixin from '../../../../etools-prp-common/mixins/localize-mixin';
+import {LitElement, html, css} from 'lit';
+import {customElement} from 'lit/decorators.js';
+import '../../../../etools-prp-common/elements/page-body.js';
+import '../../../../etools-prp-common/elements/page-header.js';
+import '../../../../elements/ip-reporting/pd-filters.js';
+import '../../../../elements/ip-reporting/pd-list-toolbar.js';
+import '../../../../elements/ip-reporting/pd-list.js';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../../../redux/store';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin LocalizeMixin
- */
-class PageIpReportingPdIndex extends LocalizeMixin(ReduxConnectedElement) {
-  public static get template() {
+@customElement('page-ip-reporting-pd-index')
+export class PageIpReportingPdIndex extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <page-header title="[[localize('programme_documents')]]"></page-header>
+      <page-header title="${translate('PROGRAMME_DOCUMENTS')}"></page-header>
 
       <page-body>
         <pd-filters></pd-filters>
@@ -32,5 +29,3 @@ class PageIpReportingPdIndex extends LocalizeMixin(ReduxConnectedElement) {
     `;
   }
 }
-
-window.customElements.define('page-ip-reporting-pd-index', PageIpReportingPdIndex);

@@ -1,10 +1,23 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.db import transaction
+from django.utils.functional import cached_property
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.account.validators import EmailValidator
-from etools_prp.apps.core.common import CURRENCIES, OVERALL_STATUS, PD_DOCUMENT_TYPE, PD_STATUS, PROGRESS_REPORT_STATUS
+from etools_prp.apps.core.common import (
+    CURRENCIES,
+    FINAL_OVERALL_STATUS,
+    OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
+    PD_STATUS,
+    PROGRESS_REPORT_STATUS,
+    PRP_IP_ROLE_TYPES,
+)
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.models import IndicatorBlueprint
@@ -14,6 +27,7 @@ from etools_prp.apps.indicator.serializers import (
 )
 from etools_prp.apps.partner.models import Partner
 
+from ..core.models import Realm
 from .models import (
     FinalReview,
     LowerLevelOutput,
@@ -219,6 +233,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'funds_received_to_date_percentage',
             'total_unicef_supplies',
             'total_unicef_supplies_currency',
+            'has_signed_document'
 
         )
 
@@ -408,6 +423,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_date',
             'review_overall_status',
             'review_overall_status_display',
+            'accepted_comment',
             'sent_back_feedback',
             'programme_document',
             'funds_received_to_date',
@@ -582,7 +598,7 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.sent_back,
         PROGRESS_REPORT_STATUS.accepted
     ])
-    comment = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False, allow_blank=True)
     overall_status = serializers.ChoiceField(required=False, choices=OVERALL_STATUS)
     reviewed_by_name = serializers.CharField(required=True)
     review_date = serializers.DateField()
@@ -605,6 +621,12 @@ class ProgressReportReviewSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'overall_status': 'Invalid overall status'
             })
+        if self.instance.is_final and overall_status and \
+                overall_status not in [FINAL_OVERALL_STATUS.met, FINAL_OVERALL_STATUS.constrained]:
+            raise serializers.ValidationError({
+                'overall_status': 'Overall status for a final report is invalid.'
+            })
+
         if status == PROGRESS_REPORT_STATUS.accepted and overall_status is None:
             raise serializers.ValidationError({
                 'overall_status': 'Overall status required when accepting a report'
@@ -811,6 +833,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "disbursement",
             "disbursement_percent",
             "document_type",
+            "has_signed_document"
         )
         validators = [
             UniqueTogetherValidator(
@@ -976,3 +999,115 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
             'file_name',
             'type',
         )
+
+
+class ImportRealmSerializer(serializers.Serializer):
+    country = serializers.SlugRelatedField(queryset=Workspace.objects.all(), slug_field='external_id')
+    organization = serializers.SlugRelatedField(queryset=Partner.objects.all(), slug_field='vendor_number')
+    group = serializers.SlugRelatedField(queryset=Group.objects.all(), slug_field='name')
+
+    group_map = {
+        "IP Authorized Officer": PRP_IP_ROLE_TYPES.ip_authorized_officer,
+        "IP Editor": PRP_IP_ROLE_TYPES.ip_editor,
+        "IP Viewer": PRP_IP_ROLE_TYPES.ip_viewer,
+        "IP Admin": PRP_IP_ROLE_TYPES.ip_admin,
+    }
+
+    @cached_property
+    def allowed_groups(self):
+        return [t[0] for t in PRP_IP_ROLE_TYPES]
+
+    def map_group(self, value):
+        return self.group_map.get(value, value)
+
+    def run_validation(self, data=None):
+        if 'group' in data:
+            data['group'] = self.map_group(data['group'])
+
+        return super(ImportRealmSerializer, self).run_validation(data)
+
+
+class ImportUserRealmsSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    realms = serializers.ListSerializer(child=ImportRealmSerializer(), allow_empty=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'email',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'realms',
+        )
+
+    def run_validation(self, data):
+        # filter out any non-PRP groups
+        if data.get('realms'):
+            data['realms'] = [item for item in data['realms'] if item['group'] in ImportRealmSerializer.group_map.keys()]
+        return super().run_validation(data)
+
+    def validate_email(self, value):
+        if value.endswith('@unicef.org'):
+            raise ValidationError('UNICEF users cannot be added through Access Management Portal.')
+        return value
+
+    def save_realms(self, user, realms):
+        realms_set = {
+            (realm['country'].id, realm['organization'].id, realm['group'].id)
+            for realm in realms
+        }
+        user_realms = user.realms.all()
+        user_realms_dict = {
+            (realm.workspace_id, realm.partner_id, realm.group_id): realm
+            for realm in user_realms
+        }
+        realms_to_create = []
+        realms_to_activate = []
+        realms_to_deactivate = []
+
+        for workspace_id, organization_id, group_id in realms_set:
+            realm_key = (workspace_id, organization_id, group_id)
+            if realm_key in user_realms_dict:
+                user_realm = user_realms_dict[realm_key]
+                if not user_realm.is_active:
+                    realms_to_activate.append(user_realm)
+            else:
+                realms_to_create.append(Realm(
+                    user=user,
+                    workspace_id=workspace_id,
+                    partner_id=organization_id,
+                    group_id=group_id,
+                ))
+
+        for realm_key, realm in user_realms_dict.items():
+            if realm_key not in realms_set:
+                realms_to_deactivate.append(realm)
+
+        Realm.objects.bulk_create(realms_to_create)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_activate]).update(is_active=True)
+        Realm.objects.filter(pk__in=[realm.id for realm in realms_to_deactivate]).update(is_active=False)
+        user.update_active_state()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        validated_data['username'] = validated_data['email']
+
+        realms = validated_data.pop('realms')
+        if not realms:
+            raise ValidationError('Cannot create a user without realms.')
+
+        first_realm = realms[0]
+        validated_data['workspace_id'] = first_realm['country'].id
+        validated_data['partner_id'] = first_realm['organization'].id
+
+        instance = super().create(validated_data)
+        self.save_realms(instance, realms)
+        return instance
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        realms = validated_data.pop('realms')
+        instance = super().update(instance, validated_data)
+        self.save_realms(instance, realms)
+        return instance

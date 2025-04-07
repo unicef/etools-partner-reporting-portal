@@ -1,75 +1,99 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../../redux/store';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- */
-class ReportLocationFilter extends LocalizeMixin(ReduxConnectedElement) {
-  static get template() {
+@customElement('report-location-filter')
+export class ReportLocationFilter extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: String})
+  locationsUrl = '';
+
+  @property({type: String})
+  locationId = '';
+
+  @property({type: String})
+  reportId = '';
+
+  @property({type: String})
+  value = '';
+
+  @property({type: Array})
+  options: any[] = [];
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
-
       <searchable-dropdown-filter
-        label="[[localize('location')]]"
+        .label="${translate('LOCATION')}"
         name="location"
         option-label="name"
-        value="[[value]]"
-        data="[[options]]"
+        .value="${this.value}"
+        .data="${this.options}"
       >
       </searchable-dropdown-filter>
     `;
   }
 
-  @property({type: String, computed: '_computeLocationsUrl(locationId, reportId)', observer: '_fetchLocations'})
-  locationsUrl!: string;
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchLocations = debounce(this._fetchLocations.bind(this), 100) as any;
+  }
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.programmeDocumentReports.current.id)'})
-  reportId!: string;
+    if (changedProperties.has('locationId') || changedProperties.has('reportId')) {
+      this.locationsUrl = this._computeLocationsUrl();
+    }
+    if (changedProperties.has('locationsUrl')) {
+      this._fetchLocations();
+    }
+  }
 
-  @property({type: String})
-  value!: string;
+  stateChanged(state) {
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
 
-  @property({type: Array})
-  options = [];
+    if (this.reportId !== state.programmeDocumentReports.current.id) {
+      this.reportId = state.programmeDocumentReports.current.id;
+    }
+  }
 
-  _computeLocationsUrl(locationId: string, reportId: string) {
-    return Endpoints.indicatorDataLocation(locationId, reportId);
+  _computeLocationsUrl() {
+    return this.locationId && this.reportId ? Endpoints.indicatorDataLocation(this.locationId, this.reportId) : '';
   }
 
   _fetchLocations() {
-    const thunk = (this.$.locations as EtoolsPrpAjaxEl).thunk();
-    (this.$.locations as EtoolsPrpAjaxEl).abort();
-    thunk()
-      .then((res: GenericObject) => {
-        this.set('options', [{id: '-1', name: 'All'}].concat(res.data || []));
+    if (!this.locationsUrl) {
+      return;
+    }
+
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.locationsUrl}
+    })
+      .then((res: any) => {
+        this.options = [{id: '-1', name: 'All'}].concat(res || []);
       })
-      .catch((_err: GenericObject) => {
+      .catch((_err: any) => {
         // TODO: error handling
       });
   }
 
   disconnectedCallback() {
-    super.connectedCallback();
-    (this.$.locations as EtoolsPrpAjaxEl).abort();
+    super.disconnectedCallback();
   }
 }
 
-window.customElements.define('report-location-filter', ReportLocationFilter);
+export {ReportLocationFilter as ReportLocationFilterEl};

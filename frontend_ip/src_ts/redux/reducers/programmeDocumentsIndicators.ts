@@ -1,10 +1,9 @@
 import {combineReducers} from 'redux';
-import {GenericObject} from '../../etools-prp-common/typings/globals.types';
 import Constants from '../../etools-prp-common/constants';
 
 export class ProgrammeDocumentsIndicatorsState {
-  byPd: GenericObject = {};
-  loading: GenericObject = {};
+  byPd: any = {};
+  loading: any = {};
 }
 
 export const ProgrammeDocumentsIndicators = combineReducers({
@@ -16,7 +15,7 @@ function byPdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_INDICATORS:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         change[action.pdId] = action.indicatorData;
 
@@ -35,7 +34,7 @@ function loadingByPdReducer(state = {}, action: any) {
   switch (action.type) {
     case Constants.SET_PD_INDICATORS_LOADING:
       return (function () {
-        const change: GenericObject = {};
+        const change: any = {};
 
         change[action.pdId] = action.loading;
 

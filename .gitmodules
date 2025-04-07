@@ -1,8 +1,8 @@
 [submodule "common_ip"]
 	path = frontend_ip/src_ts/etools-prp-common
-	url = https://github.com/unicef/etools-prp-common.git
+	url = ../etools-prp-common.git
 	branch = develop
 [submodule "common_cl"]
 	path = frontend_cluster/src_ts/etools-prp-common
-	url = https://github.com/unicef/etools-prp-common.git
+	url = ../etools-prp-common.git
 	branch = develop

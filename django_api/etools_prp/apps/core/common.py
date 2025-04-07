@@ -88,6 +88,7 @@ CSO_TYPES = Choices(
     ('Nat', 'National', 'National'),
     ('CBO', 'CBO', 'Community Based Organization'),
     ('AI', 'AI', 'Academic Institution'),
+    ('RC', 'RC', 'Red Cross/Red Crescent National Societies')
 )
 
 PARTNER_TYPE = Choices(
@@ -150,9 +151,10 @@ PD_LIST_REPORT_STATUS = Choices(
 
 PD_DOCUMENT_TYPE = Choices(
     ('PD', 'PD', 'Programme Document'),
-    ('SPD', 'SPD' 'Programme Document'),
+    ('SPD', 'SPD', 'Simplified Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
     ('SSFA', 'SSFA', 'SSFA'),
+    ('GDD', 'GDD', 'Government Programme Document'),
 )
 
 PROGRESS_REPORT_STATUS = Choices(
@@ -177,6 +179,8 @@ PD_STATUS = Choices(
     ("review", "review", "Review"),
     ("signature", "signature", "Signature"),
     ("signed", "signed", "Signed"),
+    ("pending_approval", "pending_approval", "Pending Approval"),  # GDD
+    ("approved", "approved", "Approved"),  # GDD
     ("active", "active", "Active"),
     ("cancelled", "cancelled", "Cancelled"),
     ('ended', 'ended', 'Ended'),
@@ -207,8 +211,8 @@ OVERALL_STATUS = Choices(
 )
 
 FINAL_OVERALL_STATUS = Choices(
-    (OVERALL_STATUS.met, "met", "Met results as planned"),
-    (OVERALL_STATUS.constrained, 'constrained', 'Constrained (partially met result)'),
+    (OVERALL_STATUS.met, "met", "Achieved as planned"),
+    (OVERALL_STATUS.constrained, 'constrained', 'Not achieved as planned'),
 )
 
 PARTNER_PROJECT_STATUS = Choices(
@@ -227,6 +231,7 @@ EXTERNAL_DATA_SOURCES = Choices(
     ("HPC", "HPC"),
     ("OPS", "OPS"),
     ("UNICEF", "UNICEF"),
+    ("ETOOLS", "ETOOLS")
 )
 
 CURRENCIES = Choices(
@@ -324,6 +329,7 @@ CURRENCIES = Choices(
     ("MNT", "mnt", "mnt"),
     ("MOP", "mop", "mop"),
     ("MRO", "mro", "mro"),
+    ("MRU", "mru", "mru"),
     ("MUR", "mur", "mur"),
     ("MVR", "mvr", "mvr"),
     ("MWK", "mwk", "mwk"),
@@ -356,7 +362,7 @@ CURRENCIES = Choices(
     ("SEK", "sek", "sek"),
     ("SGD", "sgd", "sgd"),
     ("SHP", "shp", "shp"),
-    ("SLL", "sll", "sll"),
+    ("SLE", "sle", "sle"),
     ("SOS", "sos", "sos"),
     ("SPL", "spl", "spl"),
     ("SRD", "srd", "srd"),

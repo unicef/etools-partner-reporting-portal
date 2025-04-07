@@ -1,7 +1,7 @@
 import {createStore, compose, applyMiddleware, combineReducers, StoreEnhancer} from 'redux';
 
 import thunk from 'redux-thunk';
-import {Localize} from './reducers/localize';
+import {activeLanguage} from './reducers/active-language';
 import {Auth} from './reducers/auth';
 import {Workspaces} from './reducers/workspaces';
 import {Location} from './reducers/location';
@@ -21,7 +21,7 @@ import {CurrenciesData} from './reducers/currencies';
 declare global {
   interface Window {
     process?: Record<string, any>;
-    /* eslint-disable-next-line no-undef */
+
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
   }
 }
@@ -32,7 +32,7 @@ const devCompose: <Ext0, StateExt0>(f1: StoreEnhancer<Ext0, StateExt0>) => Store
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const rootReducer = combineReducers({
-  localize: Localize,
+  activeLanguage: activeLanguage,
   auth: Auth,
   workspaces: Workspaces,
   location: Location,
@@ -50,6 +50,6 @@ const rootReducer = combineReducers({
   currencies: CurrenciesData
 });
 
-export const store = createStore(rootReducer, devCompose(applyMiddleware(thunk)));
+export const store = createStore(rootReducer, devCompose(applyMiddleware(thunk))) as any;
 
 export type ReduxDispatch = typeof store.dispatch;

@@ -1,73 +1,96 @@
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../../redux/store';
 import '../dropdown-filter/dropdown-filter-multi';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- */
-class PDDropdownFilter extends LocalizeMixin(ReduxConnectedElement) {
-  static get template() {
+@customElement('pd-dropdown-filter')
+export class PDDropdownFilter extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
+
+  @property({type: String})
+  programmeDocumentsUrl = '';
+
+  @property({type: String})
+  locationId = '';
+
+  @property({type: String})
+  computedValue = '';
+
+  @property({type: String})
+  value = '';
+
+  @property({type: Array})
+  data: any[] = [];
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-ajax id="programmeDocuments" url="[[programmeDocumentsUrl]]"> </etools-prp-ajax>
-
-      <dropdown-filter-multi class="item" label="[[localize('pd_title')]]" name="pds" value="[[value]]" data="[[data]]">
+      <dropdown-filter-multi
+        class="item"
+        .label="${translate('PD_TITLE')}"
+        name="pds"
+        .value="${this.value}"
+        .data="${this.data}"
+      >
       </dropdown-filter-multi>
     `;
   }
 
-  @property({type: String, computed: '_computeProgrammeDocumentsUrl(locationId)', observer: '_fetchPDs'})
-  programmeDocumentsUrl!: string;
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchPDs = debounce(this._fetchPDs.bind(this), 100) as any;
+  }
 
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
+  updated(changedProperties) {
+    super.updated(changedProperties);
 
-  @property({type: String})
-  computedValue!: string;
+    if (changedProperties.has('locationId')) {
+      this.programmeDocumentsUrl = this._computeProgrammeDocumentsUrl(this.locationId);
+    }
+    if (changedProperties.has('programmeDocumentsUrl')) {
+      this._fetchPDs();
+    }
+  }
 
-  @property({type: String})
-  value!: string;
+  stateChanged(state) {
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+  }
 
-  @property({type: Array})
-  data = [];
-
-  _computeProgrammeDocumentsUrl(locationId: string) {
+  _computeProgrammeDocumentsUrl(locationId) {
     return locationId ? Endpoints.programmeDocuments(locationId) : '';
   }
 
-  _fetchPDs(url: string) {
-    if (!url) {
+  _fetchPDs() {
+    if (!this.programmeDocumentsUrl) {
       return;
     }
 
-    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
-    (this.$.programmeDocuments as EtoolsPrpAjaxEl)
-      .thunk()()
-      .then((res: any) => {
-        this.set('data', res.data.results);
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.programmeDocumentsUrl}
+    })
+      .then((res) => {
+        this.data = res.results;
       })
-      .catch((_err: GenericObject) => {
+      .catch((_err: any) => {
         // TODO: error handling
+        console.log(_err);
       });
   }
 
   disconnectedCallback() {
-    super.connectedCallback();
-    (this.$.programmeDocuments as EtoolsPrpAjaxEl).abort();
+    super.disconnectedCallback();
   }
 }
 
-window.customElements.define('pd-dropdown-filter', PDDropdownFilter);
+export {PDDropdownFilter as PDDropdownFilterEl};

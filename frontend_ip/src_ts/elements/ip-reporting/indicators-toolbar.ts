@@ -1,50 +1,70 @@
-import {html, PolymerElement} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
-import '../etools-prp-toolbar';
 import '../../etools-prp-common/elements/download-button';
 import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {store} from '../../redux/store';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- */
-class IndicatorsToolbar extends UtilsMixin(PolymerElement) {
-  static get template() {
+@customElement('indicators-toolbar')
+export class IndicatorsToolbar extends UtilsMixin(connect(store)(LitElement)) {
+  static styles = css`
+    ${layoutStyles}
+    :host {
+      display: block;
+      margin-bottom: 25px;
+    }
+  `;
+
+  @property({type: Object})
+  queryParams: any;
+
+  @property({type: String})
+  locationId = '';
+
+  @property({type: String})
+  indicatorsUrl = '';
+
+  @property({type: String})
+  xlsExportUrl?: string;
+
+  @property({type: String})
+  pdfExportUrl?: string;
+
+  render() {
     return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
-
-      <etools-prp-toolbar query="{{query}}" location-id="{{locationId}}">
-        <download-button url="[[xlsExportUrl]]" tracker="Indicators Export Xls">XLS</download-button>
-        <download-button url="[[pdfExportUrl]]" tracker="Indicators Export Pdf">PDF</download-button>
-      </etools-prp-toolbar>
+      <div class="layout-horizontal right-align">
+        <download-button .url="${this.xlsExportUrl}" tracker="Indicators Export Xls">XLS</download-button>
+        <download-button .url="${this.pdfExportUrl}" tracker="Indicators Export Pdf">PDF</download-button>
+      </div>
     `;
   }
 
-  @property({type: String})
-  query!: string;
+  stateChanged(state: any) {
+    if (
+      state.app?.routeDetails?.queryParams &&
+      !isJsonStrMatch(this.queryParams, state.app?.routeDetails?.queryParams)
+    ) {
+      this.queryParams = state.app?.routeDetails.queryParams;
+    }
 
-  @property({type: String})
-  locationId!: string;
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+  }
 
-  @property({type: String, computed: '_computeIndicatorsUrl(locationId)'})
-  indicatorsUrl!: string;
+  updated(changedProperties: any) {
+    super.updated(changedProperties);
 
-  @property({type: String, computed: "_appendQuery(indicatorsUrl, query, 'export=xlsx')"})
-  xlsExportUrl!: string;
+    if (changedProperties.has('locationId')) {
+      this.indicatorsUrl = computeIndicatorsUrl(this.locationId);
+    }
 
-  @property({type: String, computed: "_appendQuery(indicatorsUrl, query, 'export=pdf')"})
-  pdfExportUrl!: string;
-
-  _computeIndicatorsUrl(locationId: string) {
-    return computeIndicatorsUrl(locationId);
+    if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
+      this.xlsExportUrl = this._appendQuery(this.indicatorsUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = this._appendQuery(this.indicatorsUrl, this.queryParams, 'export=pdf');
+    }
   }
 }
-
-window.customElements.define('indicators-toolbar', IndicatorsToolbar);

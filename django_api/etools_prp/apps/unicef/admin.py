@@ -32,7 +32,7 @@ from etools_prp.apps.unicef.tasks import process_programme_documents
 class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('title', 'reference_number', 'agreement', 'partner',
                     'status', 'workspace', 'external_id')
-    list_filter = ('status', 'workspace',)
+    list_filter = ('status', 'document_type', 'workspace',)
     search_fields = ('title', 'reference_number', 'agreement', 'partner__title', 'workspace__title')
     raw_id_fields = [
         'unicef_officers',

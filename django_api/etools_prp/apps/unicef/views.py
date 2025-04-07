@@ -21,6 +21,7 @@ from etools_prp.apps.core.api_error_codes import APIErrorCode
 from etools_prp.apps.core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
     PD_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
@@ -72,6 +73,7 @@ from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, 
 from .import_report import ProgressReportXLSXReader
 from .models import LowerLevelOutput, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
+    ImportUserRealmsSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
@@ -657,7 +659,7 @@ class ProgressReportSubmitAPIView(APIView):
 
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
+                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
                 email__in=progress_report.programme_document
                 .unicef_officers.filter(active=True).values_list('email', flat=True)
             ).first()
@@ -759,7 +761,7 @@ class ProgressReportSRSubmitAPIView(APIView):
 
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
+                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
                 email__in=progress_report.programme_document.unicef_officers
                 .filter(active=True).values_list('email', flat=True)
             ).first()
@@ -909,7 +911,7 @@ class ProgressReportPullHFDataAPIView(APIView):
 
                         else:
                             calculated[loc_id]['total']['d'] += ild.disaggregation['()']['d']
-                    if calculated[loc_id]['data']['d'] == 0:
+                    if calculated[loc_id]['data'].get('d') == 0:
                         calculated[loc_id]['data']['c'] = 0
                     else:
                         calculated[loc_id]['total']['c'] = convert_string_number_to_float(calculated[loc_id]['total']['v']) / calculated[loc_id]['total']['d']
@@ -1045,7 +1047,7 @@ class ProgressReportReviewAPIView(APIView):
         }:
             raise ValidationError("This report is not in submitted / accepted state.")
 
-        serializer = ProgressReportReviewSerializer(data=request.data)
+        serializer = ProgressReportReviewSerializer(data=request.data, instance=progress_report)
         serializer.is_valid(raise_exception=True)
 
         progress_report.status = serializer.validated_data['status']
@@ -1061,6 +1063,7 @@ class ProgressReportReviewAPIView(APIView):
 
         elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
             progress_report.review_overall_status = serializer.validated_data['overall_status']
+            progress_report.accepted_comment = serializer.validated_data.get('comment')
 
         progress_report.save()
         serializer = ProgressReportSerializer(instance=progress_report)
@@ -1085,15 +1088,8 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     )
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
-    def get(self, request, workspace_id, pd_id):
-        """
-        Construct the input data to the serializer for the LLO and its
-        associated indicators.
-        """
-        pd = get_object_or_404(
-            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
-        )
-
+    @staticmethod
+    def get_response_data(pd):
         data = {'ll_outputs_and_indicators': []}
         for llo in pd.lower_level_outputs:
             indicator_blueprints = []
@@ -1106,9 +1102,19 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             }
 
             data['ll_outputs_and_indicators'].append(inner_data)
+        return data
+
+    def get(self, request, workspace_id, pd_id):
+        """
+        Construct the input data to the serializer for the LLO and its
+        associated indicators.
+        """
+        pd = get_object_or_404(
+            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
+        )
 
         return Response(ProgrammeDocumentCalculationMethodsSerializer(
-            data).data)
+            self.get_response_data(pd)).data)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -1168,7 +1174,8 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                     fail_silently=False
                 )
 
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        return Response(ProgrammeDocumentCalculationMethodsSerializer(
+            self.get_response_data(pd)).data)
 
 
 class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
@@ -1311,7 +1318,10 @@ class InterventionPMPDocumentView(APIView):
 
         api = PMP_API()
         try:
-            document_url = api.get_pd_document_url(pd.workspace.business_area_code, pd.external_id)
+            if pd.document_type == PD_DOCUMENT_TYPE.GDD:
+                document_url = api.get_gpd_document_url(pd.workspace.business_area_code, pd.external_id)
+            else:
+                document_url = api.get_pd_document_url(pd.workspace.business_area_code, pd.external_id)
         except HTTPError as e:
             return Response(e.response)
         except (ConnectionError, ConnectTimeout, ReadTimeout):
@@ -1396,3 +1406,14 @@ class ProgressReportExcelImportView(APIView):
 
         else:
             return Response({}, status=statuses.HTTP_200_OK)
+
+
+class UserRealmsImportView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = get_user_model().objects.filter(email=request.data.get('email', None)).first()
+        serializer = ImportUserRealmsSerializer(data=request.data, instance=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({}, status=statuses.HTTP_200_OK)

@@ -1,179 +1,263 @@
-import {ReduxConnectedElement} from './etools-prp-common/ReduxConnectedElement';
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
-import '@polymer/app-route/app-location.js';
-import '@polymer/app-route/app-route.js';
-import '@polymer/iron-pages/iron-pages.js';
+import {LitElement, html, css, PropertyValues} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
+import './utils/routes';
 import '@unicef-polymer/etools-piwik-analytics/etools-piwik-analytics.js';
 
-import LocalizeMixin from './etools-prp-common/mixins/localize-mixin';
-import UtilsMixin from './etools-prp-common/mixins/utils-mixin';
-import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin';
-import Endpoints from './endpoints';
-import './etools-prp-common/elements/app-redirect';
-import './etools-prp-common/elements/etools-prp-ajax';
-import './etools-prp-common/elements/etools-prp-auth';
-import {EtoolsPrpAjaxEl} from './etools-prp-common/elements/etools-prp-ajax';
-import {GenericObject} from './etools-prp-common/typings/globals.types';
-import {reset, userLogout} from './redux/actions';
-import {getDomainByEnv, BASE_PATH} from './etools-prp-common/config';
-import {locales} from './locales';
-import {setPassiveTouchGestures} from '@polymer/polymer/lib/utils/settings.js';
-declare const dayjs: any;
-declare const dayjs_plugin_utc: any;
+import UtilsMixin from './etools-prp-common/mixins/utils-mixin.js';
+import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin.js';
+import Endpoints from './endpoints.js';
+import './etools-prp-common/elements/app-redirect.js';
+import './etools-prp-common/elements/etools-prp-auth.js';
+import {reset, resetToken} from './redux/actions.js';
+import {BASE_PATH} from './etools-prp-common/config.js';
+import {RootState} from './typings/redux.types.js';
+import {connect, installRouter} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from './redux/store.js';
+import dayjs from 'dayjs';
+import dayJsUtc from 'dayjs/plugin/utc';
+import {initializeIcons} from '@unicef-polymer/etools-unicef/src/etools-icons/etools-icons';
+import {handleUrlChange} from './redux/actions/app';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import cloneDeep from 'lodash-es/cloneDeep';
+import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
+import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
+import {setBasePath} from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+import {registerTranslateConfig, translate, use} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {setActiveLanguage} from './redux/actions/active-language';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
 
-dayjs.extend(dayjs_plugin_utc);
-/**
- * @polymer
- * @customElement
- * @mixinFunction
- * @appliesMixin UtilsMixin
- * @appliesMixin ErrorHandlerMixin
- * @appliesMixin LocalizeMixin
- */
-class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnectedElement))) {
-  public static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-          height: 100%;
-        }
+dayjs.extend(dayJsUtc);
 
-        iron-pages {
-          height: 100%;
-        }
-      </style>
-      <etools-piwik-analytics user="[[profile]]" page="[[route.path]]"></etools-piwik-analytics>
+function fetchLangFiles(lang: string) {
+  return Promise.allSettled([fetch(`assets/i18n/${lang}.json`).then((res: any) => res.json())]).then(
+    (response: any) => {
+      return response[0].value;
+    }
+  );
+}
 
-      <app-redirect></app-redirect>
+const translationConfig = registerTranslateConfig({
+  empty: (key) => `${key && key[0].toUpperCase() + key.slice(1).toLowerCase()}`,
+  loader: (lang: string) => fetchLangFiles(lang)
+});
 
-      <etools-prp-auth authenticated="{{authenticated}}"></etools-prp-auth>
+setBasePath('/ip/');
+initializeIcons();
 
-      <etools-prp-ajax id="signOut" url="[[signoutUrl]]" body="{}" content-type="application/json" method="post">
-      </etools-prp-ajax>
+@customElement('app-shell')
+export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitElement))) {
+  static styles = css`
+    :host {
+      display: block;
+      height: 100%;
+    }
+  `;
 
-      <app-location route="{{route}}"></app-location>
-
-      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
-
-      <iron-pages selected="[[page]]" attr-for-selected="name" role="main">
-        <template is="dom-if" if="[[_equals(page, basePath)]]" restamp="true">
-          <page-app name="[[basePath]]" route="{{subroute}}"> </page-app>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'login')]]" restamp="true">
-          <page-login name="login" value="{{error}}"></page-login>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'unauthorized')]]" restamp="true">
-          <page-unauthorized name="unauthorized"></page-unauthorized>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'not-found')]]" restamp="true">
-          <page-not-found name="not-found"></page-not-found>
-        </template>
-
-        <template is="dom-if" if="[[_equals(page, 'login-token')]]" restamp="true">
-          <page-login-token name="login-token"></page-login-token>
-        </template>
-      </iron-pages>
-    `;
-  }
   @property({type: String})
   basePath = BASE_PATH;
 
   @property({type: Object})
-  routeData!: GenericObject;
+  routeData: any = {};
 
   @property({type: Object})
-  subroute!: GenericObject;
-
-  @property({type: String, observer: '_pageChanged'})
-  page!: string;
-
-  @property({type: Boolean})
-  authenticated!: boolean;
+  subroute: any = {};
 
   @property({type: String})
-  signoutUrl: string = Endpoints.userSignOut();
+  page?: string;
 
-  @property({type: String, computed: '_computeRedirectPath(authenticated)'})
-  redirectPath!: string;
+  @property({type: Boolean})
+  authenticated = false;
+
+  @property({type: String})
+  signoutUrl = Endpoints.userSignOut();
+
+  @property({type: String})
+  redirectPath?: string;
 
   @property({type: Boolean})
   error = false;
 
-  @property({type: Object, computed: 'getReduxStateObject(rootState.userProfile.profile)'})
-  profile!: GenericObject;
+  @property({type: Object})
+  profile = {};
+
+  @property({type: Object})
+  reduxRouteDetails = {};
+
+  @state() hasLoadedStrings = false;
 
   constructor() {
     super();
-    // Gesture events like tap and track generated from touch will not be
-    // preventable, allowing for better scrolling performance.
-    setPassiveTouchGestures(true);
   }
 
-  public static get observers() {
-    return ['_routePageChanged(routeData.page)'];
+  protected shouldUpdate(props: PropertyValues) {
+    return this.hasLoadedStrings && super.shouldUpdate(props);
+  }
+
+  render() {
+    return html`
+      <etools-piwik-analytics .user="${this.profile}" .page="${this.route?.path}"></etools-piwik-analytics>
+
+      <app-redirect></app-redirect>
+
+      <etools-prp-auth .authenticated="${this.authenticated}"></etools-prp-auth>
+
+      ${this._equals(this.page, 'app') ? html`<page-app name="${this.basePath}"></page-app>` : ''}
+      ${this._equals(this.page, 'login') ? html` <page-login name="login" .value="${this.error}"></page-login>` : ''}
+      ${this._equals(this.page, 'unauthorized')
+        ? html` <page-unauthorized name="unauthorized"></page-unauthorized>`
+        : ''}
+      ${this._equals(this.page, 'not-found') ? html` <page-not-found name="not-found"></page-not-found>` : ''}
+      ${this._equals(this.page, 'login-token') ? html` <page-login-token name="login-token"></page-login-token>` : ''}
+    `;
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has('authenticated')) {
+      this.redirectPath = this.authenticated ? '/' + BASE_PATH : '/landing';
+    }
+  }
+
+  firstUpdated(changedProperties: PropertyValues) {
+    super.firstUpdated(changedProperties);
+    this.waitForTranslationsToLoad().then(async () => {
+      this.checkAppVersion();
+    });
+  }
+
+  stateChanged(state: RootState) {
+    this.setCurrentLanguage(state);
+
+    if (state.userProfile.profile && !isJsonStrMatch(this.profile, state.userProfile.profile)) {
+      this.profile = state.userProfile.profile;
+    }
+
+    if (this.selectedLanguage !== state.activeLanguage.activeLanguage) {
+      this.selectedLanguage = state.activeLanguage.activeLanguage;
+      this.loadLocalization();
+    }
+
+    if (state.app.routeDetails && !isJsonStrMatch(this.reduxRouteDetails, state.app.routeDetails)) {
+      if (this.canAccessPage(state.app.routeDetails.routeName)) {
+        this.page = state.app.routeDetails?.routeName || 'app';
+        this.reduxRouteDetails = cloneDeep(state.app.routeDetails);
+      } else {
+        EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.DEFAULT));
+      }
+    }
+  }
+
+  setCurrentLanguage(state: RootState) {
+    let currentLanguage = localStorage.getItem('defaultLanguage');
+
+    if (!state.activeLanguage.activeLanguage) {
+      if (!currentLanguage) {
+        currentLanguage = navigator.language.split('-')[0];
+      }
+
+      if (!currentLanguage) {
+        currentLanguage = 'en';
+      }
+
+      store.dispatch(setActiveLanguage(currentLanguage));
+    }
+  }
+
+  async loadLocalization() {
+    this.waitForTranslationsToLoad().then(async () => {
+      await use(this.selectedLanguage);
+      this.hasLoadedStrings = true;
+    });
+  }
+
+  waitForTranslationsToLoad() {
+    return new Promise((resolve) => {
+      const translationsCheck = setInterval(() => {
+        if (translationConfig) {
+          clearInterval(translationsCheck);
+          resolve(true);
+        }
+      }, 50);
+    });
+  }
+
+  checkAppVersion() {
+    fetch('version.json')
+      .then((res) => res.json())
+      .then((version) => {
+        if (version.revision != document.getElementById('buildRevNo')!.innerText) {
+          console.log('version.json', version.revision);
+          console.log('buildRevNo ', document.getElementById('buildRevNo')!.innerText);
+          this._showConfirmNewVersionDialog();
+        }
+      });
+  }
+
+  private async _showConfirmNewVersionDialog() {
+    // COMMENT THIS TO OUT TO REMOVE CONFIRMATION DIALOG FOR REFRESH APP
+    const confirmed = await openDialog({
+      dialog: 'are-you-sure',
+      dialogData: {
+        content: translate('A_NEW_VERSION_OF_THE_APP_IS_AV'),
+        confirmBtnText: translate('YES')
+      }
+    }).then(({confirmed}) => {
+      return confirmed;
+    });
+
+    if (confirmed) {
+      if (navigator.serviceWorker) {
+        caches.keys().then((cacheNames) => {
+          cacheNames.forEach((cacheName) => {
+            caches.delete(cacheName);
+          });
+          location.reload();
+        });
+      }
+    }
+  }
+
+  canAccessPage(_routeName: string) {
+    return true;
   }
 
   _goToLanding() {
     location.pathname = '/landing';
   }
 
-  _routePageChanged(page: string) {
-    const validPages = [BASE_PATH, 'landing', 'unauthorized', 'not-found', 'login-token'];
-    const isPageValid = validPages.includes(page); // Check if page is valid
-
-    if (!page) {
-      location.pathname = '/' + BASE_PATH;
-    } else if (isPageValid === false) {
-      this.page = 'not-found'; // If page is invalid, redirect to not-found page
-    } else {
-      this.page = page;
-    }
-  }
-
   _onTokenError() {
-    this.set('error', true);
+    this.error = true;
     this._goToLanding();
   }
 
-  async _pageChanged(page: string) {
-    let componentName = '';
-    if (page === BASE_PATH) {
-      componentName = 'app';
-    } else {
-      componentName = page;
-    }
-    const resolvedPageUrl = getDomainByEnv() + `/src/pages/${componentName}.js`;
-    await import(resolvedPageUrl).catch((err: any) => {
-      console.log(err);
-      this._notFound();
-    });
-  }
-
   _onSignOut() {
-    const thunk = (this.$.signOut as EtoolsPrpAjaxEl).thunk();
-    this.reduxStore
-      .dispatch(userLogout(thunk))
-      // @ts-ignore
-      .then(() => {
+    sendRequest({
+      method: 'POST',
+      endpoint: {url: this.signoutUrl}
+    })
+      .then((_resp: any) => {
+        store.dispatch(resetToken());
         this._goToLanding();
-        this.reduxStore.dispatch(reset());
+        store.dispatch(reset());
       })
-      .catch((_err: any) => {
-        // TODO: error handling
+      .catch((error: any) => {
+        console.error(error);
       });
   }
 
-  _notFound() {
-    this.page = 'not-found';
+  connectedCallback() {
+    super.connectedCallback();
+    this._addEventListeners();
+
+    installRouter((location) =>
+      store.dispatch(handleUrlChange(decodeURIComponent(location.pathname + location.search)))
+    );
   }
 
-  _computeRedirectPath(authenticated: boolean) {
-    return authenticated ? '/' + BASE_PATH : '/landing';
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._removeEventListeners();
   }
 
   _addEventListeners() {
@@ -190,18 +274,6 @@ class AppShell extends LocalizeMixin(ErrorHandlerMixin(UtilsMixin(ReduxConnected
     this.removeEventListener('sign-out', this._onSignOut);
     this.removeEventListener('token-error', this._onTokenError);
   }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.dispatchResources(locales);
-    this._addEventListeners();
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-
-    this._removeEventListeners();
-  }
 }
 
-window.customElements.define('app-shell', AppShell);
+export {AppShell as AppShellEl};

@@ -1,84 +1,98 @@
-import {html} from '@polymer/polymer';
-import {property} from '@polymer/decorators';
+import {html, css, LitElement} from 'lit';
+import {property, customElement} from 'lit/decorators.js';
 import '../dropdown-filter/searchable-dropdown-filter';
-import '../../../etools-prp-common/elements/etools-prp-ajax';
-import {EtoolsPrpAjaxEl} from '../../../etools-prp-common/elements/etools-prp-ajax';
 import Endpoints from '../../../endpoints';
-import LocalizeMixin from '../../../etools-prp-common/mixins/localize-mixin';
-import {ReduxConnectedElement} from '../../../etools-prp-common/ReduxConnectedElement';
-import {GenericObject} from '../../../etools-prp-common/typings/globals.types';
+import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {store} from '../../../redux/store';
+import {debounce} from 'lodash-es';
+import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
-/**
- * @polymer
- * @customElement
- * @appliesMixin LocalizeMixin
- */
-class LocationFilter extends LocalizeMixin(ReduxConnectedElement) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-      </style>
+@customElement('location-filter')
+export class LocationFilter extends connect(store)(LitElement) {
+  static styles = css`
+    :host {
+      display: block;
+    }
+  `;
 
-      <etools-prp-ajax id="locations" url="[[locationsUrl]]"> </etools-prp-ajax>
+  @property({type: String})
+  locationsUrl = '';
 
-      <searchable-dropdown-filter
-        label="[[localize('location')]]"
-        option-label="name"
-        name="location"
-        value="[[value]]"
-        data="[[data]]"
-      >
-      </searchable-dropdown-filter>
-    `;
-  }
-
-  @property({type: String, computed: '_computeLocationsUrl(locationId)', observer: '_fetchLocations'})
-  locationsUrl!: string;
-
-  @property({type: String, computed: 'getReduxStateValue(rootState.location.id)'})
-  locationId!: string;
+  @property({type: String, reflect: true})
+  locationId = '';
 
   @property({type: String})
   value = '-1';
 
   @property({type: Array})
-  data = [];
+  data: any[] = [];
 
-  _computeLocationsUrl(locationId: string) {
-    return locationId ? Endpoints.locations(locationId) : '';
+  render() {
+    return html`
+      <searchable-dropdown-filter
+        .label="${translate('LOCATION')}"
+        option-label="name"
+        name="location"
+        .value="${this.value}"
+        .data="${this.data}"
+      >
+      </searchable-dropdown-filter>
+    `;
   }
 
-  _fetchLocations(url: string) {
-    if (!url) {
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchLocations = debounce(this._fetchLocations.bind(this), 100) as any;
+  }
+
+  stateChanged(state) {
+    if (this.locationId !== state.location.id) {
+      this.locationId = state.location.id;
+    }
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('locationId')) {
+      this.locationsUrl = this._computeLocationsUrl();
+    }
+    if (changedProperties.has('locationsUrl')) {
+      this._fetchLocations();
+    }
+  }
+
+  _computeLocationsUrl() {
+    return this.locationId ? Endpoints.locations(this.locationId) : '';
+  }
+
+  _fetchLocations() {
+    if (!this.locationsUrl) {
       return;
     }
 
-    (this.$.locations as EtoolsPrpAjaxEl).abort();
-    (this.$.locations as EtoolsPrpAjaxEl)
-      .thunk()()
-      .then((res: any) => {
-        this.set(
-          'data',
-          [
-            {
-              id: '-1',
-              name: 'All'
-            }
-          ].concat(res.data || [])
-        );
+    sendRequest({
+      method: 'GET',
+      endpoint: {url: this.locationsUrl}
+    })
+      .then((res) => {
+        this.data = [
+          {
+            id: '-1',
+            name: 'All'
+          },
+          ...(res || [])
+        ];
       })
-      .catch((err: GenericObject) => {
+      .catch((err: any) => {
         console.log(err);
       });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    (this.$.locations as EtoolsPrpAjaxEl).abort();
   }
 }
 
-window.customElements.define('location-filter', LocationFilter);
+export {LocationFilter as LocationFilterEl};
