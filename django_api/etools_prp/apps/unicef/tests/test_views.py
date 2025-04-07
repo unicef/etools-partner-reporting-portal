@@ -37,6 +37,7 @@ from etools_prp.apps.core.tests.factories import (
     GroupFactory,
     PartnerFactory,
     PartnerUserFactory,
+    ProgressReportIndicatorReportFactory,
     RealmFactory,
     WorkspaceFactory,
 )
@@ -1275,6 +1276,78 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         )
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+
+class TestProgressReportPullHFDataAPIView(BaseProgressReportAPITestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        self.hf_indicator_report = self.progress_report.indicator_reports.first()
+
+    def test_get_HF_non_QPR_from_HR_invalid(self):
+        self.progress_report.report_type = REPORTING_TYPES.SR
+        self.progress_report.save(update_fields=['report_type'])
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('This Progress Report is not QPR type.' in response.data['non_field_errors'])
+
+    def test_get_HF_from_HR_without_data_invalid(self):
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('This HR indicator does not have any High frequency reports within this QPR period.' in
+                        response.data['non_field_errors'])
+
+    def test_get_HF_from_HR(self):
+        hr_progress_report = factories.ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        hf_indicator = ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.hf_indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            len(response.data),
+            ProgressReport.objects.filter(
+                programme_document=self.progress_report.programme_document,
+                report_type="HR",
+                start_date__gte=self.progress_report.start_date,
+                end_date__lte=self.progress_report.end_date,
+            ).count()
+        )
+        hr_ids = [r['id'] for r in response.data]
+        self.assertIn(hr_progress_report.pk, hr_ids)
+        self.assertEqual(
+            hf_indicator.total['v'],
+            response.data[hr_ids.index(hr_progress_report.pk)]['report_location_total']['v']
+        )
 
 
 class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
