@@ -1,0 +1,38 @@
+import logging
+
+from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.serializers import PMPLocationSerializer
+from etools_prp.apps.unicef.ppd_sync.utils import process_model
+
+logger = logging.getLogger(__name__)
+
+
+def update_create_location(i: dict) -> (list, bool):
+    locations = list()
+    for loc in i['locations']:
+        # Create gateway for location
+        # TODO: assign country after PMP add these
+        # fields into API
+
+        if loc['admin_level'] is None:
+            logger.warning("Admin level empty! Skipping!")
+            return locations, False
+
+        if loc['p_code'] is None or not loc['p_code']:
+            logger.warning("Location code empty! Skipping!")
+            return locations, False
+
+        # Create location
+        location = process_model(
+            Location,
+            PMPLocationSerializer,
+            loc,
+            {
+                'name': loc['name'],
+                'p_code': loc['p_code'],
+                'admin_level': loc['admin_level'],
+            }
+        )
+        locations.append(location)
+
+    return locations, True

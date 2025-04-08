@@ -16,14 +16,17 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_blueprint import update_create_blueprint
 from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregation
 from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
     update_create_expected_result_llos,
     update_create_expected_result_rl,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_location
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -31,12 +34,22 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_focal_points,
     update_create_unicef_focal_points,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
 from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import item_reference
 
 
 def _for_loop_reporting_period_dates_qpr_n_hr(reporting_requirements, flag_needs_not_to_exist=False):
+    """
+    Flag here is destined to make sure that we get True or False according to our desire (assertTrue/False)
+    1. So if we need items to exist, then we set Flag to False, and if we get non-existing item it returns False immediately
+    2. Otherwise, flag set to True will fire True if provided item exists thus making assertTrue failing whole the test
+    To make sure what you get in result see latest return statement of the function to see destined values of successful looping
+    Generally:
+        AssertFalse (not existing items) flag = True
+        AssertTrue      (existing items) flag = False
+    """
     for reporting_requirement in reporting_requirements:
 
         reporting_period_date_qpr_n_hr_qs_index = ReportingPeriodDates.objects.filter(external_id=reporting_requirement['id'])
@@ -53,6 +66,15 @@ def _for_loop_reporting_period_dates_qpr_n_hr(reporting_requirements, flag_needs
 
 
 def _for_loop_pd_result_links_and_llos(expected_results, flag_needs_not_to_exist=False):
+    """
+    Flag here is destined to make sure that we get True or False according to our desire (assertTrue/False)
+    1. So if we need items to exist, then we set Flag to False, and if we get non-existing item it returns False immediately
+    2. Otherwise, flag set to True will fire True if provided item exists thus making assertTrue failing whole the test
+    To make sure what you get in result see latest return statement of the function to see destined values of successful looping
+    Generally:
+        AssertFalse (not existing items) flag = True
+        AssertTrue      (existing items) flag = False
+    """
     for expected_result in expected_results:
 
         # # PD Result Link step testing
@@ -78,6 +100,15 @@ def _for_loop_pd_result_links_and_llos(expected_results, flag_needs_not_to_exist
 
 
 def _for_loop_indicators(expected_results, flag_needs_not_to_exist=False):
+    """
+    Flag here is destined to make sure that we get True or False according to our desire (assertTrue/False)
+    1. So if we need items to exist, then we set Flag to False, and if we get non-existing item it returns False immediately
+    2. Otherwise, flag set to True will fire True if provided item exists thus making assertTrue failing whole the test
+    To make sure what you get in result see latest return statement of the function to see destined values of successful looping
+    Generally:
+        AssertFalse (not existing items) flag = True
+        AssertTrue      (existing items) flag = False
+    """
     for expected_result in expected_results:
         for indicator in expected_result['indicators']:
 
@@ -238,5 +269,34 @@ class TestPDItem(BaseAPITestCase):
 
                 # Create LLO
                 d, llo = update_create_expected_result_llos(d, _workspace, pd, pdresultlink)
+
+                # Iterate over indicators
+                for i in d['indicators']:
+                    # Check if indicator is cluster indicator
+                    if i['cluster_indicator_id']:
+                        i['is_cluster_indicator'] = True
+                        i['is_unicef_hf_indicator'] = True
+                    else:
+                        i['is_cluster_indicator'] = False
+                        i['is_unicef_hf_indicator'] = i['is_high_frequency']
+
+                    # Create Blueprints
+                    i, blueprint, blueprint_result = update_create_blueprint(i, pd)
+
+                    if blueprint_result is None:
+                        continue
+
+                    # Create Locations
+                    locations, locations_result = update_create_location(i)
+
+                    if locations_result is None:
+                        continue
+
+                    # Create Disaggregations
+                    disaggregations = update_create_disaggregation(i, pd)
+
+                    # Create Reportable
+                    i, reportable, partner_activity = update_create_reportable(i, blueprint, disaggregations, llo,
+                                                                               item, pd)
 
             self.assertTrue(_for_loop_pd_result_links_and_llos(_item['expected_results']))

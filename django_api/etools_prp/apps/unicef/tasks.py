@@ -3,7 +3,6 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
 from celery import shared_task
@@ -12,21 +11,11 @@ from rest_framework.exceptions import ValidationError
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
 from etools_prp.apps.core.models import Location, Realm, Workspace
-from etools_prp.apps.core.serializers import PMPLocationSerializer
 from etools_prp.apps.indicator.models import (
     create_papc_reportables_from_ca,
     create_reportable_for_pp_from_ca_reportable,
-    Disaggregation,
-    DisaggregationValue,
-    IndicatorBlueprint,
     Reportable,
     ReportableLocationGoal,
-)
-from etools_prp.apps.indicator.serializers import (
-    PMPDisaggregationSerializer,
-    PMPDisaggregationValueSerializer,
-    PMPIndicatorBlueprintSerializer,
-    PMPReportableSerializer,
 )
 from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
@@ -37,14 +26,17 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_blueprint import update_create_blueprint
 from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregation
 from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
     update_create_expected_result_llos,
     update_create_expected_result_rl,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_location
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -52,6 +44,7 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_focal_points,
     update_create_unicef_focal_points,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
 from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
@@ -63,7 +56,6 @@ from etools_prp.apps.unicef.serializers import (
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
 )
-from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -198,133 +190,23 @@ def process_programme_documents(fast=False, area=False):
                                         i['is_cluster_indicator'] = False
                                         i['is_unicef_hf_indicator'] = i['is_high_frequency']
 
-                                    # If indicator is not cluster, create Blueprint
-                                    # otherwise use parent Blueprint
-                                    if i['is_cluster_indicator']:
-                                        # Get blueprint of parent indicator
-                                        try:
-                                            blueprint = Reportable.objects.get(
-                                                id=i['cluster_indicator_id']).blueprint
-                                        except Reportable.DoesNotExist:
-                                            logger.exception("Blueprint not exists! Skipping!")
-                                            continue
-                                    else:
-                                        # Create IndicatorBlueprint
-                                        i['disaggregatable'] = True
-                                        # TODO: Fix db schema to accommodate larger lengths
-                                        i['title'] = i['title'][:255] if i['title'] else "unknown"
+                                    # Create Blueprints
+                                    i, blueprint, blueprint_result = update_create_blueprint(i, pd)
 
-                                        if i['unit'] == '':
-                                            if int(i['baseline']['d']) == 1:
-                                                i['unit'] = 'number'
-                                                i['display_type'] = 'number'
+                                    if blueprint_result is None:
+                                        continue
 
-                                            elif int(i['baseline']['d']) != 1:
-                                                i['unit'] = 'percentage'
-                                                i['display_type'] = 'percentage'
+                                    # Create Locations
+                                    locations, locations_result = update_create_location(i)
 
-                                        elif i['unit'] == 'number':
-                                            i['display_type'] = 'number'
+                                    if locations_result is None:
+                                        continue
 
-                                        elif i['unit'] == 'percentage':
-                                            i['calculation_formula_across_periods'] = 'latest'
-
-                                        blueprint = process_model(
-                                            IndicatorBlueprint,
-                                            PMPIndicatorBlueprintSerializer,
-                                            i, {
-                                                'external_id': i['blueprint_id'],
-                                                'reportables__lower_level_outputs__cp_output__programme_document': pd.id
-                                            }
-                                        )
-
-                                    locations = list()
-                                    for loc in i['locations']:
-                                        # Create gateway for location
-                                        # TODO: assign country after PMP add these
-                                        # fields into API
-
-                                        if loc['admin_level'] is None:
-                                            logger.warning("Admin level empty! Skipping!")
-                                            continue
-
-                                        if loc['p_code'] is None or not loc['p_code']:
-                                            logger.warning("Location code empty! Skipping!")
-                                            continue
-
-                                        # Create location
-                                        location = process_model(
-                                            Location,
-                                            PMPLocationSerializer,
-                                            loc,
-                                            {
-                                                'name': loc['name'],
-                                                'p_code': loc['p_code'],
-                                                'admin_level': loc['admin_level'],
-                                            }
-                                        )
-                                        locations.append(location)
-
-                                    # If indicator is not cluster, create
-                                    # Disaggregation otherwise use parent
-                                    # Disaggregation
-                                    disaggregations = list()
-                                    if i['is_cluster_indicator']:
-                                        # Get Disaggregation
-                                        try:
-                                            disaggregations = list(
-                                                Reportable.objects.get(
-                                                    id=i['cluster_indicator_id']).disaggregations.all())
-                                        except Reportable.DoesNotExist:
-                                            disaggregations = list()
-                                    else:
-                                        # Create Disaggregation
-                                        for dis in i['disaggregation']:
-                                            dis['active'] = True
-                                            disaggregation = process_model(
-                                                Disaggregation, PMPDisaggregationSerializer,
-                                                dis, {
-                                                    'name': dis['name'],
-                                                    'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
-                                                }
-                                            )
-                                            disaggregations.append(disaggregation)
-
-                                            # Create Disaggregation Values
-                                            for dv in dis['disaggregation_values']:
-                                                dv['disaggregation'] = disaggregation.id
-                                                process_model(
-                                                    DisaggregationValue,
-                                                    PMPDisaggregationValueSerializer,
-                                                    dv,
-                                                    {
-                                                        'disaggregation_id': disaggregation.id,
-                                                        'value': dv['value'],
-                                                    }
-                                                )
+                                    # Create Disaggregations
+                                    disaggregations = update_create_disaggregation(i, pd)
 
                                     # Create Reportable
-                                    i['blueprint_id'] = blueprint.id if blueprint else None
-                                    i['disaggregation_ids'] = [ds.id for ds in disaggregations]
-
-                                    i['content_type'] = ContentType.objects.get_for_model(llo).id
-                                    i['object_id'] = llo.id
-                                    i['start_date'] = item['start_date']
-                                    i['end_date'] = item['end_date']
-
-                                    convert_string_values_to_numeric(i['target'])
-                                    convert_string_values_to_numeric(i['baseline'])
-
-                                    reportable = process_model(
-                                        Reportable,
-                                        PMPReportableSerializer,
-                                        i, {
-                                            'external_id': i['id'],
-                                            'lower_level_outputs__cp_output__programme_document': pd.id
-                                        }
-                                    )
-                                    reportable.active = i['is_active']
-                                    partner_activity = None
+                                    i, reportable, partner_activity = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
 
                                     # Associate this LLO Reportable with ClusterActivity Reportable
                                     # for dual reporting
