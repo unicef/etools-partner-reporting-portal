@@ -26,7 +26,7 @@ def update_create_expected_result_rl(expected_result_item: dict, workspace: Work
     return pd_result_link
 
 
-def update_create_expected_result_llos(expected_result_item: dict, workspace: Workspace, pd: ProgrammeDocument, pd_result_link: PDResultLink)\
+def update_create_expected_result_llo(expected_result_item: dict, workspace: Workspace, pd: ProgrammeDocument, pd_result_link: PDResultLink)\
         -> (dict, LowerLevelOutput):
 
     # Create LLO

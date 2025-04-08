@@ -31,12 +31,12 @@ from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregation
+from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregations
 from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
-    update_create_expected_result_llos,
+    update_create_expected_result_llo,
     update_create_expected_result_rl,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_location
+from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_locations
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -45,7 +45,7 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
-from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
+from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
@@ -158,7 +158,7 @@ def process_programme_documents(fast=False, area=False):
                         pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
                         # Create sections
-                        item, pd = update_create_section(item, pd, workspace)
+                        item, pd = update_create_sections(item, pd, workspace)
 
                         # Create Reporting Date Periods for QPR and HR report type
                         item = update_create_qpr_n_hr_date_periods(item, pd, workspace)
@@ -178,7 +178,7 @@ def process_programme_documents(fast=False, area=False):
                                 pdresultlink = update_create_expected_result_rl(d, workspace, pd)
 
                                 # Create LLO
-                                d, llo = update_create_expected_result_llos(d, workspace, pd, pdresultlink)
+                                d, llo = update_create_expected_result_llo(d, workspace, pd, pdresultlink)
 
                                 # Iterate over indicators
                                 for i in d['indicators']:
@@ -190,20 +190,20 @@ def process_programme_documents(fast=False, area=False):
                                         i['is_cluster_indicator'] = False
                                         i['is_unicef_hf_indicator'] = i['is_high_frequency']
 
-                                    # Create Blueprints
+                                    # Create Blueprint
                                     i, blueprint, blueprint_result = update_create_blueprint(i, pd)
 
                                     if blueprint_result is None:
                                         continue
 
                                     # Create Locations
-                                    locations, locations_result = update_create_location(i)
+                                    locations, locations_result = update_create_locations(i)
 
                                     if locations_result is None:
                                         continue
 
                                     # Create Disaggregations
-                                    disaggregations = update_create_disaggregation(i, pd)
+                                    disaggregations = update_create_disaggregations(i, pd)
 
                                     # Create Reportable
                                     i, reportable, partner_activity = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)

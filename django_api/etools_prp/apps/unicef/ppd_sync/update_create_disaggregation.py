@@ -8,7 +8,7 @@ from etools_prp.apps.unicef.ppd_sync.utils import process_model
 logger = logging.getLogger(__name__)
 
 
-def update_create_disaggregation(i: dict, pd: ProgrammeDocument) -> list:
+def update_create_disaggregations(i: dict, pd: ProgrammeDocument) -> list:
     # If indicator is not cluster, create
     # Disaggregation otherwise use parent
     # Disaggregation

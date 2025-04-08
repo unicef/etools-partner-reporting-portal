@@ -21,12 +21,12 @@ from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregation
+from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregations
 from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
-    update_create_expected_result_llos,
+    update_create_expected_result_llo,
     update_create_expected_result_rl,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_location
+from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_locations
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -35,7 +35,7 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
-from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
+from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import item_reference
 
@@ -234,7 +234,7 @@ class TestPDItem(BaseAPITestCase):
 
         self.assertFalse(section_qs.exists())
 
-        item, pd = update_create_section(_item, pd, _workspace)
+        item, pd = update_create_sections(_item, pd, _workspace)
 
         self.assertTrue(section_qs.exists())
 
@@ -268,7 +268,7 @@ class TestPDItem(BaseAPITestCase):
                 pdresultlink = update_create_expected_result_rl(d, _workspace, pd)
 
                 # Create LLO
-                d, llo = update_create_expected_result_llos(d, _workspace, pd, pdresultlink)
+                d, llo = update_create_expected_result_llo(d, _workspace, pd, pdresultlink)
 
                 # Iterate over indicators
                 for i in d['indicators']:
@@ -287,13 +287,13 @@ class TestPDItem(BaseAPITestCase):
                         continue
 
                     # Create Locations
-                    locations, locations_result = update_create_location(i)
+                    locations, locations_result = update_create_locations(i)
 
                     if locations_result is None:
                         continue
 
                     # Create Disaggregations
-                    disaggregations = update_create_disaggregation(i, pd)
+                    disaggregations = update_create_disaggregations(i, pd)
 
                     # Create Reportable
                     i, reportable, partner_activity = update_create_reportable(i, blueprint, disaggregations, llo,

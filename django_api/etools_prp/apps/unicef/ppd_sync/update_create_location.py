@@ -7,7 +7,7 @@ from etools_prp.apps.unicef.ppd_sync.utils import process_model
 logger = logging.getLogger(__name__)
 
 
-def update_create_location(i: dict) -> (list, bool):
+def update_create_locations(i: dict) -> (list, bool):
     locations = list()
     for loc in i['locations']:
         # Create gateway for location
