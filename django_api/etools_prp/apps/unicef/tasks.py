@@ -9,15 +9,9 @@ from celery import shared_task
 from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import Location, Realm, Workspace
-from etools_prp.apps.indicator.models import (
-    create_papc_reportables_from_ca,
-    create_reportable_for_pp_from_ca_reportable,
-    Reportable,
-    ReportableLocationGoal,
-)
-from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
+from etools_prp.apps.core.models import Realm, Workspace
+from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
@@ -45,6 +39,9 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable_location_goal import (
+    update_create_reportable_location_goals,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
@@ -182,19 +179,8 @@ def process_programme_documents(fast=False, area=False):
 
                                 # Iterate over indicators
                                 for i in d['indicators']:
-                                    # Check if indicator is cluster indicator
-                                    if i['cluster_indicator_id']:
-                                        i['is_cluster_indicator'] = True
-                                        i['is_unicef_hf_indicator'] = True
-                                    else:
-                                        i['is_cluster_indicator'] = False
-                                        i['is_unicef_hf_indicator'] = i['is_high_frequency']
-
                                     # Create Blueprint
-                                    i, blueprint, blueprint_result = update_create_blueprint(i, pd)
-
-                                    if blueprint_result is None:
-                                        continue
+                                    i, blueprint = update_create_blueprint(i, pd)
 
                                     # Create Locations
                                     locations, locations_result = update_create_locations(i)
@@ -208,183 +194,8 @@ def process_programme_documents(fast=False, area=False):
                                     # Create Reportable
                                     i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
 
-                                    partner_activity = None
-
-                                    # Associate this LLO Reportable with ClusterActivity Reportable
-                                    # for dual reporting
-                                    if 'cluster_indicator_id' in i and i['cluster_indicator_id'] is not None:
-                                        cai = None
-                                        pp = None
-                                        partner_activity = None
-                                        papc = None
-
-                                        try:
-                                            cai = Reportable.objects.get(id=int(i['cluster_indicator_id']))
-                                            reportable.ca_indicator_used_by_reporting_entity = cai
-
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot find ClusterActivity Indicator from this UNICEF indicator's cluster reference"
-                                                "for dual reporting - skipping link!: " + str(e)
-                                            )
-                                            continue
-
-                                        # Partner Project for this PD check
-                                        if not PartnerProject.objects.filter(
-                                            external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
-                                            external_source=EXTERNAL_DATA_SOURCES.UNICEF
-                                        ).exists():
-                                            pp = PartnerProject.objects.create(
-                                                external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
-                                                external_source=EXTERNAL_DATA_SOURCES.UNICEF,
-                                                title=item['title'],
-                                                partner=partner,
-                                                start_date=item['start_date'],
-                                                end_date=item['end_date'],
-                                            )
-
-                                            logger.info(
-                                                "Created a new PartnerProject "
-                                                "from PD: " + str(item['number'])
-                                            )
-
-                                            pp.clusters.add(cai.content_object.cluster)
-                                            pp.locations.add(*cai.locations.all())
-                                        else:
-                                            pp = PartnerProject.objects.get(
-                                                external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
-                                                external_source=EXTERNAL_DATA_SOURCES.UNICEF
-                                            )
-
-                                        # Force adoption of PartnerActivity from ClusterActivity Indicator
-                                        if pd.partner.id not in cai.content_object.partner_activities.values_list(
-                                                'partner', flat=True):
-                                            try:
-                                                partner_activity = PartnerActivity.objects.create(
-                                                    title=cai.blueprint.title,
-                                                    partner=pd.partner,
-                                                    cluster_activity=cai.content_object,
-                                                )
-
-                                            except Exception as e:
-                                                logger.exception(
-                                                    "Cannot force adopt PartnerActivity from ClusterActivity "
-                                                    "for dual reporting - skipping link!: " + str(e)
-                                                )
-                                                continue
-                                        else:
-                                            partner_activity = cai.content_object.partner_activities.get(partner=pd.partner)
-
-                                        try:
-                                            papc, created = PartnerActivityProjectContext.objects.update_or_create(
-                                                defaults={
-                                                    'start_date': item['start_date'],
-                                                    'end_date': item['end_date'],
-                                                    'status': PARTNER_ACTIVITY_STATUS.ongoing,
-                                                },
-                                                project=pp,
-                                                activity=partner_activity,
-                                            )
-
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot force adopt project context on PartnerActivity from ClusterActivity "
-                                                "for dual reporting - skipping link!: " + str(e)
-                                            )
-                                            continue
-
-                                        try:
-                                            # Grab Cluster Activity instance from
-                                            # this newly created Partner Activity instance
-                                            create_papc_reportables_from_ca(
-                                                papc, cai.content_object
-                                            )
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot create Reportables for adopted "
-                                                "PartnerActivity from ClusterActivity "
-                                                "for dual reporting - skipping link!: " + str(e)
-                                            )
-
-                                            partner_activity.delete()
-                                            continue
-
-                                        try:
-                                            # Grab Cluster Activity instance from
-                                            # this newly created Partner Activity instance
-                                            if not pp.reportables.filter(parent_indicator=cai).exists():
-                                                create_reportable_for_pp_from_ca_reportable(
-                                                    pp, cai
-                                                )
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot create Reportables for PD Partner Project "
-                                                "from referenced Cluster Activity Reportable "
-                                                " - skipping link!: " + str(e)
-                                            )
-
-                                            continue
-
-                                        except Reportable.DoesNotExist:
-                                            logger.exception(
-                                                "No ClusterActivity Reportable found "
-                                                "for dual reporting - skipping link!"
-                                            )
-
-                                    reportable.save()
-
-                                    rlgs = ReportableLocationGoal.objects.filter(reportable=reportable)
-
-                                    # If the locations for this reportable has been created before
-                                    if rlgs.exists():
-                                        existing_locs = set(rlgs.values_list('location', flat=True))
-                                        new_locs = set(map(lambda x: x.id, locations)) - existing_locs
-
-                                        # Creating M2M Through model instances for new locations
-                                        reportable_location_goals = [
-                                            ReportableLocationGoal(
-                                                reportable=reportable,
-                                                location=loc,
-                                                is_active=True,
-                                            ) for loc in Location.objects.filter(id__in=new_locs)
-                                        ]
-
-                                    else:
-                                        # Creating M2M Through model instances
-                                        reportable_location_goals = [
-                                            ReportableLocationGoal(
-                                                reportable=reportable,
-                                                location=loc,
-                                                is_active=True,
-                                            ) for loc in locations
-                                        ]
-
-                                    ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
-
-                                    ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=True)
-
-                                    if partner_activity:
-                                        # Force update on PA Reportable instance for location update
-                                        for pa_reportable in Reportable.objects.filter(partner_activity_project_contexts__activity=partner_activity):
-                                            llo_locations = reportable.locations.values_list('id', flat=True)
-                                            pai_locations = pa_reportable.locations.values_list('id', flat=True)
-                                            loc_diff = pai_locations.exclude(id__in=llo_locations)
-
-                                            # Add new locations from LLO Reportable to PA Reportable
-                                            if loc_diff.exists():
-                                                # Creating M2M Through model instances
-                                                reportable_location_goals = [
-                                                    ReportableLocationGoal(
-                                                        reportable=reportable,
-                                                        location=loc,
-                                                        is_active=True,
-                                                    ) for loc in loc_diff
-                                                ]
-
-                                                ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
-
-                                                # We don't overwrite is_active flag on PartnerActivity reportable from LLO locations here
-                                                # since Cluster may use those locations
+                                    # Create Reportable Location Goals
+                                    update_create_reportable_location_goals(reportable, locations)
 
                     # Check if another page exists
                     if list_data['next']:

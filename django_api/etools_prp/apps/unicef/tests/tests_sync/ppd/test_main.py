@@ -86,7 +86,8 @@ def _for_loop_indicators(expected_results):
             for location in indicator["locations"]:
                 reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(
                     location__name=location['name'],
-                    reportable=reportable_qs_index[0])
+                    reportable=reportable_qs_index[0],
+                    is_active=True)
                 if not reportable_location_goal_qs_index.exists():
                     return False
 

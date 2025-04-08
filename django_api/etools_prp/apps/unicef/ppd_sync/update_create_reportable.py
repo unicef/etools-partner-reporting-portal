@@ -33,4 +33,6 @@ def update_create_reportable(i: dict, blueprint: Blueprint, disaggregations: lis
     )
     reportable.active = i['is_active']
 
+    reportable.save()
+
     return i, reportable

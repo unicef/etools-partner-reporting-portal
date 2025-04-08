@@ -35,6 +35,9 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable_location_goal import (
+    update_create_reportable_location_goals,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import item_reference
@@ -157,16 +160,18 @@ def _for_loop_indicators(expected_results, flag_needs_not_to_exist=False):
             elif not flag_needs_not_to_exist and not reportable_qs_index.exists():
                 return False
 
-            # # # Reportable Location Goal step testing
-            for location in indicator["locations"]:
-                reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(
-                    location__name=location['name'],
-                    reportable=reportable_qs_index[0])
+            if flag_needs_not_to_exist and reportable_qs_index.exists():
+                # # # Reportable Location Goal step testing
+                for location in indicator["locations"]:
+                    reportable_location_goal_qs_index = ReportableLocationGoal.objects.filter(
+                        location__name=location['name'],
+                        reportable=reportable_qs_index[0],
+                        is_active=True)
 
-                if flag_needs_not_to_exist and reportable_location_goal_qs_index.exists():
-                    return True
-                elif not flag_needs_not_to_exist and not reportable_location_goal_qs_index.exists():
-                    return False
+                    if flag_needs_not_to_exist and reportable_location_goal_qs_index.exists():
+                        return True
+                    elif not flag_needs_not_to_exist and not reportable_location_goal_qs_index.exists():
+                        return False
 
     if flag_needs_not_to_exist:
         return False
@@ -259,6 +264,8 @@ class TestPDItem(BaseAPITestCase):
 
             self.assertFalse(_for_loop_pd_result_links_and_llos(_item['expected_results'], True))
 
+            self.assertFalse(_for_loop_indicators(_item['expected_results'], True))
+
             # Update LLOs and Reportable entities
             update_llos_and_reportables(pd)
 
@@ -272,19 +279,9 @@ class TestPDItem(BaseAPITestCase):
 
                 # Iterate over indicators
                 for i in d['indicators']:
-                    # Check if indicator is cluster indicator
-                    if i['cluster_indicator_id']:
-                        i['is_cluster_indicator'] = True
-                        i['is_unicef_hf_indicator'] = True
-                    else:
-                        i['is_cluster_indicator'] = False
-                        i['is_unicef_hf_indicator'] = i['is_high_frequency']
 
-                    # Create Blueprints
-                    i, blueprint, blueprint_result = update_create_blueprint(i, pd)
-
-                    if blueprint_result is None:
-                        continue
+                    # Create Blueprint
+                    i, blueprint = update_create_blueprint(i, pd)
 
                     # Create Locations
                     locations, locations_result = update_create_locations(i)
@@ -296,7 +293,11 @@ class TestPDItem(BaseAPITestCase):
                     disaggregations = update_create_disaggregations(i, pd)
 
                     # Create Reportable
-                    i, reportable, partner_activity = update_create_reportable(i, blueprint, disaggregations, llo,
-                                                                               item, pd)
+                    i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
+
+                    # Create Reportable Location Goals
+                    update_create_reportable_location_goals(reportable, locations)
 
             self.assertTrue(_for_loop_pd_result_links_and_llos(_item['expected_results']))
+
+            self.assertTrue(_for_loop_indicators(_item['expected_results']))
