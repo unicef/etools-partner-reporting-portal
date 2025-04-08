@@ -206,7 +206,9 @@ def process_programme_documents(fast=False, area=False):
                                     disaggregations = update_create_disaggregations(i, pd)
 
                                     # Create Reportable
-                                    i, reportable, partner_activity = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
+                                    i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
+
+                                    partner_activity = None
 
                                     # Associate this LLO Reportable with ClusterActivity Reportable
                                     # for dual reporting

@@ -32,6 +32,5 @@ def update_create_reportable(i: dict, blueprint: Blueprint, disaggregations: lis
         }
     )
     reportable.active = i['is_active']
-    partner_activity = None
 
-    return i, reportable, partner_activity
+    return i, reportable
