@@ -1349,6 +1349,68 @@ class TestProgressReportPullHFDataAPIView(BaseProgressReportAPITestCase):
             response.data[hr_ids.index(hr_progress_report.pk)]['report_location_total']['v']
         )
 
+    def test_post_pull_HF_from_HR_unfilled(self):
+        hr_progress_report = factories.ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.hf_indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(
+            "This indicator does not have available data to pull. Enter data for HR report on this indicator first." in
+            response.data['non_field_errors'])
+
+    def test_post_pull_HF_from_HR(self):
+        hr_progress_report = factories.ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        new_hf_indicator_report = ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.hf_indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+        total = 0
+        for idx, loc in enumerate([self.loc1, self.loc2], start=1):
+            factories.IndicatorLocationDataFactory(
+                indicator_report=new_hf_indicator_report,
+                disaggregation={"()": {"c": 0, "d": 0, "v": 100 + idx}},
+                disaggregation_reported_on=list(new_hf_indicator_report.disaggregations.values_list(
+                    'id', flat=True)),
+                location=loc
+            )
+            total += 100 + idx
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual({'total': {'c': total, 'd': 1, 'v': total}}, response.data)
+
 
 class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
 
