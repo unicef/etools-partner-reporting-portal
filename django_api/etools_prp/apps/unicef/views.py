@@ -807,23 +807,20 @@ class ProgressReportPullHFDataAPIView(APIView):
         ),
     )
 
-    def get_object(self) -> ProgressReport:
-        """Retrieve and return the target progress report."""
-        return ProgressReportHFDataService.get_progress_report(
-            self.kwargs['workspace_id'],
-            self.kwargs['pk']
-        )
+    def get_service(self, workspace_id, progress_report_id):
+        try:
+            return ProgressReportHFDataService(workspace_id, progress_report_id)
+        except ProgressReport.DoesNotExist:
+            raise Http404(f"ProgressReport with id {progress_report_id} was not found.")
 
     def get(self, request: Request, *args, **kwargs) -> Response:
         """
         GET endpoint to retrieve available HF reports for pulling data.
         Returns serialized list of HF reports that can be pulled into this QPR.
         """
-        progress_report = self.get_object()
-        indicator_report, hf_reports = ProgressReportHFDataService.validate_and_get_hf_reports(
-            progress_report,
-            self.kwargs['indicator_report_pk']
-        )
+
+        indicator_report, hf_reports = (self.get_service(kwargs['workspace_id'], kwargs['pk'])
+                                        .validate_and_get_hf_reports(kwargs['indicator_report_pk']))
 
         serializer = ProgressReportPullHFDataSerializer(
             hf_reports,
@@ -837,22 +834,10 @@ class ProgressReportPullHFDataAPIView(APIView):
         POST endpoint to pull data from HF reports into QPR.
         Performs the data pull operation and returns the sum of indicator totals.
         """
-        progress_report = self.get_object()
-        indicator_report, hf_reports = ProgressReportHFDataService.validate_and_get_hf_reports(
-            progress_report,
-            self.kwargs['indicator_report_pk']
-        )
-        locations = indicator_report.indicator_location_data.values_list('location', flat=True)
-        consolidated_data = ProgressReportHFDataService.calculate_location_totals(
-            indicator_report,
-            hf_reports,
-            locations,
-            progress_report
-        )
-        total = ProgressReportHFDataService.update_indicator_data(
-            indicator_report,
-            consolidated_data
-        )
+
+        total = (self.get_service(kwargs['workspace_id'], kwargs['pk'])
+                 .process_indicator_total(kwargs['indicator_report_pk']))
+
         return Response({'total': total}, status=statuses.HTTP_200_OK)
 
 

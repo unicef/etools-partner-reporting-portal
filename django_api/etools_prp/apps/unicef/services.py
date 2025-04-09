@@ -2,7 +2,6 @@ import logging
 from typing import Dict, List, Tuple
 
 from django.db.models import QuerySet
-from django.http import Http404
 
 from rest_framework.exceptions import ValidationError
 
@@ -22,51 +21,33 @@ class ProgressReportHFDataService:
     high frequency data from HR reports into QPR reports.
     """
 
-    @staticmethod
-    def get_progress_report(workspace_id: int, report_id: int) -> ProgressReport:
-        """
-        Retrieve a ProgressReport by workspace and report ID.
-        Args:
-            workspace_id: ID of the workspace
-            report_id: ID of the progress report
-        Returns:
-            ProgressReport instance
-        Raises:
-            Http404: If the report doesn't exist
-        """
+    def __init__(self, workspace_id: int, report_id: int) -> None:
+        self.workspace_id = workspace_id
+        self.report_id = report_id
+        self.progress_report = self.get_progress_report()
+
+    def get_progress_report(self):
         try:
             return ProgressReport.objects.select_related('programme_document').get(
-                programme_document__workspace=workspace_id,
-                pk=report_id,
+                programme_document__workspace=self.workspace_id,
+                pk=self.report_id,
             )
         except ProgressReport.DoesNotExist as exp:
             logger.exception(
                 "ProgressReport not found",
                 extra={
-                    "workspace_id": workspace_id,
-                    "report_id": report_id,
+                    "workspace_id": self.workspace_id,
+                    "report_id": self.report_id,
                     "exception": str(exp),
                 }
             )
-            raise Http404(f"ProgressReport with id {report_id} not found")
 
-    @staticmethod
-    def validate_and_get_hf_reports(
-            progress_report: ProgressReport,
-            indicator_report_id: int
-    ) -> Tuple[IndicatorReport, QuerySet[ProgressReport]]:
+    def validate_and_get_hf_reports(self, indicator_report_id: int) -> Tuple[IndicatorReport, QuerySet[ProgressReport]]:
         """
-        Validate the request and get related HF reports.
-        Args:
-            progress_report: The target QPR progress report
-            indicator_report_id: ID of the indicator report to process
-        Returns:
-            Tuple of (indicator_report, hf_reports)
-        Raises:
-            ValidationError: For various validation failures
+            Validate the request and get related HF reports.
         """
         # Validate report type
-        if progress_report.report_type != "QPR":
+        if self.progress_report.report_type != "QPR":
             raise ValidationError("This Progress Report is not QPR type.")
 
         # Get and validate indicator report
@@ -83,22 +64,22 @@ class ProgressReportHFDataService:
 
         # Validate programme document alignment
         pd_from_reportable = indicator_report.reportable.content_object.cp_output.programme_document
-        if progress_report.programme_document != pd_from_reportable:
+        if self.progress_report.programme_document != pd_from_reportable:
             raise ValidationError("Reportable does not belong to the specified progress report.")
 
         # Get related HF reports
         hf_reports = ProgressReport.objects.filter(
-            programme_document=progress_report.programme_document,
+            programme_document=self.progress_report.programme_document,
             report_type="HR",
-            start_date__gte=progress_report.start_date,
-            end_date__lte=progress_report.end_date,
+            start_date__gte=self.progress_report.start_date,
+            end_date__lte=self.progress_report.end_date,
         ).prefetch_related('indicator_reports')
 
         # Validate HF reports exist for this indicator
         target_hf_irs = IndicatorReport.objects.filter(
             id__in=hf_reports.values_list('indicator_reports', flat=True),
-            time_period_start__gte=progress_report.start_date,
-            time_period_end__lte=progress_report.end_date,
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
             reportable=indicator_report.reportable,
         )
 
@@ -107,29 +88,21 @@ class ProgressReportHFDataService:
 
         return indicator_report, hf_reports
 
-    @staticmethod
     def calculate_location_totals(
+            self,
             indicator_report: IndicatorReport,
             hf_reports: QuerySet[ProgressReport],
             location_ids: List[int],
-            progress_report: ProgressReport
     ) -> Dict[int, Dict[str, Dict]]:
         """
         Calculate consolidated location totals from HF reports.
-        Args:
-            indicator_report: The target indicator report
-            hf_reports: Related HF progress reports
-            location_ids: List of location IDs to process
-            progress_report: The target QPR progress report
-        Returns:
-            Dictionary mapping location IDs to their consolidated data
         """
         # Get relevant indicator reports and location data
         ir_ids = hf_reports.values_list('indicator_reports', flat=True)
         target_hf_irs = IndicatorReport.objects.filter(
             id__in=ir_ids,
-            time_period_start__gte=progress_report.start_date,
-            time_period_end__lte=progress_report.end_date,
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
             reportable=indicator_report.reportable,
         )
         target_hf_ilds = IndicatorLocationData.objects.filter(
@@ -231,15 +204,9 @@ class ProgressReportHFDataService:
     ) -> Dict[str, float]:
         """
         Update indicator location data with consolidated values.
-        Args:
-            indicator_report: The target indicator report to update
-            consolidated_data: Calculated location totals
-        Returns:
-            Dictionary with the new total values
-        Raises:
-            ValidationError: If no valid data is available to pull
         """
         data_available = False
+        ilds_to_update = []
 
         # Update each location data point
         for ild in indicator_report.indicator_location_data.select_related('location').all():
@@ -260,7 +227,9 @@ class ProgressReportHFDataService:
             elif indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
                 RatioIndicatorDisaggregator.post_process(ild)
 
-            ild.save()
+            ilds_to_update.append(ild)
+
+        IndicatorLocationData.objects.bulk_update(ilds_to_update, fields=['disaggregation'])
 
         if not data_available:
             raise ValidationError(
@@ -273,3 +242,10 @@ class ProgressReportHFDataService:
             RatioIndicatorDisaggregator.calculate_indicator_report_total(indicator_report)
 
         return indicator_report.total
+
+    def process_indicator_total(self, indicator_report_pk: int) -> Dict:
+        indicator_report, hf_reports = self.validate_and_get_hf_reports(indicator_report_pk)
+
+        locations = indicator_report.indicator_location_data.values_list('location', flat=True)
+        consolidated_data = self.calculate_location_totals(indicator_report, hf_reports, locations)
+        return self.update_indicator_data(indicator_report, consolidated_data)
