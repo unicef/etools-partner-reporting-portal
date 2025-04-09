@@ -6,7 +6,7 @@ from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import PMPSectionSerializer
 
 
-def update_create_section(item: Any, pd: ProgrammeDocument, workspace: Workspace) -> (Any, ProgrammeDocument):
+def update_create_sections(item: Any, pd: ProgrammeDocument, workspace: Workspace) -> (Any, ProgrammeDocument):
 
     section_data_list = item['sections']
     for section_data in section_data_list:
