@@ -3,32 +3,15 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
 from celery import shared_task
 from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES, PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
-from etools_prp.apps.core.models import Location, Realm, Workspace
-from etools_prp.apps.core.serializers import PMPLocationSerializer
-from etools_prp.apps.indicator.models import (
-    create_papc_reportables_from_ca,
-    create_reportable_for_pp_from_ca_reportable,
-    Disaggregation,
-    DisaggregationValue,
-    IndicatorBlueprint,
-    Reportable,
-    ReportableLocationGoal,
-)
-from etools_prp.apps.indicator.serializers import (
-    PMPDisaggregationSerializer,
-    PMPDisaggregationValueSerializer,
-    PMPIndicatorBlueprintSerializer,
-    PMPReportableSerializer,
-)
-from etools_prp.apps.partner.models import Partner, PartnerActivity, PartnerActivityProjectContext, PartnerProject
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
+from etools_prp.apps.core.models import Realm, Workspace
+from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
@@ -37,14 +20,17 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_blueprint import update_create_blueprint
 from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregations
 from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
-    update_create_expected_result_llos,
+    update_create_expected_result_llo,
     update_create_expected_result_rl,
 )
+from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_locations
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.ppd_sync.update_create_person import (
@@ -52,7 +38,11 @@ from etools_prp.apps.unicef.ppd_sync.update_create_person import (
     update_create_focal_points,
     update_create_unicef_focal_points,
 )
-from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_section
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable_location_goal import (
+    update_create_reportable_location_goals,
+)
+from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
@@ -63,7 +53,6 @@ from etools_prp.apps.unicef.serializers import (
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
 )
-from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -166,7 +155,7 @@ def process_programme_documents(fast=False, area=False):
                         pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
                         # Create sections
-                        item, pd = update_create_section(item, pd, workspace)
+                        item, pd = update_create_sections(item, pd, workspace)
 
                         # Create Reporting Date Periods for QPR and HR report type
                         item = update_create_qpr_n_hr_date_periods(item, pd, workspace)
@@ -186,321 +175,27 @@ def process_programme_documents(fast=False, area=False):
                                 pdresultlink = update_create_expected_result_rl(d, workspace, pd)
 
                                 # Create LLO
-                                d, llo = update_create_expected_result_llos(d, workspace, pd, pdresultlink)
+                                d, llo = update_create_expected_result_llo(d, workspace, pd, pdresultlink)
 
                                 # Iterate over indicators
                                 for i in d['indicators']:
-                                    # Check if indicator is cluster indicator
-                                    if i['cluster_indicator_id']:
-                                        i['is_cluster_indicator'] = True
-                                        i['is_unicef_hf_indicator'] = True
-                                    else:
-                                        i['is_cluster_indicator'] = False
-                                        i['is_unicef_hf_indicator'] = i['is_high_frequency']
+                                    # Create Blueprint
+                                    i, blueprint = update_create_blueprint(i, pd)
 
-                                    # If indicator is not cluster, create Blueprint
-                                    # otherwise use parent Blueprint
-                                    if i['is_cluster_indicator']:
-                                        # Get blueprint of parent indicator
-                                        try:
-                                            blueprint = Reportable.objects.get(
-                                                id=i['cluster_indicator_id']).blueprint
-                                        except Reportable.DoesNotExist:
-                                            logger.exception("Blueprint not exists! Skipping!")
-                                            continue
-                                    else:
-                                        # Create IndicatorBlueprint
-                                        i['disaggregatable'] = True
-                                        # TODO: Fix db schema to accommodate larger lengths
-                                        i['title'] = i['title'][:255] if i['title'] else "unknown"
+                                    # Create Locations
+                                    locations, locations_result = update_create_locations(i)
 
-                                        if i['unit'] == '':
-                                            if int(i['baseline']['d']) == 1:
-                                                i['unit'] = 'number'
-                                                i['display_type'] = 'number'
+                                    if locations_result is None:
+                                        continue
 
-                                            elif int(i['baseline']['d']) != 1:
-                                                i['unit'] = 'percentage'
-                                                i['display_type'] = 'percentage'
-
-                                        elif i['unit'] == 'number':
-                                            i['display_type'] = 'number'
-
-                                        elif i['unit'] == 'percentage':
-                                            i['calculation_formula_across_periods'] = 'latest'
-
-                                        blueprint = process_model(
-                                            IndicatorBlueprint,
-                                            PMPIndicatorBlueprintSerializer,
-                                            i, {
-                                                'external_id': i['blueprint_id'],
-                                                'reportables__lower_level_outputs__cp_output__programme_document': pd.id
-                                            }
-                                        )
-
-                                    locations = list()
-                                    for loc in i['locations']:
-                                        # Create gateway for location
-                                        # TODO: assign country after PMP add these
-                                        # fields into API
-
-                                        if loc['admin_level'] is None:
-                                            logger.warning("Admin level empty! Skipping!")
-                                            continue
-
-                                        if loc['p_code'] is None or not loc['p_code']:
-                                            logger.warning("Location code empty! Skipping!")
-                                            continue
-
-                                        # Create location
-                                        location = process_model(
-                                            Location,
-                                            PMPLocationSerializer,
-                                            loc,
-                                            {
-                                                'name': loc['name'],
-                                                'p_code': loc['p_code'],
-                                                'admin_level': loc['admin_level'],
-                                            }
-                                        )
-                                        locations.append(location)
-
-                                    # If indicator is not cluster, create
-                                    # Disaggregation otherwise use parent
-                                    # Disaggregation
-                                    disaggregations = list()
-                                    if i['is_cluster_indicator']:
-                                        # Get Disaggregation
-                                        try:
-                                            disaggregations = list(
-                                                Reportable.objects.get(
-                                                    id=i['cluster_indicator_id']).disaggregations.all())
-                                        except Reportable.DoesNotExist:
-                                            disaggregations = list()
-                                    else:
-                                        # Create Disaggregation
-                                        for dis in i['disaggregation']:
-                                            dis['active'] = True
-                                            disaggregation = process_model(
-                                                Disaggregation, PMPDisaggregationSerializer,
-                                                dis, {
-                                                    'name': dis['name'],
-                                                    'reportable__lower_level_outputs__cp_output__programme_document__workspace': pd.workspace.id
-                                                }
-                                            )
-                                            disaggregations.append(disaggregation)
-
-                                            # Create Disaggregation Values
-                                            for dv in dis['disaggregation_values']:
-                                                dv['disaggregation'] = disaggregation.id
-                                                process_model(
-                                                    DisaggregationValue,
-                                                    PMPDisaggregationValueSerializer,
-                                                    dv,
-                                                    {
-                                                        'disaggregation_id': disaggregation.id,
-                                                        'value': dv['value'],
-                                                    }
-                                                )
+                                    # Create Disaggregations
+                                    disaggregations = update_create_disaggregations(i, pd)
 
                                     # Create Reportable
-                                    i['blueprint_id'] = blueprint.id if blueprint else None
-                                    i['disaggregation_ids'] = [ds.id for ds in disaggregations]
+                                    i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
 
-                                    i['content_type'] = ContentType.objects.get_for_model(llo).id
-                                    i['object_id'] = llo.id
-                                    i['start_date'] = item['start_date']
-                                    i['end_date'] = item['end_date']
-
-                                    convert_string_values_to_numeric(i['target'])
-                                    convert_string_values_to_numeric(i['baseline'])
-
-                                    reportable = process_model(
-                                        Reportable,
-                                        PMPReportableSerializer,
-                                        i, {
-                                            'external_id': i['id'],
-                                            'lower_level_outputs__cp_output__programme_document': pd.id
-                                        }
-                                    )
-                                    reportable.active = i['is_active']
-                                    partner_activity = None
-
-                                    # Associate this LLO Reportable with ClusterActivity Reportable
-                                    # for dual reporting
-                                    if 'cluster_indicator_id' in i and i['cluster_indicator_id'] is not None:
-                                        cai = None
-                                        pp = None
-                                        partner_activity = None
-                                        papc = None
-
-                                        try:
-                                            cai = Reportable.objects.get(id=int(i['cluster_indicator_id']))
-                                            reportable.ca_indicator_used_by_reporting_entity = cai
-
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot find ClusterActivity Indicator from this UNICEF indicator's cluster reference"
-                                                "for dual reporting - skipping link!: " + str(e)
-                                            )
-                                            continue
-
-                                        # Partner Project for this PD check
-                                        if not PartnerProject.objects.filter(
-                                            external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
-                                            external_source=EXTERNAL_DATA_SOURCES.UNICEF
-                                        ).exists():
-                                            pp = PartnerProject.objects.create(
-                                                external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
-                                                external_source=EXTERNAL_DATA_SOURCES.UNICEF,
-                                                title=item['title'],
-                                                partner=partner,
-                                                start_date=item['start_date'],
-                                                end_date=item['end_date'],
-                                            )
-
-                                            logger.info(
-                                                "Created a new PartnerProject "
-                                                "from PD: " + str(item['number'])
-                                            )
-
-                                            pp.clusters.add(cai.content_object.cluster)
-                                            pp.locations.add(*cai.locations.all())
-                                        else:
-                                            pp = PartnerProject.objects.get(
-                                                external_id="{}/{}".format(workspace.business_area_code, pd.external_id),
-                                                external_source=EXTERNAL_DATA_SOURCES.UNICEF
-                                            )
-
-                                        # Force adoption of PartnerActivity from ClusterActivity Indicator
-                                        if pd.partner.id not in cai.content_object.partner_activities.values_list(
-                                                'partner', flat=True):
-                                            try:
-                                                partner_activity = PartnerActivity.objects.create(
-                                                    title=cai.blueprint.title,
-                                                    partner=pd.partner,
-                                                    cluster_activity=cai.content_object,
-                                                )
-
-                                            except Exception as e:
-                                                logger.exception(
-                                                    "Cannot force adopt PartnerActivity from ClusterActivity "
-                                                    "for dual reporting - skipping link!: " + str(e)
-                                                )
-                                                continue
-                                        else:
-                                            partner_activity = cai.content_object.partner_activities.get(partner=pd.partner)
-
-                                        try:
-                                            papc, created = PartnerActivityProjectContext.objects.update_or_create(
-                                                defaults={
-                                                    'start_date': item['start_date'],
-                                                    'end_date': item['end_date'],
-                                                    'status': PARTNER_ACTIVITY_STATUS.ongoing,
-                                                },
-                                                project=pp,
-                                                activity=partner_activity,
-                                            )
-
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot force adopt project context on PartnerActivity from ClusterActivity "
-                                                "for dual reporting - skipping link!: " + str(e)
-                                            )
-                                            continue
-
-                                        try:
-                                            # Grab Cluster Activity instance from
-                                            # this newly created Partner Activity instance
-                                            create_papc_reportables_from_ca(
-                                                papc, cai.content_object
-                                            )
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot create Reportables for adopted "
-                                                "PartnerActivity from ClusterActivity "
-                                                "for dual reporting - skipping link!: " + str(e)
-                                            )
-
-                                            partner_activity.delete()
-                                            continue
-
-                                        try:
-                                            # Grab Cluster Activity instance from
-                                            # this newly created Partner Activity instance
-                                            if not pp.reportables.filter(parent_indicator=cai).exists():
-                                                create_reportable_for_pp_from_ca_reportable(
-                                                    pp, cai
-                                                )
-                                        except Exception as e:
-                                            logger.exception(
-                                                "Cannot create Reportables for PD Partner Project "
-                                                "from referenced Cluster Activity Reportable "
-                                                " - skipping link!: " + str(e)
-                                            )
-
-                                            continue
-
-                                        except Reportable.DoesNotExist:
-                                            logger.exception(
-                                                "No ClusterActivity Reportable found "
-                                                "for dual reporting - skipping link!"
-                                            )
-
-                                    reportable.save()
-
-                                    rlgs = ReportableLocationGoal.objects.filter(reportable=reportable)
-
-                                    # If the locations for this reportable has been created before
-                                    if rlgs.exists():
-                                        existing_locs = set(rlgs.values_list('location', flat=True))
-                                        new_locs = set(map(lambda x: x.id, locations)) - existing_locs
-
-                                        # Creating M2M Through model instances for new locations
-                                        reportable_location_goals = [
-                                            ReportableLocationGoal(
-                                                reportable=reportable,
-                                                location=loc,
-                                                is_active=True,
-                                            ) for loc in Location.objects.filter(id__in=new_locs)
-                                        ]
-
-                                    else:
-                                        # Creating M2M Through model instances
-                                        reportable_location_goals = [
-                                            ReportableLocationGoal(
-                                                reportable=reportable,
-                                                location=loc,
-                                                is_active=True,
-                                            ) for loc in locations
-                                        ]
-
-                                    ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
-
-                                    ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=True)
-
-                                    if partner_activity:
-                                        # Force update on PA Reportable instance for location update
-                                        for pa_reportable in Reportable.objects.filter(partner_activity_project_contexts__activity=partner_activity):
-                                            llo_locations = reportable.locations.values_list('id', flat=True)
-                                            pai_locations = pa_reportable.locations.values_list('id', flat=True)
-                                            loc_diff = pai_locations.exclude(id__in=llo_locations)
-
-                                            # Add new locations from LLO Reportable to PA Reportable
-                                            if loc_diff.exists():
-                                                # Creating M2M Through model instances
-                                                reportable_location_goals = [
-                                                    ReportableLocationGoal(
-                                                        reportable=reportable,
-                                                        location=loc,
-                                                        is_active=True,
-                                                    ) for loc in loc_diff
-                                                ]
-
-                                                ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
-
-                                                # We don't overwrite is_active flag on PartnerActivity reportable from LLO locations here
-                                                # since Cluster may use those locations
+                                    # Create Reportable Location Goals
+                                    update_create_reportable_location_goals(reportable, locations)
 
                     # Check if another page exists
                     if list_data['next']:
