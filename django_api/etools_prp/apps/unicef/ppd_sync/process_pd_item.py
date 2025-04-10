@@ -2,19 +2,27 @@ import logging
 
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.ppd_sync.update_create_blueprint import update_create_blueprint
-from etools_prp.apps.unicef.ppd_sync.update_create_date_period import update_create_qpr_n_hr_date_periods, \
-    update_create_sr_date_periods
+from etools_prp.apps.unicef.ppd_sync.update_create_date_period import (
+    update_create_qpr_n_hr_date_periods,
+    update_create_sr_date_periods,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_disaggregation import update_create_disaggregations
-from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import update_create_expected_result_rl, \
-    update_create_expected_result_llo
+from etools_prp.apps.unicef.ppd_sync.update_create_expected_result import (
+    update_create_expected_result_llo,
+    update_create_expected_result_rl,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_location import update_create_locations
 from etools_prp.apps.unicef.ppd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.update_create_pd import update_create_pd
-from etools_prp.apps.unicef.ppd_sync.update_create_person import update_create_unicef_focal_points, \
-    update_create_agreement_auth_officers, update_create_focal_points
+from etools_prp.apps.unicef.ppd_sync.update_create_person import (
+    update_create_agreement_auth_officers,
+    update_create_focal_points,
+    update_create_unicef_focal_points,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_reportable import update_create_reportable
-from etools_prp.apps.unicef.ppd_sync.update_create_reportable_location_goal import \
-    update_create_reportable_location_goals
+from etools_prp.apps.unicef.ppd_sync.update_create_reportable_location_goal import (
+    update_create_reportable_location_goals,
+)
 from etools_prp.apps.unicef.ppd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.ppd_sync.update_llos_and_reportables import update_llos_and_reportables
 
