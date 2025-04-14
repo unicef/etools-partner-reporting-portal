@@ -129,3 +129,98 @@ class ProgressReportHFDataServiceTest(BaseProgressReportAPITestCase):
         self.assertEqual(ild.disaggregation['()']['d'], 1)
         self.assertEqual(ild.disaggregation['()']['c'], 200.0)
         self.assertIsNotNone(total)
+
+    def test_update_indicator_no_data_fail(self):
+        consolidated_data = {
+            self.loc1.id: {
+                'total': {'c': 0, 'd': 0, 'v': 0},
+                'data': {}
+            }
+        }
+        with self.assertRaises(ValidationError) as err:
+            ProgressReportHFDataService.update_indicator_data(
+                self.indicator_report,
+                consolidated_data
+            )
+        self.assertIn(
+            "This indicator does not have available data to pull. Enter data for HR report on this indicator first.", err.exception.args)
+
+    def test_calculate_simple_totals(self):
+        ild1 = IndicatorLocationDataFactory(
+            indicator_report=self.indicator_report,
+            location=self.loc1,
+            disaggregation={"()": {"c": 5, "d": 1, "v": 5}},
+            disaggregation_reported_on=[]
+        )
+        ild2 = IndicatorLocationDataFactory(
+            indicator_report=self.indicator_report,
+            location=self.loc1,
+            disaggregation={"()": {"c": 10, "d": 1, "v": 10}},
+            disaggregation_reported_on=[]
+        )
+
+        result = {
+            'total': {'c': 0, 'd': 0, 'v': 0},
+            'data': {}
+        }
+        updated_result = ProgressReportHFDataService._calculate_simple_totals(
+            [ild1, ild2],
+            self.indicator_report,
+            result
+        )
+        self.assertEqual(updated_result['total']['v'], 15)
+        self.assertEqual(updated_result['total']['d'], 1)
+        self.assertEqual(updated_result['total']['c'], 15.0)
+
+    def test_calculate_disaggregated_totals(self):
+        hr_progress_report = ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        new_hf_indicator_report = ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+
+        ild1 = IndicatorLocationDataFactory(
+            indicator_report=new_hf_indicator_report,
+            location=self.loc1,
+            disaggregation={
+                "()": {"c": 5, "d": 0, "v": 5},
+            },
+            disaggregation_reported_on=list(new_hf_indicator_report.disaggregations.values_list(
+                'id', flat=True)),
+        )
+        ild2 = IndicatorLocationDataFactory(
+            indicator_report=new_hf_indicator_report,
+            location=self.loc1,
+            disaggregation={
+                "()": {"c": 4, "d": 0, "v": 4},
+            },
+            disaggregation_reported_on=list(new_hf_indicator_report.disaggregations.values_list(
+                'id', flat=True)),
+        )
+
+        result = {
+            self.loc1.id: {
+                'total': {'c': 0, 'd': 0, 'v': 0},
+                'data': {}
+            }
+        }
+
+        updated_result = ProgressReportHFDataService._calculate_disaggregated_totals(
+            [ild1, ild2],
+            new_hf_indicator_report,
+            ["()"],
+            result[self.loc1.id]
+        )
+        self.assertEqual(updated_result['data']['()']['v'], 9)
+        self.assertEqual(updated_result['data']['()']['d'], 1)
+        self.assertAlmostEqual(updated_result['data']['()']['c'], 9)
