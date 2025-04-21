@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from django.contrib.auth import get_user_model
@@ -6,17 +5,13 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 
 from celery import shared_task
-from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import PRP_ROLE_TYPES
 from etools_prp.apps.core.models import Realm, Workspace
-from etools_prp.apps.partner.models import Partner
-from etools_prp.apps.partner.serializers import PMPPartnerSerializer
 from etools_prp.apps.unicef.models import (
     LowerLevelOutput,
     PDResultLink,
-    ProgrammeDocument,
     ReportingPeriodDates,
     Section,
 )
@@ -27,7 +22,6 @@ from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDResultLinkSerializer,
-    PMPProgrammeDocumentSerializer,
     PMPReportingPeriodDatesSerializer,
     PMPReportingPeriodDatesSRSerializer,
     PMPSectionSerializer,
