@@ -20,6 +20,8 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.pgd_sync.update_create_gd import update_create_gd
+from etools_prp.apps.unicef.pgd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.process_pd_item import process_pd_item
 from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
 from etools_prp.apps.unicef.serializers import (
@@ -152,36 +154,6 @@ def process_government_documents(fast=False, area=False):
                     for item in list_data['results']:
                         logger.info("Processing PD: %s" % item['id'])
 
-                        # Get partner data
-                        partner_data = item['partner_org']
-
-                        # Skip entries without unicef_vendor_number
-                        if not partner_data['unicef_vendor_number']:
-                            logger.warning("No unicef_vendor_number - skipping!")
-                            continue
-
-                        # Create/Assign Partner
-                        if not partner_data['name']:
-                            logger.warning("No partner name - skipping!")
-                            continue
-
-                        partner_data['external_id'] = partner_data.get('id', '#')
-
-                        try:
-                            partner = process_model(
-                                Partner,
-                                PMPPartnerSerializer,
-                                partner_data, {
-                                    'vendor_number': partner_data['unicef_vendor_number']
-                                }
-                            )
-                        except ValidationError:
-                            logger.exception('Error trying to save Partner model with {}'.format(partner_data))
-                            continue
-
-                        # Assign partner
-                        item['partner'] = partner.id
-
                         # Assign workspace
                         item['workspace'] = workspace.id
 
@@ -197,30 +169,16 @@ def process_government_documents(fast=False, area=False):
                             logger.warning("End date is required - skipping!")
                             continue
 
-                        # Create PD
-                        item['status'] = item['status']
-                        item['external_business_area_code'] = workspace.business_area_code
-                        # Amendment date formatting
-                        for idx in range(len(item['amendments'])):
-                            if item['amendments'][idx]['signed_date'] is None:
-                                # no signed date yet, so formatting is not required
-                                continue
+                        # Get partner
+                        item, partner = update_create_partner(item)
 
-                            item['amendments'][idx]['signed_date'] = datetime.datetime.strptime(
-                                item['amendments'][idx]['signed_date'], "%Y-%m-%d"
-                            ).strftime("%d-%b-%Y")
+                        if partner is None:
+                            continue
 
-                        try:
-                            pd = process_model(
-                                ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                                {
-                                    'external_id': item['id'],
-                                    'workspace': workspace,
-                                    'external_business_area_code': workspace.business_area_code,
-                                }
-                            )
-                        except KeyError as e:
-                            logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item), e)
+                        # Get PD
+                        item, pd = update_create_gd(item, workspace)
+
+                        if pd is None:
                             continue
 
                         pd.unicef_focal_point.all().update(active=False)
