@@ -9,12 +9,7 @@ from celery import shared_task
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import PRP_ROLE_TYPES
 from etools_prp.apps.core.models import Realm, Workspace
-from etools_prp.apps.unicef.models import (
-    LowerLevelOutput,
-    PDResultLink,
-    ReportingPeriodDates,
-    Section,
-)
+from etools_prp.apps.unicef.models import LowerLevelOutput, PDResultLink, ReportingPeriodDates, Section
 from etools_prp.apps.unicef.pgd_sync.update_create_gd import update_create_gd
 from etools_prp.apps.unicef.pgd_sync.update_create_partner import update_create_partner
 from etools_prp.apps.unicef.ppd_sync.process_pd_item import process_pd_item
