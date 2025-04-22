@@ -259,9 +259,7 @@ workflows:
                 - master
                 - staging
                 - develop
-                - epd_sync_updates
-                - migration-lit
-                - node_20.18.0_shoelace_2.18.0
+                - dynamic_imports
       - build_and_deploy_fe_cluster:
           filters:
             branches:
