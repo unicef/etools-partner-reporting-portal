@@ -3,7 +3,7 @@ RUN apk update
 RUN apk add --update bash
 
 RUN apk add git
-RUN npm install -g typescript@4.x
+RUN npm install -g typescript
 
 WORKDIR /tmp
 ADD package.json /tmp/
@@ -25,7 +25,7 @@ RUN apk add --update bash
 
 WORKDIR /code
 RUN npm init -y
-RUN npm install express
+RUN npm install express@4.21.2
 RUN npm install compression
 RUN npm install ua-parser-js
 RUN npm install browser-capabilities@1.1.x

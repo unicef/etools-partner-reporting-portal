@@ -2,6 +2,7 @@ import esbuild from 'rollup-plugin-esbuild';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import path from 'path';
+import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
 
 const importMetaUrlCurrentModulePlugin = () => {
   return {
@@ -22,13 +23,13 @@ const config = {
     format: 'es',
     inlineDynamicImports: true,
     sourcemap: true,
-    compact: true,
+    compact: true
   },
   onwarn(warning, warn) {
     if (warning.code === 'THIS_IS_UNDEFINED') return;
     warn(warning);
   },
-  plugins: [importMetaUrlCurrentModulePlugin(), resolve(), commonjs(), esbuild()],
+  plugins: [importMetaUrlCurrentModulePlugin(), resolve(), commonjs(), esbuild(), dynamicImportVars()],
   preserveEntrySignatures: false
 };
 
