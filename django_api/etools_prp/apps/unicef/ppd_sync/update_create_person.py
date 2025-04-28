@@ -9,6 +9,8 @@ from etools_prp.apps.unicef.ppd_sync.utils import save_person_and_user
 
 def update_create_unicef_focal_points(unicef_focal_points: dict, pd: ProgrammeDocument) -> ProgrammeDocument:
 
+    pd.unicef_focal_point.all().update(active=False)
+
     # Create unicef_focal_points
     for unicef_focal_point_item in unicef_focal_points:
         unicef_focal_point, user = save_person_and_user(unicef_focal_point_item)
@@ -20,12 +22,12 @@ def update_create_unicef_focal_points(unicef_focal_points: dict, pd: ProgrammeDo
 
         pd.unicef_focal_point.add(unicef_focal_point)
 
-    pd.unicef_focal_point.all().update(active=False)
-
     return pd
 
 
 def update_create_agreement_auth_officers(agreement_auth_officers: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
+
+    pd.unicef_officers.all().update(active=False)
 
     # Create agreement_auth_officers
     for person_data in agreement_auth_officers:
@@ -56,12 +58,12 @@ def update_create_agreement_auth_officers(agreement_auth_officers: dict, pd: Pro
             obj.is_active = is_active
             obj.save()
 
-    pd.unicef_officers.all().update(active=False)
-
     return pd
 
 
 def update_create_focal_points(focal_points: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
+
+    pd.partner_focal_point.all().update(active=False)
 
     # Create focal_points
     for person_data in focal_points:
@@ -91,7 +93,5 @@ def update_create_focal_points(focal_points: dict, pd: ProgrammeDocument, worksp
         if not created and obj.is_active and is_active is False:
             obj.is_active = is_active
             obj.save()
-
-    pd.partner_focal_point.all().update(active=False)
 
     return pd
