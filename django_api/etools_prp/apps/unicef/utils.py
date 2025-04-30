@@ -1,10 +1,17 @@
+import logging
 import tempfile
 
+from django.contrib.auth import get_user_model
 from django.http import FileResponse
 from django.template.loader import render_to_string
 
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
+
+logger = logging.getLogger(__name__)
+User = get_user_model()
+FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
+LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
 
 def render_pdf_to_response(request, template, data):
