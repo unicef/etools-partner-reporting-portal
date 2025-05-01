@@ -11,7 +11,7 @@ import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
+import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../../etools-prp-common/elements/report-status';
