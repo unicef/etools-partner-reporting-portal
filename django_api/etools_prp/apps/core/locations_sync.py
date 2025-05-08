@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 
@@ -11,6 +11,8 @@ from unicef_locations.exceptions import InvalidRemap
 from unicef_locations.synchronizers import LocationSynchronizer
 from unicef_locations.utils import get_location_model
 
+from etools_prp.apps.core.api import PMP_API
+from etools_prp.apps.core.common import EXTERNAL_DATA_SOURCES
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.utils.query import has_related_records
 
@@ -196,3 +198,147 @@ class PRPLocationSynchronizer(LocationSynchronizer):
         # on subsequent children updates.
         get_location_model().objects.filter(parent__in=loc_qs).update(parent=None)
         loc_qs.exclude(pk__in=affected).delete()
+
+
+class EToolsLocationSynchronizer:
+    """eTools Locations synchronizer for a given workspace"""
+
+    def __init__(self, pk) -> None:
+        self.workspace = Workspace.objects.get(pk=pk)
+        self.qs = get_location_model().objects.filter(workspaces=self.workspace)
+
+    @transaction.atomic
+    def create_update_locations(self, list_data):
+        new, updated, skipped, error = 0, 0, 0, 0
+        indexed_batch = {str(item['p_code']): item for item in list_data}
+
+        etools_pcodes = [loc['p_code'] for loc in list_data]
+        existing_loc_qs = self.qs.filter(p_code__in=etools_pcodes, is_active=True)
+
+        # get_all_parents and map them by p_code:
+        parent_pcodes = [loc['parent_p_code'] for loc in list_data]
+        parents_qs = self.qs.filter(p_code__in=parent_pcodes, is_active=True)
+        # parent location dict {pcode: parent obj}
+        parents = {r.p_code: r for r in parents_qs.all()}
+
+        # make a list of tuples (row_from_carto, existing_location_object) to iterate over and update
+        update_tuples = [(indexed_batch[loc.p_code], loc) for loc in existing_loc_qs.all()]
+        locs_to_update = []
+        for etools_loc, existing_loc in update_tuples:
+            pcode = etools_loc['p_code']
+            name = etools_loc['name']
+            point = etools_loc['point'].__str__() if etools_loc['point'] else None
+            geom = etools_loc['geom'].__str__() if etools_loc['geom'] else None
+            parent_code = etools_loc['parent_p_code']
+            if all([name, pcode]):
+                existing_loc.admin_level = etools_loc['admin_level']
+                existing_loc.admin_level_name = etools_loc['admin_level_name']
+                existing_loc.name = name
+                existing_loc.parent = parents.get(parent_code, None) if parent_code else None
+                existing_loc.geom = geom
+                existing_loc.point = point
+                locs_to_update.append(existing_loc)
+                updated += 1
+            else:
+                skipped += 1
+                logger.info(f"Skipping row pcode {pcode}")
+
+        locs_to_create = [loc for loc in list_data if loc["p_code"] not in existing_loc_qs.values_list("p_code", flat=True)]
+        locs_bulk_create = []
+        for loc in locs_to_create:
+            p_code = loc['p_code']
+            name = loc['name']
+            point = loc['point'].__str__() if loc['point'] else None
+            geom = loc['geom'].__str__() if loc['geom'] else None
+            parent_code = loc['parent_p_code']
+            if all([name, p_code]):
+                values = {
+                    'external_id': loc['id'],
+                    'external_source': EXTERNAL_DATA_SOURCES.ETOOLS,
+                    'p_code': p_code,
+                    'is_active': True,
+                    'admin_level': loc['admin_level'],
+                    'admin_level_name': loc['admin_level_name'],
+                    'name': name,
+                    'geom': geom,
+                    'point': point,
+                    'parent': parents.get(parent_code, None) if parent_code else None
+                }
+                # set everything to 0 in the tree, we'll rebuild later
+                for key in ['lft', 'rght', 'level', 'tree_id']:
+                    values[key] = 0
+                new_rec = get_location_model()(**values)
+                locs_bulk_create.append(new_rec)
+                new += 1
+            else:
+                skipped += 1
+                logger.info(f"Skipping row pcode {p_code}")
+
+        # update the records:
+        try:
+            get_location_model().objects.bulk_update(locs_to_update, fields=['p_code', 'is_active', 'admin_level',
+                                                                             'admin_level_name', 'name',
+                                                                             'geom', 'point', 'parent'])
+        except IntegrityError as e:
+            message = "Duplicates found on update"
+            logger.exception(e)
+            logger.exception(message)
+            raise
+
+        try:
+            newly_created = get_location_model().objects.bulk_create(locs_bulk_create)
+        except IntegrityError as e:
+            message = "Duplicates found on create"
+            logger.exception(e)
+            logger.exception(message)
+            raise
+        else:
+            for loc in newly_created:
+                loc.workspaces.add(self.workspace)
+
+        return new, updated, skipped, error
+
+    def sync(self):
+        api = PMP_API()
+        status = {
+            'new': 0,
+            'updated': 0,
+            'skipped': 0,
+            'error': 0
+        }
+        try:
+            for admin_level in range(0, 10):
+                page_url = None
+                has_next = True
+                while has_next:
+                    try:
+                        list_data = api.get_locations(
+                            business_area_code=str(self.workspace.business_area_code),
+                            admin_level=admin_level,
+                            url=page_url
+                        )
+                        if list_data['results']:
+                            new, updated, skipped, error = self.create_update_locations(list_data['results'])
+                            status['new'] += new
+                            status['updated'] += updated
+                            status['skipped'] += skipped
+                            status['error'] += error
+                    except Exception as e:
+                        logger.exception("API Endpoint error: %s" % e)
+                        break
+                    if list_data['next']:
+                        logger.info("Found new page")
+                        page_url = list_data['next']
+                        has_next = True
+                    else:
+                        logger.info("End of workspace")
+                        has_next = False
+        except Exception as e:
+            logger.error(str(e))
+            raise
+
+        logger.info(f'Etools Location sync status: {status}')
+
+        logger.info("Rebuilding the tree....")
+        get_location_model().objects.rebuild()
+        logger.info("Rebuilt")

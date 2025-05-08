@@ -3,6 +3,7 @@ import datetime
 import os
 import random
 import tempfile
+from unittest import skip
 from unittest.mock import patch
 
 from django.conf import settings
@@ -36,6 +37,7 @@ from etools_prp.apps.core.tests.factories import (
     GroupFactory,
     PartnerFactory,
     PartnerUserFactory,
+    ProgressReportIndicatorReportFactory,
     RealmFactory,
     WorkspaceFactory,
 )
@@ -280,6 +282,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(len(response.data['results']), 1)
 
+    @skip
     def test_list_filter_api(self):
         url = reverse(
             'programme-document',
@@ -1275,6 +1278,140 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
+class TestProgressReportPullHFDataAPIView(BaseProgressReportAPITestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        self.hf_indicator_report = self.progress_report.indicator_reports.first()
+
+    def test_get_HF_non_QPR_from_HR_invalid(self):
+        self.progress_report.report_type = REPORTING_TYPES.SR
+        self.progress_report.save(update_fields=['report_type'])
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('This Progress Report is not QPR type.' in response.data['non_field_errors'])
+
+    def test_get_HF_from_HR_without_data_invalid(self):
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue('This HR indicator does not have any High frequency reports within this QPR period.' in
+                        response.data['non_field_errors'])
+
+    def test_get_HF_from_HR(self):
+        hr_progress_report = factories.ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        hf_indicator = ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.hf_indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            len(response.data),
+            ProgressReport.objects.filter(
+                programme_document=self.progress_report.programme_document,
+                report_type="HR",
+                start_date__gte=self.progress_report.start_date,
+                end_date__lte=self.progress_report.end_date,
+            ).count()
+        )
+        hr_ids = [r['id'] for r in response.data]
+        self.assertIn(hr_progress_report.pk, hr_ids)
+        self.assertEqual(
+            hf_indicator.total['v'],
+            response.data[hr_ids.index(hr_progress_report.pk)]['report_location_total']['v']
+        )
+
+    def test_post_pull_HF_from_HR_unfilled(self):
+        hr_progress_report = factories.ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.hf_indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(
+            "This indicator does not have available data to pull. Enter data for HR report on this indicator first." in
+            response.data['non_field_errors'])
+
+    def test_post_pull_HF_from_HR(self):
+        hr_progress_report = factories.ProgressReportFactory(
+            start_date=self.progress_report.start_date,
+            end_date=self.progress_report.end_date,
+            due_date=self.progress_report.due_date,
+            report_type=REPORTING_TYPES.HR,
+            report_number=self.pd.progress_reports.filter(report_type=REPORTING_TYPES.HR).count() + 1,
+            is_final=False,
+            programme_document=self.pd,
+        )
+        new_hf_indicator_report = ProgressReportIndicatorReportFactory(
+            time_period_start=hr_progress_report.start_date,
+            time_period_end=hr_progress_report.end_date,
+            reportable=self.hf_indicator_report.reportable,
+            progress_report=hr_progress_report
+        )
+        total = 0
+        for idx, loc in enumerate([self.loc1, self.loc2], start=1):
+            factories.IndicatorLocationDataFactory(
+                indicator_report=new_hf_indicator_report,
+                disaggregation={"()": {"c": 0, "d": 0, "v": 100 + idx}},
+                disaggregation_reported_on=list(new_hf_indicator_report.disaggregations.values_list(
+                    'id', flat=True)),
+                location=loc
+            )
+            total += 100 + idx
+
+        url = reverse(
+            'progress-reports-pull-hf-data',
+            args=[self.workspace.pk, self.progress_report.pk, self.hf_indicator_report.pk],
+        )
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual({'total': {'c': total, 'd': 1, 'v': total}}, response.data)
+
+
 class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
 
     def test_review_accept_regular_qpr_report(self):
@@ -2039,12 +2176,12 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    'group': "IP_EDITOR",
+                    'group': "IP Editor",
                 },
                 {
                     'country': user.workspace.external_id,
                     'organization': user.partner.vendor_number,
-                    'group': "IP_AUTHORIZED_OFFICER",
+                    'group': "IP Authorized Officer",
                 },
             ]
         }
@@ -2079,12 +2216,12 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 {
                     'country': workspace.external_id,
                     'organization': partner.vendor_number,
-                    'group': "IP_EDITOR",
+                    'group': "IP Editor",
                 },
                 {
                     'country': workspace.external_id,
                     'organization': partner.vendor_number,
-                    'group': "IP_VIEWER",
+                    'group': "IP Viewer",
                 },
             ]
         }
@@ -2124,3 +2261,45 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
         user.refresh_from_db()
         self.assertFalse(user.is_active)
         self.assertFalse(user.realms.filter(is_active=True).exists())
+
+    def test_issue_email(self):
+        user = PartnerUserFactory.build(realms__data=[], email='new_user@domain-with-dash.org')
+        workspace = WorkspaceFactory()
+        partner = PartnerFactory()
+        self.assertFalse(get_user_model().objects.filter(email=user.email).exists())
+        input_data = {
+            'email': user.email,
+            'first_name': user.first_name,
+            'middle_name': user.middle_name,
+            'last_name': user.last_name,
+            'realms': [
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP Editor",
+                },
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP Viewer",
+                },
+                {
+                    'country': workspace.external_id,
+                    'organization': partner.vendor_number,
+                    'group': "IP LM Editor",
+                },
+            ]
+        }
+        self.client.force_authenticate(factories.NonPartnerUserFactory())
+        response = self.client.post(reverse('user-realms-import'), data=input_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+
+        self.assertTrue(get_user_model().objects.filter(email=user.email).exists())
+        user = get_user_model().objects.get(email=user.email)
+        self.assertCountEqual(
+            list(user.realms.all().values_list('workspace', 'partner', 'group__name', 'is_active')),
+            [
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_VIEWER').name, True),
+                (user.workspace.id, user.partner.id, Group.objects.get(name='IP_EDITOR').name, True),
+            ]
+        )

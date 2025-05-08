@@ -10,7 +10,7 @@ import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
-import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
+import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';

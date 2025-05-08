@@ -12,13 +12,13 @@ import '../../etools-prp-common/elements/list-placeholder';
 import './pd-reports-report-title';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import PaginationMixin from '@unicef-polymer/etools-modules-common/dist/mixins/pagination-mixin';
+import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import SortingMixin from '../../etools-prp-common/mixins/sorting-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import {store} from '../../redux/store';
-import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
