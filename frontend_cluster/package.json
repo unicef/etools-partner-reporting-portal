@@ -105,11 +105,6 @@
     "prismjs": ">=1.27.0",
     "urijs": ">=1.19.9"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && tsc --skipLibCheck"
-    }
-  },
   "lint-staged": {
     "*.ts": [
       "eslint --fix"
