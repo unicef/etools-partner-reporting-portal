@@ -7,7 +7,7 @@ from celery import shared_task
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.models import Workspace
-from etools_prp.apps.unicef.models import LowerLevelOutput, PDResultLink, ReportingPeriodDates
+from etools_prp.apps.unicef.models import LowerLevelOutput, PDResultLink
 from etools_prp.apps.unicef.pgd_sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
     update_create_sr_date_periods,
@@ -22,12 +22,7 @@ from etools_prp.apps.unicef.pgd_sync.update_create_person import (
 from etools_prp.apps.unicef.pgd_sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.pgd_sync.utils import process_model
 from etools_prp.apps.unicef.ppd_sync.process_pd_item import process_pd_item
-from etools_prp.apps.unicef.serializers import (
-    PMPLLOSerializer,
-    PMPPDResultLinkSerializer,
-    PMPReportingPeriodDatesSerializer,
-    PMPReportingPeriodDatesSRSerializer,
-)
+from etools_prp.apps.unicef.serializers import PMPLLOSerializer, PMPPDResultLinkSerializer
 
 logger = logging.getLogger(__name__)
 User = get_user_model()

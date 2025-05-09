@@ -2,9 +2,19 @@ from unittest.mock import MagicMock, patch
 
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.partner.models import Partner
-from etools_prp.apps.unicef.models import Person, ProgrammeDocument
+from etools_prp.apps.unicef.models import Person, ProgrammeDocument, ReportingPeriodDates, Section
 from etools_prp.apps.unicef.tasks import process_government_documents
 from etools_prp.apps.unicef.tests.tests_sync.pgd.conftest import item_reference
+
+
+def _for_loop_reporting_period_dates_qpr_n_hr(reporting_requirements):
+    for reporting_requirement in reporting_requirements:
+
+        reporting_period_date_qpr_n_hr_qs_index = ReportingPeriodDates.objects.filter(external_id=reporting_requirement['id'])
+        if not reporting_period_date_qpr_n_hr_qs_index.exists():
+            return False
+
+    return True
 
 
 class TestProcessGovernmentDocuments(BaseAPITestCase):
@@ -45,3 +55,14 @@ class TestProcessGovernmentDocuments(BaseAPITestCase):
         # Focal Points section testing
         person_fp_qs = Person.objects.filter(email=_item['focal_points'][0]['email'], active=False)
         self.assertTrue(person_fp_qs.exists())
+
+        # 'Section' section testing
+        section_qs = Section.objects.filter(external_id=_item['sections'][0]['id'])
+        self.assertTrue(section_qs.exists())
+
+        # Reporting period dates QPR and HR section testing
+        self.assertTrue(_for_loop_reporting_period_dates_qpr_n_hr(_item['reporting_requirements']))
+
+        # Reporting period dates SR section testing
+        reporting_period_date_sr_qs = ReportingPeriodDates.objects.filter(external_id=_item['special_reports'][0]['id'])
+        self.assertTrue(reporting_period_date_sr_qs.exists())

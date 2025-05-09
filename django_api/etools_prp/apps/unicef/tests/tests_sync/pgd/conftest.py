@@ -42,7 +42,13 @@ def item_reference():
             'highest_risk_rating_name': 'High',
             'highest_risk_rating_type': 'hact'
         },
-        'special_reports': [],
+        'special_reports': [
+            {
+                "id": 145,
+                "due_date": "2023-03-31",
+                "description": "National SBC Strategy Toolkit for ALS and training modules"
+            }
+        ],
         'sections': [
             {
                 'id': 8,
@@ -79,7 +85,43 @@ def item_reference():
         'cso_budget_currency': 'USD',
         'unicef_budget': '5000.00',
         'unicef_budget_currency': 'USD',
-        'reporting_requirements': [],
+        'reporting_requirements': [
+            {
+                "id": 696,
+                "start_date": "2023-05-01",
+                "end_date": "2023-07-31",
+                "due_date": "2023-08-31",
+                "report_type": "QPR"
+            },
+            {
+                "id": 695,
+                "start_date": "2023-03-01",
+                "end_date": "2023-04-30",
+                "due_date": "2023-05-31",
+                "report_type": "QPR"
+            },
+            {
+                "id": 561,
+                "start_date": "2022-12-01",
+                "end_date": "2023-02-28",
+                "due_date": "2023-03-30",
+                "report_type": "QPR"
+            },
+            {
+                "id": 560,
+                "start_date": "2022-09-01",
+                "end_date": "2022-11-30",
+                "due_date": "2022-12-30",
+                "report_type": "QPR"
+            },
+            {
+                "id": 559,
+                "start_date": "2022-05-30",
+                "end_date": "2022-08-31",
+                "due_date": "2022-09-30",
+                "report_type": "QPR"
+            }
+        ],
         'expected_results': [],
         'update_date': '2025-05-08T11:26:38.281867Z',
         'amendments': [],
