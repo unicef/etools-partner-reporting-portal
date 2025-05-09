@@ -1,19 +1,19 @@
 import logging
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.db import transaction
 
 from celery import shared_task
 
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import PRP_ROLE_TYPES
-from etools_prp.apps.core.models import Realm, Workspace
+from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import LowerLevelOutput, PDResultLink, ReportingPeriodDates, Section
 from etools_prp.apps.unicef.pgd_sync.update_create_gd import update_create_gd
 from etools_prp.apps.unicef.pgd_sync.update_create_partner import update_create_partner
+from etools_prp.apps.unicef.pgd_sync.update_create_person import update_create_unicef_focal_points, \
+    update_create_agreement_auth_officers, update_create_focal_points
 from etools_prp.apps.unicef.ppd_sync.process_pd_item import process_pd_item
-from etools_prp.apps.unicef.ppd_sync.utils import process_model, save_person_and_user
+from etools_prp.apps.unicef.pgd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import (
     PMPLLOSerializer,
     PMPPDResultLinkSerializer,
@@ -170,77 +170,15 @@ def process_government_documents(fast=False, area=False):
                         if pd is None:
                             continue
 
-                        pd.unicef_focal_point.all().update(active=False)
-                        pd.unicef_officers.all().update(active=False)
-                        pd.partner_focal_point.all().update(active=False)
+                        # Get Unicef Focal Points
+                        pd = update_create_unicef_focal_points(item['unicef_focal_points'], pd)
 
-                        # Create unicef_focal_points
-                        person_data_list = item['unicef_focal_points']
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data)
-                            if not person:
-                                continue
+                        # Create Agreement Auth Officers
+                        pd = update_create_agreement_auth_officers(item['agreement_auth_officers'], pd, workspace, partner)
 
-                            person.active = True
-                            person.save()
-                            pd.unicef_focal_point.add(person)
+                        # Create Focal Points
+                        pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
-                        # Create agreement_auth_officers
-                        person_data_list = item.get('agreement_auth_officers', [])
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data, create_user=True)
-                            if not person:
-                                continue
-
-                            person.active = True
-                            person.save()
-                            pd.unicef_officers.add(person)
-
-                            user.partner = partner
-                            user.save()
-
-                            obj, created = Realm.objects.get_or_create(
-                                user=user,
-                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
-                                workspace=workspace,
-                                partner=partner
-                            )
-
-                            if created:
-                                obj.send_email_notification()
-
-                            is_active = person_data.get('active')
-
-                            if not created and obj.is_active and is_active is False:
-                                obj.is_active = is_active
-                                obj.save()
-
-                        # Create focal_points
-                        person_data_list = item['focal_points']
-                        for person_data in person_data_list:
-                            person, user = save_person_and_user(person_data, create_user=True)
-                            if not person:
-                                continue
-
-                            person.active = True
-                            person.save()
-                            pd.partner_focal_point.add(person)
-                            user.partner = partner
-                            user.save()
-
-                            obj, created = Realm.objects.get_or_create(
-                                user=user,
-                                group=Group.objects.get_or_create(name=PRP_ROLE_TYPES.ip_authorized_officer)[0],
-                                workspace=workspace,
-                                partner=partner
-                            )
-                            if created:
-                                obj.send_email_notification()
-
-                            is_active = person_data.get('active')
-                            if not created and obj.is_active and is_active is False:
-                                obj.is_active = is_active
-                                obj.save()
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:
