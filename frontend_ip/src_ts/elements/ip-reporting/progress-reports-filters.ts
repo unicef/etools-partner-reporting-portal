@@ -25,6 +25,9 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
   @property({type: Array, attribute: false})
   statuses: any[] = [];
 
+  @property({type: Boolean})
+  isGpd = false;
+
   @property({type: Array, attribute: false})
   types: any[] = [];
 
@@ -50,7 +53,7 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
         <div class="row">
           <text-filter
             class="col-md-3 col-12"
-            label="${translate('PD_REF_AND_TITLE')}"
+            label="${translate(this.isGpd ? 'GPD_PD_REF_AND_TITLE' : 'PD_REF_AND_TITLE')}"
             name="pd_ref_title"
             .value="${this.queryParams?.pd_ref_title}"
           >

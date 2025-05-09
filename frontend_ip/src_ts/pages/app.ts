@@ -54,8 +54,8 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: String})
   currenciesUrl = Endpoints.currencies();
 
-  @property({type: String})
-  userPartner = '';
+  @property({type: Object})
+  userPartner!: any;
 
   @property({type: Array})
   prpRoles: any[] = [];
@@ -68,6 +68,9 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: Boolean})
   userHasPrpRolesOrAccess = false;
+
+  @property({type: Boolean})
+  isGpd = false;
 
   @property({type: String})
   locationId?: string;
@@ -89,7 +92,9 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
             <p>${translate('PLEASE_WAIT_BUSINESS_DAYS')}</p>
           </div>`
         : html``}
-      ${this.page === 'ip-reporting' ? html`<page-ip-reporting name="ip-reporting"> </page-ip-reporting>` : html``}
+      ${this.page === 'ip-reporting'
+        ? html`<page-ip-reporting name="ip-reporting" ?isGpd="${this.isGpd}"> </page-ip-reporting>`
+        : html``}
 
       <etools-toasts></etools-toasts>
     `;
@@ -136,6 +141,7 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
 
     if (state.userProfile.profile?.partner && !isJsonStrMatch(this.userPartner, state.userProfile.profile?.partner)) {
       this.userPartner = state.userProfile.profile?.partner;
+      this.isGpd = this.userPartner?.partner_type === 'Gov';
     }
 
     if (state.userProfile.profile?.prp_roles && !isJsonStrMatch(this.prpRoles, state.userProfile.profile?.prp_roles)) {
@@ -257,7 +263,7 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
     return val;
   }
 
-  _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[], userPartner: string) {
+  _computeUserHasPrpRolesOrAccess(prpRoles: any[], access: any[], userPartner: any) {
     return userPartner ? !!prpRoles.length || !!access.length : true;
   }
 

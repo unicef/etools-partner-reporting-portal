@@ -20,6 +20,9 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   queryParams!: any;
 
+  @property({type: Boolean})
+  isGpd = false;
+
   @property({type: Array})
   pd_statuses: any[] = [];
 
@@ -46,7 +49,7 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
         <div class="row">
           <dropdown-filter-multi
             class="col-md-6 col-12"
-            label="${translate('PD_STATUS')}"
+            label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_STATUS')}"
             name="pd_statuses"
             .value="${this._withDefault(this.queryParams?.pd_statuses, '')}"
             .data="${this.pd_statuses}"
@@ -54,7 +57,11 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
           >
           </dropdown-filter-multi>
 
-          <pd-dropdown-filter class="col-md-6 col-12" .value="${this._withDefault(this.queryParams?.pds, '')}">
+          <pd-dropdown-filter
+            class="col-md-6 col-12"
+            ?isGpd="${this.isGpd}"
+            .value="${this._withDefault(this.queryParams?.pds, '')}"
+          >
           </pd-dropdown-filter>
 
           <location-filter class="col-md-3 col-12" .value="${this._withDefault(this.queryParams?.location, '-1')}">
