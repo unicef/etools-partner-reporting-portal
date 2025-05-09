@@ -1,7 +1,7 @@
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import LowerLevelOutput, PDResultLink, ProgrammeDocument
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import PMPLLOSerializer, PMPPDResultLinkSerializer
+from etools_prp.apps.unicef.sync.utils import process_model
 
 
 def update_create_expected_result_rl(expected_result_item: dict, workspace: Workspace, pd: ProgrammeDocument) -> PDResultLink:

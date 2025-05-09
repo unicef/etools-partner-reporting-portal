@@ -4,7 +4,7 @@ from etools_prp.apps.core.common import PRP_ROLE_TYPES
 from etools_prp.apps.core.models import Realm, Workspace
 from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.unicef.models import ProgrammeDocument
-from etools_prp.apps.unicef.ppd_sync.utils import save_person_and_user
+from etools_prp.apps.unicef.sync.utils import save_person_and_user
 
 
 def update_create_unicef_focal_points(unicef_focal_points: dict, pd: ProgrammeDocument) -> ProgrammeDocument:

@@ -2,8 +2,8 @@ from typing import Any
 
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import ProgrammeDocument, ReportingPeriodDates
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import PMPReportingPeriodDatesSerializer, PMPReportingPeriodDatesSRSerializer
+from etools_prp.apps.unicef.sync.utils import process_model
 
 
 def update_create_qpr_n_hr_date_periods(item: Any, pd: ProgrammeDocument, workspace: Workspace) -> Any:

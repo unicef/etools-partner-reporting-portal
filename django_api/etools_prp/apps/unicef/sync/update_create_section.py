@@ -2,8 +2,8 @@ from typing import Any
 
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import ProgrammeDocument, Section
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import PMPSectionSerializer
+from etools_prp.apps.unicef.sync.utils import process_model
 
 
 def update_create_sections(item: Any, pd: ProgrammeDocument, workspace: Workspace) -> (Any, ProgrammeDocument):
