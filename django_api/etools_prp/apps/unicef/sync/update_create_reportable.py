@@ -5,7 +5,7 @@ from celery.bootsteps import Blueprint
 from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.indicator.serializers import PMPReportableSerializer
 from etools_prp.apps.unicef.models import LowerLevelOutput, ProgrammeDocument
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
+from etools_prp.apps.unicef.sync.utils import process_model
 from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 
 
