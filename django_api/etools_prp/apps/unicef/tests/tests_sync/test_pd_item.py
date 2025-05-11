@@ -38,7 +38,7 @@ from etools_prp.apps.unicef.sync.update_create_reportable import update_create_r
 from etools_prp.apps.unicef.sync.update_create_reportable_location_goal import update_create_reportable_location_goals
 from etools_prp.apps.unicef.sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.sync.update_llos_and_reportables import update_llos_and_reportables
-from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import item_reference
+from etools_prp.apps.unicef.tests.tests_sync.conftest import item_pd_reference
 
 
 def _for_loop_reporting_period_dates_qpr_n_hr(reporting_requirements, flag_needs_not_to_exist=False):
@@ -183,7 +183,7 @@ class TestPDItem(BaseAPITestCase):
 
         (_workspace,
          _item) = (
-            item_reference())
+            item_pd_reference())
 
         # Partner section testing
         partner_qs = Partner.objects.filter(vendor_number=_item["partner_org"]['unicef_vendor_number'])

@@ -22,7 +22,7 @@ from etools_prp.apps.unicef.sync.update_llos_and_reportables import update_llos_
 logger = logging.getLogger(__name__)
 
 
-def process_gpd_item(item: dict, workspace: Workspace) -> bool:
+def process_gd_item(item: dict, workspace: Workspace) -> bool:
     # here is the start of the transaction
 
     logger.info("Processing GPD: %s" % item['id'])

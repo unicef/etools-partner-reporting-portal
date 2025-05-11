@@ -1,14 +1,14 @@
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.partner.models import Partner
 from etools_prp.apps.unicef.models import Person, ProgrammeDocument
-from etools_prp.apps.unicef.pgd_sync.update_create_gd import update_create_gd
-from etools_prp.apps.unicef.pgd_sync.update_create_partner import update_create_partner
-from etools_prp.apps.unicef.pgd_sync.update_create_person import (
+from etools_prp.apps.unicef.sync.update_create_partner import update_create_partner
+from etools_prp.apps.unicef.sync.update_create_pd import update_create_pd
+from etools_prp.apps.unicef.sync.update_create_person import (
     update_create_agreement_auth_officers,
     update_create_focal_points,
     update_create_unicef_focal_points,
 )
-from etools_prp.apps.unicef.tests.tests_sync.pgd.conftest import item_reference
+from etools_prp.apps.unicef.tests.tests_sync.conftest import item_gd_reference
 
 
 class TestGDItem(BaseAPITestCase):
@@ -17,7 +17,7 @@ class TestGDItem(BaseAPITestCase):
 
         (_workspace,
          _item) = (
-            item_reference())
+            item_gd_reference())
 
         # Partner section testing
         partner_qs = Partner.objects.filter(vendor_number=_item["partner_org"]['unicef_vendor_number'])
@@ -35,7 +35,7 @@ class TestGDItem(BaseAPITestCase):
 
         self.assertFalse(pd_qs.exists())
 
-        _item, pd = update_create_gd(_item, _workspace)
+        _item, pd = update_create_pd(_item, _workspace)
 
         self.assertTrue(pd_qs.exists())
 

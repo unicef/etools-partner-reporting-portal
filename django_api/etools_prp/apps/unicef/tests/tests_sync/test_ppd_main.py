@@ -19,7 +19,7 @@ from etools_prp.apps.unicef.models import (
     Section,
 )
 from etools_prp.apps.unicef.tasks import process_programme_documents
-from etools_prp.apps.unicef.tests.tests_sync.ppd.conftest import item_reference
+from etools_prp.apps.unicef.tests.tests_sync.conftest import item_pd_reference
 
 
 def _for_loop_reporting_period_dates_qpr_n_hr(reporting_requirements):
@@ -102,7 +102,7 @@ class TestProcessProgrammeDocuments(BaseAPITestCase):
 
         (_workspace,
          _item) = (
-            item_reference())
+            item_pd_reference())
 
         # PMP API query result equivalent for testing purposes
         simulation_pmp_api = MagicMock()

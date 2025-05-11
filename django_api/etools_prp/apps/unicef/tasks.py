@@ -7,7 +7,7 @@ from celery import shared_task
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.models import Workspace
-from etools_prp.apps.unicef.sync.process_gpd_item import process_gpd_item
+from etools_prp.apps.unicef.sync.process_gd_item import process_gd_item
 from etools_prp.apps.unicef.sync.process_pd_item import process_pd_item
 
 logger = logging.getLogger(__name__)
@@ -129,7 +129,7 @@ def process_government_documents(fast=False, area=False):
             for item in list_data['results']:
                 with transaction.atomic():
                     try:
-                        process_gpd_item(item, workspace)
+                        process_gd_item(item, workspace)
                     except Exception as e:
                         logger.exception(e)
 
