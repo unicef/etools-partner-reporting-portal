@@ -36,7 +36,7 @@ def process_gd_item(item: dict, workspace: Workspace) -> bool:
 
     if not item['start_date']:
         logger.warning("Start date is required - skipping!")
-        return
+        return False
 
     if not item['end_date']:
         logger.warning("End date is required - skipping!")
@@ -46,23 +46,25 @@ def process_gd_item(item: dict, workspace: Workspace) -> bool:
     item, partner = update_create_partner(item)
 
     if partner is None:
-        return
+        return False
 
     # Get PD
     item, pd = update_create_pd(item, workspace)
 
     if pd is None:
-        return
+        return False
 
     # Get Unicef Focal Points
-    pd = update_create_unicef_focal_points(item['unicef_focal_points'], pd)
+    if "unicef_focal_points" in item:
+        pd = update_create_unicef_focal_points(item['unicef_focal_points'], pd)
 
     # Create Agreement Auth Officers
     if 'agreement_auth_officers' in item:
         pd = update_create_agreement_auth_officers(item['agreement_auth_officers'], pd, workspace, partner)
 
     # Create Focal Points
-    pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
+    if "focal_points" in item:
+        pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
 
     # Create sections
     item, pd = update_create_sections(item, pd, workspace)
@@ -86,3 +88,5 @@ def process_gd_item(item: dict, workspace: Workspace) -> bool:
 
             # Create LLO
             update_create_expected_result_llo(d, workspace, pd, pdresultlink)
+
+    return True

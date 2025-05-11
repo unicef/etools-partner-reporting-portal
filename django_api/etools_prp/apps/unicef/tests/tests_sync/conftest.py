@@ -600,7 +600,7 @@ def item_gd_reference():
             'ACO-Kabul'
         ],
         'number': '4/20254',
-        'status': 'draft',
+        'status': 'active',
         "workspace": _workspace.id,
         'partner_org': {
             'short_name': 'DOE HERAT',

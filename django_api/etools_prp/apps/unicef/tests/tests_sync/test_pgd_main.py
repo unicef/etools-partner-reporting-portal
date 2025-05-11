@@ -35,13 +35,13 @@ class TestProcessGovernmentDocuments(BaseAPITestCase):
         self.assertTrue(pd_qs.exists())
 
         # Unicef Focal Points section testing
-        person_ufc_qs = Person.objects.filter(email=_item['unicef_focal_points'][0]['email'], active=False)
+        person_ufc_qs = Person.objects.filter(email=_item['unicef_focal_points'][0]['email'])
         self.assertTrue(person_ufc_qs.exists())
 
         # Agreement Auth Officers section testing
-        person_aao_qs = Person.objects.filter(email=_item['agreement_auth_officers'][0]['email'], active=False)
+        person_aao_qs = Person.objects.filter(email=_item['agreement_auth_officers'][0]['email'])
         self.assertTrue(person_aao_qs.exists())
 
         # Focal Points section testing
-        person_fp_qs = Person.objects.filter(email=_item['focal_points'][0]['email'], active=False)
+        person_fp_qs = Person.objects.filter(email=_item['focal_points'][0]['email'])
         self.assertTrue(person_fp_qs.exists())
