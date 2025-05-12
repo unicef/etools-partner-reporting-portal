@@ -1,4 +1,5 @@
 import logging
+from pprint import pprint
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -44,6 +45,18 @@ def process_programme_documents(fast=False, area=False):
     else:
         workspaces = Workspace.objects.all()
 
+    def remove_duplicates(data):
+        cleaned_data = {}
+        for key, values in data.items():
+            unique_ids = set()
+            unique_values = []
+            for item in values:
+                if item['id'] not in unique_ids:
+                    unique_ids.add(item['id'])
+                    unique_values.append(item)
+            cleaned_data[key] = unique_values
+        return cleaned_data
+
     for workspace in workspaces:
         # Skip global workspace and Syria Cross Border / MENARO
         if workspace.business_area_code in ("0", "234R"):
@@ -51,6 +64,8 @@ def process_programme_documents(fast=False, area=False):
 
         # Iterate over all pages
         page_url = None
+
+        item_expected_results_id_by_item_id = {}
 
         while True:
             try:
@@ -69,6 +84,23 @@ def process_programme_documents(fast=False, area=False):
                  workspace.business_area_code))
 
             for item in list_data['results']:
+
+                if "expected_results" in item and len(item["expected_results"]) > 0:
+                    for expected_result in item["expected_results"]:
+                        key = str(expected_result["result_link"]) + "_" + str(expected_result["cp_output"]["id"])
+                        if key in item_expected_results_id_by_item_id:
+                            item_expected_results_id_by_item_id[key].append({
+                                "id": item["id"],
+                                "workspace": item["workspace"],
+                                "title": item["title"]
+                            })
+                        else:
+                            item_expected_results_id_by_item_id[key] = [{
+                                "id": item["id"],
+                                "workspace": item["workspace"],
+                                "title": item["title"]
+                            }]
+
                 with transaction.atomic():
                     try:
                         process_pd_item(item, workspace)
@@ -82,6 +114,13 @@ def process_programme_documents(fast=False, area=False):
             else:
                 logger.info("End of workspace")
                 break
+
+        unique_set_values = {k: v for k, v in remove_duplicates(item_expected_results_id_by_item_id).items() if len(v) > 1}
+
+        if len(unique_set_values) > 0:
+            print("[ERROR] PPD with unique set duplicate found, output format is "
+                  "(item__expected_results__result_link + item__expected_results__cp_output__id to item info): ")
+            pprint(unique_set_values)
 
 
 @shared_task

@@ -106,7 +106,7 @@ class TestProcessProgrammeDocuments(BaseAPITestCase):
 
         # PMP API query result equivalent for testing purposes
         simulation_pmp_api = MagicMock()
-        simulation_pmp_api.programme_documents.return_value = {'count': 1, 'next': None, 'results': [_item]}
+        simulation_pmp_api.programme_documents.return_value = {'count': 1, 'next': None, 'results': _item}
         simulation_pmp_api_programme_documents.return_value = simulation_pmp_api
 
         # Main process execution
