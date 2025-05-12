@@ -712,7 +712,7 @@ def item_pd_reference():
                 "title": "PD Output 1: Enhanced capacity of the DepEd Bureau of Alternative Education (BAE) in developing "
                          "and implementing of localized Social Behavior Change (SBC) Strategies to "
                          "increase enrolment in and improve local support for the Alternative Learning System",
-                "result_link": 219,
+                "result_link": 217,
                 "cp_output": {
                     "id": 700,
                     "title": "QUALITY AND INCLUSIVE LEARNING-ADOLESCENT"
@@ -1039,7 +1039,7 @@ def item_pd_reference():
                 "title": "PD Output 1: Enhanced capacity of the the Ministry of Basic, Higher, and Technical Education "
                          "(MBHTE)  in developing and implementing of localized Social Behavior Change (SBC) Strategies "
                          "to increase enrolment in and improve local support for the Alternative Learning System",
-                "result_link": 267,
+                "result_link": 257,
                 "cp_output": {
                     "id": 701,
                     "title": "PEACEBUILDING AND LEARNING-PROTECTION FROM CONFLICT AND DISASTERS"
