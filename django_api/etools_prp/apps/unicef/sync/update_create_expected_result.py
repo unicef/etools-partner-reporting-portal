@@ -15,10 +15,10 @@ def update_create_expected_result_rl(expected_result_item: dict, workspace: Work
     _result_link_item['external_business_area_code'] = workspace.business_area_code
 
     filters = {
-            'external_id': _result_link_item['result_link'],
-            'external_cp_output_id': external_cp_output_id,
-            'programme_document': pd.id,
-            'external_business_area_code': workspace.business_area_code,
+        'external_id': _result_link_item['result_link'],
+        'external_cp_output_id': external_cp_output_id,
+        'programme_document': pd.id,
+        'external_business_area_code': workspace.business_area_code,
     }
     pd_result_link = process_model(
         PDResultLink, PMPPDResultLinkSerializer,
