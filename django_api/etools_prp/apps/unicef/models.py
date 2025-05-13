@@ -377,7 +377,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     @property
     def lower_level_outputs(self):
         return LowerLevelOutput.objects.filter(
-            cp_output__programme_document=self)
+            cp_output__programme_document=self, active=True)
 
 
 class ProgressReport(TimeStampedModel):
