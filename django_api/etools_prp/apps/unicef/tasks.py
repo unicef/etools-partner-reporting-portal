@@ -1,5 +1,4 @@
 import logging
-from pprint import pprint
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -144,4 +143,3 @@ def process_government_documents(fast=False, area=False):
             else:
                 logger.info("End of workspace")
                 break
-
