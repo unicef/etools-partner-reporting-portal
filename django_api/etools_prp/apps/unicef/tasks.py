@@ -53,8 +53,6 @@ def process_programme_documents(fast=False, area=False):
         # Iterate over all pages
         page_url = None
 
-        item_expected_results_id_by_item_id = {}
-
         while True:
             try:
                 api = PMP_API()
@@ -72,22 +70,6 @@ def process_programme_documents(fast=False, area=False):
                  workspace.business_area_code))
 
             for item in list_data['results']:
-
-                if "expected_results" in item and len(item["expected_results"]) > 0:
-                    for expected_result in item["expected_results"]:
-                        key = str(expected_result["result_link"]) + "_" + str(expected_result["cp_output"]["id"])
-                        if key in item_expected_results_id_by_item_id:
-                            item_expected_results_id_by_item_id[key].append({
-                                "id": item["id"],
-                                "workspace": item["workspace"],
-                                "title": item["title"]
-                            })
-                        else:
-                            item_expected_results_id_by_item_id[key] = [{
-                                "id": item["id"],
-                                "workspace": item["workspace"],
-                                "title": item["title"]
-                            }]
 
                 with transaction.atomic():
                     try:
@@ -134,8 +116,6 @@ def process_government_documents(fast=False, area=False):
         # Iterate over all pages
         page_url = None
 
-        item_expected_results_id_by_item_id = {}
-
         while True:
             try:
                 api = PMP_API()
@@ -150,22 +130,6 @@ def process_government_documents(fast=False, area=False):
                 (list_data['count'], workspace.title, workspace.business_area_code))
 
             for item in list_data['results']:
-
-                if "expected_results" in item and len(item["expected_results"]) > 0:
-                    for expected_result in item["expected_results"]:
-                        key = str(expected_result["result_link"]) + "_" + str(expected_result["cp_output"]["id"])
-                        if key in item_expected_results_id_by_item_id:
-                            item_expected_results_id_by_item_id[key].append({
-                                "id": item["id"],
-                                "workspace": item["workspace"],
-                                "title": item["title"]
-                            })
-                        else:
-                            item_expected_results_id_by_item_id[key] = [{
-                                "id": item["id"],
-                                "workspace": item["workspace"],
-                                "title": item["title"]
-                            }]
 
                 with transaction.atomic():
                     try:
