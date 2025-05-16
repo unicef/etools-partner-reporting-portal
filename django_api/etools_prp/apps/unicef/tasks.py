@@ -53,7 +53,8 @@ def process_programme_documents(fast=False, area=False):
         page_url = None
 
         while True:
-            try: #last time this work perfectly
+            # last time this work perfectly
+            try:
                 api = PMP_API()
                 list_data = api.programme_documents(
                     business_area_code=str(
