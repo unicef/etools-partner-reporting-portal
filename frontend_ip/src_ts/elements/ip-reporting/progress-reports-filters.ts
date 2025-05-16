@@ -34,7 +34,6 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
   constructor() {
     super();
     this.statuses = this._localizeStatuses();
-    this.types = this._localizeTypes();
   }
 
   render() {
@@ -94,6 +93,10 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
 
   updated(changedProperties) {
     super.updated(changedProperties);
+
+    if (changedProperties.has('isGpd')) {
+      this.types = this._localizeTypes(this.isGpd);
+    }
   }
 
   _localizeStatuses() {
@@ -107,12 +110,19 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
     ];
   }
 
-  _localizeTypes() {
-    return [
-      {title: getTranslation('QPR'), id: 'QPR'},
-      {title: getTranslation('HR'), id: 'HR'},
-      {title: getTranslation('SR'), id: 'SR'}
-    ];
+  _localizeTypes(isGpd: boolean) {
+    if (isGpd) {
+      return [
+        {title: getTranslation('GPD_PROGRESS_REPORTS'), id: 'QPR'},
+        {title: getTranslation('GPD_SPECIAL_REPORT'), id: 'SR'}
+      ];
+    } else {
+      return [
+        {title: getTranslation('QPR'), id: 'QPR'},
+        {title: getTranslation('HR'), id: 'HR'},
+        {title: getTranslation('SR'), id: 'SR'}
+      ];
+    }
   }
 }
 
