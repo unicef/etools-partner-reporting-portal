@@ -48,6 +48,7 @@ from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, Pro
 
 logger = logging.getLogger(__name__)
 
+
 def convert_xlsx_to_csv(response):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         tmp.write(response.content)
