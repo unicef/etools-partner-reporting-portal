@@ -579,7 +579,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         logger.info(response)
 
-        raise RuntimeError("here")
+        self.assertEquals([], response.data['locations'])
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(self.pd.agreement, response.data['agreement'])
