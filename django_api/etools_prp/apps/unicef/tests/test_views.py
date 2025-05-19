@@ -577,7 +577,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             kwargs={'pd_id': self.pd.id, 'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
-        logger.exception(response)
+        logger.info(response)
 
         raise RuntimeError("here")
 
