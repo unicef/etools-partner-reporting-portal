@@ -1,6 +1,5 @@
 import csv
 import datetime
-import logging
 import os
 import random
 import tempfile
@@ -45,8 +44,6 @@ from etools_prp.apps.core.tests.factories import (
 from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggregator
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
-
-logger = logging.getLogger(__name__)
 
 
 def convert_xlsx_to_csv(response):
