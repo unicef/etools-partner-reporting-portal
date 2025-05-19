@@ -161,7 +161,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     def get_locations(self, obj):
         return ShortLocationSerializer(
             Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj
+                reportables__lower_level_outputs__cp_output__programme_document=obj
             ).distinct(),
             many=True
         ).data
@@ -249,7 +249,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
     def get_locations(self, obj):
         return ShortLocationSerializer(
             Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj
+                reportables__lower_level_outputs__cp_output__programme_document=obj
             ).distinct(),
             many=True
         ).data
