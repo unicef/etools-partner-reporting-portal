@@ -15,9 +15,6 @@ export class EtoolsUserProfileDialog extends LitElement {
   @property({type: Object})
   profile: any = {};
 
-  @property({type: Array})
-  prpRoles: any[] = [];
-
   @property({type: Boolean})
   readonly = true;
 
@@ -165,9 +162,33 @@ export class EtoolsUserProfileDialog extends LitElement {
           <div class="row-h flex-c" ?hidden="${this.hideAvailableWorkspaces}">
             <div class="col col-12">
               <div>
+                <label class="paper-label">${translate('AVAILABLE_WORKSPACES')}</label>
+                <div class="input-label flex-wrap">
+                  ${(this.profile?.workspaces_available || []).map(
+                    (item, index) => html`
+                      <div>
+                        ${item.title}
+                        <span class="separator">${this.getSeparator(this.profile.workspaces_available, index)}</span>
+                      </div>
+                    `
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row-h flex-c" ?hidden="${this.hideAvailableWorkspaces}">
+            <div class="col col-12">
+              <div>
                 <label class="paper-label">${translate('MY_ROLES')}</label>
                 <div class="input-label flex-wrap">
-                  ${(this.prpRoles || []).map((role) => html` <div>${role}</div> `)}
+                  ${(this.profile?.prp_roles || []).map(
+                    (item, index) => html`
+                      <div>
+                        ${item.role_display}
+                        <span class="separator">${this.getSeparator(this.profile?.prp_roles, index)}</span>
+                      </div>
+                    `
+                  )}
                 </div>
               </div>
             </div>
@@ -209,26 +230,14 @@ export class EtoolsUserProfileDialog extends LitElement {
     }
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has('profile')) {
-      this.prpRoles = this._computePrpRoles();
+  getSeparator(collection, index) {
+    if (!collection) {
+      return '';
     }
-  }
-
-  _computePrpRoles() {
-    if (!this.profile) {
-      return [];
+    if (index < collection.length - 1) {
+      return '|';
     }
-    return (this.profile.prp_roles || []).map((role) => {
-      let result = '';
-      result += role.workspace.title;
-
-      if (result) {
-        result += ' / ';
-      }
-
-      return result + role.role_display;
-    });
+    return '';
   }
 
   saveData() {
