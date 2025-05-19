@@ -945,15 +945,14 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')
-    id = serializers.CharField(source='external_cp_output_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
     class Meta:
         model = PDResultLink
-        # we neeed to align this
+        # we need to align this
         fields = (
-            'id',
+            'external_cp_output_id',
             'title',
             'result_link',
             'programme_document',
@@ -965,7 +964,7 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
                 fields=[
                     "result_link",
                     "external_business_area_code",
-                    "id",
+                    "external_cp_output_id",
                 ],
             ),
         ]

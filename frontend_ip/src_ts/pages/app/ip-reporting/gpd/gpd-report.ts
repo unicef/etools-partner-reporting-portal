@@ -13,16 +13,16 @@ import '../../../../elements/ip-reporting/pd-reports-report-title.js';
 import '../../../../elements/ip-reporting/pd-report-export-button.js';
 import '../../../../elements/ip-reporting/pd-modal.js';
 import '../../../../elements/ip-reporting/authorized-officer-modal.js';
-import './pd-report-sr.js';
-import './pd-report-hr.js';
-import './pd-report-qpr.js';
+import './gpd-report-sr.js';
+import './gpd-report-hr.js';
+import './gpd-report-qpr.js';
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports.js';
 import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments.js';
 import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '../../../../redux/actions/pdReports.js';
 import Endpoints from '../../../../endpoints.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
-import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util.js';
@@ -33,8 +33,8 @@ import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {buildUrl} from '../../../../etools-prp-common/utils/util.js';
 
-@customElement('page-ip-reporting-pd-report')
-export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
+@customElement('page-ip-reporting-gpd-report')
+export class PageIpReportingGpdReport extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
   static styles = [
     css`
       :host {
@@ -84,7 +84,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
   currentPd: any;
 
   @property({type: String})
-  selectedTab = 'reporting';
+  selectedTab = 'info';
 
   @property({type: String})
   mode!: string;
@@ -145,7 +145,11 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
 
       <page-header title=${this.headingPrefix} back=${this.backLink}>
         <reporting-period slot="above-title" .range=${this.currentReport?.reporting_period}></reporting-period>
-        <pd-reports-report-title slot="above-title" .report=${this.currentReport}></pd-reports-report-title>
+        <pd-reports-report-title
+          slot="above-title"
+          .report=${this.currentReport}
+          ?isGpd="${true}"
+        ></pd-reports-report-title>
         <etools-button variant="text" slot="in-title" role="button" @click=${this._showPdDetails}>
           ${this.currentReport?.programme_document?.reference_number}
         </etools-button>
@@ -198,22 +202,22 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
 
       <page-body>
         ${this._equals(this.currentReport?.report_type, 'HR')
-          ? html`<page-pd-report-hr
+          ? html`<page-gpd-report-hr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-pd-report-hr>`
+            ></page-gpd-report-hr>`
           : html``}
         ${this._equals(this.currentReport?.report_type, 'QPR')
-          ? html`<page-pd-report-qpr
+          ? html`<page-gpd-report-qpr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-pd-report-qpr>`
+            ></page-gpd-report-qpr>`
           : html``}
         ${this._equals(this.currentReport?.report_type, 'SR')
-          ? html`<page-pd-report-sr
+          ? html`<page-gpd-report-sr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
-            ></page-pd-report-sr>`
+            ></page-gpd-report-sr>`
           : html``}
       </page-body>
     `;
@@ -249,27 +253,11 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
       this.currentReport = programmeDocumentReportsCurrent(state);
       this.tabs = [
         {
-          tab: 'reporting',
-          tabLabel:
-            this.currentReport.report_type === 'HR'
-              ? translate('REPORTING_ON_INDICATORS')
-              : this.currentReport.report_type === 'QPR'
-                ? translate('REPORTING_ON_RESULTS')
-                : (translate('REPORTING_ON_DATA') as any as string),
+          tab: 'info',
+          tabLabel: translate('REPORTING_ON_DATA') as any as string,
           hidden: false
         }
       ];
-
-      if (this.currentReport.report_type === 'QPR') {
-        this.tabs = [
-          ...this.tabs,
-          {
-            tab: 'info',
-            tabLabel: translate('OTHER_INFO') as any as string,
-            hidden: false
-          }
-        ];
-      }
     }
 
     if (this.mode !== state.programmeDocumentReports.current.mode) {
@@ -420,7 +408,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
   }
 
   _computeBackLink(pdId: string) {
-    return 'pd/' + pdId + '/view/reports';
+    return 'gpd/' + pdId + '/view/reports';
   }
 
   _showPdDetails(e: CustomEvent) {
@@ -509,7 +497,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
               reportId: this.reportId,
               data: this.currentReport,
               submitUrl: this.submitUrl,
-              isGpd: false
+              isGpd: true
             }
           });
           return;

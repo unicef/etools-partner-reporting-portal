@@ -2303,3 +2303,33 @@ class TestEToolsRolesSynchronization(BaseAPITestCase):
                 (user.workspace.id, user.partner.id, Group.objects.get(name='IP_EDITOR').name, True),
             ]
         )
+
+
+class TestProgrammeDocumentCalculationMethodsAPIView(BaseProgressReportAPITestCase):
+    def setUp(self):
+        super().setUp()
+        self.llo2 = factories.LowerLevelOutputFactory(cp_output=self.cp_output)
+
+    def test_get_calculation_methods_all_active(self):
+        url = reverse(
+            'programme-document-calculation-methods',
+            args=[self.workspace.pk, self.pd.pk],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['ll_outputs_and_indicators'].__len__(), self.pd.lower_level_outputs.count(), 2)
+        self.assertEqual(
+            sorted([llo['ll_output']['id'] for llo in response.data['ll_outputs_and_indicators']]),
+            [self.llo.id, self.llo2.id])
+
+    def test_get_calculation_methods_filter_inactive(self):
+        self.llo2.active = False
+        self.llo2.save()
+        url = reverse(
+            'programme-document-calculation-methods',
+            args=[self.workspace.pk, self.pd.pk],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['ll_outputs_and_indicators'].__len__(), 1)
+        self.assertEqual(response.data['ll_outputs_and_indicators'][0]['ll_output']['id'], self.llo.id)
