@@ -1,5 +1,6 @@
 import csv
 import datetime
+import logging
 import os
 import random
 import tempfile
@@ -45,6 +46,7 @@ from etools_prp.apps.indicator.disaggregators import QuantityIndicatorDisaggrega
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.unicef.models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
 
+logger = logging.getLogger(__name__)
 
 def convert_xlsx_to_csv(response):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
@@ -574,7 +576,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             kwargs={'pd_id': self.pd.id, 'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
-        raise RuntimeError(response)
+        logger.exception(response)
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(self.pd.agreement, response.data['agreement'])
