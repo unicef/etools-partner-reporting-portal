@@ -1,5 +1,6 @@
 import csv
 import datetime
+import json
 import os
 import random
 import tempfile
@@ -578,8 +579,8 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         actual = [dict(loc) for loc in response.data['locations']]  # normal dicts
 
-        expected_1 = {'id': str(self.loc1.id), 'name': self.loc1.name}
-        expected_2 = {'id': str(self.loc2.id), 'name': self.loc2.name}
+        expected_1 = {'id': str(self.loc1.id), 'name': str(self.loc1.name) + " [" + json.dumps(self.loc1) + "]", 'admin_level': self.loc1.admin_level}
+        expected_2 = {'id': str(self.loc2.id), 'name': self.loc2.name, 'admin_level': self.loc2.admin_level}
 
         self.assertIn(expected_1, actual)
         self.assertIn(expected_2, actual)
