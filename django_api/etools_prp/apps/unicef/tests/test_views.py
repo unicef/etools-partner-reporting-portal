@@ -574,6 +574,8 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             kwargs={'pd_id': self.pd.id, 'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
+        raise RuntimeError(response)
+
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(self.pd.agreement, response.data['agreement'])
         self.assertEquals(
