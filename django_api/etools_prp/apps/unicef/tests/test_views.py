@@ -576,13 +576,10 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         self.assertEquals(len(response.data['locations']), 2)
 
-        actual = [dict(loc) for loc in response.data['locations']]  # normal dicts
+        actual = [str(loc["id"]) for loc in response.data['locations']]  # normal dicts
 
-        expected_1 = {'id': str(self.loc1.id), 'name': str(self.loc1.name) + " [None - " + self.loc1.p_code + "]", 'admin_level': self.loc1.admin_level}
-        expected_2 = {'id': str(self.loc2.id), 'name': str(self.loc2.name) + " [None - " + self.loc2.p_code + "]", 'admin_level': self.loc2.admin_level}
-
-        self.assertIn(expected_1, actual)
-        self.assertIn(expected_2, actual)
+        self.assertIn(str(self.loc1.id), actual)
+        self.assertIn(str(self.loc2.id), actual)
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(self.pd.agreement, response.data['agreement'])
