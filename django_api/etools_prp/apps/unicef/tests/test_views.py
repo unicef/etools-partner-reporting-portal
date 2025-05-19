@@ -579,6 +579,8 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         logger.exception(response)
 
+        raise RuntimeError("here")
+
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(self.pd.agreement, response.data['agreement'])
         self.assertEquals(
