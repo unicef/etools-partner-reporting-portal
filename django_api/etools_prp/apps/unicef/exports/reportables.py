@@ -142,7 +142,7 @@ class ReportableListPDFExporter(ProgressReportsMixin, ProgressReportDetailPDFExp
             ],
             [
                 HTMLTableHeader('Baseline'),
-                HTMLTableCell(calculated_baseline, colspan=2),
+                HTMLTableCell(calculated_baseline, klass='wrapped_cell', colspan=2),
             ],
             [
                 HTMLTableHeader('Target'),
