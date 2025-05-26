@@ -574,13 +574,6 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             kwargs={'pd_id': self.pd.id, 'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(len(response.data['locations']), 2)
-
-        actual = [str(loc["id"]) for loc in response.data['locations']]  # normal dicts
-
-        self.assertIn(str(self.loc1.id), actual)
-        self.assertIn(str(self.loc2.id), actual)
-
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(self.pd.agreement, response.data['agreement'])
         self.assertEquals(

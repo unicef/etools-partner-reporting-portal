@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import transaction
-from django.db.models import Q
 from django.utils.functional import cached_property
 
 from rest_framework import serializers
@@ -160,12 +159,12 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         return obj.funds_received_to_date_currency
 
     def get_locations(self, obj):
-        qs = Location.objects.filter(
-            Q(indicator_location_data__indicator_report__progress_report__programme_document=obj) |
-            Q(reportables__lower_level_outputs__cp_output__programme_document=obj)
-        ).distinct()
-
-        return ShortLocationSerializer(qs, many=True).data
+        return ShortLocationSerializer(
+            Location.objects.filter(
+                indicator_location_data__indicator_report__progress_report__programme_document=obj
+            ).distinct(),
+            many=True
+        ).data
 
     def get_unicef_officers(self, obj):
         return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
@@ -248,12 +247,12 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
 
     def get_locations(self, obj):
-        qs = Location.objects.filter(
-            Q(indicator_location_data__indicator_report__progress_report__programme_document=obj) |
-            Q(reportables__lower_level_outputs__cp_output__programme_document=obj)
-        ).distinct()
-
-        return ShortLocationSerializer(qs, many=True).data
+        return ShortLocationSerializer(
+            Location.objects.filter(
+                indicator_location_data__indicator_report__progress_report__programme_document=obj
+            ).distinct(),
+            many=True
+        ).data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):
