@@ -106,17 +106,19 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
             <div class="name">${translate('PROGRESS_REPORTS')}</div>
           </a>
 
-          <a
-            class="nav-menu-item ${this.getItemClass(this.selectedOption, 'indicators')}"
-            href="${this._appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
-            @click="${this.trackAnalytics}"
-            tracker="Indicators"
-          >
-            <sl-tooltip for="indicators-icon" placement="right" content="${translate('INDICATORS')}">
-              <etools-icon id="indicators-icon" name="trending-up"></etools-icon>
-            </sl-tooltip>
-            <div class="name">${translate('INDICATORS')}</div>
-          </a>
+          ${this.partner?.partner_type && this.partner?.partner_type !== 'Gov'
+            ? html` <a
+                class="nav-menu-item ${this.getItemClass(this.selectedOption, 'indicators')}"
+                href="${this._appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
+                @click="${this.trackAnalytics}"
+                tracker="Indicators"
+              >
+                <sl-tooltip for="indicators-icon" placement="right" content="${translate('INDICATORS')}">
+                  <etools-icon id="indicators-icon" name="trending-up"></etools-icon>
+                </sl-tooltip>
+                <div class="name">${translate('INDICATORS')}</div>
+              </a>`
+            : ``}
 
           <hr />
 
