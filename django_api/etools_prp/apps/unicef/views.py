@@ -745,10 +745,10 @@ class ProgressReportSRSubmitAPIView(APIView):
             )
 
         # We don't need this check anymore
-        #if not progress_report.narrative:
-            #raise ValidationError(
-                #"Narrative is required for SR report type"
-            #)
+        # if not progress_report.narrative:
+        #     raise ValidationError(
+        #         "Narrative is required for SR report type"
+        #     )
 
         # Attachment field validation
         if not progress_report.attachments.exists():
