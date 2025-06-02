@@ -540,8 +540,7 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
-
-    narrative = serializers.CharField(max_length=2000)
+    narrative = serializers.CharField(max_length=2000, required=False, allow_null=True, allow_blank=True)
 
     class Meta:
         model = ProgressReport
