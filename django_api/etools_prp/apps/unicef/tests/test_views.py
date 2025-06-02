@@ -576,7 +576,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
         self.assertEquals(len(response.data['locations']), 2)
 
-        actual = [str(loc["id"]) for loc in response.data['locations']]  # normal dicts
+        actual = [str(loc["id"]) for loc in response.data['locations']]
 
         self.assertIn(str(self.loc1.id), actual)
         self.assertIn(str(self.loc2.id), actual)

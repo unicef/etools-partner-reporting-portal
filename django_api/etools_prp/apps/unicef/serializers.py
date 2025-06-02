@@ -159,12 +159,22 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         return obj.funds_received_to_date_currency
 
     def get_locations(self, obj):
-        return ShortLocationSerializer(
+        qs = (
             Location.objects.filter(
                 indicator_location_data__indicator_report__progress_report__programme_document=obj
-            ).distinct(),
-            many=True
-        ).data
+            )
+            .values("id")
+            .union(
+                Location.objects.filter(
+                    reportables__lower_level_outputs__cp_output__programme_document=obj
+                )
+                .values("id")
+            )
+        )
+
+        qs = Location.objects.filter(id__in=qs)
+
+        return ShortLocationSerializer(qs, many=True).data
 
     def get_unicef_officers(self, obj):
         return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
@@ -530,8 +540,7 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
-
-    narrative = serializers.CharField(max_length=2000)
+    narrative = serializers.CharField(max_length=2000, required=False, allow_null=True, allow_blank=True)
 
     class Meta:
         model = ProgressReport
