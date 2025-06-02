@@ -744,10 +744,11 @@ class ProgressReportSRSubmitAPIView(APIView):
                 "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
             )
 
-        if not progress_report.narrative:
-            raise ValidationError(
-                "Narrative is required for SR report type"
-            )
+        # We don't need this check anymore
+        # if not progress_report.narrative:
+        #     raise ValidationError(
+        #         "Narrative is required for SR report type"
+        #     )
 
         # Attachment field validation
         if not progress_report.attachments.exists():
