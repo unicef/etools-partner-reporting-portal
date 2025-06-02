@@ -37,7 +37,9 @@ export function getReportLink(
   report: any,
   suffix: string,
   buildUrlFn: (baseUrl: string, tail: string) => string,
-  baseUrl: string
+  baseUrl: string,
+  isGpd: boolean
 ) {
-  return buildUrlFn(baseUrl, '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix);
+  const prefix = isGpd ? '/gpd/' : '/pd/';
+  return buildUrlFn(baseUrl, prefix + report.programme_document.id + '/report/' + report.id + '/' + suffix);
 }

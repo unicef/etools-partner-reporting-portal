@@ -3,7 +3,7 @@ import logging
 from etools_prp.apps.indicator.models import Disaggregation, DisaggregationValue
 from etools_prp.apps.indicator.serializers import PMPDisaggregationSerializer, PMPDisaggregationValueSerializer
 from etools_prp.apps.unicef.models import ProgrammeDocument
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
+from etools_prp.apps.unicef.sync.utils import process_model
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import logging
 
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.serializers import PMPLocationSerializer
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
+from etools_prp.apps.unicef.sync.utils import process_model
 
 logger = logging.getLogger(__name__)
 

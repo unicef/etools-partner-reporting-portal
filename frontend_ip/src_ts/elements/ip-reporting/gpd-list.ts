@@ -19,13 +19,13 @@ import '../../etools-prp-common/elements/etools-prp-number';
 import '../etools-prp-currency';
 import '../../etools-prp-common/elements/list-placeholder';
 import {store} from '../../redux/store';
-import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
+import {connect} from 'pwa-helpers';
 import {RootState} from '../../typings/redux.types';
 import {buildUrl} from '../../etools-prp-common/utils/util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
-@customElement('pd-list')
-export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
+@customElement('gpd-list')
+export class GpdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
   @property({type: Boolean})
   loading = false;
 
@@ -38,10 +38,9 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
   @property({type: Boolean}) lowResolutionLayout = false;
 
   stateChanged(state: RootState) {
-    if (state.app?.routeDetails.subSubRouteName !== 'pd') {
+    if (state.app?.routeDetails.subSubRouteName !== 'gpd') {
       return;
     }
-
     if (this.loading !== state.programmeDocuments?.loading) {
       this.loading = state.programmeDocuments.loading;
     }
@@ -71,12 +70,9 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
 
   render() {
     return html`
-      <style>
-        ${layoutStyles}
-      </style>
       ${tableStyles}
       <style>
-        ${dataTableStylesLit} :host {
+        ${layoutStyles} ${dataTableStylesLit} :host {
           display: block;
         }
 
@@ -94,7 +90,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
           this.lowResolutionLayout = e.detail.value;
         }}"
       ></etools-media-query>
-      <etools-content-panel panel-title="${translate('LIST_PDS')}">
+      <etools-content-panel panel-title="${translate('LIST_GDDS')}">
         <etools-data-table-header
           no-collapse
           .lowResolutionLayout="${this.lowResolutionLayout}"
@@ -102,10 +98,10 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column field="reference_number" class="col-2" sortable>
-            <div class="table-column">${translate('PD_REF_NUMBER')}</div>
+            <div class="table-column">${translate('REFERENCE_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable class="col-1">
-            <div class="table-column">${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}</div>
+            <div class="table-column">${translate('GPD_STATUS')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="start_date" sortable class="col-1">
             <div class="table-column">${translate('START_DATE')}</div>
@@ -113,16 +109,13 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
           <etools-data-table-column field="end_date" sortable class="col-1">
             <div class="table-column">${translate('END_DATE')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="cso_contribution" sortable class="col-1">
-            <div class="table-column">${translate('CSO_CONTRIBUTION')}</div>
-          </etools-data-table-column>
           <etools-data-table-column field="total_unicef_cash" sortable class="col-1">
             <div class="table-column">${translate('UNICEF_CASH')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="total_unicef_supplies" class="col-1">
             <div class="table-column">${translate('UNICEF_SUPPLIES')}</div>
           </etools-data-table-column>
-          <etools-data-table-column field="budget" sortable class="col-1">
+          <etools-data-table-column field="budget" sortable class="col-2">
             <div class="table-column">${translate('PLANNED_BUDGET')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="funds_received_to_date" sortable class="col-2">
@@ -139,7 +132,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
               <div slot="row-data">
                 <div
                   class="col-data col-2 table-cell table-cell--text"
-                  data-col-header-label="${translate('PD_REF_NUMBER')}"
+                  data-col-header-label="${translate('REFERENCE_NUMBER')}"
                 >
                   <sl-tooltip placement="top-end" .content="${pd.title}">
                     <a
@@ -154,7 +147,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                 </div>
                 <div
                   class="col-data col-1 table-cell table-cell--text"
-                  data-col-header-label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
+                  data-col-header-label="${translate('GPD_STATUS')}"
                 >
                   ${this._withDefault(pd.status, '')}
                 </div>
@@ -169,13 +162,6 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                   data-col-header-label="${translate('END_DATE')}"
                 >
                   ${this._withDefault(pd.end_date)}
-                </div>
-                <div
-                  class="col-data col-1 table-cell table-cell--text"
-                  data-col-header-label="${translate('CSO_CONTRIBUTION')}"
-                >
-                  <etools-prp-currency value="${pd.cso_contribution}" currency="${pd.cso_contribution_currency}">
-                  </etools-prp-currency>
                 </div>
                 <div
                   class="col-data col-1 table-cell table-cell--text"
@@ -195,7 +181,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                   </etools-prp-currency>
                 </div>
                 <div
-                  class="col-data col-1 table-cell table-cell--text"
+                  class="col-data col-2 table-cell table-cell--text"
                   data-col-header-label="${translate('PLANNED_BUDGET')}"
                 >
                   <etools-prp-currency value="${pd.budget}" currency="${pd.budget_currency}"> </etools-prp-currency>
@@ -256,7 +242,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
   }
 
   getLinkUrl(baseUrl, id, page) {
-    return buildUrl(baseUrl, `pd/${id}/view/${page}`);
+    return buildUrl(baseUrl, `gpd/${id}/view/${page}`);
   }
 
   _getPdRefNumberTracker(pdRefNumber) {
@@ -264,4 +250,4 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
   }
 }
 
-export {PdList as PdListEl};
+export {GpdList as GpdListEl};

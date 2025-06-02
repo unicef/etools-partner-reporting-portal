@@ -1,4 +1,4 @@
-import {LitElement, html} from 'lit';
+import {LitElement, PropertyValues, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
@@ -16,6 +16,9 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 
 @customElement('pd-filters')
 export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
+  @property({type: Boolean, attribute: 'is-gpd'})
+  isGpd = false;
+
   @property({type: Object})
   queryParams!: any;
 
@@ -35,7 +38,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
         <div class="row">
           <text-filter
             class="col-lg-2 col-12"
-            label="${translate('PD_REF_AND_TITLE')}"
+            label="${translate(this.isGpd ? 'REFERENCE_NUMBER' : 'PD_REF_AND_TITLE')}"
             name="ref_title"
             .value="${this.queryParams?.ref_title || ''}"
             @value-changed="${this._handleFilterChange}"
@@ -43,7 +46,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
           </text-filter>
           <dropdown-filter-multi
             class="col-lg-5 col-12"
-            label="${translate('PD_SSFA_STATUS')}"
+            label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
             name="status"
             .value="${this._withDefault(this.queryParams?.status, '')}"
             .data="${this.statuses}"
@@ -62,11 +65,11 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
     `;
   }
 
-  constructor() {
-    super();
+  protected firstUpdated(changedProperties: PropertyValues): void {
+    super.firstUpdated(changedProperties);
+
     this.statuses = this._initStatuses();
   }
-
   updated(changedProperties) {
     super.updated(changedProperties);
 
@@ -82,14 +85,19 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   private _initStatuses() {
-    return [
-      {title: getTranslation('SIGNED'), id: 'signed'},
+    const statuses = [
       {title: getTranslation('ACTIVE'), id: 'active'},
       {title: getTranslation('SUSPENDED'), id: 'suspended'},
       {title: getTranslation('ENDED'), id: 'ended'},
       {title: getTranslation('CLOSED'), id: 'closed'},
       {title: getTranslation('TERMINATED'), id: 'terminated'}
     ];
+    if (this.isGpd) {
+      statuses.unshift({title: getTranslation('APPROVED'), id: 'approved'});
+    } else {
+      statuses.unshift({title: getTranslation('SIGNED'), id: 'signed'});
+    }
+    return statuses;
   }
 
   private _handleFilterChange(event: CustomEvent) {

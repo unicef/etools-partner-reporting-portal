@@ -1,26 +1,28 @@
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import LowerLevelOutput, PDResultLink, ProgrammeDocument
-from etools_prp.apps.unicef.ppd_sync.utils import process_model
 from etools_prp.apps.unicef.serializers import PMPLLOSerializer, PMPPDResultLinkSerializer
+from etools_prp.apps.unicef.sync.utils import process_model
 
 
 def update_create_expected_result_rl(expected_result_item: dict, workspace: Workspace, pd: ProgrammeDocument) -> PDResultLink:
 
     # Create PDResultLink
     _result_link_item = expected_result_item['cp_output']
-
+    external_cp_output_id = _result_link_item.pop('id')
+    _result_link_item['external_cp_output_id'] = external_cp_output_id
     _result_link_item['programme_document'] = pd.id
     _result_link_item['result_link'] = expected_result_item['result_link']
     _result_link_item['external_business_area_code'] = workspace.business_area_code
 
+    filters = {
+        'external_id': _result_link_item['result_link'],
+        'external_cp_output_id': external_cp_output_id,
+        'programme_document': pd.id,
+        'external_business_area_code': workspace.business_area_code,
+    }
     pd_result_link = process_model(
         PDResultLink, PMPPDResultLinkSerializer,
-        _result_link_item, {
-            'external_id': _result_link_item['result_link'],
-            'external_cp_output_id': _result_link_item['id'],
-            'programme_document': pd.id,
-            'external_business_area_code': workspace.business_area_code,
-        }
+        _result_link_item, filters
     )
 
     return pd_result_link
