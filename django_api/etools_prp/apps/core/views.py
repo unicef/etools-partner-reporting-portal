@@ -14,6 +14,7 @@ from django_celery_beat.models import PeriodicTask
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView, ListAPIView, UpdateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from social_django.utils import load_strategy
@@ -27,6 +28,7 @@ from etools_prp.apps.core.common import (
     PRP_IP_ROLE_TYPES,
 )
 from etools_prp.apps.core.paginations import SmallPagination
+from etools_prp.apps.core.serializers import StaticDataSerializer
 from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from etools_prp.apps.utils.serializers import serialize_choices
 
@@ -301,12 +303,6 @@ class SocialLogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         return settings.LOGIN_URL
-
-
-from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from serializers import StaticDataSerializer
 
 
 class StaticDataView(GenericAPIView):

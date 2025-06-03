@@ -3,10 +3,14 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
-from static_data import GPD_ACTION_OPTIONS, GPD_DELIVERED_PLANNED_OPTIONS, GPD_RESULTS_ACHIEVED_OPTIONS
 
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
+from etools_prp.apps.core.static_data import (
+    GPD_ACTION_OPTIONS,
+    GPD_DELIVERED_PLANNED_OPTIONS,
+    GPD_RESULTS_ACHIEVED_OPTIONS,
+)
 from etools_prp.apps.utils.serializers import CurrentWorkspaceDefault
 
 from .models import Location, PRPRoleOld, ResponsePlan, Workspace
