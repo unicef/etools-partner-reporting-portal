@@ -60,7 +60,7 @@ urlpatterns = [
             name="progress-reports-details-update"),
     re_path(r'^(?P<workspace_id>\d+)/gpd-progress-reports/(?P<pk>\d+)/update/$',
             GPDProgressReportDetailsUpdateAPIView.as_view(),
-            name="progress-reports-details-update"),
+            name="gpd-progress-reports-details-update"),
     re_path(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/annex-C-export-PDF/$',
             ProgressReportAnnexCPDFView.as_view(),
             name="progress-reports-pdf"),
