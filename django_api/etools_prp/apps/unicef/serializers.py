@@ -20,6 +20,7 @@ from etools_prp.apps.core.common import (
 )
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.core.static_data import GPD_DELIVERED_PLANNED_OPTIONS
 from etools_prp.apps.indicator.models import IndicatorBlueprint
 from etools_prp.apps.indicator.serializers import (
     IndicatorBlueprintSimpleSerializer,
@@ -509,6 +510,27 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
+
+
+class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
+
+    DELIVERED_PLANNED_CHOICES = [
+        (opt["id"], opt["label"]) for opt in GPD_DELIVERED_PLANNED_OPTIONS
+    ]
+
+    delivered_as_planned = serializers.ChoiceField(
+        choices=DELIVERED_PLANNED_CHOICES
+    )
+    answer_factor = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    other_information = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            "delivered_as_planned",
+            "answer_factor",
+            "other_information",
+        )
 
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
