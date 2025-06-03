@@ -310,5 +310,5 @@ class StaticDataView(GenericAPIView):
     serializer_class = StaticDataSerializer
 
     def get(self, request, *args, **kwargs):
-        ser = self.get_serializer()
+        ser = self.get_serializer(instance={})
         return Response(ser.data)
