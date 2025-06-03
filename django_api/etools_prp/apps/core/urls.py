@@ -7,9 +7,9 @@ from .views import (
     LocationListAPIView,
     ResponsePlanAPIView,
     ResponsePlanCreateAPIView,
+    StaticDataView,
     TaskTriggerAPIView,
     WorkspaceAPIView,
-    StaticDataView,
 )
 
 urlpatterns = [
