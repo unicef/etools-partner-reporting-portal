@@ -10,6 +10,11 @@ from etools_prp.apps.utils.serializers import CurrentWorkspaceDefault
 
 from .models import Location, PRPRoleOld, ResponsePlan, Workspace
 
+from static_data import (
+    GPD_DELIVERED_PLANNED_OPTIONS,
+    GPD_ACTION_OPTIONS,
+    GPD_RESULTS_ACHIEVED_OPTIONS,
+)
 
 class WorkspaceSimpleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -287,3 +292,18 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
             clusters.add(cluster)
             workspaces.add(workspace)
         return attrs
+
+
+class StaticDataSerializer(serializers.Serializer):
+    gpd_delivered_planned_options = serializers.SerializerMethodField()
+    gpdActionOptions = serializers.SerializerMethodField()
+    gpdResultsAchievedOptions = serializers.SerializerMethodField()
+
+    def get_gpd_delivered_planned_options(self, _):
+        return GPD_DELIVERED_PLANNED_OPTIONS
+
+    def get_gpdActionOptions(self, _):
+        return GPD_ACTION_OPTIONS
+
+    def get_gpdResultsAchievedOptions(self, _):
+        return GPD_RESULTS_ACHIEVED_OPTIONS

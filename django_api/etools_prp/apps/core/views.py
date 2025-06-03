@@ -301,3 +301,19 @@ class SocialLogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         return settings.LOGIN_URL
+
+
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+
+from serializers import StaticDataSerializer
+
+
+class StaticDataView(GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = StaticDataSerializer
+
+    def get(self, request, *args, **kwargs):
+        ser = self.get_serializer()
+        return Response(ser.data)
