@@ -70,7 +70,7 @@ from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
+from .models import GPDProgressReport, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
     GPDProgressReportUpdateSerializer,
     ImportUserRealmsSerializer,
@@ -418,7 +418,7 @@ class GPDProgressReportDetailsUpdateAPIView(APIView):
     def get_object(self, pk):
         # restrict access to the partner that owns the PD
         return get_object_or_404(
-            ProgressReport,
+            GPDProgressReport,
             pk=pk,
             programme_document__partner=self.request.user.partner,
         )

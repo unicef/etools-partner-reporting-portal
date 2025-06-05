@@ -31,6 +31,7 @@ from etools_prp.apps.partner.models import Partner
 from ..core.models import Realm
 from .models import (
     FinalReview,
+    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -514,22 +515,23 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
 class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
 
-    DELIVERED_PLANNED_CHOICES = [
-        (opt["id"], opt["label"]) for opt in GPD_DELIVERED_PLANNED_OPTIONS
-    ]
-
     delivered_as_planned = serializers.ChoiceField(
-        choices=DELIVERED_PLANNED_CHOICES
+        choices=GPD_DELIVERED_PLANNED_OPTIONS
     )
-    answer_factor = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
     other_information = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    results_achieved = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    challenges_in_the_reporting_period = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    proposed_way_forward = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
 
     class Meta:
-        model = ProgressReport
+        model = GPDProgressReport
         fields = (
+            'id',
             "delivered_as_planned",
-            "answer_factor",
             "other_information",
+            "results_achieved",
+            "challenges_in_the_reporting_period",
+            "proposed_way_forward",
         )
 
 
