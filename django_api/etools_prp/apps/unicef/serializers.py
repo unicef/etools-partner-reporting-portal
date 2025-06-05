@@ -515,7 +515,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
 class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
 
-    delivered_as_planned = serializers.ChoiceField(
+    delivered_as_planed = serializers.ChoiceField(
         choices=GPD_DELIVERED_PLANNED_OPTIONS
     )
     other_information = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
@@ -527,7 +527,7 @@ class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
         model = GPDProgressReport
         fields = (
             'id',
-            "delivered_as_planned",
+            "delivered_as_planed",
             "other_information",
             "results_achieved",
             "challenges_in_the_reporting_period",
