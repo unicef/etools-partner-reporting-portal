@@ -485,14 +485,7 @@ class GPDProgressReport(TimeStampedModel):
     Represents a report on multiple lower level outputs by a partner
     for a certain time period, against a PD.
     """
-    partner_contribution_to_date = models.TextField(blank=True, null=True)
-    financial_contribution_to_date = models.TextField(blank=True, null=True)
-    financial_contribution_currency = models.CharField(
-        choices=CURRENCIES,
-        default=CURRENCIES.usd,
-        max_length=16,
-        verbose_name='Financial Contribution Currency'
-    )
+
     challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
     proposed_way_forward = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
@@ -531,7 +524,6 @@ class GPDProgressReport(TimeStampedModel):
     )
 
     results_achieved = models.CharField(max_length=256, null=True, blank=True)
-    answer_factor = models.CharField(max_length=256, null=True, blank=True)
     other_information = models.CharField(max_length=256, null=True, blank=True)
 
     # Fields set by PO in PMP when reviewing the progress report
@@ -553,8 +545,6 @@ class GPDProgressReport(TimeStampedModel):
     report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
-    narrative = models.TextField(verbose_name="Narrative", blank=True, null=True)
-
     tracker = FieldTracker(fields=['status'])
 
     class Meta:
@@ -591,7 +581,20 @@ class GPDProgressReport(TimeStampedModel):
 
 class FinalReview(TimeStampedModel):
     progress_report = models.OneToOneField(
-        ProgressReport, related_name='final_review', on_delete=models.deletion.CASCADE)
+        ProgressReport,
+        related_name='final_review',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    gpd_progress_report = models.OneToOneField(
+        GPDProgressReport,
+        related_name='gpd_final_review',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     release_cash_in_time_choice = models.BooleanField(null=True)
     release_cash_in_time_comment = models.TextField(
