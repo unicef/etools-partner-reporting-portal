@@ -423,6 +423,12 @@ class GPDProgressReportDetailsUpdateAPIView(APIView):
             programme_document__partner=self.request.user.partner,
         )
 
+    def get(self, request, pk, *args, **kwargs):
+        pr = self.get_object(pk)
+
+        serializer = GPDProgressReportUpdateSerializer(pr)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
     def put(self, request, pk, *args, **kwargs):
         pr = self.get_object(pk)
 
