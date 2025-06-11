@@ -259,7 +259,7 @@ workflows:
                 - master
                 - staging
                 - develop
-                - epd_sync_updates
+                - ch40063-new-gpd-api-urls
                 - gdd
       - build_and_deploy_fe_cluster:
           filters:
