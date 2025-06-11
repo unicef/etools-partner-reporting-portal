@@ -502,5 +502,11 @@
   "A_NEW_VERSION_OF_THE_APP_IS_AV": "A new version of the app is available. Refresh page?",
   "NAME": "Name",
   "ACHIEVED_AS_PLANNED": "Achieved as planned",
-  "NOT_ACHIEVED_AS_PLANNED": "Not achieved as planned"
+  "NOT_ACHIEVED_AS_PLANNED": "Not achieved as planned",
+  "ACTIVITIES_DELIVERED_AS_PLANNED": "Were the activity/ies listed in your FACE request delivered as planned?",
+  "REPORTING_PERIOD_CONTRIBUTION_ACHIEVED": "What did you achieve during the reporting period with UNICEF’s contribution? ",
+  "FACED_CHALLENGES": "If you faced any challenges, what were they?",
+  "YOUR_PROPOSED_WAY_FORWARD": "What is your proposed way forward? ",
+  "OTHER_IMPORTANT_INFO": "Other important information (as applicable)  (e.g. publications, social media posts, etc.)",
+  "PARTIALLY": "Partially"
 }
