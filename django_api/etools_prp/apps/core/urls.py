@@ -7,7 +7,6 @@ from .views import (
     LocationListAPIView,
     ResponsePlanAPIView,
     ResponsePlanCreateAPIView,
-    StaticDataView,
     TaskTriggerAPIView,
     WorkspaceAPIView,
 )
@@ -25,5 +24,4 @@ urlpatterns = [
     re_path(r'^(?P<location_id>\d+)/children-location/$',
             ChildrenLocationAPIView.as_view(), name="children-location"),
     re_path(r'^currencies/$', CurrenciesView.as_view(), name="currencies"),
-    re_path(r'^static_data/$', StaticDataView.as_view(), name="static_data"),
 ]

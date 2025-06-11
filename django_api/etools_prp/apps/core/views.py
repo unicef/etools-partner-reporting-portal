@@ -28,7 +28,6 @@ from etools_prp.apps.core.common import (
     PRP_IP_ROLE_TYPES,
 )
 from etools_prp.apps.core.paginations import SmallPagination
-from etools_prp.apps.core.serializers import StaticDataSerializer
 from etools_prp.apps.id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from etools_prp.apps.utils.serializers import serialize_choices
 
@@ -303,12 +302,3 @@ class SocialLogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         return settings.LOGIN_URL
-
-
-class StaticDataView(GenericAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = StaticDataSerializer
-
-    def get(self, request, *args, **kwargs):
-        ser = self.get_serializer(instance={})
-        return Response(ser.data)

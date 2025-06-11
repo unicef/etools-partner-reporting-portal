@@ -6,7 +6,6 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from etools_prp.apps.cluster.models import Cluster
 from etools_prp.apps.core.common import CLUSTER_TYPES, PRP_ROLE_TYPES, RESPONSE_PLAN_TYPE
-from etools_prp.apps.core.static_data import GPD_DELIVERED_PLANNED_OPTIONS
 from etools_prp.apps.utils.serializers import CurrentWorkspaceDefault
 
 from .models import Location, PRPRoleOld, ResponsePlan, Workspace
@@ -288,10 +287,3 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
             clusters.add(cluster)
             workspaces.add(workspace)
         return attrs
-
-
-class StaticDataSerializer(serializers.Serializer):
-    gpd_delivered_planned_options = serializers.SerializerMethodField()
-
-    def get_gpd_delivered_planned_options(self, _):
-        return GPD_DELIVERED_PLANNED_OPTIONS
