@@ -195,13 +195,13 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
                           this.localData.delivered_as_planned = e.target.value;
                         }}"
                       >
-                        <sl-radio value="Yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('YES')}
                         </sl-radio>
-                        <sl-radio value="No" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('NO')}
                         </sl-radio>
-                        <sl-radio value="Partially" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        <sl-radio value="partially" ?disabled="${this._equals(this.computedMode, 'view')}">
                           ${translate('PARTIALLY')}
                         </sl-radio>
                       </etools-radio-group>
