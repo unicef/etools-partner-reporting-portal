@@ -13,7 +13,6 @@ from itertools import combinations, product
 from dateutil.relativedelta import relativedelta
 
 from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
-from etools_prp.apps.unicef.models import GPDProgressReport
 
 logger = logging.getLogger("django")
 
@@ -453,6 +452,7 @@ def get_latest_pr_by_type(pd, report_type):
 
 
 def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
+    from etools_prp.apps.unicef.models import GPDProgressReport
     """
     Create ProgressReport instance by its ReportingPeriodDate instance's report type
 
@@ -611,6 +611,7 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
 
 
 def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, start_date, end_date, due_date):
+    from etools_prp.apps.unicef.models import GPDProgressReport
     """
     Create a set of new IndicatorReports and IndicatorLocationData instances per
     IndicatorReport instance, with passed-in new dates and new ProgressReport instance
