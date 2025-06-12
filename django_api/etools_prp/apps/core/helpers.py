@@ -447,7 +447,7 @@ def get_latest_pr_by_type(pd, report_type):
 
     qs = pd.gpd_progress_reports if pd.document_type == PD_DOCUMENT_TYPE.GDD else pd.progress_reports
 
-    order_by_field = {"QPR": "start_date", "HR": "id", "SR": "due_date"} [report_type]
+    order_by_field = {"QPR": "start_date", "HR": "id", "SR": "due_date"}[report_type]
 
     return qs.filter(report_type=report_type).order_by(order_by_field).last()
 

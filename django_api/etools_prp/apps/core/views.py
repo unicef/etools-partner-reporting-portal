@@ -14,7 +14,6 @@ from django_celery_beat.models import PeriodicTask
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView, ListAPIView, UpdateAPIView
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from social_django.utils import load_strategy
