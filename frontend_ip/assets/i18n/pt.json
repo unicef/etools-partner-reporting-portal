@@ -502,5 +502,11 @@
   "A_NEW_VERSION_OF_THE_APP_IS_AV": "Uma nova versão do aplicativo está disponível. Atualizar página?",
   "NAME": "Nome",
   "ACHIEVED_AS_PLANNED": "Alcançado como planejado",
-  "NOT_ACHIEVED_AS_PLANNED": "Não alcançado como planejado"
+  "NOT_ACHIEVED_AS_PLANNED": "Não alcançado como planejado",
+  "ACTIVITIES_DELIVERED_AS_PLANNED": "As atividades listadas na sua solicitação FACE foram entregues conforme planejado?",
+  "REPORTING_PERIOD_CONTRIBUTION_ACHIEVED": "O que você conseguiu durante o período do relatório com a contribuição do UNICEF?",
+  "FACED_CHALLENGES": "Se você enfrentou algum desafio, quais foram?",
+  "YOUR_PROPOSED_WAY_FORWARD": "Qual é a sua proposta para o futuro?",
+  "OTHER_IMPORTANT_INFO": "Outras informações importantes (conforme aplicável) (por exemplo, publicações, postagens em mídias sociais, etc.)",
+  "PARTIALLY": "Parcialmente"
 }

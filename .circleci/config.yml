@@ -47,7 +47,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: 'postgres://postgres:postgres@127.0.0.1:5432/test_prp'
-          DEPLOY_BRANCHES: 'develop|staging|master|epd_sync_updates|gdd'
+          DEPLOY_BRANCHES: 'develop|staging|master|ch40063-new-gpd-api-urls|gdd'
       - image: cimg/redis:6.2
       - image: cimg/postgres:12.9-postgis
         environment:
@@ -259,7 +259,7 @@ workflows:
                 - master
                 - staging
                 - develop
-                - epd_sync_updates
+                - ch40063-new-gpd-api-urls
                 - gdd
       - build_and_deploy_fe_cluster:
           filters:

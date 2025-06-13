@@ -502,5 +502,11 @@
   "A_NEW_VERSION_OF_THE_APP_IS_AV": "يتوفر إصدار جديد من التطبيق. إعادة تحميل الصفحة؟",
   "NAME": "اسم",
   "ACHIEVED_AS_PLANNED": "تحقق كما هو مخطط",
-  "NOT_ACHIEVED_AS_PLANNED": "لم يتحقق كما هو مخطط"
+  "NOT_ACHIEVED_AS_PLANNED": "لم يتحقق كما هو مخطط",
+  "ACTIVITIES_DELIVERED_AS_PLANNED": "هل تم تنفيذ الأنشطة المدرجة في طلب FACE الخاص بك كما هو مخطط له؟",
+  "REPORTING_PERIOD_CONTRIBUTION_ACHIEVED": "ما الذي حققتموه خلال الفترة المشمولة بالتقرير بفضل مساهمة اليونيسف؟",
+  "FACED_CHALLENGES": "إذا واجهت أي تحديات، ما هي؟",
+  "YOUR_PROPOSED_WAY_FORWARD": "ما هو مقترحك للمضي قدما؟",
+  "OTHER_IMPORTANT_INFO": "معلومات مهمة أخرى (حسب الاقتضاء) (مثل المنشورات، ومنشورات وسائل التواصل الاجتماعي، وما إلى ذلك)",
+  "PARTIALLY": "جزئيا"
 }
