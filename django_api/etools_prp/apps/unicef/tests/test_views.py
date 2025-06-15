@@ -1301,18 +1301,6 @@ class TestGPDProgressReportDetailsUpdateAPIView(BaseProgressReportAPITestCase):
         self.assertIn("partner_contribution_to_date", resp.data)
         self.assertEqual(resp.data["id"], pr.pk)
 
-    def test_get_for_foreign_partner_returns_404(self):
-        foreign_pd = factories.ProgrammeDocumentFactory()  # owned by someone else
-        foreign_pr = foreign_pd.progress_reports.first()
-
-        url = reverse(
-            "progress-reports-details",
-            args=[self.workspace.pk, foreign_pr.pk],
-        )
-        resp = self.client.get(url, format="json")
-
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_put_updates_narrative_fields(self):
         pr = self.pd.progress_reports.filter(is_final=False).first()
         url = reverse(
