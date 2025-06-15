@@ -481,11 +481,6 @@ class ProgressReport(TimeStampedModel):
 
 
 class GPDProgressReport(TimeStampedModel):
-    """
-    Represents a report on multiple lower level outputs by a partner
-    for a certain time period, against a PD.
-    """
-
     challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
     proposed_way_forward = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
