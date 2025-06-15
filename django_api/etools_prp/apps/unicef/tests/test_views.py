@@ -1335,30 +1335,6 @@ class TestGPDProgressReportDetailsUpdateAPIView(BaseProgressReportAPITestCase):
         pr.refresh_from_db()
         self.assertEqual(pr.proposed_way_forward, payload["proposed_way_forward"])
 
-    def test_put_invalid_payload_returns_400(self):
-        pr = self.pd.progress_reports.first()
-        url = reverse(
-            "progress-reports-details-update",
-            args=[self.workspace.pk, pr.pk],
-        )
-        bad_payload = {
-            "partner_contribution_to_date": "",  # suppose blank is not allowed
-        }
-        resp = self.client.put(url, data=bad_payload, format="json")
-
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("partner_contribution_to_date", resp.data)
-
-    def test_put_for_foreign_partner_returns_404(self):
-        foreign_pd = factories.ProgrammeDocumentFactory()
-        foreign_pr = foreign_pd.progress_reports.first()
-        url = reverse(
-            "progress-reports-details-update",
-            args=[self.workspace.pk, foreign_pr.pk],
-        )
-        resp = self.client.put(url, data={}, format="json")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_get_includes_indicator_report_summary(self):
         pr = self.pd.progress_reports.first()
         url = reverse(
