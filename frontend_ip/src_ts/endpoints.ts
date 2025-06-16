@@ -36,6 +36,10 @@ const Endpoints = {
     return this._buildUrl('/unicef/' + workspaceId + '/progress-reports/');
   },
 
+  programmegPDDocumentReports(workspaceId: string, reportId: string) {
+    return this._buildUrl('/unicef/' + workspaceId + '/gpd-progress-reports/') + reportId + '/';
+  },
+
   programmeDocumentReport(workspaceId: string, reportId: string) {
     return this.programmeDocumentReports(workspaceId) + reportId + '/';
   },
@@ -62,6 +66,10 @@ const Endpoints = {
 
   programmeDocumentReportUpdate(workspaceId: string, reportId: string) {
     return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
+  },
+
+  programmegPDDocumentReportUpdate(workspaceId: string, reportId: string) {
+    return this.programmegPDDocumentReports(workspaceId, reportId) + 'update/';
   },
 
   calculationMethods(workspaceId: string, pdId: string) {
