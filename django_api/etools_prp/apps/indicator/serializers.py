@@ -1072,6 +1072,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'progress_report',
+            'gpd_progress_report',
             'reportable',
             'reportable_object_id',
             'reporting_period',

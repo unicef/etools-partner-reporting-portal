@@ -694,6 +694,14 @@ class IndicatorReport(TimeStampedModel):
         null=True,
         blank=True,
     )
+    gpd_progress_report = models.ForeignKey(
+        'unicef.GPDProgressReport',
+        related_name="indicator_reports",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
