@@ -20,6 +20,7 @@ from etools_prp.apps.core.common import (
 )
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.core.static_data import GPD_DELIVERED_PLANNED_OPTIONS
 from etools_prp.apps.indicator.models import IndicatorBlueprint
 from etools_prp.apps.indicator.serializers import (
     IndicatorBlueprintSimpleSerializer,
@@ -30,6 +31,7 @@ from etools_prp.apps.partner.models import Partner
 from ..core.models import Realm
 from .models import (
     FinalReview,
+    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -509,6 +511,28 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
+
+
+class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
+
+    delivered_as_planed = serializers.ChoiceField(
+        choices=GPD_DELIVERED_PLANNED_OPTIONS
+    )
+    other_information = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    results_achieved = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    challenges_in_the_reporting_period = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    proposed_way_forward = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+
+    class Meta:
+        model = GPDProgressReport
+        fields = (
+            'id',
+            "delivered_as_planed",
+            "other_information",
+            "results_achieved",
+            "challenges_in_the_reporting_period",
+            "proposed_way_forward",
+        )
 
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
