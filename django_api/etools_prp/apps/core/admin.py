@@ -21,6 +21,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         'parent',
         'geom',
         'point',
+        'workspaces'
     ]
     list_filter = (
         'admin_level',

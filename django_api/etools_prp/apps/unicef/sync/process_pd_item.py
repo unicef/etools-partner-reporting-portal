@@ -100,7 +100,7 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
                 i, blueprint = update_create_blueprint(i, pd)
 
                 # Create Locations
-                locations, locations_result = update_create_locations(i)
+                locations, locations_result = update_create_locations(i, workspace)
 
                 if locations_result is None:
                     continue

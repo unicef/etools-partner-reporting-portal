@@ -205,18 +205,18 @@ class EToolsLocationSynchronizer:
 
     def __init__(self, pk) -> None:
         self.workspace = Workspace.objects.get(pk=pk)
-        self.qs = get_location_model().objects.filter(workspaces=self.workspace)
+        self.qs = get_location_model().objects.all()
 
     @transaction.atomic
     def create_update_locations(self, list_data):
         new, updated, skipped, error = 0, 0, 0, 0
         indexed_batch = {str(item['p_code']): item for item in list_data}
 
-        etools_pcodes = [loc['p_code'] for loc in list_data]
+        etools_pcodes = {loc['p_code'] for loc in list_data}
         existing_loc_qs = self.qs.filter(p_code__in=etools_pcodes, is_active=True)
 
         # get_all_parents and map them by p_code:
-        parent_pcodes = [loc['parent_p_code'] for loc in list_data]
+        parent_pcodes = {loc['parent_p_code'] for loc in list_data}
         parents_qs = self.qs.filter(p_code__in=parent_pcodes, is_active=True)
         # parent location dict {pcode: parent obj}
         parents = {r.p_code: r for r in parents_qs.all()}
@@ -238,6 +238,10 @@ class EToolsLocationSynchronizer:
                 existing_loc.geom = geom
                 existing_loc.point = point
                 locs_to_update.append(existing_loc)
+
+                if self.workspace not in existing_loc.workspaces.all():
+                    existing_loc.workspaces.add(self.workspace)
+
                 updated += 1
             else:
                 skipped += 1

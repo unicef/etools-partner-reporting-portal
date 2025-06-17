@@ -12,16 +12,16 @@ class TestEToolsLocationSynchronizer(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.workspace = factories.WorkspaceFactory(business_area_code="ABC123")
+        cls.workspace_1 = factories.WorkspaceFactory(business_area_code="ABC123")
         cls.parent_loc = factories.LocationFactory(p_code='000')
-        cls.parent_loc.workspaces.add(cls.workspace)
+        cls.parent_loc.workspaces.add(cls.workspace_1)
         cls.existing_loc = factories.LocationFactory(
             p_code='001', name='Existing Location', admin_level=1, parent=cls.parent_loc)
-        cls.existing_loc.workspaces.add(cls.workspace)
+        cls.existing_loc.workspaces.add(cls.workspace_1)
 
         cls.fake_polygon = json.loads(factories.create_fake_multipolygon().geojson)
 
-        cls.synchronizer = EToolsLocationSynchronizer(pk=cls.workspace.pk)
+        cls.synchronizer = EToolsLocationSynchronizer(pk=cls.workspace_1.pk)
 
     @patch('etools_prp.apps.core.locations_sync.logger')
     def test_create_update_locations(self, mock_logger):
@@ -130,7 +130,7 @@ class TestEToolsLocationSynchronizer(TestCase):
 
         first_call = mock_api_instance.get_locations.call_args_list[0]
         first_call.assert_called_with(
-            business_area_code=str(self.workspace.business_area_code),
+            business_area_code=str(self.workspace_1.business_area_code),
             admin_level=0,
             url=None
         )
@@ -142,3 +142,44 @@ class TestEToolsLocationSynchronizer(TestCase):
             call("Etools Location sync status: {'new': 1, 'updated': 9, 'skipped': 0, 'error': 0}")
         )
         mock_logger.info.assert_called_with("Rebuilt")
+
+    @patch('etools_prp.apps.core.locations_sync.logger')
+    def test_sync_workspace_with_common_loc(self, mock_logger):
+        workspace_2 = factories.WorkspaceFactory(business_area_code="XYZ987")
+        synchronizer = EToolsLocationSynchronizer(pk=workspace_2.pk)
+
+        self.assertIn(self.workspace_1, self.existing_loc.workspaces.all())
+        self.assertEqual(self.existing_loc.workspaces.count(), 1)
+
+        # Mock data for testing
+        list_data = [
+            {
+                'p_code': self.existing_loc.p_code,
+                'name': self.existing_loc.name,
+                'point': self.existing_loc.point,
+                "geom": self.fake_polygon,
+                'parent_p_code': None,
+                'admin_level': self.existing_loc.admin_level,
+                'admin_level_name': self.existing_loc.admin_level_name,
+                'id': 1
+            },
+            {
+                'p_code': '0001',
+                'name': 'Location 1',
+                'point': 'POINT(0 0)',
+                "geom": self.fake_polygon,
+                'parent_p_code': '000',
+                'admin_level': 0,
+                'admin_level_name': 'Level 0',
+                'id': 2
+            },
+        ]
+        new, updated, skipped, error = synchronizer.create_update_locations(list_data)
+
+        self.assertEqual(new, 1)  # 1 new locations should be created p_code 0001
+        self.assertEqual(updated, 1)  # One location should be updated
+        self.assertEqual(skipped, 0)  # No skipped expected
+        self.assertEqual(error, 0)  # No errors expected
+
+        self.assertIn(workspace_2, self.existing_loc.workspaces.all())
+        self.assertEqual(self.existing_loc.workspaces.count(), 2)
