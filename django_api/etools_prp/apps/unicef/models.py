@@ -512,10 +512,12 @@ class GPDProgressReport(TimeStampedModel):
         null=True,
     )
 
-    delivered_as_planed = models.CharField(
+    delivered_as_planned = models.CharField(
         max_length=10,
         choices=GPD_DELIVERED_PLANNED_OPTIONS,
         default='yes',
+        blank=True,
+        null=True,
     )
 
     results_achieved = models.CharField(max_length=256, null=True, blank=True)
