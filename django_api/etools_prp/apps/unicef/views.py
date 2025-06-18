@@ -68,7 +68,12 @@ from etools_prp.apps.utils.emails import send_email_from_template
 from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 
 from .export_report import ProgressReportXLSXExporter
-from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
+from .filters import (
+    GPDProgressReportFilter,
+    ProgrammeDocumentFilter,
+    ProgrammeDocumentIndicatorFilter,
+    ProgressReportFilter,
+)
 from .import_report import ProgressReportXLSXReader
 from .models import GPDProgressReport, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
@@ -370,6 +375,92 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
 
     def list(self, request, *args, **kwargs):
         filtered = ProgressReportFilter(request.GET, queryset=self.get_queryset())
+
+        qs = filtered.qs
+        order = request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in self.order_options:
+                qs = qs.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    qs = qs.order_by('-%s' % order_field)
+
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(qs, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
+
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.get_exporter_class()
+        if exporter_class:
+            filter_qs = self.filter_queryset(self.get_queryset())
+            # if exporting limit to submitted or accepted reports only
+            filter_qs = filter_qs.filter(
+                status__in=[
+                    PROGRESS_REPORT_STATUS.submitted,
+                    PROGRESS_REPORT_STATUS.accepted,
+                ],
+            )
+            if not filter_qs.exists():
+                return Response({"error": "no data"}, status=statuses.HTTP_400_BAD_REQUEST)
+            return exporter_class(filter_qs).get_as_response(request)
+        return super().get(request, *args, **kwargs)
+
+
+class GPDProgressReportAPIView(ListExportMixin, ListAPIView):
+    """
+    Endpoint for getting list of all GPD Progress Reports. Supports filtering
+    as per ProgressReportFilter by status, pd_ref_title, programme_document
+    (id) etc.
+
+    Supports additional GET param to filter by external_partner_id
+    """
+    serializer_class = ProgressReportSimpleSerializer
+    pagination_class = SmallPagination
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
+        ),
+    )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = GPDProgressReportFilter
+    exporters = {
+        'xlsx': AnnexCXLSXExporter,
+        'pdf': ProgressReportListPDFExporter,
+    }
+    # TODO: use django filter for ordering
+    order_options = {
+        'due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'
+    }
+
+    def get_queryset(self):
+        user_has_global_view = self.request.user.is_unicef
+
+        external_partner_id = self.request.GET.get('external_partner_id')
+        if external_partner_id is not None:
+            partners = Partner.objects.filter(external_id=external_partner_id)
+            queryset = GPDProgressReport.objects.filter(programme_document__partner__in=partners)
+        else:
+            # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
+            # Limit reports to this user's partner only
+            if user_has_global_view:
+                queryset = GPDProgressReport.objects.all()
+            else:
+                queryset = GPDProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
+        return queryset.filter(programme_document__workspace=self.kwargs['workspace_id']).distinct()
+
+    def list(self, request, *args, **kwargs):
+        filtered = GPDProgressReportFilter(request.GET, queryset=self.get_queryset())
 
         qs = filtered.qs
         order = request.query_params.get('sort', None)
