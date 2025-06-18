@@ -6,7 +6,7 @@ from django.db import transaction
 from celery import shared_task
 
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_STATUS, PD_DOCUMENT_TYPE
+from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_DOCUMENT_TYPE
 from etools_prp.apps.core.helpers import (
     calculate_end_date_given_start_date,
     create_ir_and_ilds_for_pr,
@@ -50,7 +50,6 @@ def process_workspaces():
 
 @shared_task
 def process_period_reports():
-    lock_id = 'process_period_reports-lock'
     logger.debug('Report generating: ----------')
 
     # Cluster reporting Indicator report generation first
@@ -165,7 +164,7 @@ def _process_pd_reports(pd):
     logger.info("Last SR report: %s for PD %s" % (generate_from_date_sr, pd))
     with transaction.atomic():
         if pd.document_type == PD_DOCUMENT_TYPE.GDD:
-            for report_type in ["QPR"]: # for now on
+            for report_type in ["QPR"]:  # for now on
                 latest_progress_report = get_latest_pr_by_type(pd, report_type)
                 generate_from_date = None
                 logger.info("Last %s report: %s for PD %s" % (report_type, generate_from_date, pd))
@@ -179,6 +178,9 @@ def _process_pd_reports(pd):
                     default_end = pd.end_date or default_start + timedelta(days=90)
                     default_due = default_end + timedelta(days=14)
 
+                    report_number = (GPDProgressReport.objects.
+                                     filter(programme_document=pd, report_type=report_type).count() + 1)
+
                     next_progress_report = GPDProgressReport.objects.create(
                         programme_document=pd,
                         report_type=report_type,
@@ -186,11 +188,7 @@ def _process_pd_reports(pd):
                         end_date=default_end,
                         due_date=default_due,
                         status="due",
-                        report_number=(
-                                GPDProgressReport.objects
-                                .filter(programme_document=pd, report_type=report_type)
-                                .count() + 1
-                        ),
+                        report_number=report_number,
                         is_final=False,
                     )
 
