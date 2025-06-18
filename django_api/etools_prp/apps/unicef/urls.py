@@ -3,6 +3,7 @@ from django.urls import re_path
 from .views import (
     GPDProgressReportAttachmentAPIView,
     GPDProgressReportAttachmentListCreateAPIView,
+    GPDProgressReportAPIView,
     GPDProgressReportDetailsUpdateAPIView,
     GPDProgressReportSRSubmitAPIView,
     GPDProgressReportSubmitAPIView,
@@ -60,6 +61,9 @@ urlpatterns = [
     re_path(r'^(?P<workspace_id>\d+)/progress-reports/$',
             ProgressReportAPIView.as_view(),
             name="progress-reports"),
+    re_path(r'^(?P<workspace_id>\d+)/gpd-progress-reports/$',
+            GPDProgressReportAPIView.as_view(),
+            name="gpd-progress-reports"),
     re_path(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/$',
             ProgressReportDetailsAPIView.as_view(),
             name="progress-reports-details"),

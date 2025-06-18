@@ -193,7 +193,7 @@ export class PageGdpReportSrReporting extends UtilsMixin(connect(store)(LitEleme
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
+            <report-attachments isGPD ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
