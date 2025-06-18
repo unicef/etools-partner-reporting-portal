@@ -40,6 +40,10 @@ const Endpoints = {
     return this._buildUrl('/unicef/' + workspaceId + '/gpd-progress-reports/') + reportId + '/';
   },
 
+  programmegPDListDocumentReports(workspaceId: string) {
+    return this._buildUrl('/unicef/' + workspaceId + '/gpd-progress-reports/');
+  },
+
   programmeDocumentReport(workspaceId: string, reportId: string) {
     return this.programmeDocumentReports(workspaceId) + reportId + '/';
   },
