@@ -6,7 +6,7 @@ from django.db import transaction
 from celery import shared_task
 
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_DOCUMENT_TYPE
+from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
 from etools_prp.apps.core.helpers import (
     calculate_end_date_given_start_date,
     create_ir_and_ilds_for_pr,
@@ -18,7 +18,7 @@ from etools_prp.apps.core.helpers import (
 from etools_prp.apps.core.locations_sync import EToolsLocationSynchronizer
 from etools_prp.apps.core.serializers import PMPWorkspaceSerializer
 from etools_prp.apps.indicator.models import Reportable
-from etools_prp.apps.unicef.models import ProgrammeDocument, GPDProgressReport
+from etools_prp.apps.unicef.models import GPDProgressReport, ProgrammeDocument
 
 logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15
