@@ -39,7 +39,7 @@ from .models import (
     ProgressReport,
     ProgressReportAttachment,
     ReportingPeriodDates,
-    Section,
+    Section, GPDProgressReportAttachment,
 )
 
 
@@ -1104,6 +1104,36 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProgressReportAttachment
+        fields = (
+            'id',
+            'path',
+            'size',
+            'file_name',
+            'type',
+        )
+
+
+class GPDProgressReportAttachmentSerializer(serializers.ModelSerializer):
+    size = serializers.SerializerMethodField()
+    file_name = serializers.SerializerMethodField()
+    path = serializers.FileField(source='file', max_length=500)
+
+    def get_file_name(self, obj):
+        return obj.file.name.split('/')[-1] if obj.file else None
+
+    def get_size(self, obj):
+        return obj.file.size if obj.file else None
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if instance.file and "http" not in instance.file.url:
+            representation['path'] = settings.WWW_ROOT[:-1] + instance.file.url
+
+        return representation
+
+    class Meta:
+        model = GPDProgressReportAttachment
         fields = (
             'id',
             'path',

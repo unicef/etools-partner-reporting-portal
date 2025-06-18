@@ -737,6 +737,35 @@ class ProgressReportAttachment(TimeStampedModel):
         return os.path.basename(self.file.name)
 
 
+class GPDProgressReportAttachment(TimeStampedModel):
+    """
+    ProgressReportAttachment represents an attachment file for ProgressReport.
+
+    related models:
+        unicef.ProgressReport (ForeignKey): "progress_report"
+    """
+    progress_report = models.ForeignKey(
+        'unicef.GPDProgressReport',
+        related_name="attachments",
+        on_delete=models.CASCADE,
+    )
+    file = models.FileField(
+        upload_to=get_pr_attachment_upload_to,
+        max_length=500
+    )
+    type = models.CharField(verbose_name="Attachment type", choices=PR_ATTACHMENT_TYPES, max_length=5)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.file.name
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
+
+
 class ReportingPeriodDates(TimeStampedExternalBusinessAreaModel):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports

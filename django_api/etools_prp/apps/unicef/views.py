@@ -70,7 +70,8 @@ from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import GPDProgressReport, ProgrammeDocument, ProgressReport, ProgressReportAttachment
+from .models import GPDProgressReport, ProgrammeDocument, ProgressReport, ProgressReportAttachment, \
+    GPDProgressReportAttachment
 from .serializers import (
     GPDProgressReportUpdateSerializer,
     ImportUserRealmsSerializer,
@@ -87,7 +88,7 @@ from .serializers import (
     ProgressReportSerializer,
     ProgressReportSimpleSerializer,
     ProgressReportSRUpdateSerializer,
-    ProgressReportUpdateSerializer,
+    ProgressReportUpdateSerializer, GPDProgressReportAttachmentSerializer,
 )
 from .services import ProgressReportHFDataService
 
@@ -1204,6 +1205,116 @@ class ProgressReportAttachmentAPIView(APIView):
 
         return Response(
             ProgressReportAttachmentSerializer(pr).data, status=statuses.HTTP_200_OK
+        )
+
+
+class GPDProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
+    serializer_class = GPDProgressReportAttachmentSerializer
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
+        ),
+    )
+    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
+
+    def get_queryset(self):
+        return GPDProgressReportAttachment.objects.filter(
+            gpd_progress_report_id=self.kwargs['progress_report_id'],
+            gpd_progress_report__programme_document__workspace_id=self.kwargs['workspace_id'],
+        )
+
+    def perform_create(self, serializer):
+        if self.get_queryset().count() == 3:
+            raise ValidationError('This progress report already has 3 attachments')
+
+        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.face \
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.face).count() == 1:
+            raise ValidationError('This progress report already has 1 FACE attachment')
+
+        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
+                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 3:
+            raise ValidationError('This progress report already has 3 Other attachments')
+
+        serializer.save(gpd_progress_report_id=self.kwargs['gpd_progress_report_id'])
+
+
+class GPDProgressReportAttachmentAPIView(APIView):
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
+        ),
+    )
+
+    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
+
+    def get(self, request, workspace_id, gpd_progress_report_id, pk):
+        attachment = get_object_or_404(
+            GPDProgressReportAttachment,
+            id=pk,
+            gpd_progress_report_id=gpd_progress_report_id,
+            gpd_progress_report__programme_document__workspace_id=workspace_id
+        )
+
+        try:
+            # lookup just so the possible FileNotFoundError can be triggered
+            attachment.file
+            serializer = GPDProgressReportAttachmentSerializer(attachment)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+        except FileNotFoundError:
+            pass
+
+        return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
+
+    @transaction.atomic
+    def delete(self, request, workspace_id, gpd_progress_report_id, pk):
+        attachment = get_object_or_404(
+            GPDProgressReportAttachment,
+            id=pk,
+            gpd_progress_report_id=gpd_progress_report_id,
+            gpd_progress_report__programme_document__workspace_id=workspace_id
+        )
+
+        if attachment.file:
+            try:
+                attachment.file.delete()
+                attachment.delete()
+                return Response({}, status=statuses.HTTP_204_NO_CONTENT)
+            except ValueError:
+                pass
+        else:
+            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
+
+    @transaction.atomic
+    def put(self, request, workspace_id, gpd_progress_report_id, pk):
+        attachment = get_object_or_404(
+            GPDProgressReportAttachment,
+            id=pk,
+            gpd_progress_report_id=gpd_progress_report_id,
+            gpd_progress_report__programme_document__workspace_id=workspace_id
+        )
+
+        serializer = GPDProgressReportAttachmentSerializer(
+            instance=attachment,
+            data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+        if attachment.file:
+            try:
+                attachment.file.delete()
+            except ValueError:
+                pass
+
+        pr = serializer.save()
+
+        return Response(
+            GPDProgressReportAttachmentSerializer(pr).data, status=statuses.HTTP_200_OK
         )
 
 
