@@ -77,6 +77,7 @@ from .serializers import (
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
+    ProgrammeDocumentGPDProgressSerializer,
     ProgrammeDocumentProgressSerializer,
     ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
@@ -219,6 +220,51 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentProgressAPIView",
+                "request.data": self.request.data,
+                search_by: pd_id,
+                "exception": exp,
+            })
+            raise Http404
+
+
+class ProgrammeDocumentGPDProgressAPIView(RetrieveAPIView):
+
+    serializer_class = ProgrammeDocumentGPDProgressSerializer
+    permission_classes = (
+        AnyPermission(
+            IsUNICEFAPIUser,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAdminForCurrentWorkspace,
+        ),
+    )
+    lookup_url_kwarg = 'pd_id'
+
+    def get(self, request, workspace_id, pd_id, *args, **kwargs):
+        """
+        Get Programme Document Details by given pk.
+        """
+        self.workspace_id = workspace_id
+        serializer = self.get_serializer(
+            self.get_object(pd_id)
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def get_object(self, pd_id):
+        user_has_global_view = self.request.user.is_unicef
+        external_request = self.request.query_params.get('external', False)
+        search_by = 'external_id' if external_request else 'pk'
+        query_params = {}
+        if not user_has_global_view:
+            query_params['partner'] = self.request.user.partner
+        query_params['workspace'] = self.workspace_id,
+        query_params[search_by] = pd_id
+        try:
+            return ProgrammeDocument.objects.get(**query_params)
+        except ProgrammeDocument.DoesNotExist as exp:
+            logger.info({
+                "endpoint": "ProgrammeDocumentGPDProgressAPIView",
                 "request.data": self.request.data,
                 search_by: pd_id,
                 "exception": exp,
