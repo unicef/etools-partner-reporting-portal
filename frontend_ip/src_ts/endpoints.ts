@@ -84,6 +84,10 @@ const Endpoints = {
     return this._buildUrl('/unicef/' + locationId + '/progress-reports/');
   },
 
+  progressgPDReports(locationId: string) {
+    return this._buildUrl('/unicef/' + locationId + '/gpd-progress-reports/');
+  },
+
   locations(workspaceId: string) {
     return this._buildUrl('/unicef/' + workspaceId + '/programme-document/locations/');
   },
@@ -138,6 +142,14 @@ const Endpoints = {
 
   progressReportAttachmentDetail(locationId: string, reportId: string, attachmentId: string) {
     return this.progressReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
+  },
+
+  progressgPDReportAttachments(locationId: string, reportId: string) {
+    return this.progressgPDReports(locationId) + reportId + '/attachments/';
+  },
+
+  progressgPDReportAttachmentDetail(locationId: string, reportId: string, attachmentId: string) {
+    return this.progressgPDReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
   }
 };
 
