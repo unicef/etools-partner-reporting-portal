@@ -1084,6 +1084,283 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
         self.assertTrue(len(self.reports))
 
 
+class TestGPDProgressReportListAPIView(BaseProgressReportAPITestCase):
+
+    def test_list_api(self):
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), self.queryset.count())
+
+    def test_list_api_filter_by_status(self):
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.due
+        )
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        url += '?status=' + PROGRESS_REPORT_STATUS.due
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_due_status(self):
+        self.reports = self.queryset.filter(
+            status__in=[
+                PROGRESS_REPORT_STATUS.due,
+                PROGRESS_REPORT_STATUS.overdue]
+        )
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        url += '?due=1'
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_pd_title(self):
+        filter_string = 'reference'
+        self.reports = self.queryset.filter(
+            Q(programme_document__reference_number__icontains=filter_string) |
+            Q(programme_document__title__icontains=filter_string)
+        )
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        url += '?pd_ref_title=' + filter_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_due_date(self):
+        today = datetime.datetime.today()
+        date_format = settings.PRINT_DATA_FORMAT
+        pr_ids = ProgressReport.objects.all().values_list('id', flat=True)
+
+        ir_ids = IndicatorReport.objects \
+            .filter(progress_report_id__in=pr_ids) \
+            .filter(due_date=today) \
+            .values_list('progress_report_id') \
+            .distinct()
+        pr_queryset = self.queryset.filter(indicator_reports__id__in=ir_ids)
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        url += '?due_date=' + today.strftime(date_format)
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(pr_queryset))
+
+    def test_list_api_filter_by_year(self):
+        current_year = datetime.datetime.today().year
+
+        pr_queryset = ProgressReport.objects.filter(end_date__year=current_year)
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        current_year_url = f'{url}?year={current_year}'
+        response = self.client.get(current_year_url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(pr_queryset))
+
+        # test for 0 results on future year
+        future_year = (datetime.datetime.today() + datetime.timedelta(days=1365)).year
+        future_year_url = f'{url}?year={future_year}'
+        response = self.client.get(future_year_url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), 0)
+
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export(self, mock_create, mock_clean, mock_send):
+        # ensure at least one report has status submitted
+        report = self.queryset.first()
+        report.status = PROGRESS_REPORT_STATUS.submitted
+        report.save()
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "xlsx"})
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        disposition = response.get("Content-Disposition")
+        self.assertTrue(disposition.startswith("attachment; filename="))
+        self.assertTrue(
+            disposition.endswith('Progress Report(s) Summary.xlsx"'),
+        )
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.submitted
+        )
+        self.assertTrue(len(self.reports))
+        self.assertTrue(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.submitted],
+            response,
+        ))
+
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_filter_empty(self, mock_create, mock_clean, mock_send):
+        # ensure we have needed report statuses
+        report_overdue = self.queryset.first()
+        report_overdue.status = PROGRESS_REPORT_STATUS.overdue
+        report_overdue.save()
+        report_due = self.queryset.last()
+        report_due.status = PROGRESS_REPORT_STATUS.due
+        report_due.save()
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(
+            url,
+            data={
+                "export": "xlsx",
+                "status": PROGRESS_REPORT_STATUS.due
+            },
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_filter(self, mock_create, mock_clean, mock_send):
+        # ensure we have needed report statuses
+        report_accepted = self.queryset.first()
+        report_accepted.status = PROGRESS_REPORT_STATUS.accepted
+        report_accepted.save()
+        report_submitted = self.queryset.last()
+        report_submitted.status = PROGRESS_REPORT_STATUS.submitted
+        report_submitted.save()
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(
+            url,
+            data={
+                "export": "xlsx",
+                "status": PROGRESS_REPORT_STATUS.submitted
+            },
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        disposition = response.get("Content-Disposition")
+        self.assertTrue(disposition.startswith("attachment; filename="))
+        self.assertTrue(
+            disposition.endswith('Progress Report(s) Summary.xlsx"'),
+        )
+        reports_submitted = self.queryset.filter(status=PROGRESS_REPORT_STATUS.submitted)
+        self.assertTrue(len(reports_submitted))
+
+        reports_accepted = self.queryset.filter(status=PROGRESS_REPORT_STATUS.accepted)
+        self.assertTrue(len(reports_accepted))
+
+        self.assertFalse(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
+            response,
+        ))
+
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_filter_multiple(self, mock_create, mock_clean, mock_send):
+        # ensure we have needed report statuses
+        reports = self.queryset.all()
+        self.assertTrue(len(reports) > 3)
+        report_overdue = reports[0]
+        report_overdue.status = PROGRESS_REPORT_STATUS.overdue
+        report_overdue.save()
+        report_accepted = reports[1]
+        report_accepted.status = PROGRESS_REPORT_STATUS.accepted
+        report_accepted.save()
+        report_sent_back = reports[2]
+        report_sent_back.status = PROGRESS_REPORT_STATUS.sent_back
+        report_sent_back.save()
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(
+            url,
+            data={
+                "export": "xlsx",
+                "status": ",".join([
+                    PROGRESS_REPORT_STATUS.accepted,
+                    PROGRESS_REPORT_STATUS.sent_back,
+                ]),
+            },
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        disposition = response.get("Content-Disposition")
+        self.assertTrue(disposition.startswith("attachment; filename="))
+        self.assertTrue(
+            disposition.endswith('Progress Report(s) Summary.xlsx"'),
+        )
+        reports_overdue = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.overdue
+        )
+        self.assertTrue(len(reports_overdue))
+        reports_accepted = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.accepted
+        )
+        self.assertTrue(len(reports_accepted))
+        reports_sent_back = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.sent_back
+        )
+        self.assertTrue(len(reports_sent_back))
+        self.assertFalse(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.overdue],
+            response,
+        ))
+        self.assertTrue(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
+            response,
+        ))
+        # Only submitted and accepted are allowed to be exported
+        self.assertFalse(string_in_download(
+            PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
+            response,
+        ))
+
+    @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
+    @patch.object(Notification, "full_clean", return_value=None)
+    @patch.object(Notification, "send_notification", return_value=None)
+    def test_list_api_export_pdf(self, mock_create, mock_clean, mock_send):
+        # ensure at least one report has status submitted
+        report = self.queryset.first()
+        report.status = PROGRESS_REPORT_STATUS.submitted
+        report.save()
+
+        url = reverse(
+            'gpd-progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, data={"export": "pdf"})
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.submitted
+        )
+        self.assertTrue(len(self.reports))
+
+
 class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
 
     def test_detail_api_not_final(self):
