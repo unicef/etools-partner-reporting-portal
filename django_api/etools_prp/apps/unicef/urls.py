@@ -25,6 +25,7 @@ from .views import (
     ProgressReportSRSubmitAPIView,
     ProgressReportSubmitAPIView,
     UserRealmsImportView, GPDProgressReportAttachmentListCreateAPIView, GPDProgressReportAttachmentAPIView,
+    GPDProgressReportSubmitAPIView, GPDProgressReportSRSubmitAPIView,
 )
 
 urlpatterns = [
@@ -83,6 +84,12 @@ urlpatterns = [
     re_path(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/submit/sr/$',
             ProgressReportSRSubmitAPIView.as_view(),
             name="progress-reports-sr-submit"),
+    re_path(r'^(?P<workspace_id>\d+)/gpd-progress-reports/(?P<pk>\d+)/submit/$',
+            GPDProgressReportSubmitAPIView.as_view(),
+            name="gpd-progress-reports-submit"),
+    re_path(r'^(?P<workspace_id>\d+)/gpd-progress-reports/(?P<pk>\d+)/submit/sr/$',
+            GPDProgressReportSRSubmitAPIView.as_view(),
+            name="gpd-progress-reports-sr-submit"),
     re_path(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/review/$',
             ProgressReportReviewAPIView.as_view(),
             name="progress-reports-review"),

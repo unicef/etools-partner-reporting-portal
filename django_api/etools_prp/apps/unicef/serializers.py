@@ -391,6 +391,63 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
 
 
+class GPDProgressReportSimpleSerializer(serializers.ModelSerializer):
+    programme_document = ProgrammeDocumentSimpleSerializer()
+    reporting_period = serializers.SerializerMethodField()
+    is_draft = serializers.SerializerMethodField()
+    review_overall_status_display = serializers.CharField(
+        source='get_review_overall_status_display')
+    partner_name = serializers.SerializerMethodField()
+    partner_vendor_number = serializers.SerializerMethodField()
+    unicef_focal_points = serializers.SerializerMethodField()
+
+    def get_partner_name(self, obj):
+        return obj.programme_document.partner.title
+
+    def get_partner_vendor_number(self, obj):
+        return obj.programme_document.partner.vendor_number
+
+    def get_unicef_focal_points(self, obj):
+        return list(obj.programme_document.unicef_focal_point.values_list('name', flat=True))
+
+    class Meta:
+        model = GPDProgressReport
+        fields = (
+            'id',
+            'report_type',
+            'report_number',
+            'is_final',
+            'challenges_in_the_reporting_period',
+            'proposed_way_forward',
+            'status',
+            'reporting_period',
+            'submission_date',
+            'due_date',
+            'is_draft',
+            'review_date',
+            'review_overall_status',
+            'review_overall_status_display',
+            'sent_back_feedback',
+            'programme_document',
+            'partner_name',
+            'partner_vendor_number',
+            'unicef_focal_points',
+            'reviewed_by_name',
+            'reviewed_by_email',
+            'reviewed_by_external_id'
+
+        )
+
+    def get_reporting_period(self, obj):
+        return "%s - %s " % (
+            obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        ) if obj.start_date and obj.end_date else "No reporting period"
+
+    def get_is_draft(self, obj):
+        return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
+
+
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
     indicator_reports = serializers.SerializerMethodField()
@@ -456,6 +513,124 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'submitting_user',
             'is_final',
             'narrative',
+            'reviewed_by_name',
+            'reviewed_by_email',
+            'reviewed_by_external_id'
+        )
+
+    def get_partner_org_id(self, obj):
+        return obj.programme_document.partner.external_id
+
+    def get_partner_org_name(self, obj):
+        return obj.programme_document.partner.title
+
+    def get_partner_vendor_number(self, obj):
+        return obj.programme_document.partner.vendor_number
+
+    def get_unicef_focal_points(self, obj):
+        return list(obj.programme_document.unicef_focal_point.values_list('name', flat=True))
+
+    def get_submitted_by(self, obj):
+        return obj.submitted_by.display_name if obj.submitted_by else None
+
+    def get_submitting_user(self, obj):
+        return obj.submitting_user.display_name if obj.submitting_user else None
+
+    def get_funds_received_to_date(self, obj):
+        return obj.programme_document.funds_received_to_date
+
+    def get_funds_received_to_date_currency(self, obj):
+        return obj.programme_document.funds_received_to_date_currency
+
+    def get_funds_received_to_date_percentage(self, obj):
+        return obj.programme_document.funds_received_to_date_percentage
+
+    def get_indicator_reports(self, obj):
+        queryset = obj.indicator_reports.all()
+        if self.llo_id and self.llo_id is not None:
+            queryset = queryset.filter(reportable__object_id=self.llo_id)
+        if self.location_id and self.location_id is not None:
+            queryset = queryset.filter(reportable__locations__id=self.location_id)
+
+        if self.show_incomplete_only in [1, "1", "true", "True", True]:
+            queryset = filter(
+                lambda x: not x.is_complete,
+                queryset
+            )
+
+        return PDReportContextIndicatorReportSerializer(queryset, read_only=True, many=True).data
+
+    def get_reporting_period(self, obj):
+        return "%s - %s " % (
+            obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        ) if obj.start_date and obj.end_date else "No reporting period"
+
+    def get_is_draft(self, obj):
+        return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
+
+
+class GPDProgressReportSerializer(GPDProgressReportSimpleSerializer):
+    programme_document = ProgrammeDocumentOutputSerializer()
+    indicator_reports = serializers.SerializerMethodField()
+    review_overall_status_display = serializers.CharField(source='get_review_overall_status_display')
+    funds_received_to_date = serializers.SerializerMethodField()
+    funds_received_to_date_currency = serializers.SerializerMethodField()
+    funds_received_to_date_percentage = serializers.SerializerMethodField()
+    submitted_by = serializers.SerializerMethodField()
+    submitting_user = serializers.SerializerMethodField()
+    partner_org_id = serializers.SerializerMethodField()
+    partner_org_name = serializers.SerializerMethodField()
+    partner_vendor_number = serializers.SerializerMethodField()
+    unicef_focal_points = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.get('context', {}).get('request')
+        self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
+        self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
+        self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
+
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.is_final:
+            if not hasattr(instance, 'final_review') or not instance.final_review:
+                FinalReview.objects.create(progress_report=instance)
+            data['final_review'] = FinalReviewSerializer(instance.final_review).data
+        return data
+
+    class Meta:
+        model = GPDProgressReport
+        fields = (
+            'id',
+            'report_type',
+            'report_number',
+            'is_final',
+            'partner_org_id',
+            'partner_org_name',
+            'partner_vendor_number',
+            'unicef_focal_points',
+            'challenges_in_the_reporting_period',
+            'proposed_way_forward',
+            'status',
+            'reporting_period',
+            'submission_date',
+            'due_date',
+            'is_draft',
+            'review_date',
+            'review_overall_status',
+            'review_overall_status_display',
+            'accepted_comment',
+            'sent_back_feedback',
+            'programme_document',
+            'funds_received_to_date',
+            'funds_received_to_date_currency',
+            'funds_received_to_date_percentage',
+            'indicator_reports',
+            'submitted_by',
+            'submitting_user',
+            'is_final',
             'reviewed_by_name',
             'reviewed_by_email',
             'reviewed_by_external_id'
