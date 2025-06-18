@@ -32,6 +32,7 @@ from ..core.models import Realm
 from .models import (
     FinalReview,
     GPDProgressReport,
+    GPDProgressReportAttachment,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -39,7 +40,7 @@ from .models import (
     ProgressReport,
     ProgressReportAttachment,
     ReportingPeriodDates,
-    Section, GPDProgressReportAttachment,
+    Section,
 )
 
 

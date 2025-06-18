@@ -70,9 +70,16 @@ from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import GPDProgressReport, ProgrammeDocument, ProgressReport, ProgressReportAttachment, \
-    GPDProgressReportAttachment
+from .models import (
+    GPDProgressReport,
+    GPDProgressReportAttachment,
+    ProgrammeDocument,
+    ProgressReport,
+    ProgressReportAttachment,
+)
 from .serializers import (
+    GPDProgressReportAttachmentSerializer,
+    GPDProgressReportSerializer,
     GPDProgressReportUpdateSerializer,
     ImportUserRealmsSerializer,
     LLOutputSerializer,
@@ -88,7 +95,7 @@ from .serializers import (
     ProgressReportSerializer,
     ProgressReportSimpleSerializer,
     ProgressReportSRUpdateSerializer,
-    ProgressReportUpdateSerializer, GPDProgressReportAttachmentSerializer, GPDProgressReportSerializer,
+    ProgressReportUpdateSerializer,
 )
 from .services import ProgressReportHFDataService
 

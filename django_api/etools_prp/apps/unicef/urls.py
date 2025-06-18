@@ -1,7 +1,11 @@
 from django.urls import re_path
 
 from .views import (
+    GPDProgressReportAttachmentAPIView,
+    GPDProgressReportAttachmentListCreateAPIView,
     GPDProgressReportDetailsUpdateAPIView,
+    GPDProgressReportSRSubmitAPIView,
+    GPDProgressReportSubmitAPIView,
     InterventionPMPDocumentView,
     ProgrammeDocumentAPIView,
     ProgrammeDocumentCalculationMethodsAPIView,
@@ -24,8 +28,7 @@ from .views import (
     ProgressReportReviewAPIView,
     ProgressReportSRSubmitAPIView,
     ProgressReportSubmitAPIView,
-    UserRealmsImportView, GPDProgressReportAttachmentListCreateAPIView, GPDProgressReportAttachmentAPIView,
-    GPDProgressReportSubmitAPIView, GPDProgressReportSRSubmitAPIView,
+    UserRealmsImportView,
 )
 
 urlpatterns = [
