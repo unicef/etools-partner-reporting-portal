@@ -263,7 +263,7 @@ class ProgrammeDocumentGPDProgressAPIView(RetrieveAPIView):
         try:
             return ProgrammeDocument.objects.get(**query_params)
         except ProgrammeDocument.DoesNotExist as exp:
-            logger.exception({
+            logger.info({
                 "endpoint": "ProgrammeDocumentGPDProgressAPIView",
                 "request.data": self.request.data,
                 search_by: pd_id,

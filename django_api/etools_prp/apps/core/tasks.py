@@ -6,7 +6,7 @@ from django.db import transaction
 from celery import shared_task
 
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
+from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL, PD_STATUS
 from etools_prp.apps.core.helpers import (
     calculate_end_date_given_start_date,
     create_ir_and_ilds_for_pr,
@@ -19,6 +19,7 @@ from etools_prp.apps.core.locations_sync import EToolsLocationSynchronizer
 from etools_prp.apps.core.serializers import PMPWorkspaceSerializer
 from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.unicef.models import GPDProgressReport, ProgrammeDocument
+from etools_prp.config.celery import app as celery_app, cache_lock
 
 logger = logging.getLogger(__name__)
 DUE_DATE_DAYS_TIMEDELTA = 15
@@ -51,101 +52,102 @@ def process_workspaces():
 @shared_task
 def process_period_reports():
     logger.debug('Report generating: ----------')
-
+    lock_id = 'process_period_reports-lock'
     # Cluster reporting Indicator report generation first
-    for reportable in Reportable.objects.filter(
-            content_type__model__in=[
-                'partnerproject',
-                'partneractivityprojectcontext',
-                'clusterobjective'
-            ],
-            active=True
-    ):
-        logger.info("Processing Reportable {}".format(reportable))
+    with cache_lock(lock_id, celery_app.oid) as acquired:
+        if acquired:
+            for reportable in Reportable.objects.filter(
+                    content_type__model__in=[
+                        'partnerproject',
+                        'partneractivityprojectcontext',
+                        'clusterobjective'
+                    ],
+                    active=True
+            ):
+                logger.info("Processing Reportable {}".format(reportable))
 
-        if reportable.reportablelocationgoal_set.count() == 0:
-            continue
+                if reportable.reportablelocationgoal_set.count() == 0:
+                    continue
 
-        frequency = reportable.frequency
-        reportable_type = reportable.content_type.model
-        latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
+                frequency = reportable.frequency
+                reportable_type = reportable.content_type.model
+                latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
 
-        if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-            logger.info("Indicator {} frequency is custom specific dates".format(reportable))
-
-            if not latest_indicator_report:
-                date_list = list()
-                date_list.append(reportable.start_date_of_reporting_period)
-                date_list.extend(reportable.cs_dates)
-            else:
-                date_list = [latest_indicator_report.due_date]
-                date_list.extend(filter(
-                    lambda item: item > latest_indicator_report.due_date,
-                    reportable.cs_dates
-                ))
-
-                # If there is no consecutive due date from last indicator report's due date
-                # Then, there is no need to generate reports
-                if len(date_list) == 1:
-                    date_list = list()
-
-        else:
-            # Get missing date list based on progress report existence
-            if latest_indicator_report:
-                logger.info("Indicator {} IndicatorReport Found with period of {} - {} ".format(
-                    reportable,
-                    latest_indicator_report.time_period_start,
-                    latest_indicator_report.time_period_end
-                ))
-
-                date_list = find_missing_frequency_period_dates_for_indicator_report(
-                    reportable,
-                    latest_indicator_report.time_period_end,
-                    frequency,
-                )
-            else:
-                logger.info("Indicator {} IndicatorReport Not Found".format(reportable))
-                date_list = find_missing_frequency_period_dates_for_indicator_report(reportable, None, frequency)
-
-        logger.info("Missing dates: {}".format(date_list))
-
-        with transaction.atomic():
-            last_element_idx = len(date_list) - 1
-
-            for idx, start_date in enumerate(date_list):
                 if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                    if idx != last_element_idx:
-                        end_date = calculate_end_date_given_start_date(start_date, frequency, cs_dates=date_list)
+                    logger.info("Indicator {} frequency is custom specific dates".format(reportable))
+
+                    if not latest_indicator_report:
+                        date_list = list()
+                        date_list.append(reportable.start_date_of_reporting_period)
+                        date_list.extend(reportable.cs_dates)
                     else:
-                        break
+                        date_list = [latest_indicator_report.due_date]
+                        date_list.extend(filter(
+                            lambda item: item > latest_indicator_report.due_date,
+                            reportable.cs_dates
+                        ))
+
+                        # If there is no consecutive due date from last indicator report's due date
+                        # Then, there is no need to generate reports
+                        if len(date_list) == 1:
+                            date_list = list()
 
                 else:
-                    end_date = calculate_end_date_given_start_date(start_date, frequency)
+                    # Get missing date list based on progress report existence
+                    if latest_indicator_report:
+                        logger.info("Indicator {} IndicatorReport Found with period of {} - {} ".format(
+                            reportable,
+                            latest_indicator_report.time_period_start,
+                            latest_indicator_report.time_period_end
+                        ))
 
-                if reportable_type == 'partneractivityprojectcontext':
-                    project = reportable.content_object.project
-                    create_ir_for_cluster(reportable, start_date, end_date, project)
-                else:
-                    project = None
-                    if reportable_type == 'partnerproject':
-                        project = reportable.content_object
+                        date_list = find_missing_frequency_period_dates_for_indicator_report(
+                            reportable,
+                            latest_indicator_report.time_period_end,
+                            frequency,
+                        )
+                    else:
+                        logger.info("Indicator {} IndicatorReport Not Found".format(reportable))
+                        date_list = find_missing_frequency_period_dates_for_indicator_report(reportable, None, frequency)
 
-                    create_ir_for_cluster(reportable, start_date, end_date, project)
+                logger.info("Missing dates: {}".format(date_list))
 
-    # PD report generation
-    for pd in ProgrammeDocument.objects.filter(id=4482).order_by("id"):
-        try:
-            _process_pd_reports(pd)
-        except Exception as e:
-            logger.exception("Error processing PD reports {}".format(e))
-            continue
+                with transaction.atomic():
+                    last_element_idx = len(date_list) - 1
+
+                    for idx, start_date in enumerate(date_list):
+                        if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                            if idx != last_element_idx:
+                                end_date = calculate_end_date_given_start_date(start_date, frequency, cs_dates=date_list)
+                            else:
+                                break
+
+                        else:
+                            end_date = calculate_end_date_given_start_date(start_date, frequency)
+
+                        if reportable_type == 'partneractivityprojectcontext':
+                            project = reportable.content_object.project
+                            create_ir_for_cluster(reportable, start_date, end_date, project)
+                        else:
+                            project = None
+                            if reportable_type == 'partnerproject':
+                                project = reportable.content_object
+
+                            create_ir_for_cluster(reportable, start_date, end_date, project)
+
+            # PD report generation
+            for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active).order_by("id"):
+                try:
+                    _process_pd_reports(pd)
+                except Exception as e:
+                    logger.exception("Error processing PD reports {}".format(e))
+                    continue
 
 
 def _process_pd_reports(pd):
     logger.info("\nProcessing ProgrammeDocument {}".format(pd.id))
     logger.info(10 * "****")
     # Get Active LLO indicators only
-    pd = ProgrammeDocument.objects.get(pk=pd.pk)
     reportable_queryset = pd.reportable_queryset.filter(active=True)
     latest_progress_report_qpr = get_latest_pr_by_type(pd, "QPR")
     latest_progress_report_hr = get_latest_pr_by_type(pd, "HR")
