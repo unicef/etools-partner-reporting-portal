@@ -12,7 +12,7 @@ from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.utils.filters.constants import Boolean
 from etools_prp.apps.utils.filters.fields import CommaSeparatedListFilter
 
-from .models import GPDProgressReport, ProgrammeDocument, ProgressReport
+from .models import ProgrammeDocument, ProgressReport
 
 
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
@@ -144,95 +144,6 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     class Meta:
         model = ProgressReport
-        fields = [
-            'status', 'pd_ref_title', 'due_date', 'programme_document', 'programme_document__id',
-            'programme_document__external_id', 'section', 'cp_output', 'report_type'
-        ]
-
-    def get_unicef_focal_points(self, queryset, name, value):
-        return queryset.filter(
-            programme_document__unicef_focal_point__email__in=parse.unquote(value).split(',')
-        ).distinct()
-
-    def get_status(self, queryset, name, value):
-        return queryset.filter(status__in=parse.unquote(value).split(','))
-
-    def get_pd_ext(self, queryset, name, value):
-        return queryset.filter(programme_document__external_id=value)
-
-    def get_section(self, queryset, name, value):
-        return queryset.filter(programme_document__sections__external_id=value)
-
-    def get_cp_output(self, queryset, name, value):
-        return queryset.filter(programme_document__cp_outputs__external_cp_output_id=value)
-
-    def get_due_overdue_status(self, queryset, name, value):
-        if value:
-            return queryset.filter(
-                status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.overdue])
-        return queryset
-
-    def get_pd_ref_title(self, queryset, name, value):
-        return queryset.filter(
-            Q(programme_document__reference_number__icontains=value) |
-            Q(programme_document__title__icontains=value)
-        )
-
-    def get_due_date(self, queryset, name, value):
-        return queryset.filter(due_date__lte=value)
-
-    def get_year(self, queryset, name, value):
-        return queryset.filter(end_date__year=value.year)
-
-    def get_location(self, queryset, name, value):
-        return queryset.filter(
-            indicator_reports__indicator_location_data__location=value)
-
-    def get_report_type(self, queryset, name, value):
-        return queryset.filter(report_type__in=parse.unquote(value).split(','))
-
-
-class GPDProgressReportFilter(django_filters.FilterSet):
-    status = CharFilter(method='get_status')
-    pd_ref_title = CharFilter(
-        field_name='pd ref title',
-        method='get_pd_ref_title',
-        label='PD/Ref # title',
-    )
-    due_date = DateFilter(
-        field_name='due date',
-        method='get_due_date',
-        label='Due date',
-        input_formats=[settings.PRINT_DATA_FORMAT],
-    )
-    year = DateFilter(
-        method='get_year',
-        input_formats=["%Y"],
-    )
-    due = TypedChoiceFilter(
-        field_name='due',
-        choices=Boolean.CHOICES,
-        coerce=strtobool,
-        method='get_due_overdue_status',
-        label='Show only due or overdue',
-    )
-    location = CharFilter(
-        field_name='location',
-        method='get_location',
-        label='Location',
-    )
-    programme_document_ext = CharFilter(
-        field_name='programme_document_ext',
-        method='get_pd_ext',
-        label='programme_document_ext',
-    )
-    section = CharFilter(field_name='section', method='get_section')
-    cp_output = CharFilter(field_name='cp_output', method='get_cp_output')
-    report_type = CharFilter(method='get_report_type')
-    unicef_focal_points = CharFilter(method='get_unicef_focal_points')
-
-    class Meta:
-        model = GPDProgressReport
         fields = [
             'status', 'pd_ref_title', 'due_date', 'programme_document', 'programme_document__id',
             'programme_document__external_id', 'section', 'cp_output', 'report_type'
