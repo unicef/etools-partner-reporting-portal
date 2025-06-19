@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 import django_filters.rest_framework
 from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
 from rest_framework import generics, status as statuses
-from rest_framework.exceptions import ValidationError, NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.request import Request
