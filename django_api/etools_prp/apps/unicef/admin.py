@@ -241,6 +241,7 @@ class LowerLevelOutputAdmin(admin.ModelAdmin):
         'cp_output',
     ]
 
+
 class GPDProgressReportAdditionAdmin(admin.ModelAdmin):
     list_display = (
         'progress_report_display_name',
