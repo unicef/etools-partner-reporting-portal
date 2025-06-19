@@ -520,10 +520,11 @@ class GPDProgressReportAdditionSerializer(serializers.ModelSerializer):
             'progress_report',
             'delivered_as_planned',
             'other_information',
-            'results_achieved',
+            'result_achieved',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
         ]
+        read_only_fields = ['progress_report']
 
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):

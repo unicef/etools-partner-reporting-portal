@@ -468,6 +468,11 @@ class GPDProgressReportAdditionRetrieveUpdateAPIView(generics.RetrieveUpdateAPIV
     def get_queryset(self):
         return GPDProgressReportAddition.objects.all()
 
+    def perform_update(self, serializer):
+        progress_report_id = self.kwargs.get(self.lookup_url_kwarg)
+        progress_report = ProgressReport.objects.get(id=progress_report_id)
+        serializer.save(progress_report=progress_report)
+
 
 class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
     """

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('delivered_as_planned', models.CharField(choices=[('yes', 'Yes'), ('no', 'No'), ('partially', 'Partially')], default='yes', max_length=10)),
                 ('other_information', models.CharField(blank=True, max_length=256, null=True)),
-                ('results_achieved', models.CharField(blank=True, max_length=256, null=True)),
+                ('result_achieved', models.CharField(blank=True, max_length=256, null=True)),
                 ('challenges_in_the_reporting_period', models.TextField(blank=True, null=True)),
                 ('proposed_way_forward', models.TextField(blank=True, null=True)),
                 ('progress_report', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='gpd_addition', to='unicef.progressreport')),

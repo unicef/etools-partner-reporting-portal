@@ -510,7 +510,7 @@ class GPDProgressReportAddition(models.Model):
     )
     delivered_as_planned = models.CharField(max_length=10, choices=GPD_PROGRESS_REPORT_ADDITION_DELIVERED_CHOICES, default='yes')
     other_information = models.CharField(max_length=256, null=True, blank=True)
-    results_achieved = models.CharField(max_length=256, null=True, blank=True)
+    result_achieved = models.CharField(max_length=256, null=True, blank=True)
     challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
     proposed_way_forward = models.TextField(blank=True, null=True)
 
