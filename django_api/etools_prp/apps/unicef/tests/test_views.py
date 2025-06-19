@@ -1285,58 +1285,6 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
 
-class TestGPDProgressReportDetailsUpdateAPIView(BaseProgressReportAPITestCase):
-
-    def test_get_returns_progress_report(self):
-        pr = self.pd.progress_reports.first()
-
-        url = reverse(
-            "progress-reports-details",
-            args=[self.workspace.pk, pr.pk],
-        )
-        resp = self.client.get(url, format="json")
-
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        self.assertIn("partner_contribution_to_date", resp.data)
-        self.assertEqual(resp.data["id"], pr.pk)
-
-    def test_put_updates_narrative_fields(self):
-        pr = self.pd.progress_reports.filter(is_final=False).first()
-        url = reverse(
-            "progress-reports-details-update",
-            args=[self.workspace.pk, pr.pk],
-        )
-        payload = {
-            "partner_contribution_to_date": "Updated contribution text",
-            "financial_contribution_currency": "USD",
-            "challenges_in_the_reporting_period": "New challenges text",
-            "proposed_way_forward": "New way forward text",
-        }
-        resp = self.client.put(url, data=payload, format="json")
-
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        for field, value in payload.items():
-            self.assertEqual(resp.data[field], value)
-
-        # persisted?
-        pr.refresh_from_db()
-        self.assertEqual(pr.proposed_way_forward, payload["proposed_way_forward"])
-
-    def test_get_includes_indicator_report_summary(self):
-        pr = self.pd.progress_reports.first()
-        url = reverse(
-            "progress-reports-details",
-            args=[self.workspace.pk, pr.pk],
-        )
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        irs = resp.data["indicator_reports"]
-        self.assertGreaterEqual(len(irs), 1)
-        self.assertIn("overall_status", irs[0])
-
-
 class TestProgressReportPullHFDataAPIView(BaseProgressReportAPITestCase):
 
     def setUp(self):

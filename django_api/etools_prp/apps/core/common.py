@@ -157,6 +157,12 @@ PD_DOCUMENT_TYPE = Choices(
     ('GDD', 'GDD', 'Government Programme Document'),
 )
 
+GPD_PROGRESS_REPORT_ADDITION_DELIVERED_CHOICES = [
+    ('yes', 'Yes'),
+    ('no', 'No'),
+    ('partially', 'Partially'),
+]
+
 PROGRESS_REPORT_STATUS = Choices(
     ('Due', 'due', 'Due'),
     ('Not', 'not_yet_due', 'Not Yet Due'),

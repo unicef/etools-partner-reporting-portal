@@ -56,7 +56,6 @@ from etools_prp.apps.partner.models import (
     PartnerProjectFunding,
 )
 from etools_prp.apps.unicef.models import (
-    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -1281,60 +1280,6 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
             'programme_document', 'report_type', 'report_number'
         )
         model = ProgressReport
-
-
-@factory.django.mute_signals(signals.post_save)
-class GPDProgressReportFactory(factory.django.DjangoModelFactory):
-    """
-    Arguments:
-        start_date {datetime.date} -- Datetime date object for start date
-        end_date {datetime.date} -- Datetime date object for end date
-        due_date {datetime.date} -- Datetime date object for due date
-        report_number {int} -- Report number
-        report_type {str} -- Report type: QPR, HR, SR
-        is_final {bool} -- A flag for final report
-        programme_document {ProgrammeDocument} -- ProgrammeDocument ORM object to bind
-        submitted_by {User} -- User ORM object to bind
-        submitting_user {User} -- User ORM object to bind
-
-    Ex) ProgressReportFactory(
-            start_date=start_date1,
-            end_date=end_date1,
-            due_date=due_date1,
-            report_number=1,
-            report_type="QPR",
-            is_final=False,
-            programme_document=programme_document1,
-            submitted_by=submitted_by1,
-            submitting_user=submitting_user1,
-        )
-    """
-    start_date = factory.LazyFunction(faker.date)
-    end_date = factory.LazyFunction(faker.date)
-    due_date = factory.LazyFunction(faker.date)
-    partner_contribution_to_date = factory.LazyFunction(faker.text)
-    financial_contribution_to_date = factory.LazyFunction(faker.text)
-    financial_contribution_currency = factory.LazyFunction(faker.currency_code)
-    challenges_in_the_reporting_period = factory.LazyFunction(faker.text)
-    proposed_way_forward = factory.LazyFunction(faker.text)
-    review_date = due_date
-    submission_date = due_date
-    programme_document = factory.SubFactory('etools_prp.apps.core.tests.factories.ProgrammeDocument', progress_report=None)
-    submitted_by = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory', profile=None)
-    submitting_user = factory.SubFactory('etools_prp.apps.core.tests.factories.PartnerUserFactory', profile=None)
-    reviewed_by_email = factory.LazyFunction(faker.ascii_safe_email)
-    reviewed_by_name = factory.LazyFunction(faker.name)
-    sent_back_feedback = factory.LazyFunction(faker.text)
-    narrative = factory.LazyFunction(faker.text)
-    reviewed_by_external_id = factory.LazyFunction(lambda: faker.random_number(4, True))
-    status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
-    review_overall_status = fuzzy.FuzzyChoice(PROGRESS_REPORT_STATUS_LIST)
-
-    class Meta:
-        django_get_or_create = (
-            'programme_document', 'report_type', 'report_number'
-        )
-        model = GPDProgressReport
 
 
 class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):

@@ -18,7 +18,6 @@ from etools_prp.apps.core.tasks import process_period_reports, process_workspace
 from etools_prp.apps.indicator.models import IndicatorLocationData
 from etools_prp.apps.unicef.models import (
     FinalReview,
-    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -209,20 +208,6 @@ class ProgressReportAdmin(admin.ModelAdmin):
     inlines = [FinalReviewAdminInline]
 
 
-class GPDProgressReportAdmin(admin.ModelAdmin):
-    list_display = ('programme_document', 'report_type', 'status',
-                    'submitted_by', 'start_date', 'end_date', 'due_date', 'submission_date',
-                    'review_date', 'report_number')
-    list_filter = ('status', 'report_type', 'programme_document__status',)
-    search_fields = ('programme_document__title', 'programme_document__reference_number')
-    raw_id_fields = [
-        'programme_document',
-        'submitted_by',
-        'submitting_user',
-    ]
-    inlines = [FinalReviewAdminInline]
-
-
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'report_type', 'start_date', 'end_date', 'due_date')
     search_fields = ('programme_document__title', 'programme_document__reference_number')
@@ -269,7 +254,6 @@ class SectionAdmin(admin.ModelAdmin):
 
 admin.site.register(ProgrammeDocument, ProgrammeDocumentAdmin)
 admin.site.register(ProgressReport, ProgressReportAdmin)
-admin.site.register(GPDProgressReport, GPDProgressReportAdmin)
 admin.site.register(PDResultLink, PDResultLinkAdmin)
 admin.site.register(LowerLevelOutput, LowerLevelOutputAdmin)
 admin.site.register(Section, SectionAdmin)

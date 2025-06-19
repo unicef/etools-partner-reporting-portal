@@ -9,8 +9,8 @@ from django.shortcuts import get_object_or_404
 
 import django_filters.rest_framework
 from requests import ConnectionError, ConnectTimeout, HTTPError, ReadTimeout
-from rest_framework import status as statuses
-from rest_framework.exceptions import ValidationError
+from rest_framework import generics, status as statuses
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.request import Request
@@ -70,17 +70,9 @@ from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import (
-    GPDProgressReport,
-    GPDProgressReportAttachment,
-    ProgrammeDocument,
-    ProgressReport,
-    ProgressReportAttachment,
-)
+from .models import GPDProgressReportAddition, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
-    GPDProgressReportAttachmentSerializer,
-    GPDProgressReportSerializer,
-    GPDProgressReportUpdateSerializer,
+    GPDProgressReportAdditionSerializer,
     ImportUserRealmsSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
@@ -411,42 +403,6 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
         return render_pdf_to_response(request, "report_annex_c_pdf", data)
 
 
-class GPDProgressReportDetailsUpdateAPIView(APIView):
-    """
-        Endpoint for updating GPD Progress Report narrative fields
-    """
-    permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
-
-    def get_object(self, pk):
-        # restrict access to the partner that owns the PD
-        return get_object_or_404(
-            GPDProgressReport,
-            pk=pk,
-            programme_document__partner=self.request.user.partner,
-        )
-
-    def get(self, request, pk, *args, **kwargs):
-        pr = self.get_object(pk)
-
-        serializer = GPDProgressReportUpdateSerializer(pr)
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-    def put(self, request, pk, *args, **kwargs):
-        pr = self.get_object(pk)
-
-        serializer = GPDProgressReportUpdateSerializer(instance=pr, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-
 class ProgressReportDetailsUpdateAPIView(APIView):
     """
         Endpoint for updating Progress Report narrative fields
@@ -490,6 +446,27 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class GPDProgressReportAdditionRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = GPDProgressReportAdditionSerializer
+    lookup_url_kwarg = 'progress_report_id'
+
+    def get_object(self):
+        progress_report_id = self.kwargs.get(self.lookup_url_kwarg)
+
+        try:
+            progress_report = ProgressReport.objects.select_related('programme_document').get(id=progress_report_id)
+        except ProgressReport.DoesNotExist:
+            raise NotFound("Progress report not found.")
+
+        addition = progress_report.gpd_addition_safe
+        if addition is None:
+            raise NotFound("This progress report is not linked to a GDD-type programme document.")
+        return addition
+
+    def get_queryset(self):
+        return GPDProgressReportAddition.objects.all()
 
 
 class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
@@ -838,235 +815,6 @@ class ProgressReportSRSubmitAPIView(APIView):
             )
 
 
-class GPDProgressReportSubmitAPIView(APIView):
-    """
-    Only a partner authorized officer, partner admin, and partner editor can submit a progress report.
-    """
-    permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
-
-    def get_object(self):
-        try:
-            return GPDProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner,
-                programme_document__workspace=self.kwargs['workspace_id'],
-                pk=self.kwargs['pk'])
-        except GPDProgressReport.DoesNotExist as exp:
-            logger.exception({
-                "endpoint": "GPDProgressReportSubmitAPIView",
-                "request.data": self.request.data,
-                "pk": self.kwargs['pk'],
-                "exception": exp,
-            })
-            raise Http404
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        progress_report = self.get_object()
-
-        if progress_report.programme_document.status \
-                not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated, PD_STATUS.suspended]:
-            raise ValidationError(
-                "Updating Progress Report for a {} Programme Document is not allowed. "
-                "Only Active/Ended/Suspended/Terminated "
-                "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
-            )
-
-        for ir in progress_report.indicator_reports.all():
-            if not ir.is_complete:
-                raise ValidationError(
-                    "You have not completed all indicator location data across "
-                    "all indicator reports for this progress report."
-                )
-
-            # Check if indicator was already submitted or SENT BACK
-            if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
-                ir.submission_date = datetime.now().date()
-                ir.report_status = INDICATOR_REPORT_STATUS.submitted
-                ir.save()
-
-        # QPR report type specific validations
-        if progress_report.report_type == "QPR":
-            for ir in progress_report.indicator_reports.all():
-                if ir.overall_status == OVERALL_STATUS.no_status:
-                    raise ValidationError(
-                        "You have not selected overall status for one of Outputs ({}).".format(
-                            ir.reportable.content_object
-                        )
-                    )
-
-                # Check for IndicatorReport narrative assessment for overall status Met or No Progress
-                if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
-                        and not ir.narrative_assessment:
-                    raise ValidationError(
-                        "You have not completed the narrative assessment for one of the outputs ({}). Unless your output "
-                        "status is Met or No Progress, you have to fill in the narrative assessment.".format(
-                            ir.reportable.content_object
-                        )
-                    )
-
-            # Check if PR other tab is fulfilled
-            other_tab_errors = []
-            if not progress_report.partner_contribution_to_date:
-                other_tab_errors.append("You have not completed Non-Financial Contribution To Date field on Other Info tab.")
-            if not progress_report.financial_contribution_to_date:
-                other_tab_errors.append("You have not completed Financial Contribution To Date field on Other Info tab.")
-            if not progress_report.financial_contribution_currency:
-                other_tab_errors.append("You have not completed Financial Contribution Currency field on Other Info tab.")
-            if not progress_report.challenges_in_the_reporting_period:
-                other_tab_errors.append(
-                    "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab."
-                )
-            if not progress_report.proposed_way_forward:
-                other_tab_errors.append("You have not completed Proposed way forward field on Other Info tab.")
-
-            if other_tab_errors:
-                raise ValidationError(other_tab_errors)
-
-        if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
-            provided_email = request.data.get('submitted_by_email')
-
-            authorized_officer_user = get_user_model().objects.filter(
-                email=provided_email or self.request.user.email,
-                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document
-                .unicef_officers.filter(active=True).values_list('email', flat=True)
-            ).first()
-
-            if not authorized_officer_user:
-                if provided_email:
-                    _error_message = 'Report could not be submitted, because {} is not the authorized ' \
-                                     'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
-                else:
-                    _error_message = 'Your report could not be submitted, because you are not the authorized ' \
-                                     'officer assigned to the PCA that is connected to that PD.'
-                raise ValidationError(
-                    _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
-                )
-
-            # HR report type progress report is automatically accepted
-            if progress_report.report_type == "HR":
-                progress_report.status = PROGRESS_REPORT_STATUS.accepted
-
-            # QPR report type is submitted at this stage
-            else:
-                progress_report.status = PROGRESS_REPORT_STATUS.submitted
-
-            progress_report.submission_date = datetime.now().date()
-            progress_report.submitted_by = authorized_officer_user
-            progress_report.submitting_user = self.request.user
-            progress_report.save()
-
-            # IndicatorLocationData lock marking
-            ild_ids = progress_report.indicator_reports.values_list('indicator_location_data', flat=True)
-            IndicatorLocationData.objects.filter(id__in=ild_ids).update(is_locked=True)
-
-            parent_irs = progress_report.indicator_reports.values_list('parent', flat=True)
-            IndicatorLocationData.objects.filter(indicator_report__in=parent_irs).update(is_locked=True)
-
-            serializer = GPDProgressReportSerializer(instance=progress_report)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-        else:
-            raise ValidationError(
-                "Progress report was already submitted. Your IMO will need to send it "
-                "back for you to edit your submission."
-            )
-
-
-class GPDProgressReportSRSubmitAPIView(APIView):
-    """
-    A dedicated API endpoint for submitting SR Progress Report.
-    Only a partner authorized officer, partner admin, and partner editor can submit a progress report.
-    """
-    permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
-
-    def get_object(self):
-        try:
-            return GPDProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner,
-                programme_document__workspace=self.kwargs['workspace_id'],
-                pk=self.kwargs['pk'],
-                report_type="SR")
-        except GPDProgressReport.DoesNotExist as exp:
-            logger.exception({
-                "endpoint": "GPDProgressReportSRSubmitAPIView",
-                "request.data": self.request.data,
-                "pk": self.kwargs['pk'],
-                "exception": exp,
-            })
-            raise Http404
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        progress_report = self.get_object()
-        if progress_report.programme_document.status \
-                not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated, PD_STATUS.suspended]:
-            raise ValidationError(
-                "Updating Progress Report for a {} Programme Document is not allowed. "
-                "Only Active/Ended/Suspended/Terminated "
-                "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
-            )
-
-        # We don't need this check anymore
-        # if not progress_report.narrative:
-        #     raise ValidationError(
-        #         "Narrative is required for SR report type"
-        #     )
-
-        # Attachment field validation
-        if not progress_report.attachments.exists():
-            raise ValidationError(
-                "Attachment is required for SR report type"
-            )
-
-        # Accept/send back validation and submission on behalf feature
-        if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
-            provided_email = request.data.get('submitted_by_email')
-
-            authorized_officer_user = get_user_model().objects.filter(
-                email=provided_email or self.request.user.email,
-                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document.unicef_officers
-                .filter(active=True).values_list('email', flat=True)
-            ).first()
-
-            if not authorized_officer_user:
-                if provided_email:
-                    _error_message = 'Report could not be submitted, because {} is not the authorized ' \
-                                     'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
-                else:
-                    _error_message = 'Your report could not be submitted, because you are not the authorized ' \
-                                     'officer assigned to the PCA that is connected to that PD.'
-                raise ValidationError(
-                    _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
-                )
-
-            progress_report.status = PROGRESS_REPORT_STATUS.submitted
-            progress_report.submission_date = datetime.now().date()
-            progress_report.submitted_by = authorized_officer_user
-            progress_report.submitting_user = self.request.user
-            progress_report.save()
-
-            serializer = GPDProgressReportSerializer(instance=progress_report)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-        else:
-            raise ValidationError(
-                "Progress report was already submitted. Your IMO will need to send it "
-                "back for you to edit your submission."
-            )
-
-
 class ProgressReportPullHFDataAPIView(APIView):
     """
     API endpoint for pulling High Frequency data into QPR ProgressReports.
@@ -1395,116 +1143,6 @@ class ProgressReportAttachmentAPIView(APIView):
 
         return Response(
             ProgressReportAttachmentSerializer(pr).data, status=statuses.HTTP_200_OK
-        )
-
-
-class GPDProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
-    serializer_class = GPDProgressReportAttachmentSerializer
-    permission_classes = (
-        AnyPermission(
-            IsUNICEFAPIUser,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
-    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
-
-    def get_queryset(self):
-        return GPDProgressReportAttachment.objects.filter(
-            gpd_progress_report_id=self.kwargs['progress_report_id'],
-            gpd_progress_report__programme_document__workspace_id=self.kwargs['workspace_id'],
-        )
-
-    def perform_create(self, serializer):
-        if self.get_queryset().count() == 3:
-            raise ValidationError('This progress report already has 3 attachments')
-
-        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.face \
-                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.face).count() == 1:
-            raise ValidationError('This progress report already has 1 FACE attachment')
-
-        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
-                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 3:
-            raise ValidationError('This progress report already has 3 Other attachments')
-
-        serializer.save(gpd_progress_report_id=self.kwargs['gpd_progress_report_id'])
-
-
-class GPDProgressReportAttachmentAPIView(APIView):
-    permission_classes = (
-        AnyPermission(
-            IsUNICEFAPIUser,
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
-
-    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
-
-    def get(self, request, workspace_id, gpd_progress_report_id, pk):
-        attachment = get_object_or_404(
-            GPDProgressReportAttachment,
-            id=pk,
-            gpd_progress_report_id=gpd_progress_report_id,
-            gpd_progress_report__programme_document__workspace_id=workspace_id
-        )
-
-        try:
-            # lookup just so the possible FileNotFoundError can be triggered
-            attachment.file
-            serializer = GPDProgressReportAttachmentSerializer(attachment)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-        except FileNotFoundError:
-            pass
-
-        return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
-
-    @transaction.atomic
-    def delete(self, request, workspace_id, gpd_progress_report_id, pk):
-        attachment = get_object_or_404(
-            GPDProgressReportAttachment,
-            id=pk,
-            gpd_progress_report_id=gpd_progress_report_id,
-            gpd_progress_report__programme_document__workspace_id=workspace_id
-        )
-
-        if attachment.file:
-            try:
-                attachment.file.delete()
-                attachment.delete()
-                return Response({}, status=statuses.HTTP_204_NO_CONTENT)
-            except ValueError:
-                pass
-        else:
-            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
-
-    @transaction.atomic
-    def put(self, request, workspace_id, gpd_progress_report_id, pk):
-        attachment = get_object_or_404(
-            GPDProgressReportAttachment,
-            id=pk,
-            gpd_progress_report_id=gpd_progress_report_id,
-            gpd_progress_report__programme_document__workspace_id=workspace_id
-        )
-
-        serializer = GPDProgressReportAttachmentSerializer(
-            instance=attachment,
-            data=request.data
-        )
-
-        serializer.is_valid(raise_exception=True)
-        if attachment.file:
-            try:
-                attachment.file.delete()
-            except ValueError:
-                pass
-
-        pr = serializer.save()
-
-        return Response(
-            GPDProgressReportAttachmentSerializer(pr).data, status=statuses.HTTP_200_OK
         )
 
 
