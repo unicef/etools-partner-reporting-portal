@@ -18,6 +18,7 @@ from etools_prp.apps.core.tasks import process_period_reports, process_workspace
 from etools_prp.apps.indicator.models import IndicatorLocationData
 from etools_prp.apps.unicef.models import (
     FinalReview,
+    GPDProgressReportAddition,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -240,6 +241,23 @@ class LowerLevelOutputAdmin(admin.ModelAdmin):
         'cp_output',
     ]
 
+class GPDProgressReportAdditionAdmin(admin.ModelAdmin):
+    list_display = (
+        'progress_report_display_name',
+        'delivered_as_planned',
+        'other_information',
+        'result_achieved',
+        'challenges_in_the_reporting_period',
+        'proposed_way_forward'
+    )
+    search_fields = ('delivered_as_planned', 'progress_report__display_name', )
+    raw_id_fields = [
+        'progress_report',
+    ]
+
+    def progress_report_display_name(self, obj):
+        return getattr(obj.progress_report, "display_name", "-")
+
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'title', 'active')
@@ -259,3 +277,4 @@ admin.site.register(LowerLevelOutput, LowerLevelOutputAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(ReportingPeriodDates, ReportingPeriodDatesAdmin)
+admin.site.register(GPDProgressReportAddition, GPDProgressReportAdditionAdmin)
