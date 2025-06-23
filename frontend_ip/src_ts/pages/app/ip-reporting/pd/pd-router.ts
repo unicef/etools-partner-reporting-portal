@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
-import './pd-details.js';
+import './pd-view.js';
 import './pd-report.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
@@ -34,10 +34,10 @@ class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
         }
       </style>
 
-      ${this._equals(this.page, 'pd-details')
-        ? html` <page-ip-reporting-pd-details name="pd-details"> </page-ip-reporting-pd-details>`
+      ${this._equals(this.page, 'view')
+        ? html` <page-ip-reporting-pd-details name="pd-view"> </page-ip-reporting-pd-details>`
         : html``}
-      ${this._equals(this.page, 'pd-report')
+      ${this._equals(this.page, 'report')
         ? html` <page-ip-reporting-pd-report name="pd-report"> </page-ip-reporting-pd-report>`
         : html``}
     `;
@@ -46,23 +46,7 @@ class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
   stateChanged(state: RootState) {
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
       this.routeDetails = state.app.routeDetails;
-      this._routeTreeChanged(state.app.routeDetails.params?.pdRoute);
-    }
-  }
-
-  _routeTreeChanged(tree) {
-    switch (tree) {
-      case 'view':
-        this.page = 'pd-details';
-        break;
-
-      case 'report':
-        this.page = 'pd-report';
-        break;
-
-      default:
-        this.page = 'pd-details';
-        break;
+      this.page = state.app.routeDetails.params?.pdRoute;
     }
   }
 }

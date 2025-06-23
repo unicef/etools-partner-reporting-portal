@@ -19,6 +19,8 @@
     "importHelpers": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "outDir": "src",
     "rootDir": "src_ts"
   },
