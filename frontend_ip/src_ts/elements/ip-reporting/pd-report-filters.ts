@@ -46,7 +46,7 @@ export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
         <div class="row">
           <dropdown-filter
             class="col-md-4 col-12"
-            .label=${translate('STATUS')}
+            .label=${translate('GPD_STATUS')}
             name="status"
             .value=${this._withDefault(this.queryParams?.status, '-1')}
             .data=${this.statuses}

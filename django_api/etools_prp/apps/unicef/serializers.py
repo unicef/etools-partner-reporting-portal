@@ -20,6 +20,7 @@ from etools_prp.apps.core.common import (
 )
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
+from etools_prp.apps.core.static_data import GPD_DELIVERED_PLANNED_OPTIONS
 from etools_prp.apps.indicator.models import IndicatorBlueprint
 from etools_prp.apps.indicator.serializers import (
     IndicatorBlueprintSimpleSerializer,
@@ -30,6 +31,7 @@ from etools_prp.apps.partner.models import Partner
 from ..core.models import Realm
 from .models import (
     FinalReview,
+    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -159,12 +161,22 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         return obj.funds_received_to_date_currency
 
     def get_locations(self, obj):
-        return ShortLocationSerializer(
+        qs = (
             Location.objects.filter(
                 indicator_location_data__indicator_report__progress_report__programme_document=obj
-            ).distinct(),
-            many=True
-        ).data
+            )
+            .values("id")
+            .union(
+                Location.objects.filter(
+                    reportables__lower_level_outputs__cp_output__programme_document=obj
+                )
+                .values("id")
+            )
+        )
+
+        qs = Location.objects.filter(id__in=qs)
+
+        return ShortLocationSerializer(qs, many=True).data
 
     def get_unicef_officers(self, obj):
         return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
@@ -247,12 +259,22 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
 
     def get_locations(self, obj):
-        return ShortLocationSerializer(
+        qs = (
             Location.objects.filter(
                 indicator_location_data__indicator_report__progress_report__programme_document=obj
-            ).distinct(),
-            many=True
-        ).data
+            )
+            .values("id")
+            .union(
+                Location.objects.filter(
+                    reportables__lower_level_outputs__cp_output__programme_document=obj
+                )
+                .values("id")
+            )
+        )
+
+        qs = Location.objects.filter(id__in=qs)
+
+        return ShortLocationSerializer(qs, many=True).data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):
@@ -491,6 +513,28 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
 
 
+class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
+
+    delivered_as_planed = serializers.ChoiceField(
+        choices=GPD_DELIVERED_PLANNED_OPTIONS
+    )
+    other_information = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    results_achieved = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    challenges_in_the_reporting_period = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+    proposed_way_forward = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
+
+    class Meta:
+        model = GPDProgressReport
+        fields = (
+            'id',
+            "delivered_as_planed",
+            "other_information",
+            "results_achieved",
+            "challenges_in_the_reporting_period",
+            "proposed_way_forward",
+        )
+
+
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
     partner_contribution_to_date = serializers.CharField(max_length=2000, required=False, allow_blank=True)
@@ -520,8 +564,7 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
-
-    narrative = serializers.CharField(max_length=2000)
+    narrative = serializers.CharField(max_length=2000, required=False, allow_null=True, allow_blank=True)
 
     class Meta:
         model = ProgressReport
@@ -945,15 +988,14 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')
-    id = serializers.CharField(source='external_cp_output_id')
     programme_document = serializers.PrimaryKeyRelatedField(
         queryset=ProgrammeDocument.objects.all())
 
     class Meta:
         model = PDResultLink
-        # we neeed to align this
+        # we need to align this
         fields = (
-            'id',
+            'external_cp_output_id',
             'title',
             'result_link',
             'programme_document',
@@ -965,7 +1007,7 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
                 fields=[
                     "result_link",
                     "external_business_area_code",
-                    "id",
+                    "external_cp_output_id",
                 ],
             ),
         ]

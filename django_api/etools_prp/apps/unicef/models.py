@@ -31,6 +31,7 @@ from etools_prp.apps.core.common import (
     SR_TYPE,
 )
 from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
+from etools_prp.apps.core.static_data import GPD_DELIVERED_PLANNED_OPTIONS
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
 from etools_prp.apps.utils.emails import send_email_from_template
 
@@ -377,7 +378,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     @property
     def lower_level_outputs(self):
         return LowerLevelOutput.objects.filter(
-            cp_output__programme_document=self)
+            cp_output__programme_document=self, active=True)
 
 
 class ProgressReport(TimeStampedModel):
@@ -479,9 +480,116 @@ class ProgressReport(TimeStampedModel):
         return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
 
 
+class GPDProgressReport(TimeStampedModel):
+    challenges_in_the_reporting_period = models.TextField(blank=True, null=True)
+    proposed_way_forward = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
+    programme_document = models.ForeignKey(
+        ProgrammeDocument,
+        related_name="gpd_progress_reports",
+        on_delete=models.CASCADE,
+        default=-1,
+    )
+    start_date = models.DateField(verbose_name='Start Date', blank=True, null=True)
+    end_date = models.DateField(verbose_name='End Date', blank=True, null=True)
+    due_date = models.DateField(verbose_name='Due Date')
+    submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
+    # User should match by email to Person in programme_document.partner_focal_point list
+    submitted_by = models.ForeignKey(
+        'account.User',
+        verbose_name='Submitted by / on behalf on',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
+    submitting_user = models.ForeignKey(
+        'account.User',
+        verbose_name='Submitted by',
+        related_name='gpd_submitted_reports',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
+    delivered_as_planed = models.CharField(
+        max_length=10,
+        choices=GPD_DELIVERED_PLANNED_OPTIONS,
+        default='yes',
+    )
+
+    results_achieved = models.CharField(max_length=256, null=True, blank=True)
+    other_information = models.CharField(max_length=256, null=True, blank=True)
+
+    # Fields set by PO in PMP when reviewing the progress report
+    review_date = models.DateField(verbose_name='Review Date',
+                                   blank=True,
+                                   null=True)
+    reviewed_by_email = models.CharField(max_length=256, null=True, blank=True)
+    reviewed_by_name = models.CharField(max_length=256, null=True, blank=True)
+    reviewed_by_external_id = models.IntegerField(null=True, blank=True)
+    review_overall_status = models.CharField(
+        verbose_name='Overall status set by UNICEF PO',
+        choices=OVERALL_STATUS,
+        max_length=3,
+        blank=True,
+        null=True
+    )
+    sent_back_feedback = models.TextField(blank=True, null=True)
+    accepted_comment = models.CharField(verbose_name="Report accepted comment", max_length=50, blank=True, null=True)
+    report_number = models.IntegerField(verbose_name="Report Number")
+    report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
+    is_final = models.BooleanField(verbose_name="Is final report", default=False)
+    tracker = FieldTracker(fields=['status'])
+
+    class Meta:
+        ordering = ['-due_date', '-id']
+        unique_together = ('programme_document', 'report_type', 'report_number')
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.is_final and not hasattr(self, 'final_review'):
+            FinalReview.objects.create(gpd_progress_report=self)
+
+    @cached_property
+    def latest_indicator_report(self):
+        return self.indicator_reports.all().order_by('-created').first()
+
+    def get_reporting_period(self):
+        return "{} - {}".format(
+            self.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            self.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        ) if self.start_date and self.end_date else "No reporting period"
+
+    def get_submission_date(self):
+        return self.submission_date.strftime(settings.PRINT_DATA_FORMAT) if self.submission_date else None
+
+    @cached_property
+    def display_name(self):
+        return '{} {}'.format(self.programme_document.title, self.get_reporting_period())
+
+    def __str__(self):
+        dates = f", due {self.due_date}" if self.report_type == SR_TYPE else f"{self.start_date} to {self.end_date} [due {self.due_date}]"
+        return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
+
+
 class FinalReview(TimeStampedModel):
     progress_report = models.OneToOneField(
-        ProgressReport, related_name='final_review', on_delete=models.deletion.CASCADE)
+        ProgressReport,
+        related_name='final_review',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    gpd_progress_report = models.OneToOneField(
+        GPDProgressReport,
+        related_name='gpd_final_review',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     release_cash_in_time_choice = models.BooleanField(null=True)
     release_cash_in_time_comment = models.TextField(

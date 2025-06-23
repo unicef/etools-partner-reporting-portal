@@ -75,9 +75,19 @@ const loadPageComponents = (routeDetails: EtoolsRouteDetails) => async (_dispatc
         await import(`../../pages/${page}/${subpage}/${subSubPage}/pd-${pdSubPage}.ts`);
       }
     }
+
+    if (subSubPage === 'gpd') {
+      const pdPage = routeDetails.params?.pdID ? 'router' : 'index';
+      await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdPage}.ts`);
+
+      if (pdPage === 'router') {
+        const pdSubPage = routeDetails.params?.pdRoute || 'details';
+        await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdSubPage}.ts`);
+      }
+    }
   } catch {
     console.log(
-      `No file imports configuration found: ${page}-${subpage}-${subSubPage}-pd:${pdPage}-pdSub:${pdSubPage}!`
+      `No file imports configuration found: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}!`
     );
     EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
   }

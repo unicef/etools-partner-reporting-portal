@@ -7,7 +7,13 @@ import {
   programmeDocumentReportsAttachmentsCurrent
 } from '../../redux/selectors/programmeDocumentReportsAttachments';
 import {pdReportsAttachmentsSet} from '../../redux/actions/pdReportsAttachments';
-import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
+import {
+  computegPDListUrl,
+  computeListUrl,
+  getDeletegPDUrl,
+  getDeleteUrl,
+  setFiles
+} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
@@ -67,6 +73,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: Boolean})
   showFace = false;
+
+  @property({type: Boolean})
+  isGPD = false;
 
   @property({type: Boolean})
   otherOneLoading!: boolean;
@@ -247,7 +256,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
     if (!locationId || !reportId) {
       return;
     }
-    return computeListUrl(locationId, reportId);
+    return this.isGPD ? computegPDListUrl(locationId, reportId) : computeListUrl(locationId, reportId);
   }
 
   _uploadStarted(type: string) {
@@ -313,7 +322,9 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   _getDeleteUrl(locationId: string, reportId: string, attachmentId: string) {
-    return getDeleteUrl(locationId, reportId, attachmentId);
+    return this.isGPD
+      ? getDeletegPDUrl(locationId, reportId, attachmentId)
+      : getDeleteUrl(locationId, reportId, attachmentId);
   }
 
   _deleteFile(type: string, id: string | undefined) {

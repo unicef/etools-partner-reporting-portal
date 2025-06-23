@@ -69,6 +69,9 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Boolean})
   smallMenu: boolean;
 
+  @property({type: Boolean})
+  isGpd = false;
+
   @property({type: Object})
   route!: Route;
 
@@ -120,11 +123,14 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
             ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
             : ''}
           ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
+          ${this._equals(this.page, 'gpd') ? html` <page-ip-reporting-gpd name="gpd"> </page-ip-reporting-gpd>` : ''}
           ${this._equals(this.page, 'indicators')
-            ? html` <page-ip-reporting-indicators name="indicators"> </page-ip-reporting-indicators>`
+            ? html` <page-ip-reporting-indicators name="indicators" ?isGpd="${this.isGpd}">
+              </page-ip-reporting-indicators>`
             : ''}
           ${this._equals(this.page, 'progress-reports')
-            ? html` <page-ip-progress-reports name="progress-reports"> </page-ip-progress-reports>`
+            ? html` <page-ip-progress-reports name="progress-reports" ?isGpd="${this.isGpd}">
+              </page-ip-progress-reports>`
             : ''}
         </app-header-layout>
       </app-drawer-layout>
@@ -141,7 +147,9 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
         EtoolsRouter.updateAppLocation([state.workspaces.baseUrl, 'overview'].join('/'));
       } else if (
         state.app.routeDetails.subSubRouteName &&
-        !['overview', 'progress-reports', 'indicators', 'pd'].includes(state.app.routeDetails.subSubRouteName as string)
+        !['overview', 'progress-reports', 'indicators', 'pd', 'gpd'].includes(
+          state.app.routeDetails.subSubRouteName as string
+        )
       ) {
         EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
         return;

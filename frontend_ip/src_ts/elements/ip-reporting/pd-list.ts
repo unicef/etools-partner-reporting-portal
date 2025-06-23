@@ -105,7 +105,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
             <div class="table-column">${translate('PD_REF_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="status" sortable class="col-1">
-            <div class="table-column">${translate('PD_SSFA_STATUS')}</div>
+            <div class="table-column">${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}</div>
           </etools-data-table-column>
           <etools-data-table-column field="start_date" sortable class="col-1">
             <div class="table-column">${translate('START_DATE')}</div>
@@ -154,7 +154,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                 </div>
                 <div
                   class="col-data col-1 table-cell table-cell--text"
-                  data-col-header-label="${translate('PD_SSFA_STATUS')}"
+                  data-col-header-label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
                 >
                   ${this._withDefault(pd.status, '')}
                 </div>

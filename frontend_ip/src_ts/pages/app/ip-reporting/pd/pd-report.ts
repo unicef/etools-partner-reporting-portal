@@ -508,7 +508,8 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
               pdId: this.pdId,
               reportId: this.reportId,
               data: this.currentReport,
-              submitUrl: this.submitUrl
+              submitUrl: this.submitUrl,
+              isGpd: false
             }
           });
           return;

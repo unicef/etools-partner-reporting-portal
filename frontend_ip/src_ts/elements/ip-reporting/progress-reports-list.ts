@@ -41,6 +41,9 @@ export class ProgressReportsList extends SortingMixin(
   @property({type: Boolean})
   loading!: boolean;
 
+  @property({type: Boolean})
+  isGpd = false;
+
   @property({type: Array})
   data: any[] = [];
 
@@ -112,7 +115,7 @@ export class ProgressReportsList extends SortingMixin(
             .count} ${translate('RESULTS_TO_SHOW')}"
         >
           <etools-data-table-column field="programme_document__reference_number" class="col-2" sortable>
-            <div class="table-column">${translate('PD_REF_NUMBER')}</div>
+            <div class="table-column">${translate(this.isGpd ? 'GPD_REF_NUMBER' : 'PD_REF_NUMBER')}</div>
           </etools-data-table-column>
           <etools-data-table-column class="col-2">
             <div class="table-column">${translate('REPORT_NUMBER')}</div>
@@ -137,7 +140,7 @@ export class ProgressReportsList extends SortingMixin(
               <div slot="row-data">
                 <div
                   class="col-data col-2 table-cell table-cell--text"
-                  data-col-header-label="${translate('PD_REF_NUMBER')}"
+                  data-col-header-label="${translate(this.isGpd ? 'GPD_REF_NUMBER' : 'PD_REF_NUMBER')}"
                 >
                   <sl-tooltip content="${report.programme_document?.title}">
                     <span class="truncate">
@@ -154,6 +157,7 @@ export class ProgressReportsList extends SortingMixin(
                     display-link-icon
                     .report="${report}"
                     .baseUrl="${this.baseUrl}"
+                    ?isGpd="${this.isGpd}"
                   ></pd-reports-report-title>
                 </div>
                 <div

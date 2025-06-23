@@ -13,6 +13,8 @@ import {store} from '../../../redux/store';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {RootState} from '../../../typings/redux.types';
 import {buildUrl} from '../../../etools-prp-common/utils/util';
+import {AnyObject} from '@unicef-polymer/etools-utils/dist/types/global.types';
+import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 /**
  * main menu
@@ -63,19 +65,35 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
             </sl-tooltip>
             <div class="name">${translate('OVERVIEW')}</div>
           </a>
-
-          <a
-            class="nav-menu-item ${this.getItemClass(this.selectedOption, 'pd')}"
-            href="${this._appendQuery(this.pdUrl, this.pdQuery)}"
-            @click="${this.trackAnalytics}"
-            tracker="Programme Documents"
-          >
-            <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('PROGRAMME_DOCUMENTS')}">
-              <etools-icon id="programme_documents-icon" name="description"></etools-icon>
-            </sl-tooltip>
-            <div class="name">${translate('PROGRAMME_DOCUMENTS')}</div>
-          </a>
-
+          ${this.partner?.partner_type === 'Gov'
+            ? html`
+                <a
+                  class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gpd')}"
+                  href="${this._appendQuery(this.gpdUrl, this.gpdQuery)}"
+                  @click="${this.trackAnalytics}"
+                  tracker="Government Programme Document"
+                >
+                  <sl-tooltip for="programme_documents-icon" placement="right" content="${translate('GDD')}">
+                    <etools-icon id="programme_documents-icon" name="description"></etools-icon>
+                  </sl-tooltip>
+                  <div class="name">${translate('GDD')}</div>
+                </a>
+              `
+            : html` <a
+                class="nav-menu-item ${this.getItemClass(this.selectedOption, 'pd')}"
+                href="${this._appendQuery(this.pdUrl, this.pdQuery)}"
+                @click="${this.trackAnalytics}"
+                tracker="Programme Documents"
+              >
+                <sl-tooltip
+                  for="programme_documents-icon"
+                  placement="right"
+                  content="${translate('PROGRAMME_DOCUMENTS')}"
+                >
+                  <etools-icon id="programme_documents-icon" name="description"></etools-icon>
+                </sl-tooltip>
+                <div class="name">${translate('PROGRAMME_DOCUMENTS')}</div>
+              </a>`}
           <a
             class="nav-menu-item ${this.getItemClass(this.selectedOption, 'progress-reports')}"
             href="${this._appendQuery(this.progressReportsUrl, this.reportsQuery)}"
@@ -88,17 +106,19 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
             <div class="name">${translate('PROGRESS_REPORTS')}</div>
           </a>
 
-          <a
-            class="nav-menu-item ${this.getItemClass(this.selectedOption, 'indicators')}"
-            href="${this._appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
-            @click="${this.trackAnalytics}"
-            tracker="Indicators"
-          >
-            <sl-tooltip for="indicators-icon" placement="right" content="${translate('INDICATORS')}">
-              <etools-icon id="indicators-icon" name="trending-up"></etools-icon>
-            </sl-tooltip>
-            <div class="name">${translate('INDICATORS')}</div>
-          </a>
+          ${this.partner?.partner_type && this.partner?.partner_type !== 'Gov'
+            ? html` <a
+                class="nav-menu-item ${this.getItemClass(this.selectedOption, 'indicators')}"
+                href="${this._appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
+                @click="${this.trackAnalytics}"
+                tracker="Indicators"
+              >
+                <sl-tooltip for="indicators-icon" placement="right" content="${translate('INDICATORS')}">
+                  <etools-icon id="indicators-icon" name="trending-up"></etools-icon>
+                </sl-tooltip>
+                <div class="name">${translate('INDICATORS')}</div>
+              </a>`
+            : ``}
 
           <hr />
 
@@ -140,6 +160,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   pdQuery = {status: String(['signed', 'active', 'suspended'])};
 
   @property({type: Object})
+  gpdQuery = {status: String(['approved', 'active', 'suspended'])};
+
+  @property({type: Object})
   reportsQuery = {status: String(['Due', 'Ove', 'Sen'])};
 
   @property({type: Object})
@@ -152,6 +175,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   pdUrl!: string;
 
   @property({type: String})
+  gpdUrl!: string;
+
+  @property({type: String})
   progressReportsUrl!: string;
 
   @property({type: String})
@@ -159,6 +185,9 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
 
   @property({type: String})
   indicatorsReportsUrl!: string;
+
+  @property({type: Object})
+  partner!: AnyObject;
 
   public _toggleSmallMenu(): void {
     this.smallMenu = !this.smallMenu;
@@ -172,10 +201,14 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
   }
 
   stateChanged(state: RootState): void {
+    if (!isJsonStrMatch(state.partner?.current, this.partner)) {
+      this.partner = {...state.partner?.current};
+    }
     if (state.workspaces?.baseUrl && state.workspaces.baseUrl !== this.baseUrl) {
       this.baseUrl = state.workspaces.baseUrl;
       this.overviewUrl = buildUrl(this.baseUrl, 'overview');
       this.pdUrl = buildUrl(this.baseUrl, 'pd');
+      this.gpdUrl = buildUrl(this.baseUrl, 'gpd');
       this.progressReportsUrl = buildUrl(this.baseUrl, 'progress-reports');
       this.indicatorsReportsUrl = buildUrl(this.baseUrl, 'indicators');
     }

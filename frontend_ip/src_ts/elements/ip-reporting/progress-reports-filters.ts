@@ -25,13 +25,15 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
   @property({type: Array, attribute: false})
   statuses: any[] = [];
 
+  @property({type: Boolean})
+  isGpd = false;
+
   @property({type: Array, attribute: false})
   types: any[] = [];
 
   constructor() {
     super();
     this.statuses = this._localizeStatuses();
-    this.types = this._localizeTypes();
   }
 
   render() {
@@ -50,7 +52,7 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
         <div class="row">
           <text-filter
             class="col-md-3 col-12"
-            label="${translate('PD_REF_AND_TITLE')}"
+            label="${translate(this.isGpd ? 'GPD_PD_REF_AND_TITLE' : 'PD_REF_AND_TITLE')}"
             name="pd_ref_title"
             .value="${this.queryParams?.pd_ref_title}"
           >
@@ -91,6 +93,10 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
 
   updated(changedProperties) {
     super.updated(changedProperties);
+
+    if (changedProperties.has('isGpd')) {
+      this.types = this._localizeTypes(this.isGpd);
+    }
   }
 
   _localizeStatuses() {
@@ -104,12 +110,19 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
     ];
   }
 
-  _localizeTypes() {
-    return [
-      {title: getTranslation('QPR'), id: 'QPR'},
-      {title: getTranslation('HR'), id: 'HR'},
-      {title: getTranslation('SR'), id: 'SR'}
-    ];
+  _localizeTypes(isGpd: boolean) {
+    if (isGpd) {
+      return [
+        {title: getTranslation('GPD_PROGRESS_REPORTS'), id: 'QPR'},
+        {title: getTranslation('GPD_SPECIAL_REPORT'), id: 'SR'}
+      ];
+    } else {
+      return [
+        {title: getTranslation('QPR'), id: 'QPR'},
+        {title: getTranslation('HR'), id: 'HR'},
+        {title: getTranslation('SR'), id: 'SR'}
+      ];
+    }
   }
 }
 
