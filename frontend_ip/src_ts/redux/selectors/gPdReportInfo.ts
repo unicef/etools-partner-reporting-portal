@@ -6,7 +6,8 @@ const keys = [
   'result_achieved',
   'challenges_in_the_reporting_period',
   'proposed_way_forward',
-  'other_information'
+  'other_information',
+  'financial_contribution_currency'
 ];
 
 // App.Selectors.ReportInfo
