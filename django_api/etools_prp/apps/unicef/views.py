@@ -70,9 +70,8 @@ from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import GPDProgressReport, ProgrammeDocument, ProgressReport, ProgressReportAttachment
+from .models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
-    GPDProgressReportUpdateSerializer,
     ImportUserRealmsSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
@@ -401,42 +400,6 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
         }
 
         return render_pdf_to_response(request, "report_annex_c_pdf", data)
-
-
-class GPDProgressReportDetailsUpdateAPIView(APIView):
-    """
-        Endpoint for updating GPD Progress Report narrative fields
-    """
-    permission_classes = (
-        AnyPermission(
-            IsPartnerAuthorizedOfficerForCurrentWorkspace,
-            IsPartnerEditorForCurrentWorkspace,
-            IsPartnerAdminForCurrentWorkspace,
-        ),
-    )
-
-    def get_object(self, pk):
-        # restrict access to the partner that owns the PD
-        return get_object_or_404(
-            GPDProgressReport,
-            pk=pk,
-            programme_document__partner=self.request.user.partner,
-        )
-
-    def get(self, request, pk, *args, **kwargs):
-        pr = self.get_object(pk)
-
-        serializer = GPDProgressReportUpdateSerializer(pr)
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-    def put(self, request, pk, *args, **kwargs):
-        pr = self.get_object(pk)
-
-        serializer = GPDProgressReportUpdateSerializer(instance=pr, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportDetailsUpdateAPIView(APIView):

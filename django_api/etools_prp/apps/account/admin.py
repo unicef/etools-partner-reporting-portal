@@ -23,7 +23,7 @@ class CustomUserAdmin(UserAdmin):
     )
     search_fields = ('email', 'username',)
     exclude = ('date_joined', 'last_login')
-    raw_id_fields = ('partner',)
+    raw_id_fields = ('partner', 'workspace')
 
     add_form = CustomUserCreationForm
     add_fieldsets = (
@@ -60,7 +60,7 @@ class CustomUserAdmin(UserAdmin):
             }
         ),
     )
-    autocomplete_fields = ['workspace', 'partner']
+
     filter_horizontal = ('user_permissions',)
     inlines = [RealmInline]
 

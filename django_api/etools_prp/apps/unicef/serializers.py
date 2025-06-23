@@ -11,6 +11,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from etools_prp.apps.account.validators import EmailValidator
 from etools_prp.apps.core.common import (
     CURRENCIES,
+    DELIVERED_AS_PLANNED_OPTIONS,
     FINAL_OVERALL_STATUS,
     OVERALL_STATUS,
     PD_DOCUMENT_TYPE,
@@ -20,7 +21,6 @@ from etools_prp.apps.core.common import (
 )
 from etools_prp.apps.core.models import Location, Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
-from etools_prp.apps.core.static_data import GPD_DELIVERED_PLANNED_OPTIONS
 from etools_prp.apps.indicator.models import IndicatorBlueprint
 from etools_prp.apps.indicator.serializers import (
     IndicatorBlueprintSimpleSerializer,
@@ -31,7 +31,6 @@ from etools_prp.apps.partner.models import Partner
 from ..core.models import Realm
 from .models import (
     FinalReview,
-    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -404,6 +403,11 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     partner_org_name = serializers.SerializerMethodField()
     partner_vendor_number = serializers.SerializerMethodField()
     unicef_focal_points = serializers.SerializerMethodField()
+    # GPD specific fields
+    is_gpd = serializers.SerializerMethodField()
+    delivered_as_planned = serializers.CharField(source='gpd_report.delivered_as_planned')
+    results_achieved = serializers.CharField(source='gpd_report.results_achieved')
+    other_information = serializers.CharField(source='gpd_report.other_information')
 
     def __init__(self, *args, **kwargs):
         request = kwargs.get('context', {}).get('request')
@@ -458,7 +462,11 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'narrative',
             'reviewed_by_name',
             'reviewed_by_email',
-            'reviewed_by_external_id'
+            'reviewed_by_external_id',
+            'is_gpd',
+            'delivered_as_planned',
+            'results_achieved',
+            'other_information'
         )
 
     def get_partner_org_id(self, obj):
@@ -512,27 +520,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
 
-
-class GPDProgressReportUpdateSerializer(serializers.ModelSerializer):
-
-    delivered_as_planed = serializers.ChoiceField(
-        choices=GPD_DELIVERED_PLANNED_OPTIONS
-    )
-    other_information = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
-    results_achieved = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
-    challenges_in_the_reporting_period = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
-    proposed_way_forward = serializers.CharField(allow_blank=True, required=False, max_length=8_000)
-
-    class Meta:
-        model = GPDProgressReport
-        fields = (
-            'id',
-            "delivered_as_planed",
-            "other_information",
-            "results_achieved",
-            "challenges_in_the_reporting_period",
-            "proposed_way_forward",
-        )
+    def get_is_gpd(self, obj):
+        return obj.programme_document.is_gpd
 
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
@@ -551,6 +540,11 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
     challenges_in_the_reporting_period = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
+    # GPD specific fields
+    delivered_as_planned = serializers.ChoiceField(choices=DELIVERED_AS_PLANNED_OPTIONS, allow_blank=True, allow_null=True)
+    results_achieved = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    other_information = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+
     class Meta:
         model = ProgressReport
         fields = (
@@ -560,7 +554,21 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
             'financial_contribution_currency',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
+            'delivered_as_planned',
+            'results_achieved',
+            'other_information'
         )
+
+    def update(self, instance, validated_data):
+        if instance.programme_document.is_gpd:
+            gpd_report_data = {}
+            for field in ['delivered_as_planned', 'results_achieved', 'other_information']:
+                gpd_report_data[field] = validated_data.pop(field, None)
+            for key, value in gpd_report_data.items():
+                setattr(instance.gpd_report, key, value)
+                instance.gpd_report.save()
+
+        return super().update(instance, validated_data)
 
 
 class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):

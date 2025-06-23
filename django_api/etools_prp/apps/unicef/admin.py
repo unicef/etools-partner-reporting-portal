@@ -191,6 +191,10 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return redirect("admin:unicef_programmedocument_changelist")
 
 
+class GPDProgressReportAdminInline(admin.StackedInline):
+    model = GPDProgressReport
+
+
 class FinalReviewAdminInline(admin.StackedInline):
     model = FinalReview
 
@@ -199,28 +203,14 @@ class ProgressReportAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'report_type', 'status',
                     'submitted_by', 'start_date', 'end_date', 'due_date', 'submission_date',
                     'review_date', 'report_number')
-    list_filter = ('status', 'report_type', 'programme_document__status',)
+    list_filter = ('status', 'report_type', 'programme_document__status', 'programme_document__document_type')
     search_fields = ('programme_document__title', 'programme_document__reference_number')
     raw_id_fields = [
         'programme_document',
         'submitted_by',
         'submitting_user',
     ]
-    inlines = [FinalReviewAdminInline]
-
-
-class GPDProgressReportAdmin(admin.ModelAdmin):
-    list_display = ('programme_document', 'report_type', 'status',
-                    'submitted_by', 'start_date', 'end_date', 'due_date', 'submission_date',
-                    'review_date', 'report_number')
-    list_filter = ('status', 'report_type', 'programme_document__status',)
-    search_fields = ('programme_document__title', 'programme_document__reference_number')
-    raw_id_fields = [
-        'programme_document',
-        'submitted_by',
-        'submitting_user',
-    ]
-    inlines = [FinalReviewAdminInline]
+    inlines = [GPDProgressReportAdminInline, FinalReviewAdminInline]
 
 
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):
@@ -269,7 +259,6 @@ class SectionAdmin(admin.ModelAdmin):
 
 admin.site.register(ProgrammeDocument, ProgrammeDocumentAdmin)
 admin.site.register(ProgressReport, ProgressReportAdmin)
-admin.site.register(GPDProgressReport, GPDProgressReportAdmin)
 admin.site.register(PDResultLink, PDResultLinkAdmin)
 admin.site.register(LowerLevelOutput, LowerLevelOutputAdmin)
 admin.site.register(Section, SectionAdmin)
