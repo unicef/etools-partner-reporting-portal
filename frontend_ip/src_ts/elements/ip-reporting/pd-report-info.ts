@@ -22,6 +22,7 @@ import {reportInfoCurrent} from '../../redux/selectors/reportInfo';
 import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
 import {RootState} from '../../typings/redux.types';
+import cloneDeep from 'lodash-es/cloneDeep';
 import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parser';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
@@ -181,29 +182,30 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
   render() {
     return html`
-      <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
-        (this.permissions = e.detail.value)}"> </etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      >
+      </etools-prp-permissions>
 
       <etools-content-panel panel-title="Other info" ?no-header="${this.noHeader}">
         <div class="row">
           <div class="col-12 padding-v">
             <labelled-item label="${translate('NON_FINANCIAL_CONTRIBUTION_DURING_REPORTING_PERIOD')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html`<span class="value">${this._withDefault(this.data.partner_contribution_to_date)}</span>`
-                  : html`
-                      <etools-input
-                        id="partner_contribution_to_date"
-                        .value="${this.localData?.partner_contribution_to_date}"
-                        @value-changed="${({detail}: CustomEvent) =>
-                          (this.localData.partner_contribution_to_date = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.partner_contribution_to_date?.length}
-                        maxlength="2000"
-                      ></etools-input>
-                    `
-              }
+              ${this._equals(this.computedMode, 'view')
+                ? html`<span class="value">${this._withDefault(this.data.partner_contribution_to_date)}</span>`
+                : html`
+                    <etools-input
+                      id="partner_contribution_to_date"
+                      .value="${this.localData?.partner_contribution_to_date}"
+                      @value-changed="${({detail}: CustomEvent) =>
+                        (this.localData.partner_contribution_to_date = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.partner_contribution_to_date?.length}
+                      maxlength="2000"
+                    ></etools-input>
+                  `}
             </labelled-item>
           </div>
 
@@ -218,8 +220,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                   @value-changed="${({detail}: CustomEvent) =>
                     (this.localData.financial_contribution_to_date = detail.value)}"
                   placeholder="&#8212;"
-                  no-label-float              
-                  ?readonly="${this._equals(this.computedMode, 'view')}"                 
+                  no-label-float
+                  ?readonly="${this._equals(this.computedMode, 'view')}"
                 >
                 </etools-currency>
               </div>
@@ -240,370 +242,356 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                   }}"
                 ></etools-dropdown>
               </div>
-           </div>
+            </div>
           </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('CHALLENGES_BOTTLENECKS')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html`
-                      <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span>
-                    `
-                  : html`
-                      <etools-input
-                        id="challenges_in_the_reporting_period"
-                        .value="${this.localData?.challenges_in_the_reporting_period}"
-                        @value-changed="${({detail}: CustomEvent) =>
-                          (this.localData.challenges_in_the_reporting_period = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.challenges_in_the_reporting_period?.length}
-                        maxlength="2000"
-                      ></etools-input>
-                    `
-              }
+              ${this._equals(this.computedMode, 'view')
+                ? html` <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span> `
+                : html`
+                    <etools-input
+                      id="challenges_in_the_reporting_period"
+                      .value="${this.localData?.challenges_in_the_reporting_period}"
+                      @value-changed="${({detail}: CustomEvent) =>
+                        (this.localData.challenges_in_the_reporting_period = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.challenges_in_the_reporting_period?.length}
+                      maxlength="2000"
+                    ></etools-input>
+                  `}
             </labelled-item>
           </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('PROPOSED_WAY_FORWARD')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
-                  : html`
-                      <etools-input
-                        id="proposed_way_forward"
-                        .value="${this.localData?.proposed_way_forward}"
-                        @value-changed="${({detail}: CustomEvent) =>
-                          (this.localData.proposed_way_forward = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.proposed_way_forward?.length}
-                        maxlength="2000"
-                      ></etools-input>
+              ${this._equals(this.computedMode, 'view')
+                ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
+                : html`
+                    <etools-input
+                      id="proposed_way_forward"
+                      .value="${this.localData?.proposed_way_forward}"
+                      @value-changed="${({detail}: CustomEvent) =>
+                        (this.localData.proposed_way_forward = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.proposed_way_forward?.length}
+                      maxlength="2000"
+                    ></etools-input>
 
-                      ${this.showFaceMessage
-                        ? html` <div class="face-form-message">${translate('FACE_FORM_SUBMITTED')}</div> `
-                        : html``}
-                    `
-              }
+                    ${this.showFaceMessage
+                      ? html` <div class="face-form-message">${translate('FACE_FORM_SUBMITTED')}</div> `
+                      : html``}
+                  `}
             </labelled-item>
           </div>
 
-          ${
-            this._isFinalReport(this.currentReport)
-              ? html`
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('RELEASE_CASH_IN_TIME')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.release_cash_in_time_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.release_cash_in_time_choice = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
+          ${this._isFinalReport(this.currentReport)
+            ? html`
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('RELEASE_CASH_IN_TIME')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.release_cash_in_time_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.release_cash_in_time_choice = e.target.value;
+                      }}"
+                    >
+                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('YES')}
+                      </sl-radio>
+                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('NO')}
+                      </sl-radio>
+                    </etools-radio-group>
+
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.release_cash_in_time_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="release_cash_in_time_comment"
+                            .value="${this.localData?.final_review?.release_cash_in_time_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.release_cash_in_time_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.release_cash_in_time_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('RELEASE_SUPPLIES_IN_TIME')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.release_supplies_in_time_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.release_supplies_in_time_choice = e.target.value;
+                      }}"
+                    >
+                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('YES')}
+                      </sl-radio>
+                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('NO')}
+                      </sl-radio>
+                    </etools-radio-group>
+
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.release_supplies_in_time_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="release_supplies_in_time_comment"
+                            .value="${this.localData?.final_review?.release_supplies_in_time_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.release_supplies_in_time_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.release_supplies_in_time_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('FEEDBACK_FACE_FORM_IN_TIME')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.feedback_face_form_in_time_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.feedback_face_form_in_time_choice = e.target.value;
+                      }}"
+                    >
+                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('YES')}
+                      </sl-radio>
+                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('NO')}
+                      </sl-radio>
+                    </etools-radio-group>
+
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.feedback_face_form_in_time_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="feedback_face_form_in_time_comment"
+                            .value="${this.localData?.final_review?.feedback_face_form_in_time_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.feedback_face_form_in_time_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.feedback_face_form_in_time_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('RESPOND_REQUESTS_IN_TIME')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.respond_requests_in_time_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.respond_requests_in_time_choice = e.target.value;
+                      }}"
+                    >
+                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('YES')}
+                      </sl-radio>
+                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('NO')}
+                      </sl-radio>
+                    </etools-radio-group>
+
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.respond_requests_in_time_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="respond_requests_in_time_comment"
+                            .value="${this.localData?.final_review?.respond_requests_in_time_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.respond_requests_in_time_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.respond_requests_in_time_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('IMPLEMENTED_AS_PLANNED')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.implemented_as_planned_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.implemented_as_planned_choice = e.target.value;
+                      }}"
+                    >
+                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('YES')}
+                      </sl-radio>
+                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('NO')}
+                      </sl-radio>
+                    </etools-radio-group>
+
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.implemented_as_planned_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="implemented_as_planned_comment"
+                            .value="${this.localData?.final_review?.implemented_as_planned_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.implemented_as_planned_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.implemented_as_planned_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('ACTION_TO_ADDRESS')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.action_to_address_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.action_to_address_choice = e.target.value;
+                      }}"
+                    >
+                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('YES')}
+                      </sl-radio>
+                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        ${translate('NO')}
+                      </sl-radio>
+                    </etools-radio-group>
+
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.action_to_address_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="action_to_address_comment"
+                            .value="${this.localData?.final_review?.action_to_address_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.action_to_address_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.action_to_address_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+
+                <div class="col-12 padding-v">
+                  <labelled-item label="${translate('OVERALL_SATISFACTION')}">
+                    <etools-radio-group
+                      .value="${this.localData?.final_review?.overall_satisfaction_choice}"
+                      @sl-change="${(e: any) => {
+                        this.localData.final_review.overall_satisfaction_choice = e.target.value;
+                      }}"
+                    >
+                      <div class="layout-horizontal">
+                        <sl-radio
+                          class="r-ml"
+                          value="very_unsatisfied"
+                          ?disabled="${this._equals(this.computedMode, 'view')}"
+                        >
+                          ${translate('VERY_UNSATISFIED')}
                         </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
+                        <sl-radio
+                          class="r-ml"
+                          value="unsatisfied"
+                          ?disabled="${this._equals(this.computedMode, 'view')}"
+                        >
+                          ${translate('UNSATISFIED')}
                         </sl-radio>
-                      </etools-radio-group>
-
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.release_cash_in_time_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="release_cash_in_time_comment"
-                              .value="${this.localData?.final_review?.release_cash_in_time_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.release_cash_in_time_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.release_cash_in_time_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('RELEASE_SUPPLIES_IN_TIME')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.release_supplies_in_time_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.release_supplies_in_time_choice = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
+                        <sl-radio class="r-ml" value="neutral" ?disabled="${this._equals(this.computedMode, 'view')}">
+                          ${translate('NEUTRAL')}
                         </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
+                        <sl-radio class="r-ml" value="satisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
+                          ${translate('SATISFIED')}
                         </sl-radio>
-                      </etools-radio-group>
-
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.release_supplies_in_time_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="release_supplies_in_time_comment"
-                              .value="${this.localData?.final_review?.release_supplies_in_time_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.release_supplies_in_time_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.release_supplies_in_time_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('FEEDBACK_FACE_FORM_IN_TIME')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.feedback_face_form_in_time_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.feedback_face_form_in_time_choice = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
+                        <sl-radio
+                          class="r-ml"
+                          value="very_satisfied"
+                          ?disabled="${this._equals(this.computedMode, 'view')}"
+                        >
+                          ${translate('VERY_SATISFIED')}
                         </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
-                        </sl-radio>
-                      </etools-radio-group>
+                      </div>
+                    </etools-radio-group>
 
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.feedback_face_form_in_time_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="feedback_face_form_in_time_comment"
-                              .value="${this.localData?.final_review?.feedback_face_form_in_time_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.feedback_face_form_in_time_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.feedback_face_form_in_time_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('RESPOND_REQUESTS_IN_TIME')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.respond_requests_in_time_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.respond_requests_in_time_choice = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
-                        </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
-                        </sl-radio>
-                      </etools-radio-group>
-
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.respond_requests_in_time_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="respond_requests_in_time_comment"
-                              .value="${this.localData?.final_review?.respond_requests_in_time_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.respond_requests_in_time_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.respond_requests_in_time_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('IMPLEMENTED_AS_PLANNED')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.implemented_as_planned_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.implemented_as_planned_choice = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
-                        </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
-                        </sl-radio>
-                      </etools-radio-group>
-
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.implemented_as_planned_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="implemented_as_planned_comment"
-                              .value="${this.localData?.final_review?.implemented_as_planned_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.implemented_as_planned_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.implemented_as_planned_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('ACTION_TO_ADDRESS')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.action_to_address_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.action_to_address_choice = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
-                        </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
-                        </sl-radio>
-                      </etools-radio-group>
-
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.action_to_address_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="action_to_address_comment"
-                              .value="${this.localData?.final_review?.action_to_address_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.action_to_address_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.action_to_address_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-
-                  <div class="col-12 padding-v">
-                    <labelled-item label="${translate('OVERALL_SATISFACTION')}">
-                      <etools-radio-group
-                        .value="${this.localData?.final_review?.overall_satisfaction_choice}"
-                        @sl-change="${(e: any) => {
-                          this.localData.final_review.overall_satisfaction_choice = e.target.value;
-                        }}"
-                      >
-                        <div class="layout-horizontal">
-                          <sl-radio
-                            class="r-ml"
-                            value="very_unsatisfied"
-                            ?disabled="${this._equals(this.computedMode, 'view')}"
-                          >
-                            ${translate('VERY_UNSATISFIED')}
-                          </sl-radio>
-                          <sl-radio
-                            class="r-ml"
-                            value="unsatisfied"
-                            ?disabled="${this._equals(this.computedMode, 'view')}"
-                          >
-                            ${translate('UNSATISFIED')}
-                          </sl-radio>
-                          <sl-radio class="r-ml" value="neutral" ?disabled="${this._equals(this.computedMode, 'view')}">
-                            ${translate('NEUTRAL')}
-                          </sl-radio>
-                          <sl-radio
-                            class="r-ml"
-                            value="satisfied"
-                            ?disabled="${this._equals(this.computedMode, 'view')}"
-                          >
-                            ${translate('SATISFIED')}
-                          </sl-radio>
-                          <sl-radio
-                            class="r-ml"
-                            value="very_satisfied"
-                            ?disabled="${this._equals(this.computedMode, 'view')}"
-                          >
-                            ${translate('VERY_SATISFIED')}
-                          </sl-radio>
-                        </div>
-                      </etools-radio-group>
-
-                      ${this._equals(this.computedMode, 'view')
-                        ? html`
-                            <div class="value">
-                              ${this._withDefault(this.data?.final_review?.overall_satisfaction_comment)}
-                            </div>
-                          `
-                        : html`
-                            <etools-input
-                              id="overall_satisfaction_comment"
-                              .value="${this.localData?.final_review?.overall_satisfaction_comment}"
-                              @value-changed="${({detail}: CustomEvent) =>
-                                (this.localData.final_review.overall_satisfaction_comment = detail.value)}"
-                              no-label-float
-                              placeholder="${translate('COMMENTS')}"
-                              char-counter
-                              .charCount=${this.localData?.final_review?.overall_satisfaction_comment?.length}
-                              maxlength="2000"
-                            ></etools-input>
-                          `}
-                    </labelled-item>
-                  </div>
-                `
-              : html``
-          }
+                    ${this._equals(this.computedMode, 'view')
+                      ? html`
+                          <div class="value">
+                            ${this._withDefault(this.data?.final_review?.overall_satisfaction_comment)}
+                          </div>
+                        `
+                      : html`
+                          <etools-input
+                            id="overall_satisfaction_comment"
+                            .value="${this.localData?.final_review?.overall_satisfaction_comment}"
+                            @value-changed="${({detail}: CustomEvent) =>
+                              (this.localData.final_review.overall_satisfaction_comment = detail.value)}"
+                            no-label-float
+                            placeholder="${translate('COMMENTS')}"
+                            char-counter
+                            .charCount=${this.localData?.final_review?.overall_satisfaction_comment?.length}
+                            maxlength="2000"
+                          ></etools-input>
+                        `}
+                  </labelled-item>
+                </div>
+              `
+            : html``}
           <div class="col-12 right-align padding-v">
-          ${
-            !this._equals(this.computedMode, 'view')
+            ${!this._equals(this.computedMode, 'view')
               ? html`
                   <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
                   </etools-button>
                 `
-              : html``
-          }
+              : html``}
           </div>
 
           <div class="col-12 padding-v">
             <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
-          </div
+          </div>
         </div>
       </etools-content-panel>
     `;
@@ -640,7 +628,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
       return data;
     }
 
-    this.localData = {...data};
+    this.localData = cloneDeep(data);
     return data;
   }
 

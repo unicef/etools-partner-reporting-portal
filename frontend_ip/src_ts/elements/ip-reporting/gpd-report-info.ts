@@ -14,6 +14,7 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
 import '../../etools-prp-common/elements/filter-list';
+import cloneDeep from 'lodash-es/cloneDeep';
 import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
@@ -181,132 +182,122 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
 
   render() {
     return html`
-      <etools-prp-permissions .permissions="${this.permissions}" @permissions-changed="${(e) =>
-        (this.permissions = e.detail.value)}"> </etools-prp-permissions>
+      <etools-prp-permissions
+        .permissions="${this.permissions}"
+        @permissions-changed="${(e) => (this.permissions = e.detail.value)}"
+      >
+      </etools-prp-permissions>
 
       <etools-content-panel panel-title="Other info" ?no-header="${this.noHeader}">
         <div class="row">
-
-        <div class="col-12 padding-v">
-                <labelled-item label="${translate('ACTIVITIES_DELIVERED_AS_PLANNED')}">
-                      <etools-radio-group
-                        .value="${this.localData?.delivered_as_planned}"
-                        @sl-change="${(e: any) => {
-                          this.localData.delivered_as_planned = e.target.value;
-                        }}"
-                      >
-                        <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('YES')}
-                        </sl-radio>
-                        <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('NO')}
-                        </sl-radio>
-                        <sl-radio value="partially" ?disabled="${this._equals(this.computedMode, 'view')}">
-                          ${translate('PARTIALLY')}
-                        </sl-radio>
-                      </etools-radio-group>
-                </labelled-item>
+          <div class="col-12 padding-v">
+            <labelled-item label="${translate('ACTIVITIES_DELIVERED_AS_PLANNED')}">
+              <etools-radio-group
+                .value="${this.localData?.delivered_as_planned}"
+                @sl-change="${(e: any) => {
+                  this.localData.delivered_as_planned = e.target.value;
+                }}"
+              >
+                <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
+                  ${translate('YES')}
+                </sl-radio>
+                <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
+                  ${translate('NO')}
+                </sl-radio>
+                <sl-radio value="partially" ?disabled="${this._equals(this.computedMode, 'view')}">
+                  ${translate('PARTIALLY')}
+                </sl-radio>
+              </etools-radio-group>
+            </labelled-item>
           </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('REPORTING_PERIOD_CONTRIBUTION_ACHIEVED')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html`<span class="value">${this._withDefault(this.data.result_achieved)}</span>`
-                  : html`
-                      <etools-input
-                        id="partner_contribution_to_date"
-                        .value="${this.localData?.result_achieved}"
-                        @value-changed="${({detail}: CustomEvent) => (this.localData.result_achieved = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.result_achieved?.length}
-                        maxlength="2000"
-                      ></etools-input>
-                    `
-              }
+              ${this._equals(this.computedMode, 'view')
+                ? html`<span class="value">${this._withDefault(this.data.result_achieved)}</span>`
+                : html`
+                    <etools-input
+                      id="partner_contribution_to_date"
+                      .value="${this.localData?.result_achieved}"
+                      @value-changed="${({detail}: CustomEvent) => (this.localData.result_achieved = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.result_achieved?.length}
+                      maxlength="2000"
+                    ></etools-input>
+                  `}
             </labelled-item>
           </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('FACED_CHALLENGES')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html`
-                      <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span>
-                    `
-                  : html`
-                      <etools-input
-                        id="challenges_in_the_reporting_period"
-                        .value="${this.localData?.challenges_in_the_reporting_period}"
-                        @value-changed="${({detail}: CustomEvent) =>
-                          (this.localData.challenges_in_the_reporting_period = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.challenges_in_the_reporting_period?.length}
-                        maxlength="2000"
-                      ></etools-input>
-                    `
-              }
+              ${this._equals(this.computedMode, 'view')
+                ? html` <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span> `
+                : html`
+                    <etools-input
+                      id="challenges_in_the_reporting_period"
+                      .value="${this.localData?.challenges_in_the_reporting_period}"
+                      @value-changed="${({detail}: CustomEvent) =>
+                        (this.localData.challenges_in_the_reporting_period = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.challenges_in_the_reporting_period?.length}
+                      maxlength="2000"
+                    ></etools-input>
+                  `}
             </labelled-item>
           </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('YOUR_PROPOSED_WAY_FORWARD')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
-                  : html`
-                      <etools-input
-                        id="challenges_in_the_reporting_period"
-                        .value="${this.localData?.proposed_way_forward}"
-                        @value-changed="${({detail}: CustomEvent) =>
-                          (this.localData.proposed_way_forward = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.proposed_way_forward?.length}
-                        maxlength="2000"
-                      ></etools-input>
-                    `
-              }
+              ${this._equals(this.computedMode, 'view')
+                ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
+                : html`
+                    <etools-input
+                      id="challenges_in_the_reporting_period"
+                      .value="${this.localData?.proposed_way_forward}"
+                      @value-changed="${({detail}: CustomEvent) =>
+                        (this.localData.proposed_way_forward = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.proposed_way_forward?.length}
+                      maxlength="2000"
+                    ></etools-input>
+                  `}
             </labelled-item>
           </div>
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('OTHER_IMPORTANT_INFO')}">
-              ${
-                this._equals(this.computedMode, 'view')
-                  ? html` <span class="value">${this._withDefault(this.data.other_information)}</span> `
-                  : html`
-                      <etools-input
-                        id="challenges_in_the_reporting_period"
-                        .value="${this.localData?.other_information}"
-                        @value-changed="${({detail}: CustomEvent) => (this.localData.other_information = detail.value)}"
-                        no-label-float
-                        char-counter
-                        .charCount=${this.localData?.other_information?.length}
-                        maxlength="2000"
-                      ></etools-input>
-                    `
-              }
+              ${this._equals(this.computedMode, 'view')
+                ? html` <span class="value">${this._withDefault(this.data.other_information)}</span> `
+                : html`
+                    <etools-input
+                      id="challenges_in_the_reporting_period"
+                      .value="${this.localData?.other_information}"
+                      @value-changed="${({detail}: CustomEvent) => (this.localData.other_information = detail.value)}"
+                      no-label-float
+                      char-counter
+                      .charCount=${this.localData?.other_information?.length}
+                      maxlength="2000"
+                    ></etools-input>
+                  `}
             </labelled-item>
           </div>
 
           <div class="col-12 right-align padding-v">
-          ${
-            !this._equals(this.computedMode, 'view')
+            ${!this._equals(this.computedMode, 'view')
               ? html`
                   <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
                   </etools-button>
                 `
-              : html``
-          }
+              : html``}
           </div>
 
           <div class="col-12 padding-v">
             <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
-          </div
+          </div>
         </div>
       </etools-content-panel>
     `;
@@ -343,7 +334,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
       return data;
     }
 
-    this.localData = {...data};
+    this.localData = cloneDeep(data);
     return data;
   }
 
