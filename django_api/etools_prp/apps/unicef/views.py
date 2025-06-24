@@ -444,7 +444,8 @@ class ProgressReportDetailsUpdateAPIView(APIView):
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        pr.refresh_from_db()
+        return Response(ProgressReportSerializer(instance=pr).data, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
