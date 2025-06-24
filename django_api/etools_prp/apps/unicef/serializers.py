@@ -31,6 +31,7 @@ from etools_prp.apps.partner.models import Partner
 from ..core.models import Realm
 from .models import (
     FinalReview,
+    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -534,14 +535,22 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
     )
     financial_contribution_currency = serializers.ChoiceField(
         choices=CURRENCIES,
+        required=False,
         allow_blank=True,
         allow_null=True,
     )
-    challenges_in_the_reporting_period = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    challenges_in_the_reporting_period = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True
+    )
     proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
     # GPD specific fields
-    delivered_as_planned = serializers.ChoiceField(choices=DELIVERED_AS_PLANNED_OPTIONS, allow_blank=True, allow_null=True)
+    delivered_as_planned = serializers.ChoiceField(
+        choices=DELIVERED_AS_PLANNED_OPTIONS,
+        required=False,
+        allow_blank=True, allow_null=True)
     results_achieved = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     other_information = serializers.CharField(max_length=2000, required=False, allow_blank=True)
 
@@ -564,10 +573,10 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
             gpd_report_data = {}
             for field in ['delivered_as_planned', 'results_achieved', 'other_information']:
                 gpd_report_data[field] = validated_data.pop(field, None)
-            for key, value in gpd_report_data.items():
-                setattr(instance.gpd_report, key, value)
-                instance.gpd_report.save()
-
+            GPDProgressReport.objects.update_or_create(
+                gpd_report=instance,
+                defaults=gpd_report_data
+            )
         return super().update(instance, validated_data)
 
 

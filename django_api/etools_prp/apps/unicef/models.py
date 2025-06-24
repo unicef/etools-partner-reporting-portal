@@ -380,7 +380,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         return LowerLevelOutput.objects.filter(
             cp_output__programme_document=self, active=True)
 
-    @cached_property
+    @property
     def is_gpd(self):
         return self.document_type == PD_DOCUMENT_TYPE.GDD
 
