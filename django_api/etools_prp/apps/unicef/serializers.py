@@ -378,7 +378,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'unicef_focal_points',
             'reviewed_by_name',
             'reviewed_by_email',
-            'reviewed_by_external_id'
+            'reviewed_by_external_id',
             'is_gpd'
         )
 
