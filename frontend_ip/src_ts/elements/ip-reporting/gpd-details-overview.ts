@@ -239,6 +239,7 @@ export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
             title="${translate('GPD_PROGRESS_REPORTS')}"
             .data="${this.reportingRequirements?.qpr}"
             ?loading="${!this.loaded}"
+            isGpd
           >
           </pd-details-reporting-requirements>
         </etools-content-panel>

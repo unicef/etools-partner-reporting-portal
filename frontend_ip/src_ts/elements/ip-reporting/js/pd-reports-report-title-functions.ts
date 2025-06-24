@@ -9,7 +9,11 @@ export function shouldDisplayLink(
   return displayLink && fn(permissions, report);
 }
 
-export function getReportTitleFull(report: any) {
+export function getReportTitleFull(report: any, isGpd = false) {
+  if (isGpd) {
+    return 'PR';
+  }
+
   let title = '';
   if (report.report_type === 'QPR') {
     title += getTranslation('QPR_SHORT') + report.report_number + ' ' + getTranslation('QPR_LONG');
@@ -21,7 +25,11 @@ export function getReportTitleFull(report: any) {
   return title;
 }
 
-export function getReportTitle(report: any) {
+export function getReportTitle(report: any, isGpd = false) {
+  if (isGpd) {
+    return 'PR';
+  }
+
   let title = '';
   if (report.report_type === 'QPR') {
     title += getTranslation('QPR_SHORT') + report.report_number;
