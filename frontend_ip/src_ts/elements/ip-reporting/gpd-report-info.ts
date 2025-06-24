@@ -19,7 +19,7 @@ import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/sr
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
 import {gPdReportInfoCurrent} from '../../redux/selectors/gPdReportInfo';
-import {computeMode, computegPDUpdateUrl} from './js/pd-report-info-functions';
+import {computeMode, computeUpdateUrl} from './js/pd-report-info-functions';
 import {pdReportsUpdate} from '../../redux/actions/pdReports';
 import {RootState} from '../../typings/redux.types';
 import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parser';
@@ -305,7 +305,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments isGPD ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
+            <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
           </div
         </div>
       </etools-content-panel>
@@ -393,7 +393,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
   }
 
   _computeUpdateUrl(locationId: string, reportId: string) {
-    return computegPDUpdateUrl(locationId, reportId);
+    return computeUpdateUrl(locationId, reportId);
   }
 
   _computeMode(mode: string, overrideMode: string, report: any, permissions: any) {

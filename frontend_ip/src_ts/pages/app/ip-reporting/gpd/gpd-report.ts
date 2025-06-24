@@ -329,7 +329,7 @@ export class PageIpReportingGpdReport extends ProgressReportUtilsMixin(UtilsMixi
   }
 
   _computeReportUrl(locationId: string, reportId: string, _: any) {
-    return locationId && reportId ? Endpoints.programmegPDDocumentReports(locationId, reportId) : '';
+    return locationId && reportId ? Endpoints.programmeDocumentReport(locationId, reportId) : '';
   }
 
   _computeSubmitUrl(locationId: string, reportId: string, reportType: string) {
