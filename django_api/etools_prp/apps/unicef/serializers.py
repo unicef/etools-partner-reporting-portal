@@ -339,6 +339,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
     partner_name = serializers.SerializerMethodField()
     partner_vendor_number = serializers.SerializerMethodField()
     unicef_focal_points = serializers.SerializerMethodField()
+    is_gpd = serializers.SerializerMethodField()
 
     def get_partner_name(self, obj):
         return obj.programme_document.partner.title
@@ -378,7 +379,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'reviewed_by_name',
             'reviewed_by_email',
             'reviewed_by_external_id'
-
+            'is_gpd'
         )
 
     def get_reporting_period(self, obj):
@@ -389,6 +390,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
+
+    def get_is_gpd(self, obj):
+        return obj.programme_document.is_gpd
 
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
@@ -520,9 +524,6 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
-
-    def get_is_gpd(self, obj):
-        return obj.programme_document.is_gpd
 
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
