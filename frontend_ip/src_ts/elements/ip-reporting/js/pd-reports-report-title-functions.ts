@@ -11,7 +11,7 @@ export function shouldDisplayLink(
 
 export function getReportTitleFull(report: any, isGpd = false) {
   if (isGpd) {
-    return 'PR';
+    return `PR${report.report_number} (Progress Report)`;
   }
 
   let title = '';
@@ -27,7 +27,7 @@ export function getReportTitleFull(report: any, isGpd = false) {
 
 export function getReportTitle(report: any, isGpd = false) {
   if (isGpd) {
-    return 'PR';
+    return `PR${report.report_number}`;
   }
 
   let title = '';
