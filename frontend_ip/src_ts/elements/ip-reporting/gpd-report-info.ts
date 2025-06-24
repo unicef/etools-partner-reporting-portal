@@ -214,15 +214,15 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
           <div class="col-12 padding-v">
             <labelled-item label="${translate('REPORTING_PERIOD_CONTRIBUTION_ACHIEVED')}">
               ${this._equals(this.computedMode, 'view')
-                ? html`<span class="value">${this._withDefault(this.data.result_achieved)}</span>`
+                ? html`<span class="value">${this._withDefault(this.data.results_achieved)}</span>`
                 : html`
                     <etools-input
                       id="partner_contribution_to_date"
-                      .value="${this.localData?.result_achieved}"
-                      @value-changed="${({detail}: CustomEvent) => (this.localData.result_achieved = detail.value)}"
+                      .value="${this.localData?.results_achieved}"
+                      @value-changed="${({detail}: CustomEvent) => (this.localData.results_achieved = detail.value)}"
                       no-label-float
                       char-counter
-                      .charCount=${this.localData?.result_achieved?.length}
+                      .charCount=${this.localData?.results_achieved?.length}
                       maxlength="2000"
                     ></etools-input>
                   `}
