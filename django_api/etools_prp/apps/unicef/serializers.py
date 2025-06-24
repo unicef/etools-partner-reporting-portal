@@ -549,7 +549,7 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         max_length=2000,
         required=False,
         allow_blank=True,
-        allow_null = True,
+        allow_null=True,
     )
     proposed_way_forward = serializers.CharField(
         max_length=2000,
@@ -574,7 +574,7 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         max_length=2000,
         required=False,
         allow_blank=True,
-        allow_null = True
+        allow_null=True
     )
 
     class Meta:
