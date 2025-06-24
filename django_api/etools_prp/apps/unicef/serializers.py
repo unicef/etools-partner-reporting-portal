@@ -527,11 +527,17 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
-    partner_contribution_to_date = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    partner_contribution_to_date = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+        allow_null=True
+    )
     financial_contribution_to_date = serializers.CharField(
         max_length=2000,
         required=False,
         allow_blank=True,
+        allow_null=True,
     )
     financial_contribution_currency = serializers.ChoiceField(
         choices=CURRENCIES,
@@ -542,17 +548,34 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
     challenges_in_the_reporting_period = serializers.CharField(
         max_length=2000,
         required=False,
-        allow_blank=True
+        allow_blank=True,
+        allow_null = True,
     )
-    proposed_way_forward = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    proposed_way_forward = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+        allow_null=True
+    )
 
     # GPD specific fields
     delivered_as_planned = serializers.ChoiceField(
         choices=DELIVERED_AS_PLANNED_OPTIONS,
         required=False,
-        allow_blank=True, allow_null=True)
-    results_achieved = serializers.CharField(max_length=2000, required=False, allow_blank=True)
-    other_information = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+        allow_blank=True,
+        allow_null=True
+    )
+    results_achieved = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+    )
+    other_information = serializers.CharField(
+        max_length=2000,
+        required=False,
+        allow_blank=True,
+        allow_null = True
+    )
 
     class Meta:
         model = ProgressReport
