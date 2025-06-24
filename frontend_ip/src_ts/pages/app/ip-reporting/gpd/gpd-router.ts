@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
-import './gpd-details.js';
+import './gpd-view.js';
 import './gpd-report.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
@@ -34,10 +34,10 @@ class PageIpReportingGpdRouter extends UtilsMixin(connect(store)(LitElement)) {
         }
       </style>
 
-      ${this._equals(this.page, 'gpd-details')
-        ? html` <page-ip-reporting-gpd-details name="gpd-details"> </page-ip-reporting-gpd-details>`
+      ${this._equals(this.page, 'view')
+        ? html` <page-ip-reporting-gpd-details name="gpd-view"> </page-ip-reporting-gpd-details>`
         : html``}
-      ${this._equals(this.page, 'gpd-report')
+      ${this._equals(this.page, 'report')
         ? html` <page-ip-reporting-gpd-report name="gpd-report"> </page-ip-reporting-gpd-report>`
         : html``}
     `;
@@ -46,23 +46,7 @@ class PageIpReportingGpdRouter extends UtilsMixin(connect(store)(LitElement)) {
   stateChanged(state: RootState) {
     if (state.app.routeDetails && !isJsonStrMatch(this.routeDetails, state.app.routeDetails)) {
       this.routeDetails = state.app.routeDetails;
-      this._routeTreeChanged(state.app.routeDetails.params?.pdRoute);
-    }
-  }
-
-  _routeTreeChanged(tree) {
-    switch (tree) {
-      case 'view':
-        this.page = 'gpd-details';
-        break;
-
-      case 'report':
-        this.page = 'gpd-report';
-        break;
-
-      default:
-        this.page = 'gpd-details';
-        break;
+      this.page = state.app.routeDetails.params?.pdRoute;
     }
   }
 }
