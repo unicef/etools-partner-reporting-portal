@@ -71,10 +71,10 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
                     name="${this._getReportIcon(this.report, this.permissions)}"
                   ></etools-icon>`
                 : html``}
-              ${this._getReportTitle(this.report)}
+              ${this._getReportTitle(this.report, this.isGpd)}
             </a>
           `
-        : html`${this._getReportTitleFull(this.report)}`}
+        : html`${this._getReportTitleFull(this.report, this.isGpd)}`}
       ${this._isFinalReport(this.report) ? html`<div class="final-badge">final</div>` : html``}
     `;
   }
@@ -99,12 +99,12 @@ export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(Li
     return shouldDisplayLink(this.displayLink, this.report, this.permissions, this._canNavigateToReport);
   }
 
-  _getReportTitleFull(report: any) {
-    return report ? getReportTitleFull(report) : '';
+  _getReportTitleFull(report: any, isGpd: boolean) {
+    return report ? getReportTitleFull(report, isGpd) : '';
   }
 
-  _getReportTitle(report: any) {
-    return getReportTitle(report);
+  _getReportTitle(report: any, isGpd: boolean) {
+    return getReportTitle(report, isGpd);
   }
 
   _getReportLink(report: any, permissions: any, baseUrl: any, isGpd: boolean) {
