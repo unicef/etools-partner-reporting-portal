@@ -54,7 +54,7 @@ const loadPageComponents = (routeDetails: EtoolsRouteDetails) => async (_dispatc
   const page = routeDetails.routeName;
   const subpage = routeDetails.subRouteName;
   const subSubPage = routeDetails.subSubRouteName;
-
+  let pdPage, pdSubPage;
   try {
     await import(`../../pages/${page}.ts`);
 
@@ -67,26 +67,27 @@ const loadPageComponents = (routeDetails: EtoolsRouteDetails) => async (_dispatc
     }
 
     if (subSubPage === 'pd') {
-      const pdPage = routeDetails.params?.pdID ? 'router' : 'index';
+      pdPage = routeDetails.params?.pdID ? 'router' : 'index';
       await import(`../../pages/${page}/${subpage}/${subSubPage}/pd-${pdPage}.ts`);
 
       if (pdPage === 'router') {
-        const pdSubPage = routeDetails.params?.pdRoute || 'details';
+        pdSubPage = routeDetails.params?.pdRoute || 'details';
         await import(`../../pages/${page}/${subpage}/${subSubPage}/pd-${pdSubPage}.ts`);
       }
     }
 
     if (subSubPage === 'gpd') {
-      const pdPage = routeDetails.params?.pdID ? 'router' : 'index';
+      pdPage = routeDetails.params?.pdID ? 'router' : 'index';
       await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdPage}.ts`);
 
       if (pdPage === 'router') {
-        const pdSubPage = routeDetails.params?.pdRoute || 'details';
+        pdSubPage = routeDetails.params?.pdRoute || 'details';
         await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdSubPage}.ts`);
       }
     }
+    console.info(`Loading: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}`);
   } catch {
-    console.log(
+    console.warn(
       `No file imports configuration found: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}!`
     );
     EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
