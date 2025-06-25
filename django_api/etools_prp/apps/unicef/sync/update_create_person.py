@@ -61,7 +61,7 @@ def update_create_agreement_auth_officers(agreement_auth_officers: dict, pd: Pro
     return pd
 
 
-def update_create_focal_points(focal_points: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
+def update_create_partner_focal_points(focal_points: dict, pd: ProgrammeDocument, workspace: Workspace, partner: Partner) -> ProgrammeDocument:
 
     pd.partner_focal_point.all().update(active=False)
 
