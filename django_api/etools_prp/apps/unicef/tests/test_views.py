@@ -1241,12 +1241,14 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
 
     def test_detail_update_gpd_report(self):
         gpd_progress_report = self.gpd.progress_reports.filter(is_final=False).first()
-        self.assertIsNone(gpd_progress_report.gpd_report)
+        self.assertFalse(hasattr(gpd_progress_report, 'gpd_report'))
 
         url = reverse(
             'progress-reports-details-update',
             args=[self.workspace.pk, gpd_progress_report.pk],
         )
+        self.partner_user.partner = self.government
+        self.partner_user.save()
         data = {
             "delivered_as_planned": "partially",
             "results_achieved": "Results were partially achieved",
@@ -1255,8 +1257,11 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         }
         response = self.client.put(url, format='json', data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        gpd_progress_report.refresh_from_db()
+        self.assertTrue(hasattr(gpd_progress_report, 'gpd_report'))
         for field in data.keys():
             self.assertEqual(response.data[field], data[field])
+        for field in ["delivered_as_planned", "results_achieved"]:
             self.assertEqual(getattr(gpd_progress_report.gpd_report, field), data[field])
 
     def test_detail_api_filter_incomplete(self):
