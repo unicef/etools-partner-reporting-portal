@@ -205,7 +205,7 @@ class EToolsLocationSynchronizer:
 
     def __init__(self, pk) -> None:
         self.workspace = Workspace.objects.get(pk=pk)
-        self.qs = get_location_model().objects.all()
+        self.qs = get_location_model().objects.filter(workspaces=self.workspace)
 
     @transaction.atomic
     def create_update_locations(self, list_data):
@@ -238,10 +238,6 @@ class EToolsLocationSynchronizer:
                 existing_loc.geom = geom
                 existing_loc.point = point
                 locs_to_update.append(existing_loc)
-
-                if self.workspace not in existing_loc.workspaces.all():
-                    existing_loc.workspaces.add(self.workspace)
-
                 updated += 1
             else:
                 skipped += 1
