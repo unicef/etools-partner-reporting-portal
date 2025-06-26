@@ -219,7 +219,7 @@ class PMPLocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ('name', 'p_code', 'admin_level_name', 'admin_level', 'parent')
+        fields = ('name', 'p_code', 'admin_level_name', 'admin_level')
         validators = [
             UniqueTogetherValidator(
                 queryset=Location.objects.all(),
