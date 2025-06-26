@@ -444,7 +444,8 @@ class ProgressReportDetailsUpdateAPIView(APIView):
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        pr.refresh_from_db()
+        return Response(ProgressReportSerializer(instance=pr).data, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
@@ -638,12 +639,14 @@ class ProgressReportSubmitAPIView(APIView):
 
             # Check if PR other tab is fulfilled
             other_tab_errors = []
-            if not progress_report.partner_contribution_to_date:
-                other_tab_errors.append("You have not completed Non-Financial Contribution To Date field on Other Info tab.")
-            if not progress_report.financial_contribution_to_date:
-                other_tab_errors.append("You have not completed Financial Contribution To Date field on Other Info tab.")
-            if not progress_report.financial_contribution_currency:
-                other_tab_errors.append("You have not completed Financial Contribution Currency field on Other Info tab.")
+            if not progress_report.programme_document.is_gpd:
+                if not progress_report.partner_contribution_to_date:
+                    other_tab_errors.append("You have not completed Non-Financial Contribution To Date field on Other Info tab.")
+                if not progress_report.financial_contribution_to_date:
+                    other_tab_errors.append("You have not completed Financial Contribution To Date field on Other Info tab.")
+                if not progress_report.financial_contribution_currency:
+                    other_tab_errors.append("You have not completed Financial Contribution Currency field on Other Info tab.")
+
             if not progress_report.challenges_in_the_reporting_period:
                 other_tab_errors.append(
                     "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab."

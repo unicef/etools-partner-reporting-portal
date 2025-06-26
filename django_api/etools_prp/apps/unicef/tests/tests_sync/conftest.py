@@ -155,7 +155,8 @@ def item_pd_reference():
                                 "name": "Philippines (the)",
                                 "p_code": "PH",
                                 "admin_level_name": "Country",
-                                "admin_level": 0
+                                "admin_level": 0,
+                                "parent_pcode": None
                             }
                         ],
                         "disaggregation": [],
@@ -182,25 +183,28 @@ def item_pd_reference():
                         },
                         "locations": [
                             {
-                                "id": 426,
-                                "name": "Angeles City",
-                                "p_code": "PH035401000",
-                                "admin_level_name": "Municipality",
-                                "admin_level": 3
-                            },
-                            {
                                 "id": 86,
                                 "name": "Zamboanga del Norte",
                                 "p_code": "PH097200000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
                             },
                             {
                                 "id": 112,
                                 "name": "Northern Samar",
                                 "p_code": "PH084800000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
+                            },
+                            {
+                                "id": 426,
+                                "name": "Angeles City",
+                                "p_code": "PH035401000",
+                                "admin_level_name": "Municipality",
+                                "admin_level": 3,
+                                "parent_pcode": "PH"
                             }
                         ],
                         "disaggregation": [],
@@ -228,25 +232,28 @@ def item_pd_reference():
                         },
                         "locations": [
                             {
-                                "id": 426,
-                                "name": "Angeles City",
-                                "p_code": "PH035401000",
-                                "admin_level_name": "Municipality",
-                                "admin_level": 3
-                            },
-                            {
                                 "id": 86,
                                 "name": "Zamboanga del Norte",
                                 "p_code": "PH097200000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
                             },
                             {
                                 "id": 112,
                                 "name": "Northern Samar",
                                 "p_code": "PH084800000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
+                            },
+                            {
+                                "id": 426,
+                                "name": "Angeles City",
+                                "p_code": "PH035401000",
+                                "admin_level_name": "Municipality",
+                                "admin_level": 3,
+                                "parent_pcode": "PH"
                             }
                         ],
                         "disaggregation": [],
@@ -287,25 +294,29 @@ def item_pd_reference():
                         },
                         "locations": [
                             {
-                                "id": 426,
-                                "name": "Angeles City",
-                                "p_code": "PH035401000",
-                                "admin_level_name": "Municipality",
-                                "admin_level": 3
-                            },
-                            {
                                 "id": 86,
                                 "name": "Zamboanga del Norte",
                                 "p_code": "PH097200000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
+
                             },
                             {
                                 "id": 112,
                                 "name": "Northern Samar",
                                 "p_code": "PH084800000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
+                            },
+                            {
+                                "id": 426,
+                                "name": "Angeles City",
+                                "p_code": "PH035401000",
+                                "admin_level_name": "Municipality",
+                                "admin_level": 3,
+                                "parent_pcode": "PH"
                             }
                         ],
                         "disaggregation": [],
@@ -333,25 +344,29 @@ def item_pd_reference():
                         },
                         "locations": [
                             {
-                                "id": 426,
-                                "name": "Angeles City",
-                                "p_code": "PH035401000",
-                                "admin_level_name": "Municipality",
-                                "admin_level": 3
-                            },
-                            {
                                 "id": 86,
                                 "name": "Zamboanga del Norte",
                                 "p_code": "PH097200000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
+
                             },
                             {
                                 "id": 112,
                                 "name": "Northern Samar",
                                 "p_code": "PH084800000",
                                 "admin_level_name": "Province",
-                                "admin_level": 2
+                                "admin_level": 2,
+                                "parent_pcode": "PH"
+                            },
+                            {
+                                "id": 426,
+                                "name": "Angeles City",
+                                "p_code": "PH035401000",
+                                "admin_level_name": "Municipality",
+                                "admin_level": 3,
+                                "parent_pcode": "PH"
                             }
                         ],
                         'disaggregation': [
@@ -537,43 +552,6 @@ def item_pd_reference():
                 "other_description": None,
                 "signed_date": "2022-12-20",
                 "amendment_number": "1"
-            }
-        ],
-        "locations": [
-            {
-                "id": 35,
-                "name": "Philippines (the)",
-                "p_code": "PH",
-                "admin_level_name": "Country",
-                "admin_level": 0
-            },
-            {
-                "id": 70,
-                "name": "Maguindanao",
-                "p_code": "PH153800000",
-                "admin_level_name": "Province",
-                "admin_level": 2
-            },
-            {
-                "id": 426,
-                "name": "Angeles City",
-                "p_code": "PH035401000",
-                "admin_level_name": "Municipality",
-                "admin_level": 3
-            },
-            {
-                "id": 86,
-                "name": "Zamboanga del Norte",
-                "p_code": "PH097200000",
-                "admin_level_name": "Province",
-                "admin_level": 2
-            },
-            {
-                "id": 112,
-                "name": "Northern Samar",
-                "p_code": "PH084800000",
-                "admin_level_name": "Province",
-                "admin_level": 2
             }
         ],
         "unicef_budget_cash": "7739433.72",

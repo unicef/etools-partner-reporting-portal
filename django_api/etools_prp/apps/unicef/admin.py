@@ -18,6 +18,7 @@ from etools_prp.apps.core.tasks import process_period_reports, process_workspace
 from etools_prp.apps.indicator.models import IndicatorLocationData
 from etools_prp.apps.unicef.models import (
     FinalReview,
+    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -190,6 +191,10 @@ class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
         return redirect("admin:unicef_programmedocument_changelist")
 
 
+class GPDProgressReportAdminInline(admin.StackedInline):
+    model = GPDProgressReport
+
+
 class FinalReviewAdminInline(admin.StackedInline):
     model = FinalReview
 
@@ -198,14 +203,14 @@ class ProgressReportAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'report_type', 'status',
                     'submitted_by', 'start_date', 'end_date', 'due_date', 'submission_date',
                     'review_date', 'report_number')
-    list_filter = ('status', 'report_type', 'programme_document__status',)
+    list_filter = ('status', 'report_type', 'programme_document__status', 'programme_document__document_type')
     search_fields = ('programme_document__title', 'programme_document__reference_number')
     raw_id_fields = [
         'programme_document',
         'submitted_by',
         'submitting_user',
     ]
-    inlines = [FinalReviewAdminInline]
+    inlines = [GPDProgressReportAdminInline, FinalReviewAdminInline]
 
 
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):

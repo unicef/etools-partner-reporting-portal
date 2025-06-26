@@ -5,9 +5,9 @@ from django.conf import settings
 from django.db.models import Q
 
 import django_filters
-from django_filters.filters import CharFilter, DateFilter, TypedChoiceFilter
+from django_filters.filters import BooleanFilter, CharFilter, DateFilter, TypedChoiceFilter
 
-from etools_prp.apps.core.common import PD_STATUS, PROGRESS_REPORT_STATUS
+from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_STATUS, PROGRESS_REPORT_STATUS
 from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.utils.filters.constants import Boolean
 from etools_prp.apps.utils.filters.fields import CommaSeparatedListFilter
@@ -141,12 +141,13 @@ class ProgressReportFilter(django_filters.FilterSet):
     cp_output = CharFilter(field_name='cp_output', method='get_cp_output')
     report_type = CharFilter(method='get_report_type')
     unicef_focal_points = CharFilter(method='get_unicef_focal_points')
+    is_gpd = BooleanFilter(method='get_gpd_reports')
 
     class Meta:
         model = ProgressReport
         fields = [
             'status', 'pd_ref_title', 'due_date', 'programme_document', 'programme_document__id',
-            'programme_document__external_id', 'section', 'cp_output', 'report_type'
+            'programme_document__external_id', 'section', 'cp_output', 'report_type', 'is_gpd'
         ]
 
     def get_unicef_focal_points(self, queryset, name, value):
@@ -190,3 +191,8 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     def get_report_type(self, queryset, name, value):
         return queryset.filter(report_type__in=parse.unquote(value).split(','))
+
+    def get_gpd_reports(self, queryset, name, value):
+        if value:
+            return queryset.filter(programme_document__document_type=PD_DOCUMENT_TYPE.GDD)
+        return queryset.exclude(programme_document__document_type=PD_DOCUMENT_TYPE.GDD)

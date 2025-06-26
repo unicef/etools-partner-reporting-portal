@@ -402,3 +402,10 @@ CURRENCIES = Choices(
     ("ZWL", "zwl", "zwl"),  # Temporary due API issue
     ("SSP", "ssp", "ssp"),
 )
+
+
+DELIVERED_AS_PLANNED_OPTIONS = (
+    ('yes', 'Yes'),
+    ('no', 'No'),
+    ('partially', 'Partially')
+)

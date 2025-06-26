@@ -502,5 +502,11 @@
   "A_NEW_VERSION_OF_THE_APP_IS_AV": "Une nouvelle version de l'application est disponible. Rafraîchir la page?",
   "NAME": "Nom",
   "ACHIEVED_AS_PLANNED": "Réalisé comme prévu",
-  "NOT_ACHIEVED_AS_PLANNED": "Non réalisé comme prévu"
+  "NOT_ACHIEVED_AS_PLANNED": "Non réalisé comme prévu",
+  "ACTIVITIES_DELIVERED_AS_PLANNED": "Les activités répertoriées dans votre demande FACE ont-elles été réalisées comme prévu ?",
+  "REPORTING_PERIOD_CONTRIBUTION_ACHIEVED": "Qu’avez-vous réalisé au cours de la période considérée grâce à la contribution de l’UNICEF ?",
+  "FACED_CHALLENGES": "Si vous avez rencontré des difficultés, lesquelles ?",
+  "YOUR_PROPOSED_WAY_FORWARD": "Quelle est la voie à suivre que vous proposez ?",
+  "OTHER_IMPORTANT_INFO": "Autres informations importantes (le cas échéant) (par exemple, publications, publications sur les réseaux sociaux, etc.)",
+  "PARTIALLY": "Partiellement"
 }

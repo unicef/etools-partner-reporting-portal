@@ -17,6 +17,7 @@ from rest_framework.exceptions import ValidationError
 
 from etools_prp.apps.core.common import (
     CURRENCIES,
+    DELIVERED_AS_PLANNED_OPTIONS,
     FINAL_REVIEW_CHOICES,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -379,6 +380,10 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         return LowerLevelOutput.objects.filter(
             cp_output__programme_document=self, active=True)
 
+    @property
+    def is_gpd(self):
+        return self.document_type == PD_DOCUMENT_TYPE.GDD
+
 
 class ProgressReport(TimeStampedModel):
     """
@@ -479,9 +484,29 @@ class ProgressReport(TimeStampedModel):
         return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
 
 
+class GPDProgressReport(TimeStampedModel):
+    gpd_report = models.OneToOneField(
+        ProgressReport, related_name='gpd_report',
+        on_delete=models.CASCADE,
+        null=True, blank=True
+    )
+    delivered_as_planned = models.CharField(
+        choices=DELIVERED_AS_PLANNED_OPTIONS,
+        max_length=10, null=True, blank=True,
+        verbose_name='Activities delivered as planned'
+    )
+    results_achieved = models.TextField(null=True, blank=True)
+    other_information = models.TextField(null=True, blank=True)
+
+
 class FinalReview(TimeStampedModel):
     progress_report = models.OneToOneField(
-        ProgressReport, related_name='final_review', on_delete=models.deletion.CASCADE)
+        ProgressReport,
+        related_name='final_review',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     release_cash_in_time_choice = models.BooleanField(null=True)
     release_cash_in_time_comment = models.TextField(

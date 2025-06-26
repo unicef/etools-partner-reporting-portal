@@ -16,7 +16,7 @@ from etools_prp.apps.unicef.sync.update_create_partner import update_create_part
 from etools_prp.apps.unicef.sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.sync.update_create_person import (
     update_create_agreement_auth_officers,
-    update_create_focal_points,
+    update_create_partner_focal_points,
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.sync.update_create_reportable import update_create_reportable
@@ -63,13 +63,13 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
     if "unicef_focal_points" in item:
         pd = update_create_unicef_focal_points(item['unicef_focal_points'], pd)
 
-    # Create Agreement Auth Officers
+    # Create Agreement Partner Auth Officers
     if 'agreement_auth_officers' in item:
         pd = update_create_agreement_auth_officers(item['agreement_auth_officers'], pd, workspace, partner)
 
-    # Create Focal Points
+    # Create Partner Focal Points
     if "focal_points" in item:
-        pd = update_create_focal_points(item['focal_points'], pd, workspace, partner)
+        pd = update_create_partner_focal_points(item['focal_points'], pd, workspace, partner)
 
     # Create sections
     item, pd = update_create_sections(item, pd, workspace)
@@ -100,7 +100,7 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
                 i, blueprint = update_create_blueprint(i, pd)
 
                 # Create Locations
-                locations, locations_result = update_create_locations(i)
+                locations, locations_result = update_create_locations(i, workspace)
 
                 if locations_result is None:
                     continue

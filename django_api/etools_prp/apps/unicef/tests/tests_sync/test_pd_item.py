@@ -31,7 +31,7 @@ from etools_prp.apps.unicef.sync.update_create_partner import update_create_part
 from etools_prp.apps.unicef.sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.sync.update_create_person import (
     update_create_agreement_auth_officers,
-    update_create_focal_points,
+    update_create_partner_focal_points,
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.sync.update_create_reportable import update_create_reportable
@@ -228,7 +228,7 @@ class TestPDItem(BaseAPITestCase):
 
         self.assertFalse(person_fp_qs.exists())
 
-        pd = update_create_focal_points(_item['focal_points'], pd, _workspace, partner)
+        pd = update_create_partner_focal_points(_item['focal_points'], pd, _workspace, partner)
 
         self.assertTrue(person_fp_qs.exists())
 
@@ -282,7 +282,11 @@ class TestPDItem(BaseAPITestCase):
                     i, blueprint = update_create_blueprint(i, pd)
 
                     # Create Locations
-                    locations, locations_result = update_create_locations(i)
+                    locations, locations_result = update_create_locations(i, workspace=_workspace)
+                    for location in locations:
+                        self.assertIn(_workspace, location.workspaces.all())
+                        if location.parent:
+                            self.assertTrue(location.parent, Location.objects.get(p_code='PH'))
 
                     if locations_result is None:
                         continue
