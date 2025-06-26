@@ -47,7 +47,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: 'postgres://postgres:postgres@127.0.0.1:5432/test_prp'
-          DEPLOY_BRANCHES: 'develop|staging|master|258996-gpd-reporting'
+          DEPLOY_BRANCHES: 'develop|staging|master'
       - image: cimg/redis:6.2
       - image: cimg/postgres:12.9-postgis
         environment:
@@ -170,104 +170,12 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push unicef/etools-prp-polymer:$TAG
 
-  build_and_deploy_fe_cluster:
-    working_directory: ~/code/frontend_cluster
-    # The primary container is an instance of the first list image listed. Your build commands run in this container.
-    docker:
-      - image: node:12.22.7
-    steps:
-      - checkout:
-          path: ~/code
-      - run:
-          name: 'Pull Submodule'
-          command: |
-            git submodule init
-            git submodule update --checkout
-      - setup_remote_docker
-      - run:
-          name: Exporting revision number
-          command: |
-            REVNO=${CIRCLE_SHA1}
-            BUILDDATE=$(date -u +%F_%T)
-            sed -i "0,/revNo/s//$REVNO/" package.json
-            sed -i "0,/bDate/s//$BUILDDATE/" package.json
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="17.03.0-ce"
-            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
-      - run:
-          name: Building the image
-          command: |
-            TAG=${CIRCLE_BRANCH}
-            docker build -t unicef/etools-prp-cluster-fe:$TAG -f Dockerfile-bundle .
-      - run:
-          name: Pushing to Docker Hub
-          command: |
-            TAG=${CIRCLE_BRANCH}
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push unicef/etools-prp-cluster-fe:$TAG
-  build_and_deploy_id_management:
-    working_directory: ~/code/react/id_management_frontend
-    # The primary container is an instance of the first list image listed. Your build commands run in this container.
-    docker:
-      - image: node:12.22.7
-    steps:
-      - checkout:
-          path: ~/code
-      - setup_remote_docker
-      - run:
-          name: Exporting revision number
-          command: |
-            REVNO=${CIRCLE_SHA1}
-            BUILDDATE=$(date -u +%F_%T)
-            sed -i "0,/revNo/s//$REVNO/" package.json
-            sed -i "0,/bDate/s//$BUILDDATE/" package.json
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="17.03.0-ce"
-            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
-      - run:
-          name: Building the image
-          command: |
-            TAG=${CIRCLE_BRANCH}
-            docker build -t unicef/etools-prp-id-management-frontend:$TAG -f Dockerfile-bundle .
-          no_output_timeout: 25m
-      - run:
-          name: Pushing to Docker Hub
-          command: |
-            TAG=${CIRCLE_BRANCH}
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push unicef/etools-prp-id-management-frontend:$TAG
-
 workflows:
   version: 2
   all:
     jobs:
       - setup
       - build_and_deploy_fe_ip:
-          filters:
-            branches:
-              only:
-                - master
-                - staging
-                - develop
-                - 258996-gpd-reporting
-      - build_and_deploy_fe_cluster:
-          filters:
-            branches:
-              only:
-                - master
-                - staging
-                - develop
-      - build_and_deploy_id_management:
           filters:
             branches:
               only:
