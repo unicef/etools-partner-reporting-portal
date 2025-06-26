@@ -41,6 +41,9 @@ export class PdDetailsReportingRequirements extends UtilsMixin(connect(store)(Li
   @property({type: Boolean})
   loading = false;
 
+  @property({type: Boolean})
+  isGpd = false;
+
   @property({type: String})
   title = '';
 
@@ -63,7 +66,7 @@ export class PdDetailsReportingRequirements extends UtilsMixin(connect(store)(Li
           (item, index) => html`
             <etools-data-table-row no-collapse>
               <div slot="row-data">
-                <div class="col-data col-4 table-cell">${this.getReportName(item.report_type, index)}</div>
+                <div class="col-data col-4 table-cell">${this.getReportTitle(item.report_type, index, this.isGpd)}</div>
                 <div class="col-data col-4 table-cell table-cell--text">${item.due_date}</div>
                 <div class="col-data col-4 table-cell table-cell--text">${item.start_date} - ${item.end_date}</div>
               </div>
@@ -78,5 +81,13 @@ export class PdDetailsReportingRequirements extends UtilsMixin(connect(store)(Li
         ></list-placeholder>
       </section>
     `;
+  }
+
+  getReportTitle(report_type: string, index: number, isGpd = false) {
+    if (isGpd) {
+      return 'PR';
+    } else {
+      return this.getReportName(report_type, index);
+    }
   }
 }

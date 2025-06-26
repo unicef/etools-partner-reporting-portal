@@ -5,7 +5,7 @@ from etools_prp.apps.unicef.sync.update_create_partner import update_create_part
 from etools_prp.apps.unicef.sync.update_create_pd import update_create_pd
 from etools_prp.apps.unicef.sync.update_create_person import (
     update_create_agreement_auth_officers,
-    update_create_focal_points,
+    update_create_partner_focal_points,
     update_create_unicef_focal_points,
 )
 from etools_prp.apps.unicef.tests.tests_sync.conftest import item_gd_reference
@@ -62,6 +62,6 @@ class TestGDItem(BaseAPITestCase):
 
         self.assertFalse(person_fp_qs.exists())
 
-        pd = update_create_focal_points(_item['focal_points'], pd, _workspace, partner)
+        pd = update_create_partner_focal_points(_item['focal_points'], pd, _workspace, partner)
 
         self.assertTrue(person_fp_qs.exists())

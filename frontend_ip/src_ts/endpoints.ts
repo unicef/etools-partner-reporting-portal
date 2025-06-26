@@ -36,14 +36,6 @@ const Endpoints = {
     return this._buildUrl('/unicef/' + workspaceId + '/progress-reports/');
   },
 
-  programmegPDDocumentReports(workspaceId: string, reportId: string) {
-    return this._buildUrl('/unicef/' + workspaceId + '/gpd-progress-reports/') + reportId + '/';
-  },
-
-  programmegPDListDocumentReports(workspaceId: string) {
-    return this._buildUrl('/unicef/' + workspaceId + '/gpd-progress-reports/');
-  },
-
   programmeDocumentReport(workspaceId: string, reportId: string) {
     return this.programmeDocumentReports(workspaceId) + reportId + '/';
   },
@@ -72,20 +64,12 @@ const Endpoints = {
     return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
   },
 
-  programmegPDDocumentReportUpdate(workspaceId: string, reportId: string) {
-    return this.programmegPDDocumentReports(workspaceId, reportId) + 'update/';
-  },
-
   calculationMethods(workspaceId: string, pdId: string) {
     return this._buildUrl('/unicef/' + workspaceId + '/programme-document/' + pdId + '/calculation-methods/');
   },
 
   progressReports(locationId: string) {
     return this._buildUrl('/unicef/' + locationId + '/progress-reports/');
-  },
-
-  progressgPDReports(locationId: string) {
-    return this._buildUrl('/unicef/' + locationId + '/gpd-progress-reports/');
   },
 
   locations(workspaceId: string) {
@@ -142,14 +126,6 @@ const Endpoints = {
 
   progressReportAttachmentDetail(locationId: string, reportId: string, attachmentId: string) {
     return this.progressReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
-  },
-
-  progressgPDReportAttachments(locationId: string, reportId: string) {
-    return this.progressgPDReports(locationId) + reportId + '/attachments/';
-  },
-
-  progressgPDReportAttachmentDetail(locationId: string, reportId: string, attachmentId: string) {
-    return this.progressgPDReports(locationId) + reportId + '/attachments/' + attachmentId + '/';
   }
 };
 

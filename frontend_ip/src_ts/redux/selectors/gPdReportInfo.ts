@@ -3,10 +3,11 @@ import {createSelector} from 'reselect';
 
 const keys = [
   'delivered_as_planned',
-  'result_achieved',
+  'results_achieved',
   'challenges_in_the_reporting_period',
   'proposed_way_forward',
-  'other_information'
+  'other_information',
+  'financial_contribution_currency'
 ];
 
 // App.Selectors.ReportInfo

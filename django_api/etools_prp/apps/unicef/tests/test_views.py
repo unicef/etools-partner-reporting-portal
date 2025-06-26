@@ -22,6 +22,7 @@ from etools_prp.apps.core.common import (
     FINAL_OVERALL_STATUS,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_DOCUMENT_TYPE,
     PD_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
@@ -280,7 +281,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data['results']), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     @skip
     def test_list_filter_api(self):
@@ -292,7 +293,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data['results']), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
         document = response.data['results'][0]
         response = self.client.get(
@@ -300,8 +301,8 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data['results']), 1)
-        self.assertEquals(
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(
             response.data['results'][0]['title'],
             document['title'])
 
@@ -310,13 +311,13 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(
+        self.assertEqual(
             response.data['results'][0]['status'],
             document['status'])
-        self.assertEquals(
+        self.assertEqual(
             response.data['results'][0]['title'],
             document['title'])
-        self.assertEquals(
+        self.assertEqual(
             response.data['results'][0]['reference_number'],
             document['reference_number'])
 
@@ -329,7 +330,7 @@ class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         for result in response.data['results']:
-            self.assertEquals(result['title'], document['title'])
+            self.assertEqual(result['title'], document['title'])
 
     def test_list_api_export_pdf(self):
         url = reverse(
@@ -574,7 +575,7 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             kwargs={'pd_id': self.pd.id, 'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(len(response.data['locations']), 2)
+        self.assertEqual(len(response.data['locations']), 2)
 
         actual = [str(loc["id"]) for loc in response.data['locations']]
 
@@ -582,8 +583,8 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
         self.assertIn(str(self.loc2.id), actual)
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(self.pd.agreement, response.data['agreement'])
-        self.assertEquals(
+        self.assertEqual(self.pd.agreement, response.data['agreement'])
+        self.assertEqual(
             self.pd.reference_number,
             response.data['reference_number'])
 
@@ -602,6 +603,7 @@ class BaseProgressReportAPITestCase(BaseAPITestCase):
         self.unicef_officer = factories.PersonFactory()
         self.unicef_focal_point = factories.PersonFactory()
         self.partner_focal_point = factories.PersonFactory()
+        self.government_focal_point = factories.PersonFactory()
         self.objective = factories.ClusterObjectiveFactory(
             cluster=self.cluster,
             locations=[
@@ -615,12 +617,20 @@ class BaseProgressReportAPITestCase(BaseAPITestCase):
                 self.loc1, self.loc2
             ]
         )
-        self.partner = factories.PartnerFactory(country_code=faker.country_code())
+        self.partner = factories.PartnerFactory()
+        self.government = factories.PartnerFactory()
+
         self.user = factories.NonPartnerUserFactory()
         self.partner_user = factories.PartnerUserFactory(
             workspace=self.workspace,
             partner=self.partner,
             realms__data=[PRP_ROLE_TYPES.ip_authorized_officer]
+        )
+        RealmFactory(
+            user=self.partner_user,
+            workspace=self.workspace,
+            partner=self.government,
+            group=GroupFactory(name=PRP_ROLE_TYPES.ip_authorized_officer)
         )
         factories.ClusterPRPRoleFactory(user=self.user, workspace=self.workspace, cluster=self.cluster, role=PRP_ROLE_TYPES.cluster_imo)
         self.project = factories.PartnerProjectFactory(
@@ -780,6 +790,35 @@ class BaseProgressReportAPITestCase(BaseAPITestCase):
         for loc_data in IndicatorLocationData.objects.filter(indicator_report__reportable=self.llo_reportable):
             QuantityIndicatorDisaggregator.post_process(loc_data)
 
+        # Create GPD  and 3 progress reports
+        self.gpd = factories.ProgrammeDocumentFactory(
+            document_type=PD_DOCUMENT_TYPE.GDD,
+            workspace=self.workspace,
+            partner=self.government,
+            sections=[factories.SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.government_focal_point, ]
+        )
+
+        for idx in range(3):
+            qpr_period = factories.QPRReportingPeriodDatesFactory(programme_document=self.gpd)
+            pr = factories.ProgressReportFactory(
+                start_date=qpr_period.start_date,
+                end_date=qpr_period.end_date,
+                due_date=qpr_period.due_date,
+                report_number=idx + 1,
+                report_type=qpr_period.report_type,
+                is_final=False,
+                programme_document=self.gpd,
+                submitted_by=self.user,
+                submitting_user=self.user,
+            )
+            factories.ProgressReportAttachmentFactory(
+                progress_report=pr,
+                type=PR_ATTACHMENT_TYPES.face,
+            )
+
         super().setUp()
 
         # Logging in as Partner AO
@@ -815,8 +854,8 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             kwargs={'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), self.queryset.count())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), self.queryset.count())
 
     def test_list_api_filter_by_status(self):
         self.reports = self.queryset.filter(
@@ -829,8 +868,8 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
         url += '?status=' + PROGRESS_REPORT_STATUS.due
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), len(self.reports))
 
     def test_list_api_filter_by_due_status(self):
         self.reports = self.queryset.filter(
@@ -845,8 +884,8 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
         url += '?due=1'
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), len(self.reports))
 
     def test_list_api_filter_by_pd_title(self):
         filter_string = 'reference'
@@ -861,8 +900,8 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
         url += '?pd_ref_title=' + filter_string
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), len(self.reports))
 
     def test_list_api_filter_by_due_date(self):
         today = datetime.datetime.today()
@@ -882,8 +921,8 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
         url += '?due_date=' + today.strftime(date_format)
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(pr_queryset))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), len(pr_queryset))
 
     def test_list_api_filter_by_year(self):
         current_year = datetime.datetime.today().year
@@ -895,15 +934,37 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
         current_year_url = f'{url}?year={current_year}'
         response = self.client.get(current_year_url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(pr_queryset))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), len(pr_queryset))
 
         # test for 0 results on future year
         future_year = (datetime.datetime.today() + datetime.timedelta(days=1365)).year
         future_year_url = f'{url}?year={future_year}'
         response = self.client.get(future_year_url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 0)
+
+    def test_list_api_filter_by_is_gpd(self):
+        self.reports = ProgressReport.objects.filter(programme_document__document_type=PD_DOCUMENT_TYPE.GDD)
+        self.partner_user.partner = self.government
+        self.partner_user.save()
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        url += '?is_gpd=true'
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), len(self.reports))
+
+        url = reverse(
+            'progress-reports',
+            kwargs={'workspace_id': self.workspace.id})
+        url += '?is_gpd=false'
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 0, 'No PD reports for government context')
 
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
@@ -919,7 +980,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             kwargs={'workspace_id': self.workspace.id})
         response = self.client.get(url, data={"export": "xlsx"})
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         disposition = response.get("Content-Disposition")
         self.assertTrue(disposition.startswith("attachment; filename="))
         self.assertTrue(
@@ -957,7 +1018,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             },
         )
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
@@ -982,7 +1043,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             },
         )
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         disposition = response.get("Content-Disposition")
         self.assertTrue(disposition.startswith("attachment; filename="))
         self.assertTrue(
@@ -1030,7 +1091,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             },
         )
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         disposition = response.get("Content-Disposition")
         self.assertTrue(disposition.startswith("attachment; filename="))
         self.assertTrue(
@@ -1076,7 +1137,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             kwargs={'workspace_id': self.workspace.id})
         response = self.client.get(url, data={"export": "pdf"})
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.reports = self.queryset.filter(
             status=PROGRESS_REPORT_STATUS.submitted
@@ -1094,7 +1155,7 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             args=[self.workspace.pk, progress_report.pk],
         )
         response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue('final_review' not in response.data)
 
     def test_detail_api_final(self):
@@ -1108,7 +1169,7 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             args=[self.workspace.pk, progress_report.pk],
         )
         response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue('final_review' in response.data)
         self.assertEqual(response.data['final_review']['respond_requests_in_time_choice'], None)
         self.assertEqual(response.data['final_review']['respond_requests_in_time_comment'], None)
@@ -1131,9 +1192,9 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             "proposed_way_forward": "Proposed way forward text"
         }
         response = self.client.put(url, format='json', data=data)
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         for field in data.keys():
-            self.assertEquals(response.data[field], data[field])
+            self.assertEqual(response.data[field], data[field])
 
     def test_detail_update_final(self):
         progress_report = self.pd.progress_reports.filter(is_final=False).first()
@@ -1171,12 +1232,37 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             }
         }
         response = self.client.put(url, format='json', data=data)
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['proposed_way_forward'], data['proposed_way_forward'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['proposed_way_forward'], data['proposed_way_forward'])
         progress_report.final_review.refresh_from_db()
         for field in data['final_review'].keys():
-            self.assertEquals(response.data['final_review'][field], data['final_review'][field])
-            self.assertEquals(response.data['final_review'][field], getattr(progress_report.final_review, field))
+            self.assertEqual(response.data['final_review'][field], data['final_review'][field])
+            self.assertEqual(response.data['final_review'][field], getattr(progress_report.final_review, field))
+
+    def test_detail_update_gpd_report(self):
+        gpd_progress_report = self.gpd.progress_reports.filter(is_final=False).first()
+        self.assertFalse(hasattr(gpd_progress_report, 'gpd_report'))
+
+        url = reverse(
+            'progress-reports-details-update',
+            args=[self.workspace.pk, gpd_progress_report.pk],
+        )
+        self.partner_user.partner = self.government
+        self.partner_user.save()
+        data = {
+            "delivered_as_planned": "partially",
+            "results_achieved": "Results were partially achieved",
+            "challenges_in_the_reporting_period": "Challenges in the reporting period text",
+            "proposed_way_forward": "Proposed way forward text"
+        }
+        response = self.client.put(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        gpd_progress_report.refresh_from_db()
+        self.assertTrue(hasattr(gpd_progress_report, 'gpd_report'))
+        for field in data.keys():
+            self.assertEqual(response.data[field], data[field])
+        for field in ["delivered_as_planned", "results_achieved"]:
+            self.assertEqual(getattr(gpd_progress_report.gpd_report, field), data[field])
 
     def test_detail_api_filter_incomplete(self):
         progress_report = self.pd.progress_reports.first()
@@ -1188,8 +1274,8 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             args=[self.workspace.pk, progress_report.pk],
         )
         response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data['indicator_reports']),
             ir_qs.count(),
         )
@@ -1197,8 +1283,8 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         ir_qs = ir_qs.filter(submission_date__isnull=True)
         url += '?incomplete=true'
         response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data['indicator_reports']),
             ir_qs.count(),
         )
@@ -1213,8 +1299,8 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             args=[self.workspace.pk, progress_report.pk],
         )
         response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data['indicator_reports']),
             ir_qs.count(),
         )
@@ -1239,11 +1325,11 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
 
         # test an indicator report exists for given location
         ir_qs = ir_qs.filter(reportable__locations__id=new_loc.pk)
-        self.assertEquals(ir_qs.count(), 1)
+        self.assertEqual(ir_qs.count(), 1)
         url_loc_filter = url + f'?location={new_loc.pk}'
         response = self.client.get(url_loc_filter, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data['indicator_reports']),
             ir_qs.count(),
         )
@@ -1251,11 +1337,11 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         # test no indicator reports exist for an unused location
         unused_loc = factories.LocationFactory()
         ir_qs = ir_qs.filter(reportable__locations__id=unused_loc.pk)
-        self.assertEquals(ir_qs.count(), 0)
+        self.assertEqual(ir_qs.count(), 0)
         url_loc_filter = url + f'?location={unused_loc.pk}'
         response = self.client.get(url_loc_filter, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data['indicator_reports']),
             0,
         )
@@ -1270,7 +1356,7 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             args=[self.workspace.pk, progress_report.pk],
         )
         response = self.client.get(url, data={"export": "pdf"})
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_report_annex_c_export(self):
         progress_report = self.pd.progress_reports.first()
@@ -1282,7 +1368,7 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
             args=[self.workspace.pk, progress_report.pk],
         )
         response = self.client.get(url)
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestGPDProgressReportDetailsUpdateAPIView(BaseProgressReportAPITestCase):
@@ -1497,7 +1583,7 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.post(url, data=data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
         self.assertEqual(progress_report.review_overall_status, OVERALL_STATUS.met)
@@ -1533,7 +1619,7 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.post(url, data=data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertTrue('Overall status for a final report is invalid.' in response.data['overall_status'])
 
     def test_review_accept_final_qpr_report(self):
@@ -1561,7 +1647,7 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.post(url, data=data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
         self.assertEqual(progress_report.review_overall_status, OVERALL_STATUS.met)
@@ -1597,7 +1683,7 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.post(url, data=data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.sent_back)
         self.assertEqual(progress_report.sent_back_feedback, data['comment'])
@@ -1633,7 +1719,7 @@ class TestProgressReportReviewAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.post(url, data=data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
         self.assertEqual(progress_report.accepted_comment, "")
@@ -1665,7 +1751,7 @@ class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(authorized_officer)
         response = self.client.post(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.accepted)
         self.assertEqual(progress_report.submitted_by, authorized_officer)
@@ -1692,7 +1778,7 @@ class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(authorized_officer)
         response = self.client.post(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
         self.assertEqual(progress_report.submitted_by, authorized_officer)
@@ -1728,7 +1814,7 @@ class TestProgressReportSRSubmitAPIView(BaseProgressReportAPITestCase):
         self.client.force_authenticate(authorized_officer)
         response = self.client.post(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         progress_report.refresh_from_db()
         self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
         self.assertEqual(progress_report.submitted_by, authorized_officer)
@@ -1879,8 +1965,8 @@ class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
             kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), self.pr.attachments.count())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), self.pr.attachments.count())
 
     def test_create_api(self):
         url = reverse(
@@ -1897,8 +1983,8 @@ class TestProgressReportAttachmentListCreateAPIView(BaseAPITestCase):
         data = {'type': 'Other', 'path': upload_file}
         response = self.client.post(url, data, format="multipart")
 
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(response.data['size'], data['path'].size)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['size'], data['path'].size)
 
         os.remove('test.txt')
 
@@ -2047,8 +2133,8 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
             kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id, 'pk': self.attachment.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['id'], self.attachment.id)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.attachment.id)
 
     def test_update_api(self):
         f = open('test.txt', 'w')
@@ -2064,8 +2150,8 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
             kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id, 'pk': self.attachment.id})
         response = self.client.put(url, data, format="multipart")
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['size'], data['path'].size)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['size'], data['path'].size)
 
         os.remove('test.txt')
 
@@ -2075,7 +2161,7 @@ class TestProgressReportAttachmentAPIView(BaseAPITestCase):
             kwargs={'workspace_id': self.workspace.id, 'progress_report_id': self.pr.id, 'pk': self.attachment.id})
         response = self.client.delete(url, format='multipart')
 
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
@@ -2152,7 +2238,7 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         )
         self.assertTrue(reportable_qs.count())
         response = self.client.get(url)
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), reportable_qs.count())
         data = response.data["results"][0]
         self.assertEqual(data["id"], reportable.pk)
@@ -2172,7 +2258,7 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
 
         # expect results
         response = self.client.get(f"{url}?report_status={report_status}")
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
         # expect no results
@@ -2182,7 +2268,7 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         response = self.client.get(
             f"{url}?report_status={different_report_status}"
         )
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 0)
 
     def test_export(self):
@@ -2197,14 +2283,14 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         response = self.client.get(
             f"{url}?report_status={report_status}&export=pdf"
         )
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # add reportable that should not be part of export
         self._setup_reportable(report_status="Due")
         response = self.client.get(
             f"{url}?report_status={report_status}&export=pdf"
         )
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestEToolsRolesSynchronization(BaseAPITestCase):

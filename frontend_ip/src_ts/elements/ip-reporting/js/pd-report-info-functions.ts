@@ -4,10 +4,6 @@ export function computeUpdateUrl(locationId: string, reportId: string) {
   return Endpoints.programmeDocumentReportUpdate(locationId, reportId);
 }
 
-export function computegPDUpdateUrl(locationId: string, reportId: string) {
-  return Endpoints.programmegPDDocumentReportUpdate(locationId, reportId);
-}
-
 // @ts-ignore
 export function computeMode(mode: string, overrideMode: string, report: any, permissions: any) {
   return permissions && permissions.savePdReport ? overrideMode || mode : 'view';
