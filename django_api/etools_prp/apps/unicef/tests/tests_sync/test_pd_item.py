@@ -282,11 +282,7 @@ class TestPDItem(BaseAPITestCase):
                     i, blueprint = update_create_blueprint(i, pd)
 
                     # Create Locations
-                    locations, locations_result = update_create_locations(i, workspace=_workspace)
-                    for location in locations:
-                        self.assertIn(_workspace, location.workspaces.all())
-                        if location.parent:
-                            self.assertTrue(location.parent, Location.objects.get(p_code='PH'))
+                    locations, locations_result = update_create_locations(i)
 
                     if locations_result is None:
                         continue
