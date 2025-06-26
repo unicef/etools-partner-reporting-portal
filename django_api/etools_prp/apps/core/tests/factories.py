@@ -19,6 +19,7 @@ from etools_prp.apps.cluster.models import Cluster, ClusterActivity, ClusterObje
 from etools_prp.apps.core.common import (
     CLUSTER_TYPES,
     CSO_TYPES,
+    DELIVERED_AS_PLANNED_OPTIONS,
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -56,6 +57,7 @@ from etools_prp.apps.partner.models import (
     PartnerProjectFunding,
 )
 from etools_prp.apps.unicef.models import (
+    GPDProgressReport,
     LowerLevelOutput,
     PDResultLink,
     Person,
@@ -1280,6 +1282,18 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
             'programme_document', 'report_type', 'report_number'
         )
         model = ProgressReport
+
+
+@factory.django.mute_signals(signals.post_save)
+class GPDProgressReportFactory(factory.django.DjangoModelFactory):
+
+    delivered_as_planned = fuzzy.FuzzyChoice(DELIVERED_AS_PLANNED_OPTIONS)
+
+    class Meta:
+        django_get_or_create = (
+            'programme_document',
+        )
+        model = GPDProgressReport
 
 
 class ProgressReportAttachmentFactory(factory.django.DjangoModelFactory):

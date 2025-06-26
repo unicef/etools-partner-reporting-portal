@@ -44,180 +44,53 @@ export const updateStoreRouteDetails: ActionCreator<AppActionUpdateRouteDetails>
   };
 };
 
-const importPdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-
-  switch (routeDetails.params?.pdRoute) {
-    case 'details':
-      imported = import('../../pages/app/ip-reporting/pd/pd-details.js');
-      break;
-    case 'report':
-      imported = import('../../pages/app/ip-reporting/pd/pd-report.js');
-      break;
-    default:
-      imported = import('../../pages/app/ip-reporting/pd/pd-details.js');
-      break;
-  }
-
-  // imported?.then(() => {
-  //   console.log('Imported importPdSubRoutes', routeDetails.subRouteName, routeDetails.params?.pdRoute);
-  // });
-
-  return imported;
-};
-
-const importPdRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-
-  if (routeDetails.params?.pdID) {
-    imported = import('../../pages/app/ip-reporting/pd/pd-router.js').then(() => {
-      importPdSubRoutes(routeDetails);
-    });
-  } else {
-    imported = import('../../pages/app/ip-reporting/pd/pd-index.js');
-  }
-
-  // imported?.then(() => {
-  //   console.log('Imported importPdRoutes', routeDetails.subRouteName);
-  // });
-
-  return imported;
-};
-
-const importGpdSubRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-
-  switch (routeDetails.params?.pdRoute) {
-    case 'details':
-      imported = import('../../pages/app/ip-reporting/gpd/gpd-details.js');
-      break;
-    case 'report':
-      imported = import('../../pages/app/ip-reporting/gpd/gpd-report.js');
-      break;
-    default:
-      imported = import('../../pages/app/ip-reporting/gpd/gpd-details.js');
-      break;
-  }
-  return imported;
-};
-
-const importGpdRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-
-  if (routeDetails.params?.pdID) {
-    imported = import('../../pages/app/ip-reporting/gpd/gpd-router.js')
-      .then(() => {
-        importGpdSubRoutes(routeDetails);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  } else {
-    imported = import('../../pages/app/ip-reporting/gpd/gpd-index.js');
-  }
-  return imported;
-};
-
-const importSubSubRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-  switch (routeDetails.subSubRouteName) {
-    case 'overview':
-      imported = import('../../pages/app/ip-reporting/overview.js');
-      break;
-    case 'indicators':
-      imported = import('../../pages/app/ip-reporting/indicators.js');
-      break;
-    case 'pd':
-      imported = import('../../pages/app/ip-reporting/pd.js').then(() => {
-        importPdRoutes(routeDetails);
-      });
-      break;
-    case 'gpd':
-      imported = import('../../pages/app/ip-reporting/gpd.js')
-        .then(() => {
-          importGpdRoutes(routeDetails);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      break;
-    case 'progress-reports':
-      imported = import('../../pages/app/ip-reporting/progress-reports.js');
-      break;
-    default:
-      imported = import('../../pages/app/ip-reporting/overview.js');
-      break;
-  }
-
-  // imported?.then(() => {
-  //   console.log('Imported importSubSubRoutes', routeDetails.subSubRouteName);
-  // });
-
-  return imported;
-};
-
-const importSubRoutes = (routeDetails: EtoolsRouteDetails) => {
-  let imported: Promise<any> | undefined;
-
-  switch (routeDetails.subRouteName) {
-    case 'ip-reporting':
-      imported = import('../../pages/app/ip-reporting.js').then(() => importSubSubRoutes(routeDetails));
-      break;
-    default:
-      imported = import('../../pages/app/ip-reporting.js').then(() => importSubSubRoutes(routeDetails));
-      break;
-  }
-
-  // imported?.then(() => {
-  //   console.log('Imported importSubRoutes', routeDetails.subRouteName);
-  // });
-
-  return imported;
-};
-
-const loadPageComponents = (routeDetails: EtoolsRouteDetails) => (_dispatch: any, _getState: any) => {
+const loadPageComponents = (routeDetails: EtoolsRouteDetails) => async (_dispatch: any, _getState: any) => {
   if (!routeDetails) {
     // invalid route => redirect to 404 page
     EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
     return;
   }
 
-  let imported: Promise<any> | undefined;
-  const appShell = document.body.querySelector('app-shell');
+  const page = routeDetails.routeName;
+  const subpage = routeDetails.subRouteName;
+  const subSubPage = routeDetails.subSubRouteName;
+  let pdPage, pdSubPage;
+  try {
+    await import(`../../pages/${page}.ts`);
 
-  switch (routeDetails.routeName) {
-    case 'app':
-      imported = import('../../pages/app.js').then(() => importSubRoutes(routeDetails));
-      break;
-    case 'unauthorized':
-      imported = import('../../pages/unauthorized.js');
-      break;
-    case 'not-found':
-      imported = import('../../pages/not-found.js');
-      break;
-    case 'login-token':
-      imported = import('../../pages/login-token.js');
-      break;
-    case 'login':
-      imported = import('../../pages/login.js');
-      break;
-    default:
-      imported = import('../../pages/app.js').then(() => importSubRoutes(routeDetails));
-      break;
-  }
+    if (subpage) {
+      await import(`../../pages/${page}/${subpage}.ts`);
 
-  if (imported) {
-    imported
-      .catch((err) => {
-        console.log(err);
-        EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
-      })
-      .finally(() =>
-        fireEvent(appShell, 'global-loading', {
-          active: false,
-          loadingSource: 'initialisation'
-        })
-      );
+      if (subSubPage) {
+        await import(`../../pages/${page}/${subpage}/${subSubPage}.ts`);
+      }
+    }
+
+    if (subSubPage === 'pd') {
+      pdPage = routeDetails.params?.pdID ? 'router' : 'index';
+      await import(`../../pages/${page}/${subpage}/${subSubPage}/pd-${pdPage}.ts`);
+
+      if (pdPage === 'router') {
+        pdSubPage = routeDetails.params?.pdRoute || 'details';
+        await import(`../../pages/${page}/${subpage}/${subSubPage}/pd-${pdSubPage}.ts`);
+      }
+    }
+
+    if (subSubPage === 'gpd') {
+      pdPage = routeDetails.params?.pdID ? 'router' : 'index';
+      await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdPage}.ts`);
+
+      if (pdPage === 'router') {
+        pdSubPage = routeDetails.params?.pdRoute || 'details';
+        await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdSubPage}.ts`);
+      }
+    }
+    console.info(`Loading: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}`);
+  } catch {
+    console.warn(
+      `No file imports configuration found: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}!`
+    );
+    EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
   }
 };
 

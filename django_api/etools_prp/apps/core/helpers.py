@@ -12,7 +12,7 @@ from itertools import combinations, product
 
 from dateutil.relativedelta import relativedelta
 
-from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL
+from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
 
 logger = logging.getLogger("django")
 
@@ -444,19 +444,11 @@ def get_latest_pr_by_type(pd, report_type):
         ProgressReport -- Latest ProgressReport instance for given report_type
     """
 
-    if report_type == "QPR":
-        return pd.progress_reports \
-            .filter(report_type="QPR").order_by('start_date').last()
+    qs = pd.progress_reports.all()
 
-    if report_type == "HR":
-        # Ordering by id since reporting period can now alternate
-        # from etools_prp.apps.cluster indicator segregation
-        return pd.progress_reports \
-            .filter(report_type="HR").order_by('id').last()
+    order_by_field = {"QPR": "start_date", "HR": "id", "SR": "due_date"}[report_type]
 
-    if report_type == "SR":
-        return pd.progress_reports \
-            .filter(report_type="SR").order_by('due_date').last()
+    return qs.filter(report_type=report_type).order_by(order_by_field).last()
 
 
 def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
@@ -504,8 +496,14 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
         report_number=report_number,
         is_final=is_final,
     )
+    if pd.document_type == PD_DOCUMENT_TYPE.GDD:
+        from etools_prp.apps.unicef.models import GPDProgressReport
 
-    return (next_progress_report, start_date, end_date, due_date)
+        GPDProgressReport.objects.create(
+            gpd_report=next_progress_report
+        )
+
+    return next_progress_report, start_date, end_date, due_date
 
 
 def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, end_date, due_date):
@@ -708,7 +706,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                                         break
 
                                 if not indicator_report.progress_report:
-                                    # Otherwise, create a brand new HR progress report
+                                    # Otherwise, create a new HR progress report
                                     # for this cluster LLO Indicator report
                                     new_cluster_hr_progress_report = ProgressReport.objects.create(
                                         start_date=indicator_report.time_period_start,
@@ -719,6 +717,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                                         report_number=report_number,
                                         is_final=False,
                                     )
+
                                     indicator_report.progress_report = new_cluster_hr_progress_report
 
                                     # Increment report_number for next HR progress report to be created if needed
@@ -755,7 +754,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                                         break
 
                                 if not indicator_report.progress_report:
-                                    # Otherwise, create a brand new HR progress report
+                                    # Otherwise, create a new HR progress report
                                     # for this cluster LLO Indicator report
                                     new_cluster_hr_progress_report = ProgressReport.objects.create(
                                         start_date=indicator_report.time_period_start,
@@ -766,6 +765,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                                         report_number=report_number,
                                         is_final=False,
                                     )
+
                                     indicator_report.progress_report = new_cluster_hr_progress_report
 
                                     # Increment report_number for next HR progress report to be created if needed

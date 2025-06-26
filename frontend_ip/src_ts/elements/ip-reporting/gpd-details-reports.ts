@@ -8,7 +8,7 @@ import './pd-report-filters.js';
 import './pd-reports-toolbar.js';
 import './pd-reports-list.js';
 import {pdReportsFetch} from '../../redux/actions/pdReports.js';
-import {computePDReportsUrl, computePDReportsParams} from './js/pd-details-reports-functions.js';
+import {computePDReportsParams, computePDReportsUrl} from './js/pd-details-reports-functions.js';
 import {RootState} from '../../typings/redux.types';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
