@@ -8,8 +8,8 @@ import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 
-@customElement('pd-sent-back')
-export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
+@customElement('gpd-accepted')
+export class GpdAccepted extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: Object})
   currentReport: any = {};
 
@@ -44,7 +44,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
     .sent-back-feedback {
       width: 100%;
       margin-bottom: 25px;
-      border-top: 2px solid var(--sl-color-danger-700);
+      border-top: 2px solid #009951;
       position: relative;
     }
     .ribbon {
@@ -54,7 +54,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
       left: 16px;
       top: 0;
       z-index: 2;
-      background: var(--sl-color-danger-700);
+      background: #009951;
     }
     .ribbon::before,
     .ribbon::after {
@@ -68,16 +68,16 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
     }
     .ribbon::before {
       left: 0;
-      border-left: 15px solid var(--sl-color-danger-700);
+      border-left: 15px solid #009951;
     }
     .ribbon::after {
       right: 0;
-      border-right: 15px solid var(--sl-color-danger-700);
+      border-right: 15px solid #009951;
     }
     h3 {
       margin: 0 0 1em;
       text-transform: uppercase;
-      color: var(--sl-color-danger-700);
+      color: #009951;
     }
     etools-button {
       margin: 0;
@@ -106,8 +106,8 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
           <etools-content-panel no-header class="sent-back-feedback">
             <div class="ribbon" aria-hidden="true"></div>
             <div class="card-content">
-              <h3>Report was sent back</h3>
-              <div class="${this.containerClass}">${this.currentReport.sent_back_feedback}</div>
+              <h3>Report was accepted</h3>
+              <div class="${this.containerClass}">${this.currentReport.accepted_comment}</div>
             </div>
             ${this.collapsible
               ? html`
@@ -145,7 +145,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   _hasFeedback(currentReport: any) {
-    return !!(this._equals(currentReport.status, 'Sen') && currentReport.sent_back_feedback);
+    return !!(this._equals(currentReport.status, 'Acc') && currentReport.accepted_comment);
   }
 
   _computeButtonText(expanded) {
@@ -154,7 +154,7 @@ export class PdSentBack extends UtilsMixin(connect(store)(LitElement)) {
 
   _computeCollapsible(threshold: number, currentReport: any) {
     if (currentReport) {
-      return currentReport.sent_back_feedback && currentReport.sent_back_feedback.length >= threshold;
+      return currentReport.accepted_comment && currentReport.accepted_comment.length >= threshold;
     }
     return false;
   }

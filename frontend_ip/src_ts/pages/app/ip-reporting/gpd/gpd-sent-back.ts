@@ -107,7 +107,7 @@ export class GpdSentBack extends UtilsMixin(connect(store)(LitElement)) {
             <div class="ribbon" aria-hidden="true"></div>
             <div class="card-content">
               <h3>Report was sent back</h3>
-              <div class="${this.containerClass}" inner-text="${this.currentReport.sent_back_feedback}"></div>
+              <div class="${this.containerClass}">${this.currentReport.sent_back_feedback}</div>
             </div>
             ${this.collapsible
               ? html`

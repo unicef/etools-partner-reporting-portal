@@ -297,6 +297,12 @@ class TestPDItem(BaseAPITestCase):
                     # Create Reportable
                     i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
 
+                    self.assertEqual(i['is_high_frequency'], reportable.is_unicef_hf_indicator)
+                    if i["id"] in [1426, 1427]:
+                        self.assertEqual(reportable.is_unicef_hf_indicator, True)
+                    else:
+                        self.assertEqual(reportable.is_unicef_hf_indicator, False)
+
                     # Create Reportable Location Goals
                     update_create_reportable_location_goals(reportable, locations)
 

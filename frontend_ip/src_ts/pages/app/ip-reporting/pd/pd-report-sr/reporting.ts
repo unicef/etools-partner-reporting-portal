@@ -5,6 +5,7 @@ import '../../../../../etools-prp-common/elements/labelled-item.js';
 import '../../../../../etools-prp-common/elements/etools-prp-permissions.js';
 import '../../../../../elements/ip-reporting/report-attachments.js';
 import '../pd-sent-back.js';
+import '../pd-accepted.js';
 
 import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../../../../../endpoints.js';
@@ -148,6 +149,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
   render() {
     return html`
       <pd-sent-back></pd-sent-back>
+      <pd-accepted></pd-accepted>
 
       <etools-prp-permissions
         .permissions="${this.permissions}"
