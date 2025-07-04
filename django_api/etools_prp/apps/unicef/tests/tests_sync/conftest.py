@@ -208,7 +208,7 @@ def item_pd_reference():
                             }
                         ],
                         "disaggregation": [],
-                        "is_high_frequency": False,
+                        "is_high_frequency": True,
                         "is_active": True,
                         "numerator_label": "",
                         "denominator_label": "",
@@ -257,7 +257,7 @@ def item_pd_reference():
                             }
                         ],
                         "disaggregation": [],
-                        "is_high_frequency": False,
+                        "is_high_frequency": True,
                         "is_active": True,
                         "numerator_label": "",
                         "denominator_label": "",
