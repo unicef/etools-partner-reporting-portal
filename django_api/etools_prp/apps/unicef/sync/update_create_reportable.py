@@ -12,6 +12,8 @@ from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
 def update_create_reportable(i: dict, blueprint: Blueprint, disaggregations: list, llo: LowerLevelOutput, item: dict, pd: ProgrammeDocument) -> \
         (dict, Reportable, bool):
 
+    i['is_unicef_hf_indicator'] = i['is_high_frequency']
+
     i['blueprint_id'] = blueprint.id if blueprint else None
     i['disaggregation_ids'] = [ds.id for ds in disaggregations]
 
