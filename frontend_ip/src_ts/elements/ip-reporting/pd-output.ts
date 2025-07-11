@@ -5,7 +5,6 @@ import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 import '@unicef-polymer/etools-unicef/src/etools-icon-button/etools-icon-button';
 import '@unicef-polymer/etools-unicef/src/etools-collapse/etools-collapse';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {
@@ -28,9 +27,10 @@ import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {buildUrl} from '../../etools-prp-common/utils/util';
+import {formatIndicatorValue} from '@unicef-polymer/etools-utils/dist/general.util';
 
 @customElement('pd-output')
-export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PdOutput extends ProgressReportUtilsMixin(connect(store)(LitElement)) {
   static styles = [
     layoutStyles,
     css`
@@ -278,11 +278,11 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                         <dt class="flex-4">${translate('TARGET')}:</dt>
                         <dd class="flex">
                           ${
-                            this._equals(indicator.reportable.blueprint.display_type, 'number')
+                            indicator.reportable.blueprint.display_type === 'number'
                               ? html` <etools-prp-number value=${indicator.reportable.target.v}></etools-prp-number> `
-                              : this._equals(indicator.reportable.blueprint.display_type, 'percentage')
+                              : indicator.reportable.blueprint.display_type === 'percentage'
                                 ? html` <span>${indicator.reportable.target.v}%</span> `
-                                : this._equals(indicator.reportable.blueprint.display_type, 'ratio')
+                                : indicator.reportable.blueprint.display_type === 'ratio'
                                   ? html`
                                       <span>${indicator.reportable.target.v}/${indicator.reportable.target.d}</span>
                                     `
@@ -293,7 +293,7 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                       <dl class="layout-horizontal right-align">
                         <dt class="flex-4">${translate('TOTAL_CUMULATIVE_PROGRESS_FROM_QPR')}:</dt>
                         ${
-                          this._equals(indicator.reportable.blueprint.display_type, 'number')
+                          indicator.reportable.blueprint.display_type === 'number'
                             ? html`
                                 <dd class="flex">
                                   <etools-prp-number value=${indicator.reportable.achieved.v}></etools-prp-number>
@@ -301,10 +301,10 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                               `
                             : html`
                                 <dd class="flex">
-                                  ${this._formatIndicatorValue(
+                                  ${formatIndicatorValue(
                                     indicator.reportable.blueprint.display_type,
                                     indicator.reportable.achieved.c,
-                                    1
+                                    true
                                   )}
                                 </dd>
                               `
@@ -313,7 +313,7 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                       <dl class="layout-horizontal right-align">
                         <dt class="flex-4">${translate('ACHIEVEMENT_IN_REPORTING_PERIOD')}:</dt>
                         ${
-                          this._equals(indicator.reportable.blueprint.display_type, 'number')
+                          indicator.reportable.blueprint.display_type === 'number'
                             ? html`
                                 <dd class="flex">
                                   <etools-prp-number value=${indicator.total.v}></etools-prp-number>
@@ -321,10 +321,10 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
                               `
                             : html`
                                 <dd class="flex">
-                                  ${this._formatIndicatorValue(
+                                  ${formatIndicatorValue(
                                     indicator.reportable.blueprint.display_type,
                                     indicator.total.c,
-                                    1
+                                    true
                                   )}
                                 </dd>
                               `
@@ -542,6 +542,14 @@ export class PdOutput extends ProgressReportUtilsMixin(UtilsMixin(connect(store)
       default:
         return '';
     }
+  }
+
+  _toLowerCaseLocalized(text: string) {
+    const localizedText = getTranslation(text);
+    if (localizedText) {
+      return localizedText.toLowerCase();
+    }
+    return text;
   }
 }
 

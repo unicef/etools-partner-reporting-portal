@@ -10,7 +10,6 @@ import {pdReportsAttachmentsSet} from '../../redux/actions/pdReportsAttachments'
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
@@ -22,7 +21,7 @@ import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
  * @appliesMixin UtilsMixin
  */
 @customElement('report-attachments')
-export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
+export class ReportAttachments extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;

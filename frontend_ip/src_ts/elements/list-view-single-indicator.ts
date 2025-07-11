@@ -18,14 +18,13 @@ import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 
 import {store} from '../redux/store';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
-import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../typings/redux.types';
 import {buildUrl} from '../etools-prp-common/utils/util';
 import {BASE_PATH} from '../etools-prp-common/config';
 import {classMap} from 'lit/directives/class-map.js';
 
 @customElement('list-view-single-indicator')
-export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElement)) {
+export class ListViewSingleIndicator extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -105,6 +104,18 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
   @property({type: Boolean})
   lowResolutionLayout = false;
 
+  @property({type: String})
+  progressBarType?: string;
+
+  @property({type: Object})
+  isClusterApp: any;
+
+  @property({type: String})
+  appName: string | undefined;
+
+  @property({type: String})
+  indicatorReportsUrl?: string;
+
   render() {
     return html`
       ${tableStyles} ${sharedStyles}
@@ -127,8 +138,8 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
             class="col-data col-2 table-cell table-cell--text self-center"
             data-col-header-label="${translate('INDICATOR')}"
             class=${classMap({
-              'col-data col-3': this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext'),
-              'col-data col-4': !this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
+              'col-data col-3': this.indicator?.content_type_key === 'partner.partneractivityprojectcontext',
+              'col-data col-4': this.indicator?.content_type_key !== 'partner.partneractivityprojectcontext'
             })}
           >
             <sl-tooltip content="${this.indicator?.blueprint?.title}">
@@ -140,7 +151,7 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
               </span>
             </sl-tooltip>
           </span>
-          ${this._equals(this.indicator?.content_type_key, 'partner.partneractivityprojectcontext')
+          ${this.indicator?.content_type_key === 'partner.partneractivityprojectcontext'
             ? html`<span
                 class="col-data col-1 table-cell table-cell--text self-center"
                 data-col-header-label="${translate('PROJECT_CONTEXT')}"
@@ -161,11 +172,11 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
             class="col-data col-1 table-cell table-cell--text self-center"
             data-col-header-label="${translate('BASELINE')}"
           >
-            ${this._equals(this.indicator?.blueprint?.display_type, 'number')
+            ${this.indicator?.blueprint?.display_type === 'number'
               ? html`<etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>`
-              : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
+              : this.indicator?.blueprint?.display_type === 'percentage'
                 ? html`<span><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>%</span>`
-                : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
+                : this.indicator?.blueprint?.display_type === 'ratio'
                   ? html`<span
                       ><etools-prp-number .value="${this.indicator?.baseline.v}"></etools-prp-number>
                       /
@@ -177,11 +188,11 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
             class="col-data col-1 table-cell table-cell--text self-center"
             data-col-header-label="${translate('TARGET')}"
           >
-            ${this._equals(this.indicator?.blueprint?.display_type, 'number')
+            ${this.indicator?.blueprint?.display_type === 'number'
               ? html`<etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>`
-              : this._equals(this.indicator?.blueprint?.display_type, 'percentage')
+              : this.indicator?.blueprint?.display_type === 'percentage'
                 ? html`<span><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>%</span>`
-                : this._equals(this.indicator?.blueprint?.display_type, 'ratio')
+                : this.indicator?.blueprint?.display_type === 'ratio'
                   ? html`<span
                       ><etools-prp-number .value="${this.indicator?.target.v}"></etools-prp-number>
                       /
@@ -202,12 +213,12 @@ export class ListViewSingleIndicator extends UtilsMixin(connect(store)(LitElemen
               <dl class="indicator-progress layout-horizontal">
                 <dt class="flex-none self-center">${translate('AGAINST_TARGET')}</dt>
                 <dd class="flex-none">
-                  ${this._equals(this.progressBarType, 'cluster')
+                  ${this.progressBarType === 'cluster'
                     ? html`<etools-prp-progress-bar-cluster
                         .displayType=${this.indicator?.blueprint?.display_type}
                         .number=${this.indicator?.total_against_target}
                       ></etools-prp-progress-bar-cluster>`
-                    : this._equals(this.progressBarType, 'default')
+                    : this.progressBarType === 'default'
                       ? html`<etools-prp-progress-bar
                           .displayType=${this.indicator?.blueprint?.display_type}
                           .number=${this.indicator?.total_against_target}

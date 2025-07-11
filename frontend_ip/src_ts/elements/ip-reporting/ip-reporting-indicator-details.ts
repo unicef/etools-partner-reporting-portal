@@ -2,7 +2,6 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {fetchIndicatorDetails} from '../../redux/actions/indicators';
 import '../../etools-prp-common/elements/labelled-item';
@@ -21,9 +20,10 @@ import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {formatIndicatorValue} from '@unicef-polymer/etools-utils/dist/general.util';
 
 @customElement('ip-reporting-indicator-details')
-export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitElement)) {
+export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
   @property({type: String})
   indicatorDetailUrl = '';
 
@@ -134,7 +134,7 @@ export class IpReportingIndicatorDetails extends UtilsMixin(connect(store)(LitEl
                       <dd>
                         ${report.display_type === 'number'
                           ? html`<etools-prp-number value="${report.total.v}"></etools-prp-number>`
-                          : html`${this._formatIndicatorValue(report.display_type, report.total.c, 1)}`}
+                          : html`${formatIndicatorValue(report.display_type, report.total.c, true)}`}
                       </dd>
                     </dl>
                     <dl>

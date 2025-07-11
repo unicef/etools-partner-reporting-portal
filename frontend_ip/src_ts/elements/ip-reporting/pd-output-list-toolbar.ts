@@ -1,6 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import Endpoints from '../../endpoints';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -22,9 +21,10 @@ import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util';
 
 @customElement('pd-output-list-toolbar')
-export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) {
+export class PdOutputListToolbar extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -112,8 +112,8 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
     }
 
     if (changedProperties.has('pdReportUrl') || changedProperties.has('queryParams')) {
-      this.pdfExportUrl = this._appendQuery(this.pdReportUrl, this.queryParams, 'export=pdf');
-      this.xlsExportUrl = this._appendQuery(this.pdReportUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = appendQuery(this.pdReportUrl, this.queryParams, 'export=pdf');
+      this.xlsExportUrl = appendQuery(this.pdReportUrl, this.queryParams, 'export=xlsx');
     }
 
     if (changedProperties.has('reportId')) {
@@ -140,9 +140,7 @@ export class PdOutputListToolbar extends UtilsMixin(connect(store)(LitElement)) 
           ? html`
               ${this.showRefresh
                 ? html`
-                    <etools-button variant="primary" @click="${this._refresh}" ?disabled="${this.busy}">
-                      ${translate('REFRESH')}
-                    </etools-button>
+                    <etools-button variant="primary" @click="${this._refresh}"> ${translate('REFRESH')} </etools-button>
                   `
                 : ''}
               <download-button .url="${this.importTemplateUrl}" tracker="Import template">

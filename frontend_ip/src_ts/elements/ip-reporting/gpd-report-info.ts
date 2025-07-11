@@ -15,7 +15,6 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
 import '../../etools-prp-common/elements/filter-list';
 import cloneDeep from 'lodash-es/cloneDeep';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -27,6 +26,8 @@ import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parse
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
+import {fieldsAreValid} from '@unicef-polymer/etools-utils/dist/validation.util';
 
 /**
  * @customElement
@@ -34,7 +35,7 @@ import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
  * @appliesMixin UtilsMixin
  */
 @customElement('gpd-report-info')
-export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
+export class GPdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitElement)) {
   static styles = [
     layoutStyles,
     css`
@@ -198,13 +199,9 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
                   this.localData.delivered_as_planned = e.target.value;
                 }}"
               >
-                <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                  ${translate('YES')}
-                </sl-radio>
-                <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                  ${translate('NO')}
-                </sl-radio>
-                <sl-radio value="partially" ?disabled="${this._equals(this.computedMode, 'view')}">
+                <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
+                <sl-radio value="partially" ?disabled="${this.computedMode === 'view'}">
                   ${translate('PARTIALLY')}
                 </sl-radio>
               </etools-radio-group>
@@ -213,8 +210,8 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('REPORTING_PERIOD_CONTRIBUTION_ACHIEVED')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html`<span class="value">${this._withDefault(this.data.results_achieved)}</span>`
+              ${this.computedMode === 'view'
+                ? html`<span class="value">${valueWithDefault(this.data.results_achieved)}</span>`
                 : html`
                     <etools-input
                       id="partner_contribution_to_date"
@@ -231,8 +228,8 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('FACED_CHALLENGES')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html` <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span> `
+              ${this.computedMode === 'view'
+                ? html` <span class="value">${valueWithDefault(this.data.challenges_in_the_reporting_period)}</span> `
                 : html`
                     <etools-input
                       id="challenges_in_the_reporting_period"
@@ -250,8 +247,8 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('YOUR_PROPOSED_WAY_FORWARD')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
+              ${this.computedMode === 'view'
+                ? html` <span class="value">${valueWithDefault(this.data.proposed_way_forward)}</span> `
                 : html`
                     <etools-input
                       id="challenges_in_the_reporting_period"
@@ -269,8 +266,8 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('OTHER_IMPORTANT_INFO')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html` <span class="value">${this._withDefault(this.data.other_information)}</span> `
+              ${this.computedMode === 'view'
+                ? html` <span class="value">${valueWithDefault(this.data.other_information)}</span> `
                 : html`
                     <etools-input
                       id="challenges_in_the_reporting_period"
@@ -286,7 +283,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
           </div>
 
           <div class="col-12 right-align padding-v">
-            ${!this._equals(this.computedMode, 'view')
+            ${this.computedMode !== 'view'
               ? html`
                   <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
@@ -296,7 +293,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
+            <report-attachments ?readonly="${this.computedMode === 'view'}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
@@ -347,7 +344,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(s
   }
 
   _handleInput() {
-    if (!this._fieldsAreValid()) {
+    if (!fieldsAreValid(this.shadowRoot)) {
       return;
     }
     this._updateData();

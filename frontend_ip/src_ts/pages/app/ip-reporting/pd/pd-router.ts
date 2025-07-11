@@ -1,6 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import './pd-view.js';
 import './pd-report.js';
 import {RootState} from '../../../../typings/redux.types.js';
@@ -10,9 +9,9 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces.js';
 
 @customElement('page-ip-reporting-pd-router')
-class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
+class PageIpReportingPdRouter extends connect(store)(LitElement) {
   @property({type: String})
-  page = '';
+  page?: any = '';
 
   @property({type: String})
   pdId = '';
@@ -34,10 +33,10 @@ class PageIpReportingPdRouter extends UtilsMixin(connect(store)(LitElement)) {
         }
       </style>
 
-      ${this._equals(this.page, 'view')
+      ${this.page === 'view'
         ? html` <page-ip-reporting-pd-details name="pd-view"> </page-ip-reporting-pd-details>`
         : html``}
-      ${this._equals(this.page, 'report')
+      ${this.page === 'report'
         ? html` <page-ip-reporting-pd-report name="pd-report"> </page-ip-reporting-pd-report>`
         : html``}
     `;

@@ -20,7 +20,6 @@ import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/progr
 import {currentProgrammeDocument} from '../../../../etools-prp-common/redux/selectors/programmeDocuments.js';
 import {pdReportsSetCurrent, pdReportsFetchSingle, pdReportsUpdateSingle} from '../../../../redux/actions/pdReports.js';
 import Endpoints from '../../../../endpoints.js';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import ProgressReportUtilsMixin from '../../../../mixins/progress-report-utils-mixin.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
@@ -34,7 +33,7 @@ import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.j
 import {buildUrl} from '../../../../etools-prp-common/utils/util.js';
 
 @customElement('page-ip-reporting-pd-report')
-export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PageIpReportingPdReport extends ProgressReportUtilsMixin(connect(store)(LitElement)) {
   static styles = [
     css`
       :host {
@@ -150,7 +149,7 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
           ${this.currentReport?.programme_document?.reference_number}
         </etools-button>
 
-        ${this._equals(this.currentPd?.status, 'Suspended')
+        ${this.currentPd?.status === 'Suspended'
           ? html`
               <message-box slot="header-content" type="warning">
                 This report belongs to a suspended PD. Please contact UNICEF programme focal person to confirm reporting
@@ -197,19 +196,19 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(UtilsMixin
       </page-header>
 
       <page-body>
-        ${this._equals(this.currentReport?.report_type, 'HR')
+        ${this.currentReport?.report_type === 'HR'
           ? html`<page-pd-report-hr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
             ></page-pd-report-hr>`
           : html``}
-        ${this._equals(this.currentReport?.report_type, 'QPR')
+        ${this.currentReport?.report_type === 'QPR'
           ? html`<page-pd-report-qpr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"
             ></page-pd-report-qpr>`
           : html``}
-        ${this._equals(this.currentReport?.report_type, 'SR')
+        ${this.currentReport?.report_type === 'SR'
           ? html`<page-pd-report-sr
               .selectedTab="${this.selectedTab}"
               .report="${this.currentReport}"

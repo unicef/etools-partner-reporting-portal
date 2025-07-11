@@ -2,7 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
@@ -10,9 +9,10 @@ import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/list-placeholder';
+import {get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 
 @customElement('pd-details-reporting-requirements')
-export class PdDetailsReportingRequirements extends UtilsMixin(connect(store)(LitElement)) {
+export class PdDetailsReportingRequirements extends connect(store)(LitElement) {
   static styles = [
     layoutStyles,
     css`
@@ -89,5 +89,13 @@ export class PdDetailsReportingRequirements extends UtilsMixin(connect(store)(Li
     } else {
       return this.getReportName(report_type, index);
     }
+  }
+
+  getReportName(type: string, index: number) {
+    const typeLocalized = getTranslation(type.toLowerCase());
+    if (typeLocalized) {
+      return getTranslation(type.toLowerCase()).split(' ')[0] + (index + 1);
+    }
+    return type;
   }
 }

@@ -8,7 +8,6 @@ import '@unicef-polymer/etools-unicef/src/etools-app-layout/app-header.js';
 import '../../elements/ip-reporting/header/app-header.js';
 import '../../etools-prp-common/elements/page-title.js';
 
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin.js';
 import {Route} from '../../etools-prp-common/typings/globals.types.js';
 import {RootState} from '../../typings/redux.types.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
@@ -21,10 +20,9 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util.js';
 import {SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY} from '../../etools-prp-common/config.js';
 import {appDrawerStyles} from '../../elements/ip-reporting/menu/styles/app-drawer-styles.js';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
-// import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum.js';
 
 @customElement('page-ip-reporting')
-export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
+export class PageIpReporting extends connect(store)(LitElement) {
   static styles = [
     css`
       ${appDrawerStyles}
@@ -76,7 +74,7 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
   route!: Route;
 
   @property({type: Object})
-  routeData!: {page: string};
+  routeDetails?: any;
 
   @query('#drawer') private drawer!: LitElement;
 
@@ -119,16 +117,16 @@ export class PageIpReporting extends UtilsMixin(connect(store)(LitElement)) {
         <app-header-layout id="appHeadLayout" fullbleed has-scrolling-region>
           <ip-reporting-app-header></ip-reporting-app-header>
 
-          ${this._equals(this.page, 'overview')
+          ${this.page === 'overview'
             ? html` <page-ip-reporting-overview name="overview"> </page-ip-reporting-overview>`
             : ''}
-          ${this._equals(this.page, 'pd') ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
-          ${this._equals(this.page, 'gpd') ? html` <page-ip-reporting-gpd name="gpd"> </page-ip-reporting-gpd>` : ''}
-          ${this._equals(this.page, 'indicators')
+          ${this.page === 'pd' ? html` <page-ip-reporting-pd name="pd"> </page-ip-reporting-pd>` : ''}
+          ${this.page === 'gpd' ? html` <page-ip-reporting-gpd name="gpd"> </page-ip-reporting-gpd>` : ''}
+          ${this.page === 'indicators'
             ? html` <page-ip-reporting-indicators name="indicators" ?isGpd="${this.isGpd}">
               </page-ip-reporting-indicators>`
             : ''}
-          ${this._equals(this.page, 'progress-reports')
+          ${this.page === 'progress-reports'
             ? html` <page-ip-progress-reports name="progress-reports" ?isGpd="${this.isGpd}">
               </page-ip-progress-reports>`
             : ''}

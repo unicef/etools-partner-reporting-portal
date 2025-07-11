@@ -8,7 +8,6 @@ import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {pdIndicatorsAll, pdIndicatorsLoading} from '../../redux/selectors/programmeDocumentIndicators';
 import {pdIndicatorsFetch, pdIndicatorsUpdate} from '../../redux/actions/pdIndicators';
@@ -29,6 +28,7 @@ import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {debounce} from '@unicef-polymer/etools-utils/dist/debouncer.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {openDialog} from '@unicef-polymer/etools-utils/dist/dialog.util';
+import {cloneDeepIfHasValue} from '@unicef-polymer/etools-utils/dist/general.util';
 import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
 
 /**
@@ -37,7 +37,7 @@ import '@unicef-polymer/etools-modules-common/dist/layout/are-you-sure';
  * @appliesMixin UtilsMixin
  */
 @customElement('pd-details-calculation-methods')
-export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitElement)) {
+export class PdDetailsCalculationMethods extends connect(store)(LitElement) {
   static styles = [
     layoutStyles,
     css`
@@ -225,6 +225,9 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
   @property({type: String})
   indicatorsUrl!: string;
 
+  @property({type: Object})
+  permissions: any;
+
   connectedCallback() {
     super.connectedCallback();
 
@@ -260,7 +263,7 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
 
     if (changedProperties.has('data')) {
       this.formattedData = computeFormattedData(this.data);
-      this.localData = this._clone(this.data);
+      this.localData = cloneDeepIfHasValue(this.data);
     }
   }
 
@@ -300,7 +303,7 @@ export class PdDetailsCalculationMethods extends UtilsMixin(connect(store)(LitEl
 
   getDataForSave(data: any) {
     // exclude latest because BE will throw error
-    const dataToSave = this._clone(data);
+    const dataToSave = cloneDeepIfHasValue(data);
     (dataToSave.ll_outputs_and_indicators || []).forEach((item) => {
       if (item.indicators?.length) {
         item.indicators = item.indicators.filter(

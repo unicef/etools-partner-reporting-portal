@@ -2,14 +2,13 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles.js';
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports.js';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 
 @customElement('gpd-sent-back')
-export class GpdSentBack extends UtilsMixin(connect(store)(LitElement)) {
+export class GpdSentBack extends connect(store)(LitElement) {
   @property({type: Object})
   currentReport: any = {};
 
@@ -145,7 +144,7 @@ export class GpdSentBack extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   _hasFeedback(currentReport: any) {
-    return !!(this._equals(currentReport.status, 'Sen') && currentReport.sent_back_feedback);
+    return !!(currentReport.status === 'Sen' && currentReport.sent_back_feedback);
   }
 
   _computeButtonText(expanded) {

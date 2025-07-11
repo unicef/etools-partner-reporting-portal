@@ -12,7 +12,6 @@ import '../../etools-prp-common/elements/etools-prp-permissions';
 import './pd-reports-report-title';
 import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {
@@ -25,10 +24,11 @@ import {RootState} from '../../typings/redux.types';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
 
 @customElement('pd-reports-list')
 export class PdReportsList extends PaginationMixin(
-  DataTableMixin(ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))))
+  DataTableMixin(ProgressReportUtilsMixin(connect(store)(LitElement)))
 ) {
   static styles = [
     layoutStyles,
@@ -171,19 +171,19 @@ export class PdReportsList extends PaginationMixin(
                   class="col-data col-2 table-cell table-cell--text"
                   data-col-header-label="${translate('DUE_DATE')}"
                 >
-                  ${this._withDefault(report.due_date, '-')}
+                  ${valueWithDefault(report.due_date, '-')}
                 </div>
                 <div
                   class="col-data col-2 table-cell table-cell--text"
                   data-col-header-label="${translate('DATE_OF_SUBMISSION')}"
                 >
-                  ${this._withDefault(report.submission_date)}
+                  ${valueWithDefault(report.submission_date)}
                 </div>
                 <div
                   class="col-data col-3 table-cell table-cell--text"
                   data-col-header-label="${translate('REPORTING_PERIOD')}"
                 >
-                  ${this._withDefault(report.reporting_period)}
+                  ${valueWithDefault(report.reporting_period)}
                 </div>
               </div>
             </etools-data-table-row>

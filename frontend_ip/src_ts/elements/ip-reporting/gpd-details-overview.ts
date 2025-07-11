@@ -19,12 +19,13 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../etools-prp-currency';
 import '../../etools-prp-common/elements/etools-prp-progress-bar';
 import Settings from '../../etools-prp-common/settings';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
+import {commaSeparatedDictValues} from '@unicef-polymer/etools-utils/dist/array.util';
 
 @customElement('gpd-details-overview')
-export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
+export class GpdDetailsOverview extends connect(store)(LitElement) {
   @property({type: Object})
   pd: any = {};
 
@@ -86,31 +87,31 @@ export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
           <div class="row padding-v">
             <div class="item col-4">
               <labelled-item label="${translate('AGREEMENT')}">
-                <span class="field-value">${this._withDefault(this.pd.agreement)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.agreement)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
               <labelled-item label="${translate('DOCUMENT_TYPE')}">
-                <span class="field-value">${this._withDefault(this.pd.document_type_display)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.document_type_display)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
               <labelled-item label="${translate('REFERENCE_NUMBER')}">
-                <span class="field-value">${this._withDefault(this.pd.reference_number)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.reference_number)}</span>
               </labelled-item>
             </div>
           </div>
           <div class="row padding-v">
             <div class="item col-12">
               <labelled-item label="${translate('TITLE')}">
-                <span class="field-value">${this._withDefault(this.pd.title)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.title)}</span>
               </labelled-item>
             </div>
           </div>
           <div class="row padding-v">
             <div class="item col-4">
               <labelled-item label="${translate('UNICEF_OFFICES')}">
-                <span class="field-value">${this._withDefault(this.pd.unicef_office)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.unicef_office)}</span>
               </labelled-item>
             </div>
             <div class="item col-4">
@@ -136,12 +137,12 @@ export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
             </div>
             <div class="col-2">
               <labelled-item label="${translate('START_DATE')}">
-                <span class="field-value">${this._withDefault(this.pd.start_date)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.start_date)}</span>
               </labelled-item>
             </div>
             <div class="col-2">
               <labelled-item label="${translate('END_DATE')}">
-                <span class="field-value">${this._withDefault(this.pd.end_date)}</span>
+                <span class="field-value">${valueWithDefault(this.pd.end_date)}</span>
               </labelled-item>
             </div>
             <div class="col-2">
@@ -198,7 +199,7 @@ export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
           <div class="row padding-v">
             <div class="col-12">
               <labelled-item label="${translate('LOCATIONS')}">
-                <span class="field-value">${this._commaSeparatedDictValues(this.pd.locations, 'name')}</span>
+                <span class="field-value">${commaSeparatedDictValues(this.pd.locations, 'name')}</span>
               </labelled-item>
             </div>
           </div>
@@ -264,7 +265,7 @@ export class GpdDetailsOverview extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   _formatFocalPoint(items: any): string {
-    return this._withDefault(this._commaSeparatedDictValues(items, 'name'));
+    return valueWithDefault(commaSeparatedDictValues(items, 'name'));
   }
 
   _displayFullName(types: any[]) {

@@ -3,7 +3,6 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
@@ -13,8 +12,9 @@ import {partnerLoading} from '../../redux/selectors/partner';
 import {computePartnerType} from './js/partner-details-functions';
 import {RootState} from '../../typings/redux.types';
 import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
 @customElement('partner-details')
-export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PartnerDetails extends MatomoMixin(connect(store)(LitElement)) {
   static styles = [
     layoutStyles,
     css`
@@ -69,22 +69,22 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
         <div class="row">
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('FULL_NAME')}">
-              <span class="field-value">${this._withDefault(this.partner?.title)}</span>
+              <span class="field-value">${valueWithDefault(this.partner?.title)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('SHORT_NAME')}">
-              <span class="field-value">${this._withDefault(this.partner?.short_title)}</span>
+              <span class="field-value">${valueWithDefault(this.partner?.short_title)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('ALTERNATE_NAME')}">
-              <span class="field-value">${this._withDefault(this.partner?.alternate_title)}</span>
+              <span class="field-value">${valueWithDefault(this.partner?.alternate_title)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('VENDOR_NUMBER')}">
-              <span class="field-value">${this._withDefault(this.partner?.vendor_number)}</span>
+              <span class="field-value">${valueWithDefault(this.partner?.vendor_number)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
@@ -94,12 +94,12 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('SHARED_PARTNERS')}">
-              <span class="field-value">${this._withDefault(this.partner?.shared_partner_display)}</span>
+              <span class="field-value">${valueWithDefault(this.partner?.shared_partner_display)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('DATE_LAST_ASSESSED')}">
-              <span class="field-value">${this._withDefault(this.partner?.core_values_assessment_date)}</span>
+              <span class="field-value">${valueWithDefault(this.partner?.core_values_assessment_date)}</span>
             </labelled-item>
           </div>
         </div>
@@ -109,7 +109,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
             <labelled-item label="${translate('ADDRESS')}">
               <span class="field-value" has-icon>
                 <etools-icon name="communication:location-on"></etools-icon>
-                ${this._withDefault(this.partner?.street_address)}
+                ${valueWithDefault(this.partner?.street_address)}
               </span>
             </labelled-item>
           </div>
@@ -117,7 +117,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
             <labelled-item label="${translate('PHONE_NUMBER')}">
               <span class="field-value" has-icon>
                 <etools-icon name="communication:phone"></etools-icon>
-                ${this._withDefault(this.partner?.phone_number)}
+                ${valueWithDefault(this.partner?.phone_number)}
               </span>
             </labelled-item>
           </div>
@@ -125,7 +125,7 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
             <labelled-item label="${translate('EMAIL_ADDRESS')}">
               <span class="field-value" has-icon>
                 <etools-icon name="communication:email"></etools-icon>
-                ${this._withDefault(this.partner?.email)}
+                ${valueWithDefault(this.partner?.email)}
               </span>
             </labelled-item>
           </div>
@@ -139,6 +139,6 @@ export class PartnerDetails extends MatomoMixin(UtilsMixin(connect(store)(LitEle
   }
 
   _computePartnerType(partner: any): string {
-    return computePartnerType(partner, this._withDefault);
+    return computePartnerType(partner, valueWithDefault);
   }
 }
