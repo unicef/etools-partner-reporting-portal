@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import Endpoints from '../../../endpoints.js';
-import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin.js';
 import SortingMixin from '../../../etools-prp-common/mixins/sorting-mixin.js';
 import {currentProgrammeDocument} from '../../../etools-prp-common/redux/selectors/programmeDocuments.js';
 import {pdFetch, pdSetCurrent, pdSetCurrentId} from '../../../redux/actions/pd.js';
@@ -16,7 +15,7 @@ import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/r
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 
 @customElement('page-ip-reporting-gpd')
-class PageIpReportingGpd extends SortingMixin(UtilsMixin(connect(store)(LitElement))) {
+class PageIpReportingGpd extends SortingMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;

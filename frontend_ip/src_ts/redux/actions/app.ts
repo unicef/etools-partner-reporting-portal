@@ -13,7 +13,6 @@ import {Action, ActionCreator} from 'redux';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router';
 import {EtoolsRedirectPath} from '@unicef-polymer/etools-utils/dist/enums/router.enum';
 import {EtoolsRouteDetails} from '@unicef-polymer/etools-utils/dist/interfaces/router.interfaces';
-import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {Environment} from '@unicef-polymer/etools-utils/dist/singleton/environment';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import Constants from '../../etools-prp-common/constants.js';
@@ -85,11 +84,11 @@ const loadPageComponents = (routeDetails: EtoolsRouteDetails) => async (_dispatc
         await import(`../../pages/${page}/${subpage}/${subSubPage}/gpd-${pdSubPage}.ts`);
       }
     }
-    console.info(`Loading: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}`);
-  } catch {
+  } catch (e) {
     console.warn(
       `No file imports configuration found: ${page}-${subpage}-${subSubPage}-pd/gpd:${pdPage}-pd/gpdSub:${pdSubPage}!`
     );
+    console.warn(e);
     EtoolsRouter.updateAppLocation(EtoolsRouter.getRedirectPath(EtoolsRedirectPath.NOT_FOUND));
   }
 };

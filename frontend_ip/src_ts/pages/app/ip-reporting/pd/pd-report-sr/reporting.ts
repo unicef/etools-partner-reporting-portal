@@ -7,7 +7,6 @@ import '../../../../../elements/ip-reporting/report-attachments.js';
 import '../pd-sent-back.js';
 import '../pd-accepted.js';
 
-import UtilsMixin from '../../../../../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../../../../../endpoints.js';
 
 import {reportInfoCurrent} from '../../../../../redux/selectors/reportInfo.js';
@@ -21,9 +20,10 @@ import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/ajax-request.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles.js';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util.js';
 
 @customElement('page-pd-report-sr-reporting')
-export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElement)) {
+export class PagePdReportSrReporting extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -167,7 +167,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
           <div class="col-12 padding-v">
             <labelled-item label="${translate('NARRATIVE')}">
               ${this.computedMode === 'view'
-                ? html` <span class="value">${this._withDefault(this.data.narrative)}</span> `
+                ? html` <span class="value">${valueWithDefault(this.data.narrative)}</span> `
                 : html`
                     <etools-input
                       id="narrative"
@@ -193,7 +193,7 @@ export class PagePdReportSrReporting extends UtilsMixin(connect(store)(LitElemen
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
+            <report-attachments ?readonly="${this.computedMode === 'view'}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>

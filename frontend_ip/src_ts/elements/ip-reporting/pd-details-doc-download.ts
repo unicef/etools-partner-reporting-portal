@@ -3,7 +3,6 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {currentProgrammeDocument} from '../../etools-prp-common/redux/selectors/programmeDocuments';
 import {computeDocUrl} from './js/pd-details-doc-download-functions';
@@ -15,7 +14,7 @@ import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styl
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 
 @customElement('pd-details-doc-download')
-export class PdDetailsDocDownload extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PdDetailsDocDownload extends MatomoMixin(connect(store)(LitElement)) {
   static styles = css`
     .spinner-size {
       font-size: 16px;

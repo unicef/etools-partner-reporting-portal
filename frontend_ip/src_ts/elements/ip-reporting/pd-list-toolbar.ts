@@ -1,6 +1,5 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/download-button';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
@@ -9,9 +8,10 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {store} from '../../redux/store';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util.js';
 
 @customElement('pd-list-toolbar')
-export class PdListToolbar extends UtilsMixin(connect(store)(LitElement)) {
+export class PdListToolbar extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -46,8 +46,8 @@ export class PdListToolbar extends UtilsMixin(connect(store)(LitElement)) {
     }
 
     if (changedProperties.has('pdUrl') || changedProperties.has('queryParams')) {
-      this.pdfExportUrl = this._appendQuery(this.pdUrl, this.queryParams, 'export=pdf');
-      this.xlsxExportUrl = this._appendQuery(this.pdUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = appendQuery(this.pdUrl, this.queryParams, 'export=pdf');
+      this.xlsxExportUrl = appendQuery(this.pdUrl, this.queryParams, 'export=xlsx');
     }
   }
 

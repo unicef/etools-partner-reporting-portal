@@ -2,7 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import '../ip-reporting/pd-report-filters.js';
 import '../ip-reporting/pd-reports-toolbar.js';
@@ -15,7 +14,7 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('pd-details-reports')
-export class PdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
+export class PdDetailsReport extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;

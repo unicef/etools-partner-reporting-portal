@@ -11,12 +11,13 @@ import '../filters/checkbox-filter/checkbox-filter';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
+import {valueWithDefaultStatuses} from '../../etools-prp-common/utils/util';
 
 @customElement('indicators-filters')
-export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
+export class IndicatorsFilters extends connect(store)(LitElement) {
   @property({type: Object})
   queryParams!: any;
 
@@ -25,6 +26,9 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: Array})
   pd_statuses: any[] = [];
+
+  @property({type: Array})
+  filters: any[] = [];
 
   constructor() {
     super();
@@ -51,7 +55,7 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
             class="col-md-6 col-12"
             label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_STATUS')}"
             name="pd_statuses"
-            .value="${this._withDefault(this.queryParams?.pd_statuses, '')}"
+            .value="${valueWithDefaultStatuses(this.queryParams?.pd_statuses, '')}"
             .data="${this.pd_statuses}"
             hide-search
           >
@@ -60,11 +64,11 @@ export class IndicatorsFilters extends UtilsMixin(connect(store)(LitElement)) {
           <pd-dropdown-filter
             class="col-md-6 col-12"
             ?isGpd="${this.isGpd}"
-            .value="${this._withDefault(this.queryParams?.pds, '')}"
+            .value="${valueWithDefault(this.queryParams?.pds, '')}"
           >
           </pd-dropdown-filter>
 
-          <location-filter class="col-md-3 col-12" .value="${this._withDefault(this.queryParams?.location, '-1')}">
+          <location-filter class="col-md-3 col-12" .value="${valueWithDefault(this.queryParams?.location, '-1')}">
           </location-filter>
 
           <text-filter

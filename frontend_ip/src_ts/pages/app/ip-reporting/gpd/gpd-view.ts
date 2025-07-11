@@ -8,13 +8,13 @@ import '../../../../etools-prp-common/elements/page-header.js';
 import '../../../../etools-prp-common/elements/message-box.js';
 import '../../../../elements/ip-reporting/gpd-details-overview.js';
 import '../../../../elements/ip-reporting/gpd-details-reports.js';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../../../redux/store.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util.js';
 import {EtoolsRouter} from '@unicef-polymer/etools-utils/dist/singleton/router.js';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util.js';
 
 const DETAILS = 'details';
 const REPORTS = 'reports';
@@ -33,7 +33,7 @@ const NAVIGATION_TABS: any[] = [
 ];
 
 @customElement('page-ip-reporting-gpd-details')
-export class PageIpReportingGpdDetails extends UtilsMixin(connect(store)(LitElement)) {
+export class PageIpReportingGpdDetails extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -62,7 +62,7 @@ export class PageIpReportingGpdDetails extends UtilsMixin(connect(store)(LitElem
     return html`
       ${sharedStyles}
 
-      <page-header title="${this.pd.title}" back="${this._appendQuery('gpd', this.pdQuery)}">
+      <page-header title="${this.pd.title}" back="${appendQuery('gpd', this.pdQuery)}">
         ${this.pd?.status === 'Suspended'
           ? html` <message-box slot="header-content" type="warning">
               PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
@@ -83,7 +83,7 @@ export class PageIpReportingGpdDetails extends UtilsMixin(connect(store)(LitElem
   }
 
   stateChanged(state: RootState) {
-    if (this.state !== currentProgrammeDocument(state)) {
+    if (this.pd !== currentProgrammeDocument(state)) {
       this.pd = currentProgrammeDocument(state);
     }
     if (state.app.routeDetails.params) {

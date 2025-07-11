@@ -8,11 +8,11 @@ import {RootState} from '../../typings/redux.types';
 import '../../etools-prp-common/elements/labelled-item';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
 
 @customElement('risk-rating')
-export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {
+export class RiskRating extends connect(store)(LitElement) {
   static styles = [
     layoutStyles,
     css`
@@ -44,27 +44,27 @@ export class RiskRating extends UtilsMixin(connect(store)(LitElement)) {
         <div class="row">
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('FINANCIAL_RISK_RATING')}">
-              <span class="field-value">${this._withDefault(this.partner.rating)}</span>
+              <span class="field-value">${valueWithDefault(this.partner.rating)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('TYPE_OF_ASSESSMENT')}">
-              <span class="field-value">${this._withDefault(this.partner.type_of_assessment)}</span>
+              <span class="field-value">${valueWithDefault(this.partner.type_of_assessment)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('RISK_RATING_LAST_DATE_ASSESSMENT')}">
-              <span class="field-value">${this._withDefault(this.partner.last_assessment_date)}</span>
+              <span class="field-value">${valueWithDefault(this.partner.last_assessment_date)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('SEA_RISK_RATING')}">
-              <span class="field-value">${this._withDefault(this.partner.sea_risk_rating_name)}</span>
+              <span class="field-value">${valueWithDefault(this.partner.sea_risk_rating_name)}</span>
             </labelled-item>
           </div>
           <div class="col-md-4 col-12">
             <labelled-item label="${translate('PSEA_RISK_RATING_DATE_OF_ASSESSMENT')}">
-              <span class="field-value">${this._withDefault(this.partner.psea_assessment_date)}</span>
+              <span class="field-value">${valueWithDefault(this.partner.psea_assessment_date)}</span>
             </labelled-item>
           </div>
         </div>
