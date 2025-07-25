@@ -88,6 +88,11 @@ class ProgressReportDetailPDFExporter:
                 tables.append(indicator_table)
 
                 for location_data in indicator.indicator_location_data.all():
+
+                    if indicator.reportable.reportablelocationgoal_set.filter(
+                            location=location_data.location, is_active=False).exists():
+                        continue
+
                     location_progress = format_total_value_to_string(
                         location_data.disaggregation.get('()'),
                         is_percentage=is_percentage,
