@@ -44,6 +44,9 @@ export class ProgressReportsFilters extends connect(store)(LitElement) {
           display: block;
           background: white;
         }
+        *[hidden] {
+          display: none !important;
+        }
         checkbox-filter {
           margin-top: 2em;
         }
@@ -73,6 +76,7 @@ export class ProgressReportsFilters extends connect(store)(LitElement) {
           >
           </dropdown-filter-multi>
           <dropdown-filter-multi
+            ?hidden="${this.isGpd}"
             class="col-md-6 col-12"
             label="${translate('REPORT_TYPE')}"
             name="report_type"
