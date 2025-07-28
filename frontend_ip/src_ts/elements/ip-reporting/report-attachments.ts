@@ -94,6 +94,12 @@ export class ReportAttachments extends connect(store)(LitElement) {
   @property({type: String})
   reportId!: string;
 
+  @property({type: Boolean})
+  isGpd = false;
+
+  @property({type: Boolean})
+  uploadText = 'OTHER';
+
   @state() mapKeyToLoading;
 
   connectedCallback(): void {
@@ -124,6 +130,10 @@ export class ReportAttachments extends connect(store)(LitElement) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
+
+    if (changedProperties.has('isGpd')) {
+      this.uploadText = this.isGpd ? 'ATTACHMENT' : 'OTHER';
+    }
 
     if (changedProperties.has('attachmentsListUrl')) {
       this._getReportAttachments();
@@ -167,7 +177,7 @@ export class ReportAttachments extends connect(store)(LitElement) {
       <div id="other-one-container">
         <etools-upload
           id="otherOneAttachmentComponent"
-          label="${translate('OTHER')} #1"
+          label="${translate(this.uploadText)} #1"
           .fileUrl="${this.otherOneAttachment?.path}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherOneAttachment?.id)}"
           @upload-started="${() => this._uploadStarted('otherOneAttachmentComponent')}"
@@ -189,7 +199,7 @@ export class ReportAttachments extends connect(store)(LitElement) {
       <div id="other-two-container">
         <etools-upload
           id="otherTwoAttachmentComponent"
-          label="${translate('OTHER')} #2"
+          label="${translate(this.uploadText)} #2"
           .fileUrl="${this.otherTwoAttachment?.path}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherTwoAttachment?.id)}"
           @upload-started="${() => this._uploadStarted('otherTwoAttachmentComponent')}"
@@ -212,7 +222,7 @@ export class ReportAttachments extends connect(store)(LitElement) {
         ? html` <div id="other-three-container">
             <etools-upload
               id="otherTwoAttachmentComponent"
-              label="${translate('OTHER')} #3"
+              label="${translate(this.uploadText)} #3"
               .fileUrl="${this.otherThreeAttachment?.path}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
               @upload-started="${() => this._uploadStarted('otherThreeAttachmentComponent')}"
