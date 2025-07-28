@@ -2254,6 +2254,7 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         self.assertEqual(data["id"], reportable.pk)
 
     def test_list_without_inactive_reportable_location_goal(self):
+        self._setup_reportable()
         url = reverse(
             "programme-document-indicators",
             args=[self.workspace.pk],
