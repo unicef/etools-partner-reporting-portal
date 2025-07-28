@@ -52,7 +52,7 @@ class ReportableAdmin(admin.ModelAdmin):
 class ReportableLocationGoalAdmin(admin.ModelAdmin):
     list_display = ('location', 'is_active')
     raw_id_fields = ('reportable', 'location')
-    search_fields = ('reportable__indicator_reports__id', 'location__name')
+    search_fields = ('reportable__id', 'location__name')
 
 
 class IndicatorReportAdmin(admin.ModelAdmin):

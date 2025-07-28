@@ -411,7 +411,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
         return None
 
     def get_locations(self, obj):
-        return ReportableLocationGoalSerializer(obj.reportablelocationgoal_set.all(), many=True).data
+        return ReportableLocationGoalSerializer(obj.reportablelocationgoal_set.filter(is_active=True), many=True).data
 
     class Meta:
         model = Reportable
