@@ -223,6 +223,7 @@
   "LATEST": "latest",
   "FACE": "FACE",
   "OTHER": "Other",
+  "ATTACHMENT": "Attachment",
   "UPLOAD_FILE": "Upload file",
   "NO_REPORT_DATA": "No report data associated with this indicator has been submitted yet",
   "PARTNER_DASHBOARD": "Partner Dashboard",

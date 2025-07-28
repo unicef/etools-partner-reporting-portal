@@ -193,7 +193,7 @@ export class PageGdpReportSrReporting extends connect(store)(LitElement) {
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments isGPD ?readonly="${this.computedMode === 'view'}"></report-attachments>
+            <report-attachments isGpd="true" ?readonly="${this.computedMode === 'view'}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
