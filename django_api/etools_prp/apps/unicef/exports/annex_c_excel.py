@@ -370,6 +370,9 @@ class ProgressReportsXLSXExporter:
     def write_indicator_reports_to_current_sheet(self, current_row, indicator_reports, disaggregation_column_map):
         for indicator_report in indicator_reports:
             for location_data in indicator_report.indicator_location_data.all():
+                if indicator_report.reportable.reportablelocationgoal_set.filter(
+                        location=location_data.location, is_active=False).exists():
+                    continue
                 general_info_row = self.get_general_info_row(indicator_report.progress_report, location_data)
 
                 for column, (cell_data, cell_format) in enumerate(general_info_row):
