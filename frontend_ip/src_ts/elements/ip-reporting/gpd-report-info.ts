@@ -293,7 +293,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitEl
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments ?readonly="${this.computedMode === 'view'}"></report-attachments>
+            <report-attachments isGpd="true" ?readonly="${this.computedMode === 'view'}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
