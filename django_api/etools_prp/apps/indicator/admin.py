@@ -49,6 +49,12 @@ class ReportableAdmin(admin.ModelAdmin):
     ]
 
 
+class ReportableLocationGoalAdmin(admin.ModelAdmin):
+    list_display = ('location', 'is_active')
+    raw_id_fields = ('reportable', 'location')
+    search_fields = ('reportable__id', 'location__name')
+
+
 class IndicatorReportAdmin(admin.ModelAdmin):
     list_display = ('title', 'report_status', 'progress_report',
                     'time_period_start', 'time_period_end', 'due_date',
@@ -96,3 +102,4 @@ admin.site.register(IndicatorLocationData, IndicatorLocationDataAdmin)
 admin.site.register(Disaggregation, DisaggregationAdmin)
 admin.site.register(DisaggregationValue, DisaggregationValueAdmin)
 admin.site.register(ReportingEntity, ReportingEntityAdmin)
+admin.site.register(ReportableLocationGoal, ReportableLocationGoalAdmin)
