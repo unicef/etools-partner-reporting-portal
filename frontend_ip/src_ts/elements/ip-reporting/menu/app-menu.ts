@@ -7,7 +7,6 @@ import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {getCorrespondingEtoolsEnvironment, SMALL_MENU_ACTIVE_LOCALSTORAGE_KEY} from '../../../etools-prp-common/config';
 import MatomoMixin from '@unicef-polymer/etools-piwik-analytics/matomo-mixin';
-import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../redux/store';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
@@ -15,6 +14,7 @@ import {RootState} from '../../../typings/redux.types';
 import {buildUrl} from '../../../etools-prp-common/utils/util';
 import {AnyObject} from '@unicef-polymer/etools-utils/dist/types/global.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util';
 
 /**
  * main menu
@@ -22,7 +22,7 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
  * @customElement
  */
 @customElement('app-menu')
-export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement))) {
+export class AppMenu extends MatomoMixin(connect(store)(LitElement)) {
   public render() {
     // main template
     // language=HTML
@@ -69,7 +69,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
             ? html`
                 <a
                   class="nav-menu-item ${this.getItemClass(this.selectedOption, 'gpd')}"
-                  href="${this._appendQuery(this.gpdUrl, this.gpdQuery)}"
+                  href="${appendQuery(this.gpdUrl, this.gpdQuery)}"
                   @click="${this.trackAnalytics}"
                   tracker="Government Programme Document"
                 >
@@ -81,7 +81,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
               `
             : html` <a
                 class="nav-menu-item ${this.getItemClass(this.selectedOption, 'pd')}"
-                href="${this._appendQuery(this.pdUrl, this.pdQuery)}"
+                href="${appendQuery(this.pdUrl, this.pdQuery)}"
                 @click="${this.trackAnalytics}"
                 tracker="Programme Documents"
               >
@@ -96,7 +96,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
               </a>`}
           <a
             class="nav-menu-item ${this.getItemClass(this.selectedOption, 'progress-reports')}"
-            href="${this._appendQuery(this.progressReportsUrl, this.reportsQuery)}"
+            href="${appendQuery(this.progressReportsUrl, this.reportsQuery)}"
             @click="${this.trackAnalytics}"
             tracker="Progress Reports"
           >
@@ -109,7 +109,7 @@ export class AppMenu extends MatomoMixin(UtilsMixin(connect(store)(LitElement)))
           ${this.partner?.partner_type && this.partner?.partner_type !== 'Gov'
             ? html` <a
                 class="nav-menu-item ${this.getItemClass(this.selectedOption, 'indicators')}"
-                href="${this._appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
+                href="${appendQuery(this.indicatorsReportsUrl, this.indicatorsQuery)}"
                 @click="${this.trackAnalytics}"
                 tracker="Indicators"
               >

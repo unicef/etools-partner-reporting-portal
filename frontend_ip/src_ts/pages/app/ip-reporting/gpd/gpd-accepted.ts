@@ -2,14 +2,13 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {buttonsStyles} from '../../../../etools-prp-common/styles/buttons-styles.js';
 import {programmeDocumentReportsCurrent} from '../../../../redux/selectors/programmeDocumentReports.js';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import {RootState} from '../../../../typings/redux.types.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../../../redux/store.js';
 import '@unicef-polymer/etools-unicef/src/etools-content-panel/etools-content-panel';
 
 @customElement('gpd-accepted')
-export class GpdAccepted extends UtilsMixin(connect(store)(LitElement)) {
+export class GpdAccepted extends connect(store)(LitElement) {
   @property({type: Object})
   currentReport: any = {};
 
@@ -145,7 +144,7 @@ export class GpdAccepted extends UtilsMixin(connect(store)(LitElement)) {
   }
 
   _hasFeedback(currentReport: any) {
-    return !!(this._equals(currentReport.status, 'Acc') && currentReport.accepted_comment);
+    return !!(currentReport.status === 'Acc' && currentReport.accepted_comment);
   }
 
   _computeButtonText(expanded) {

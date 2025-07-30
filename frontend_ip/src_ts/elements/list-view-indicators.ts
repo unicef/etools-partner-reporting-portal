@@ -9,7 +9,6 @@ import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styl
 import '@unicef-polymer/etools-unicef/src/etools-loading/etools-loading';
 import {tableStyles} from '../etools-prp-common/styles/table-styles';
 import DataTableMixin from '../etools-prp-common/mixins/data-table-mixin';
-import UtilsMixin from '../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
 import './list-view-single-indicator';
@@ -22,7 +21,7 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {repeat} from 'lit/directives/repeat.js';
 import {classMap} from 'lit/directives/class-map.js';
 @customElement('list-view-indicators')
-export class ListViewIndicators extends UtilsMixin(DataTableMixin(PaginationMixin(connect(store)(LitElement)))) {
+export class ListViewIndicators extends DataTableMixin(PaginationMixin(connect(store)(LitElement))) {
   @property({type: Array})
   data: any[] = [];
 

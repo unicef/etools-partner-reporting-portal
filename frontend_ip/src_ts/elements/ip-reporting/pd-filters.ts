@@ -3,7 +3,6 @@ import {customElement, property} from 'lit/decorators.js';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {store} from '../../redux/store';
 import {filterStyles} from '../../styles/filter-styles';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '../../etools-prp-common/elements/filter-list.js';
@@ -13,9 +12,11 @@ import '../../elements/filters/location-filter-multi/location-filter-multi.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util.js';
+import {valueWithDefaultStatuses} from '../../etools-prp-common/utils/util.js';
 
 @customElement('pd-filters')
-export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
+export class PdFilters extends connect(store)(LitElement) {
   @property({type: Boolean, attribute: 'is-gpd'})
   isGpd = false;
 
@@ -48,7 +49,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
             class="col-lg-5 col-12"
             label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
             name="status"
-            .value="${this._withDefault(this.queryParams?.status, '')}"
+            .value="${valueWithDefaultStatuses(this.queryParams?.status, '')}"
             .data="${this.statuses}"
             hide-search
             @value-changed="${this._handleFilterChange}"
@@ -56,7 +57,7 @@ export class PdFilters extends UtilsMixin(connect(store)(LitElement)) {
           </dropdown-filter-multi>
           <location-filter-multi
             class="col-lg-5 col-12"
-            .value="${this._withDefault(this.queryParams?.location, '')}"
+            .value="${valueWithDefault(this.queryParams?.location, '')}"
             @value-changed="${this._handleFilterChange}"
           >
           </location-filter-multi>

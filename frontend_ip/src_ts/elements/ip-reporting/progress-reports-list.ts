@@ -10,7 +10,6 @@ import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 import '../../etools-prp-common/elements/report-status';
 import '../../etools-prp-common/elements/list-placeholder';
 import './pd-reports-report-title';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
@@ -21,10 +20,11 @@ import {store} from '../../redux/store';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
 
 @customElement('progress-reports-list')
 export class ProgressReportsList extends SortingMixin(
-  ProgressReportUtilsMixin(PaginationMixin(DataTableMixin(UtilsMixin(connect(store)(LitElement)))))
+  ProgressReportUtilsMixin(PaginationMixin(DataTableMixin(connect(store)(LitElement))))
 ) {
   static styles = [
     layoutStyles,
@@ -144,7 +144,7 @@ export class ProgressReportsList extends SortingMixin(
                 >
                   <sl-tooltip content="${report.programme_document?.title}">
                     <span class="truncate">
-                      ${this._withDefault(report.programme_document?.reference_number, '-')}
+                      ${valueWithDefault(report.programme_document?.reference_number, '-')}
                     </span>
                   </sl-tooltip>
                 </div>
@@ -170,19 +170,19 @@ export class ProgressReportsList extends SortingMixin(
                   class="col-data col-2 table-cell table-cell--text"
                   data-col-header-label="${translate('DUE_DATE')}"
                 >
-                  ${this._withDefault(report.due_date, '-')}
+                  ${valueWithDefault(report.due_date, '-')}
                 </div>
                 <div
                   class="col-data col-2 table-cell table-cell--text"
                   data-col-header-label="${translate('DATE_OF_SUBMISSION')}"
                 >
-                  ${this._withDefault(report.submission_date, '-')}
+                  ${valueWithDefault(report.submission_date, '-')}
                 </div>
                 <div
                   class="col-data col-2 table-cell table-cell--text truncate"
                   data-col-header-label="${translate('REPORTING_PERIOD')}"
                 >
-                  ${this._withDefault(report.reporting_period, '-')}
+                  ${valueWithDefault(report.reporting_period, '-')}
                 </div>
               </div>
             </etools-data-table-row>

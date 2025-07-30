@@ -206,7 +206,9 @@ class ReportableListPDFExporter(ProgressReportsMixin, ProgressReportDetailPDFExp
             if not current_indicator_report:
                 continue
 
-            for location_data in current_indicator_report.indicator_location_data.all():
+            active_location_goals = current_indicator_report.reportable.reportablelocationgoal_set.filter(is_active=True)
+            for location_data in current_indicator_report.indicator_location_data.filter(
+                    location__reportablelocationgoal__in=active_location_goals).distinct():
                 tables.append(self.get_current_previous_location_data_table(
                     location_data
                 ))

@@ -2,7 +2,6 @@ import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {connect} from 'pwa-helpers';
 import {store} from '../../redux/store';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {tableStyles} from '../../etools-prp-common/styles/table-styles';
 import './pd-report-filters.js';
 import './pd-reports-toolbar.js';
@@ -15,7 +14,7 @@ import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-compari
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 
 @customElement('gpd-details-reports')
-export class GpdDetailsReport extends connect(store)(UtilsMixin(LitElement)) {
+export class GpdDetailsReport extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;

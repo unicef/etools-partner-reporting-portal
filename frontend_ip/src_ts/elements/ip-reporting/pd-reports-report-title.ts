@@ -2,7 +2,6 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '@unicef-polymer/etools-unicef/src/etools-icons/etools-icon';
 import {
   shouldDisplayLink,
@@ -13,7 +12,7 @@ import {
 import {buildUrl} from '../../etools-prp-common/utils/util';
 
 @customElement('pd-reports-report-title')
-export class PdReportsReportTitle extends ProgressReportUtilsMixin(UtilsMixin(LitElement)) {
+export class PdReportsReportTitle extends ProgressReportUtilsMixin(LitElement) {
   static styles = css`
     .final-badge {
       display: inline-block;

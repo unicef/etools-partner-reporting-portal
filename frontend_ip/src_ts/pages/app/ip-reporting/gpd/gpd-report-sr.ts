@@ -1,11 +1,10 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import UtilsMixin from '../../../../etools-prp-common/mixins/utils-mixin.js';
 import './gpd-report-sr/reporting.js';
 import './gpd-report-hr-qpr/info.js';
 
 @customElement('page-gpd-report-sr')
-export class PageGpdReportSr extends UtilsMixin(LitElement) {
+export class PageGpdReportSr extends LitElement {
   @property({type: String, attribute: true, reflect: true})
   selectedTab = 'info';
 

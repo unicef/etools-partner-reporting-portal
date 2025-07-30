@@ -1,15 +1,15 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import '../../etools-prp-common/elements/download-button';
 import {computeIndicatorsUrl} from './js/indicators-toolbar-functions';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {store} from '../../redux/store';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util';
 
 @customElement('indicators-toolbar')
-export class IndicatorsToolbar extends UtilsMixin(connect(store)(LitElement)) {
+export class IndicatorsToolbar extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -63,8 +63,8 @@ export class IndicatorsToolbar extends UtilsMixin(connect(store)(LitElement)) {
     }
 
     if (changedProperties.has('indicatorsUrl') || changedProperties.has('queryParams')) {
-      this.xlsExportUrl = this._appendQuery(this.indicatorsUrl, this.queryParams, 'export=xlsx');
-      this.pdfExportUrl = this._appendQuery(this.indicatorsUrl, this.queryParams, 'export=pdf');
+      this.xlsExportUrl = appendQuery(this.indicatorsUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = appendQuery(this.indicatorsUrl, this.queryParams, 'export=pdf');
     }
   }
 }

@@ -2,11 +2,10 @@ import {LitElement, html, css} from 'lit';
 import '@unicef-polymer/etools-unicef/src/etools-checkbox/etools-checkbox';
 import {property, customElement} from 'lit/decorators.js';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import UtilsMixin from '../../../etools-prp-common/mixins/utils-mixin';
 import FilterMixin from '../../../etools-prp-common/mixins/filter-mixin';
 
 @customElement('checkbox-filter')
-export class CheckboxFilter extends UtilsMixin(FilterMixin(LitElement)) {
+export class CheckboxFilter extends FilterMixin(LitElement) {
   static styles = css`
     :host {
       display: block;

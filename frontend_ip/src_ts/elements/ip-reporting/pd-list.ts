@@ -8,7 +8,6 @@ import '@unicef-polymer/etools-unicef/src/etools-data-table/etools-data-table';
 import {dataTableStylesLit} from '@unicef-polymer/etools-unicef/src/etools-data-table/styles/data-table-styles';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import DataTableMixin from '../../etools-prp-common/mixins/data-table-mixin';
 import PaginationMixin from '@unicef-polymer/etools-unicef/src/mixins/pagination-mixin';
@@ -21,11 +20,12 @@ import '../../etools-prp-common/elements/list-placeholder';
 import {store} from '../../redux/store';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {RootState} from '../../typings/redux.types';
-import {buildUrl} from '../../etools-prp-common/utils/util';
+import {buildUrl, valueWithDefaultStatuses} from '../../etools-prp-common/utils/util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
 
 @customElement('pd-list')
-export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixin(connect(store)(LitElement))))) {
+export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(connect(store)(LitElement)))) {
   @property({type: Boolean})
   loading = false;
 
@@ -148,7 +148,7 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                       href="${this.getLinkUrl(this.baseUrl, pd.id, 'details')}"
                       class="truncate"
                     >
-                      ${this._withDefault(pd.reference_number)}
+                      ${valueWithDefault(pd.reference_number)}
                     </a>
                   </sl-tooltip>
                 </div>
@@ -156,19 +156,19 @@ export class PdList extends MatomoMixin(DataTableMixin(PaginationMixin(UtilsMixi
                   class="col-data col-1 table-cell table-cell--text"
                   data-col-header-label="${translate(this.isGpd ? 'GPD_STATUS' : 'PD_SSFA_STATUS')}"
                 >
-                  ${this._withDefault(pd.status, '')}
+                  ${valueWithDefaultStatuses(pd.status, '')}
                 </div>
                 <div
                   class="col-data col-1 table-cell table-cell--text"
                   data-col-header-label="${translate('START_DATE')}"
                 >
-                  ${this._withDefault(pd.start_date)}
+                  ${valueWithDefault(pd.start_date)}
                 </div>
                 <div
                   class="col-data col-1 table-cell table-cell--text"
                   data-col-header-label="${translate('END_DATE')}"
                 >
-                  ${this._withDefault(pd.end_date)}
+                  ${valueWithDefault(pd.end_date)}
                 </div>
                 <div
                   class="col-data col-1 table-cell table-cell--text"

@@ -14,7 +14,6 @@ import '../../etools-prp-common/elements/labelled-item';
 import '../../etools-prp-common/elements/etools-prp-permissions';
 import './report-attachments';
 import '../../etools-prp-common/elements/filter-list';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import ProgressReportUtilsMixin from '../../mixins/progress-report-utils-mixin';
 import {programmeDocumentReportsCurrent} from '../../redux/selectors/programmeDocumentReports';
@@ -27,6 +26,8 @@ import {formatServerErrorAsText} from '../../etools-prp-common/utils/error-parse
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
+import {fieldsAreValid} from '@unicef-polymer/etools-utils/dist/validation.util';
 
 /**
  * @customElement
@@ -34,7 +35,7 @@ import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
  * @appliesMixin UtilsMixin
  */
 @customElement('pd-report-info')
-export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(store)(LitElement))) {
+export class PdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitElement)) {
   static styles = [
     layoutStyles,
     css`
@@ -192,8 +193,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
         <div class="row">
           <div class="col-12 padding-v">
             <labelled-item label="${translate('NON_FINANCIAL_CONTRIBUTION_DURING_REPORTING_PERIOD')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html`<span class="value">${this._withDefault(this.data.partner_contribution_to_date)}</span>`
+              ${this.computedMode === 'view'
+                ? html`<span class="value">${valueWithDefault(this.data.partner_contribution_to_date)}</span>`
                 : html`
                     <etools-input
                       id="partner_contribution_to_date"
@@ -221,7 +222,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                     (this.localData.financial_contribution_to_date = detail.value)}"
                   placeholder="&#8212;"
                   no-label-float
-                  ?readonly="${this._equals(this.computedMode, 'view')}"
+                  ?readonly="${this.computedMode === 'view'}"
                 >
                 </etools-currency>
               </div>
@@ -232,7 +233,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                   option-value="value"
                   option-label="label"
                   .selected="${this.localData?.financial_contribution_currency}"
-                  ?readonly="${this._equals(this.computedMode, 'view')}"
+                  ?readonly="${this.computedMode === 'view'}"
                   ?required="${this._hasCurrencyAmmount(this.data.financial_contribution_to_date)}"
                   trigger-value-change-event
                   @etools-selected-item-changed="${(event: CustomEvent) => {
@@ -247,8 +248,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('CHALLENGES_BOTTLENECKS')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html` <span class="value">${this._withDefault(this.data.challenges_in_the_reporting_period)}</span> `
+              ${this.computedMode === 'view'
+                ? html` <span class="value">${valueWithDefault(this.data.challenges_in_the_reporting_period)}</span> `
                 : html`
                     <etools-input
                       id="challenges_in_the_reporting_period"
@@ -266,8 +267,8 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
 
           <div class="col-12 padding-v">
             <labelled-item label="${translate('PROPOSED_WAY_FORWARD')}">
-              ${this._equals(this.computedMode, 'view')
-                ? html` <span class="value">${this._withDefault(this.data.proposed_way_forward)}</span> `
+              ${this.computedMode === 'view'
+                ? html` <span class="value">${valueWithDefault(this.data.proposed_way_forward)}</span> `
                 : html`
                     <etools-input
                       id="proposed_way_forward"
@@ -297,18 +298,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                         this.localData.final_review.release_cash_in_time_choice = e.target.value;
                       }}"
                     >
-                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('YES')}
-                      </sl-radio>
-                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('NO')}
-                      </sl-radio>
+                      <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                      <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.release_cash_in_time_comment)}
+                            ${valueWithDefault(this.data?.final_review?.release_cash_in_time_comment)}
                           </div>
                         `
                       : html`
@@ -335,18 +332,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                         this.localData.final_review.release_supplies_in_time_choice = e.target.value;
                       }}"
                     >
-                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('YES')}
-                      </sl-radio>
-                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('NO')}
-                      </sl-radio>
+                      <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                      <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.release_supplies_in_time_comment)}
+                            ${valueWithDefault(this.data?.final_review?.release_supplies_in_time_comment)}
                           </div>
                         `
                       : html`
@@ -373,18 +366,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                         this.localData.final_review.feedback_face_form_in_time_choice = e.target.value;
                       }}"
                     >
-                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('YES')}
-                      </sl-radio>
-                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('NO')}
-                      </sl-radio>
+                      <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                      <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.feedback_face_form_in_time_comment)}
+                            ${valueWithDefault(this.data?.final_review?.feedback_face_form_in_time_comment)}
                           </div>
                         `
                       : html`
@@ -411,18 +400,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                         this.localData.final_review.respond_requests_in_time_choice = e.target.value;
                       }}"
                     >
-                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('YES')}
-                      </sl-radio>
-                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('NO')}
-                      </sl-radio>
+                      <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                      <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.respond_requests_in_time_comment)}
+                            ${valueWithDefault(this.data?.final_review?.respond_requests_in_time_comment)}
                           </div>
                         `
                       : html`
@@ -449,18 +434,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                         this.localData.final_review.implemented_as_planned_choice = e.target.value;
                       }}"
                     >
-                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('YES')}
-                      </sl-radio>
-                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('NO')}
-                      </sl-radio>
+                      <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                      <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.implemented_as_planned_comment)}
+                            ${valueWithDefault(this.data?.final_review?.implemented_as_planned_comment)}
                           </div>
                         `
                       : html`
@@ -487,18 +468,14 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                         this.localData.final_review.action_to_address_choice = e.target.value;
                       }}"
                     >
-                      <sl-radio value="yes" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('YES')}
-                      </sl-radio>
-                      <sl-radio value="no" ?disabled="${this._equals(this.computedMode, 'view')}">
-                        ${translate('NO')}
-                      </sl-radio>
+                      <sl-radio value="yes" ?disabled="${this.computedMode === 'view'}"> ${translate('YES')} </sl-radio>
+                      <sl-radio value="no" ?disabled="${this.computedMode === 'view'}"> ${translate('NO')} </sl-radio>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.action_to_address_comment)}
+                            ${valueWithDefault(this.data?.final_review?.action_to_address_comment)}
                           </div>
                         `
                       : html`
@@ -526,40 +503,28 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
                       }}"
                     >
                       <div class="layout-horizontal">
-                        <sl-radio
-                          class="r-ml"
-                          value="very_unsatisfied"
-                          ?disabled="${this._equals(this.computedMode, 'view')}"
-                        >
+                        <sl-radio class="r-ml" value="very_unsatisfied" ?disabled="${this.computedMode === 'view'}">
                           ${translate('VERY_UNSATISFIED')}
                         </sl-radio>
-                        <sl-radio
-                          class="r-ml"
-                          value="unsatisfied"
-                          ?disabled="${this._equals(this.computedMode, 'view')}"
-                        >
+                        <sl-radio class="r-ml" value="unsatisfied" ?disabled="${this.computedMode === 'view'}">
                           ${translate('UNSATISFIED')}
                         </sl-radio>
-                        <sl-radio class="r-ml" value="neutral" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        <sl-radio class="r-ml" value="neutral" ?disabled="${this.computedMode === 'view'}">
                           ${translate('NEUTRAL')}
                         </sl-radio>
-                        <sl-radio class="r-ml" value="satisfied" ?disabled="${this._equals(this.computedMode, 'view')}">
+                        <sl-radio class="r-ml" value="satisfied" ?disabled="${this.computedMode === 'view'}">
                           ${translate('SATISFIED')}
                         </sl-radio>
-                        <sl-radio
-                          class="r-ml"
-                          value="very_satisfied"
-                          ?disabled="${this._equals(this.computedMode, 'view')}"
-                        >
+                        <sl-radio class="r-ml" value="very_satisfied" ?disabled="${this.computedMode === 'view'}">
                           ${translate('VERY_SATISFIED')}
                         </sl-radio>
                       </div>
                     </etools-radio-group>
 
-                    ${this._equals(this.computedMode, 'view')
+                    ${this.computedMode === 'view'
                       ? html`
                           <div class="value">
-                            ${this._withDefault(this.data?.final_review?.overall_satisfaction_comment)}
+                            ${valueWithDefault(this.data?.final_review?.overall_satisfaction_comment)}
                           </div>
                         `
                       : html`
@@ -580,7 +545,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
               `
             : html``}
           <div class="col-12 right-align padding-v">
-            ${!this._equals(this.computedMode, 'view')
+            ${this.computedMode !== 'view'
               ? html`
                   <etools-button variant="primary" id="toggle-button" @click="${this._handleInput}">
                     ${translate('SAVE')}
@@ -590,7 +555,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
           </div>
 
           <div class="col-12 padding-v">
-            <report-attachments ?readonly="${this._equals(this.computedMode, 'view')}"></report-attachments>
+            <report-attachments ?readonly="${this.computedMode === 'view'}"></report-attachments>
           </div>
         </div>
       </etools-content-panel>
@@ -641,7 +606,7 @@ export class PdReportInfo extends ProgressReportUtilsMixin(UtilsMixin(connect(st
   }
 
   _handleInput() {
-    if (!this._fieldsAreValid()) {
+    if (!fieldsAreValid(this.shadowRoot)) {
       return;
     }
     this._updateData();
