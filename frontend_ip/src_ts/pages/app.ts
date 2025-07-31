@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@unicef-polymer/etools-unicef/src/etools-toasts/etools-toasts';
-import UtilsMixin from '../etools-prp-common/mixins/utils-mixin.js';
 import Endpoints from '../endpoints.js';
 import {setWorkspace, fetchUserProfile, setApp} from '../redux/actions.js';
 import {fetchCurrencies} from '../redux/actions/currencies.js';
@@ -18,7 +17,7 @@ import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax/index.js';
 
 @customElement('page-app')
-export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
+export class PageApp extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -41,9 +40,6 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
 
   @property({type: Object})
   route!: Route;
-
-  @property({type: Object})
-  routeData!: {workspace_code: string; app: string};
 
   @property({type: String})
   page = '';
@@ -84,6 +80,9 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: String})
   _app?: string;
 
+  @property({type: Object})
+  routeDetails: any;
+
   render() {
     return html`
       ${!this.userHasPrpRolesOrAccess
@@ -106,8 +105,8 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
       this.userHasPrpRolesOrAccess = this._computeUserHasPrpRolesOrAccess(this.prpRoles, this.access, this.userPartner);
     }
 
-    if (changedProperties.has('language')) {
-      this._languageChanged(this.language);
+    if (changedProperties.has('_language')) {
+      this._languageChanged(this._language);
     }
 
     if (changedProperties.has('_workspaceCode') || changedProperties.has('workspaces')) {
@@ -241,7 +240,7 @@ export class PageApp extends UtilsMixin(connect(store)(LitElement)) {
     }
   }
 
-  private _languageChanged(_language: string) {
+  private _languageChanged(_language?: string) {
     this.setHtmlDirAttribute();
   }
 

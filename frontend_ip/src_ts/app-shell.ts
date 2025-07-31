@@ -3,7 +3,6 @@ import {customElement, property, state} from 'lit/decorators.js';
 import './utils/routes';
 import '@unicef-polymer/etools-piwik-analytics/etools-piwik-analytics.js';
 
-import UtilsMixin from './etools-prp-common/mixins/utils-mixin.js';
 import ErrorHandlerMixin from './etools-prp-common/mixins/errors-mixin.js';
 import Endpoints from './endpoints.js';
 import './etools-prp-common/elements/app-redirect.js';
@@ -47,7 +46,7 @@ setBasePath('/ip/');
 initializeIcons();
 
 @customElement('app-shell')
-export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitElement))) {
+export class AppShell extends ErrorHandlerMixin(connect(store)(LitElement)) {
   static styles = css`
     :host {
       display: block;
@@ -103,13 +102,11 @@ export class AppShell extends ErrorHandlerMixin(UtilsMixin(connect(store)(LitEle
 
       <etools-prp-auth .authenticated="${this.authenticated}"></etools-prp-auth>
 
-      ${this._equals(this.page, 'app') ? html`<page-app name="${this.basePath}"></page-app>` : ''}
-      ${this._equals(this.page, 'login') ? html` <page-login name="login" .value="${this.error}"></page-login>` : ''}
-      ${this._equals(this.page, 'unauthorized')
-        ? html` <page-unauthorized name="unauthorized"></page-unauthorized>`
-        : ''}
-      ${this._equals(this.page, 'not-found') ? html` <page-not-found name="not-found"></page-not-found>` : ''}
-      ${this._equals(this.page, 'login-token') ? html` <page-login-token name="login-token"></page-login-token>` : ''}
+      ${this.page === 'app' ? html`<page-app name="${this.basePath}"></page-app>` : ''}
+      ${this.page === 'login' ? html` <page-login name="login" .value="${this.error}"></page-login>` : ''}
+      ${this.page === 'unauthorized' ? html` <page-unauthorized name="unauthorized"></page-unauthorized>` : ''}
+      ${this.page === 'not-found' ? html` <page-not-found name="not-found"></page-not-found>` : ''}
+      ${this.page === 'login-token' ? html` <page-login-token name="login-token"></page-login-token>` : ''}
     `;
   }
 

@@ -5,14 +5,14 @@ import {filterStyles} from '../../styles/filter-styles';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/dropdown-filter/dropdown-filter';
 import {get as getTranslation, translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {store} from '../../redux/store';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
+import {valueWithDefaultStatuses} from '../../etools-prp-common/utils/util';
 
 @customElement('pd-report-filters')
-export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
+export class PdReportFilters extends connect(store)(LitElement) {
   @property({type: Object})
   queryParams: any = {};
 
@@ -48,7 +48,7 @@ export class PdReportFilters extends UtilsMixin(connect(store)(LitElement)) {
             class="col-md-4 col-12"
             .label=${translate('GPD_STATUS')}
             name="status"
-            .value=${this._withDefault(this.queryParams?.status, '-1')}
+            .value=${valueWithDefaultStatuses(this.queryParams?.status, '-1')}
             .data=${this.statuses}
           ></dropdown-filter>
         </div>

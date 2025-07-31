@@ -2202,6 +2202,16 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
                 calculation_formula_across_locations=IndicatorBlueprint.SUM,
             )
         )
+        self.rep_loc_goal_1 = factories.LocationWithReportableLocationGoalFactory(
+            location=factories.LocationFactory(),
+            reportable=reportable,
+        )
+
+        self.rep_loc_goal_2 = factories.LocationWithReportableLocationGoalFactory(
+            location=factories.LocationFactory(),
+            reportable=reportable,
+        )
+
         hr_period = factories.HRReportingPeriodDatesFactory(programme_document=self.pd)
         report_status = report_status if report_status else random.choice(
             [x[0] for x in PROGRESS_REPORT_STATUS]
@@ -2242,6 +2252,31 @@ class TestProgrammeDocumentIndicatorsAPIView(BaseAPITestCase):
         self.assertEqual(len(response.data["results"]), reportable_qs.count())
         data = response.data["results"][0]
         self.assertEqual(data["id"], reportable.pk)
+
+    def test_list_without_inactive_reportable_location_goal(self):
+        self._setup_reportable()
+        url = reverse(
+            "programme-document-indicators",
+            args=[self.workspace.pk],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        actual_locations = [i['location'] for i in response.data["results"][0]['locations']]
+        actual_locations.sort()
+        expected_locations = [self.rep_loc_goal_1.location.id, self.rep_loc_goal_2.location.id]
+        expected_locations.sort()
+        self.assertEqual(actual_locations, expected_locations)
+
+        self.rep_loc_goal_1.is_active = False
+        self.rep_loc_goal_1.save(update_fields=['is_active'])
+        url = reverse(
+            "programme-document-indicators",
+            args=[self.workspace.pk],
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"][0]['locations']), 1)
+        self.assertEqual(response.data["results"][0]['locations'][0]['location'], self.rep_loc_goal_2.location.id)
 
     def test_filter_report_status(self):
         report_status = "Sub"

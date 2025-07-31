@@ -2,7 +2,6 @@ import {html, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {filterStyles} from '../../styles/filter-styles';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import '../../etools-prp-common/elements/filter-list';
 import '../../elements/filters/text-filter/text-filter';
@@ -13,9 +12,11 @@ import {store} from '../../redux/store';
 import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {RootState} from '../../typings/redux.types';
+import {valueWithDefault} from '@unicef-polymer/etools-utils/dist/general.util';
+import {valueWithDefaultStatuses} from '../../etools-prp-common/utils/util';
 
 @customElement('progress-reports-filters')
-export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement)) {
+export class ProgressReportsFilters extends connect(store)(LitElement) {
   @property({type: Object})
   queryParams!: any;
 
@@ -43,6 +44,9 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
           display: block;
           background: white;
         }
+        *[hidden] {
+          display: none !important;
+        }
         checkbox-filter {
           margin-top: 2em;
         }
@@ -59,23 +63,24 @@ export class ProgressReportsFilters extends UtilsMixin(connect(store)(LitElement
           </text-filter>
           <location-filter
             class="col-md-3 col-12"
-            .value="${this._withDefault(this.queryParams?.location, '-1')}"
+            .value="${valueWithDefault(this.queryParams?.location, '-1')}"
           ></location-filter>
           <dropdown-filter-multi
             class="col-md-6 col-12"
             label="${translate('REPORT_STATUS')}"
             name="status"
-            .value="${this._withDefault(this.queryParams?.status, '')}"
+            .value="${valueWithDefaultStatuses(this.queryParams?.status, '')}"
             .data="${this.statuses}"
-            ?disabled="${this._equals(this.queryParams?.due, '1')}"
+            ?disabled="${this.queryParams?.due === '1'}"
             hide-search
           >
           </dropdown-filter-multi>
           <dropdown-filter-multi
+            ?hidden="${this.isGpd}"
             class="col-md-6 col-12"
             label="${translate('REPORT_TYPE')}"
             name="report_type"
-            .value="${this._withDefault(this.queryParams?.report_type, '')}"
+            .value="${valueWithDefault(this.queryParams?.report_type, '')}"
             .data="${this.types}"
             hide-search
           >

@@ -1,7 +1,6 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import '../../etools-prp-common/elements/download-button';
 import {computePdReportsUrl, hasResults} from './js/progress-reports-toolbar-functions';
@@ -10,9 +9,10 @@ import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {RootState} from '../../typings/redux.types';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util';
 
 @customElement('progress-reports-toolbar')
-export class ProgressReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
+export class ProgressReportsToolbar extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -75,8 +75,8 @@ export class ProgressReportsToolbar extends UtilsMixin(connect(store)(LitElement
     }
 
     if (changedProperties.has('pdReportsUrl') || changedProperties.has('queryParams')) {
-      this.xlsExportUrl = this._appendQuery(this.pdReportsUrl, this.queryParams, 'export=xlsx');
-      this.pdfExportUrl = this._appendQuery(this.pdReportsUrl, this.queryParams, 'export=pdf');
+      this.xlsExportUrl = appendQuery(this.pdReportsUrl, this.queryParams, 'export=xlsx');
+      this.pdfExportUrl = appendQuery(this.pdReportsUrl, this.queryParams, 'export=pdf');
     }
   }
 

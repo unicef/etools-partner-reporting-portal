@@ -10,7 +10,6 @@ import {pdReportsAttachmentsSet} from '../../redux/actions/pdReportsAttachments'
 import {computeListUrl, getDeleteUrl, setFiles} from './js/report-attachments-functions';
 import '@unicef-polymer/etools-unicef/src/etools-upload/etools-file';
 import {fireEvent} from '@unicef-polymer/etools-utils/dist/fire-event.util';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {translate, get as getTranslation} from '@unicef-polymer/etools-unicef/src/etools-translate';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
@@ -22,7 +21,7 @@ import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
  * @appliesMixin UtilsMixin
  */
 @customElement('report-attachments')
-export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
+export class ReportAttachments extends connect(store)(LitElement) {
   static styles = css`
     :host {
       display: block;
@@ -95,6 +94,12 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
   @property({type: String})
   reportId!: string;
 
+  @property({type: Boolean})
+  isGpd = false;
+
+  @property({type: Boolean})
+  uploadText = 'OTHER';
+
   @state() mapKeyToLoading;
 
   connectedCallback(): void {
@@ -125,6 +130,10 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
 
   updated(changedProperties) {
     super.updated(changedProperties);
+
+    if (changedProperties.has('isGpd')) {
+      this.uploadText = this.isGpd ? 'ATTACHMENT' : 'OTHER';
+    }
 
     if (changedProperties.has('attachmentsListUrl')) {
       this._getReportAttachments();
@@ -168,7 +177,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
       <div id="other-one-container">
         <etools-upload
           id="otherOneAttachmentComponent"
-          label="${translate('OTHER')} #1"
+          label="${translate(this.uploadText)} #1"
           .fileUrl="${this.otherOneAttachment?.path}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherOneAttachment?.id)}"
           @upload-started="${() => this._uploadStarted('otherOneAttachmentComponent')}"
@@ -190,7 +199,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
       <div id="other-two-container">
         <etools-upload
           id="otherTwoAttachmentComponent"
-          label="${translate('OTHER')} #2"
+          label="${translate(this.uploadText)} #2"
           .fileUrl="${this.otherTwoAttachment?.path}"
           .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherTwoAttachment?.id)}"
           @upload-started="${() => this._uploadStarted('otherTwoAttachmentComponent')}"
@@ -213,7 +222,7 @@ export class ReportAttachments extends UtilsMixin(connect(store)(LitElement)) {
         ? html` <div id="other-three-container">
             <etools-upload
               id="otherTwoAttachmentComponent"
-              label="${translate('OTHER')} #3"
+              label="${translate(this.uploadText)} #3"
               .fileUrl="${this.otherThreeAttachment?.path}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
               @upload-started="${() => this._uploadStarted('otherThreeAttachmentComponent')}"

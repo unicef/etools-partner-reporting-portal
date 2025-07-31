@@ -366,7 +366,7 @@ CURRENCIES = Choices(
     ("SOS", "sos", "sos"),
     ("SPL", "spl", "spl"),
     ("SRD", "srd", "srd"),
-    ("STD", "std", "std"),
+    ("STN", "stn", "stn"),
     ("SVC", "svc", "svc"),
     ("SYP", "syp", "syp"),
     ("SZL", "szl", "szl"),

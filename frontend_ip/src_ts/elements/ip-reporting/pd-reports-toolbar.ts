@@ -2,7 +2,6 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import '../../etools-prp-common/elements/download-button';
 import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
-import UtilsMixin from '../../etools-prp-common/mixins/utils-mixin';
 import {programmeDocumentReportsCount} from '../../redux/selectors/programmeDocumentReports';
 import {computePdReportsUrl, canExport, computePdQuery} from './js/pd-reports-toolbar-functions';
 import {RootState} from '../../typings/redux.types';
@@ -11,9 +10,10 @@ import {connect} from '@unicef-polymer/etools-utils/dist/pwa.utils.js';
 import {isJsonStrMatch} from '@unicef-polymer/etools-utils/dist/equality-comparisons.util';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
 import {translate} from '@unicef-polymer/etools-unicef/src/etools-translate';
+import {appendQuery} from '@unicef-polymer/etools-utils/dist/navigation.util';
 
 @customElement('pd-reports-toolbar')
-class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
+class PdReportsToolbar extends connect(store)(LitElement) {
   static styles = css`
     ${layoutStyles}
     :host {
@@ -103,8 +103,8 @@ class PdReportsToolbar extends UtilsMixin(connect(store)(LitElement)) {
       changedProperties.has('queryParams') ||
       changedProperties.has('pdQuery')
     ) {
-      this.xlsExportUrl = this._appendQuery(this.pdReportsUrl, this.queryParams, this.pdQuery, 'export=xlsx');
-      this.pdfExportUrl = this._appendQuery(this.pdReportsUrl, this.queryParams, this.pdQuery, 'export=pdf');
+      this.xlsExportUrl = appendQuery(this.pdReportsUrl, this.queryParams, this.pdQuery, 'export=xlsx');
+      this.pdfExportUrl = appendQuery(this.pdReportsUrl, this.queryParams, this.pdQuery, 'export=pdf');
     }
   }
 }
