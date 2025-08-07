@@ -43,7 +43,7 @@ class ProgrammeDocumentsXLSXExporter:
         self.worksheet.title = 'Programme Document(s) Summary'
         headers = [
             'Title',
-            'PD/SSFA status',
+            'PD/SPD status',
             'Agreement',
             'Document Type',
             'Reference Number',
@@ -189,7 +189,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableCell(format_currency(pd.in_kind_amount, pd.in_kind_amount_currency))
             ])
             rows.append([
-                HTMLTableHeader('PD/SSFA status'),
+                HTMLTableHeader('PD/SPD status'),
                 HTMLTableCell(pd.get_status_display()),
                 HTMLTableHeader('Start Date'),
                 HTMLTableCell(pd.start_date),

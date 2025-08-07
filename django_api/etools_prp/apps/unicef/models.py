@@ -112,7 +112,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
                                         verbose_name='Reference Number',
                                         db_index=True)
     title = models.CharField(max_length=512,
-                             verbose_name='PD/SSFA ToR Title',
+                             verbose_name='PD/SPD ToR Title',
                              db_index=True)
     unicef_office = models.CharField(max_length=255,
                                      verbose_name='UNICEF Office(s)')
@@ -147,7 +147,7 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         choices=PD_STATUS,
         default=PD_STATUS.development,
         max_length=256,
-        verbose_name='PD/SSFA status'
+        verbose_name='PD/SPD status'
     )
     sections = models.ManyToManyField(Section)
     contributing_to_cluster = models.BooleanField(
