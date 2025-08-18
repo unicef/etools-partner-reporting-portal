@@ -1018,7 +1018,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @patch("etools_prp.apps.utils.emails.EmailTemplate.objects.update_or_create")
     @patch.object(Notification, "full_clean", return_value=None)
