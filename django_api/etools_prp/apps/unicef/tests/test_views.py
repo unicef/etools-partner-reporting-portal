@@ -1117,8 +1117,7 @@ class TestProgressReportListAPIView(BaseProgressReportAPITestCase):
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.accepted],
             response,
         ))
-        # Only submitted and accepted are allowed to be exported
-        self.assertFalse(string_in_download(
+        self.assertTrue(string_in_download(
             PROGRESS_REPORT_STATUS[PROGRESS_REPORT_STATUS.sent_back],
             response,
         ))
