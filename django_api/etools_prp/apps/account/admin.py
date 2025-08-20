@@ -16,7 +16,7 @@ class RealmInline(admin.StackedInline):
 
 class CustomUserAdmin(UserAdmin):
     list_display = (
-        'email', 'username', 'workspace', 'partner', 'last_login', 'date_joined',
+        'email', 'username', 'workspace', 'partner', 'realm_count', 'last_login', 'date_joined',
     )
     list_filter = (
         'is_superuser', 'is_staff', 'is_active',
@@ -62,7 +62,12 @@ class CustomUserAdmin(UserAdmin):
     )
 
     filter_horizontal = ('user_permissions',)
-    inlines = [RealmInline]
+
+    def get_inlines(self, request, obj):
+        """Only show realm inline for users with equal of fewer than 10 realms"""
+        if obj and obj.realms.count() > 10:
+            return []  # No inlines for users with many realms
+        return [RealmInline]
 
     def country(self, obj):
         if obj.partner:
@@ -70,6 +75,13 @@ class CustomUserAdmin(UserAdmin):
                 'workspace__title', flat=True).distinct().order_by())
 
     country.short_description = 'Workspace'
+
+    def realm_count(self, obj):
+        count = obj.realms.count()
+        if count > 10:
+            return f"{count}"
+        return count
+    realm_count.short_description = 'Realms'
 
 
 admin.site.register(User, CustomUserAdmin)
