@@ -78,8 +78,6 @@ class CustomUserAdmin(UserAdmin):
 
     def realm_count(self, obj):
         count = obj.realms.count()
-        if count > 10:
-            return f"{count}"
         return count
     realm_count.short_description = 'Realms'
 
