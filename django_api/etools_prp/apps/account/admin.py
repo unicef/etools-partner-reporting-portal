@@ -81,5 +81,6 @@ class CustomUserAdmin(UserAdmin):
         return count
     realm_count.short_description = 'Realms'
 
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(UserProfile)
