@@ -152,7 +152,7 @@ class TestLocationListAPIView(BaseAPITestCase):
         ).distinct()
         pks = []
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
-        expected = Location.objects.filter(pk__in=pks).count()
+        expected = Location.objects.filter(pk__in=pks, is_active=True).count()
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), expected)
@@ -176,10 +176,56 @@ class TestLocationListAPIView(BaseAPITestCase):
         expected = Location.objects.filter(
             pk__in=pks,
             admin_level=self.admin_level,
-            cluster_objectives__in=objective_ids).count()
+            cluster_objectives__in=objective_ids,
+            is_active=True).count()
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), expected)
+
+    def test_inactive_locations_excluded(self):
+        """Test that inactive locations are not returned in the API response"""
+        inactive_loc = factories.LocationFactory(admin_level=self.admin_level, is_active=False)
+        inactive_loc.workspaces.add(self.workspace)
+        
+        cluster_objective = self.cluster.cluster_objectives.first()
+        cluster_objective.locations.add(inactive_loc)
+
+        url = reverse(
+            'location', kwargs={
+                'response_plan_id': self.response_plan.id})
+        response = self.client.get(url, format='json')
+
+        location_ids = [loc['id'] for loc in response.data['results']]
+        self.assertNotIn(inactive_loc.id, location_ids)
+        
+        self.assertIn(self.loc1.id, location_ids)
+        self.assertIn(self.loc2.id, location_ids)
+
+
+class TestChildrenLocationAPIView(BaseAPITestCase):
+    def setUp(self):
+        self.workspace = factories.WorkspaceFactory()
+        self.user = factories.NonPartnerUserFactory()
+        
+        self.parent_loc = factories.LocationFactory(admin_level=0, is_active=True)
+        
+        self.child_loc1 = factories.LocationFactory(parent=self.parent_loc, admin_level=1, is_active=True)
+        self.child_loc2 = factories.LocationFactory(parent=self.parent_loc, admin_level=1, is_active=True)
+        
+        self.inactive_child = factories.LocationFactory(parent=self.parent_loc, admin_level=1, is_active=False)
+
+    def test_children_location_excludes_inactive(self):
+        """Test that ChildrenLocationAPIView excludes inactive locations"""
+        url = reverse('children-location', kwargs={'location_id': self.parent_loc.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        
+        location_ids = [loc['id'] for loc in response.data]
+        self.assertNotIn(self.inactive_child.id, location_ids)
+        
+        self.assertIn(self.child_loc1.id, location_ids)
+        self.assertIn(self.child_loc2.id, location_ids)
 
 
 class TestResponsePlanAPIView(BaseAPITestCase):

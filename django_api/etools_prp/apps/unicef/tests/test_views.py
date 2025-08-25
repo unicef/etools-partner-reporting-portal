@@ -839,7 +839,7 @@ class BaseProgressReportAPITestCase(BaseAPITestCase):
             Q(parent__parent_id=self.location_id) |
             Q(parent__parent__parent_id=self.location_id) |
             Q(parent__parent__parent__parent_id=self.location_id)
-        ).values_list(
+        ).filter(is_active=True).values_list(
             'reportables__lower_level_outputs__cp_output__programme_document__id',
             flat=True
         )
@@ -2512,3 +2512,69 @@ class TestProgrammeDocumentCalculationMethodsAPIView(BaseProgressReportAPITestCa
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['ll_outputs_and_indicators'].__len__(), 1)
         self.assertEqual(response.data['ll_outputs_and_indicators'][0]['ll_output']['id'], self.llo.id)
+
+
+class TestProgrammeDocumentLocationsAPIView(BaseAPITestCase):
+    def setUp(self):
+        super().setUp()
+        self.workspace = factories.WorkspaceFactory()
+        self.user = factories.PartnerUserFactory()
+        self.partner = self.user.partner
+        
+        self.active_loc = factories.LocationFactory(is_active=True)
+        self.inactive_loc = factories.LocationFactory(is_active=False)
+        
+        self.pd = factories.ProgrammeDocumentFactory(
+            partner=self.partner,
+            workspace=self.workspace
+        )
+
+    def test_programme_document_locations_excludes_inactive(self):
+        """Test that ProgrammeDocumentLocationsAPIView excludes inactive locations"""
+        url = reverse('programme-document-locations', kwargs={'workspace_id': self.workspace.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        if response.data and 'results' in response.data:
+            location_ids = [loc['id'] for loc in response.data['results']]
+        else:
+            location_ids = [loc['id'] for loc in response.data] if response.data else []
+        
+        self.assertNotIn(self.inactive_loc.id, location_ids)
+
+
+class TestProgressReportLocationsAPIView(BaseAPITestCase):
+    def setUp(self):
+        super().setUp()
+        self.workspace = factories.WorkspaceFactory() 
+        self.user = factories.PartnerUserFactory()
+        self.partner = self.user.partner
+        
+        self.active_loc = factories.LocationFactory(is_active=True)
+        self.inactive_loc = factories.LocationFactory(is_active=False)
+        
+        self.pd = factories.ProgrammeDocumentFactory(
+            partner=self.partner,
+            workspace=self.workspace
+        )
+        self.progress_report = factories.ProgressReportFactory(
+            programme_document=self.pd
+        )
+
+    def test_progress_report_locations_excludes_inactive(self):
+        """Test that ProgressReportLocationsAPIView excludes inactive locations"""
+        url = reverse('progress-report-locations', kwargs={
+            'workspace_id': self.workspace.id,
+            'progress_report_id': self.progress_report.id
+        })
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        if response.data and 'results' in response.data:
+            location_ids = [loc['id'] for loc in response.data['results']]
+        else:
+            location_ids = [loc['id'] for loc in response.data] if response.data else []
+        
+        self.assertNotIn(self.inactive_loc.id, location_ids)

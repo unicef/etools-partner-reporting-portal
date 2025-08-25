@@ -227,7 +227,7 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
 
 class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
-    queryset = Location.objects.all()
+    queryset = Location.objects.filter(is_active=True)
     serializer_class = ShortLocationSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -519,7 +519,7 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
 
 
 class ProgressReportLocationsAPIView(ListAPIView):
-    queryset = Location.objects.all()
+    queryset = Location.objects.filter(is_active=True)
     serializer_class = ShortLocationSerializer
     permission_classes = (IsAuthenticated,)
 

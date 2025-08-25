@@ -884,7 +884,7 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
             Q(reportable__partner_projects__clusters__response_plan=response_plan_id) |
             Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
-        return Location.objects.filter(pk__in=result)
+        return Location.objects.filter(pk__in=result, is_active=True)
 
 
 class PartnerAnalysisSummaryAPIView(APIView):
@@ -1233,12 +1233,13 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             ).distinct().values_list('location_id', flat=True))
 
         loc_ids = set(partner_types_loc)
-        result = Location.objects.filter(id__in=loc_ids)
+        result = Location.objects.filter(id__in=loc_ids, is_active=True)
 
         if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
                 Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(','))) &
-                Q(admin_level=int(filter_parameters['narrow_loc_type']))
+                Q(admin_level=int(filter_parameters['narrow_loc_type'])) &
+                Q(is_active=True)
             )
 
         else:

@@ -79,7 +79,7 @@ class LocationListAPIView(ListAPIView):
         """
         response_plan_id = self.kwargs.get(self.lookup_field)
         response_plan = get_object_or_404(ResponsePlan, id=response_plan_id)
-        return response_plan.workspace.locations
+        return response_plan.workspace.locations.filter(is_active=True)
 
 
 class ChildrenLocationAPIView(ListAPIView):
@@ -97,7 +97,7 @@ class ChildrenLocationAPIView(ListAPIView):
             Q(parent__parent_id=self.location_id) |
             Q(parent__parent__parent_id=self.location_id) |
             Q(parent__parent__parent__parent_id=self.location_id)
-        )
+        ).filter(is_active=True)
 
     def list(self, request, location_id, *args, **kwargs):
         self.location_id = location_id
