@@ -2520,10 +2520,10 @@ class TestProgrammeDocumentLocationsAPIView(BaseAPITestCase):
         self.workspace = factories.WorkspaceFactory()
         self.user = factories.PartnerUserFactory()
         self.partner = self.user.partner
-        
+
         self.active_loc = factories.LocationFactory(is_active=True)
         self.inactive_loc = factories.LocationFactory(is_active=False)
-        
+
         self.pd = factories.ProgrammeDocumentFactory(
             partner=self.partner,
             workspace=self.workspace
@@ -2535,25 +2535,25 @@ class TestProgrammeDocumentLocationsAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         if response.data and 'results' in response.data:
             location_ids = [loc['id'] for loc in response.data['results']]
         else:
             location_ids = [loc['id'] for loc in response.data] if response.data else []
-        
+
         self.assertNotIn(self.inactive_loc.id, location_ids)
 
 
 class TestProgressReportLocationsAPIView(BaseAPITestCase):
     def setUp(self):
         super().setUp()
-        self.workspace = factories.WorkspaceFactory() 
+        self.workspace = factories.WorkspaceFactory()
         self.user = factories.PartnerUserFactory()
         self.partner = self.user.partner
-        
+
         self.active_loc = factories.LocationFactory(is_active=True)
         self.inactive_loc = factories.LocationFactory(is_active=False)
-        
+
         self.pd = factories.ProgrammeDocumentFactory(
             partner=self.partner,
             workspace=self.workspace
@@ -2571,10 +2571,10 @@ class TestProgressReportLocationsAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         if response.data and 'results' in response.data:
             location_ids = [loc['id'] for loc in response.data['results']]
         else:
             location_ids = [loc['id'] for loc in response.data] if response.data else []
-        
+
         self.assertNotIn(self.inactive_loc.id, location_ids)
