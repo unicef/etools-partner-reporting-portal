@@ -2559,15 +2559,18 @@ class TestProgressReportLocationsAPIView(BaseAPITestCase):
             workspace=self.workspace
         )
         self.progress_report = factories.ProgressReportFactory(
-            programme_document=self.pd
+            programme_document=self.pd,
+            report_type=REPORTING_TYPES.QPR,
+            report_number=1
         )
 
     def test_progress_report_locations_excludes_inactive(self):
         """Test that ProgressReportLocationsAPIView excludes inactive locations"""
-        url = reverse('progress-report-locations', kwargs={
+        url = reverse('progress-reports-locations', kwargs={
             'workspace_id': self.workspace.id,
             'progress_report_id': self.progress_report.id
         })
+        self.client.force_authenticate(self.user)
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
