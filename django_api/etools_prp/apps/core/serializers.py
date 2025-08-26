@@ -87,8 +87,8 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
 
     class Meta:
-        model = Workspace
-        fields = ('id', 'title')
+        model = Location
+        fields = ('id', 'name')
 
     def get_id(self, obj):
         return str(obj.id)

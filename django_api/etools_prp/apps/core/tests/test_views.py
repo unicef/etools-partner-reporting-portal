@@ -198,8 +198,8 @@ class TestLocationListAPIView(BaseAPITestCase):
         location_ids = [loc['id'] for loc in response.data['results']]
         self.assertNotIn(inactive_loc.id, location_ids)
 
-        self.assertIn(self.loc1.id, location_ids)
-        self.assertIn(self.loc2.id, location_ids)
+        self.assertIn(str(self.loc1.id), location_ids)
+        self.assertIn(str(self.loc2.id), location_ids)
 
 
 class TestChildrenLocationAPIView(BaseAPITestCase):
@@ -217,6 +217,7 @@ class TestChildrenLocationAPIView(BaseAPITestCase):
     def test_children_location_excludes_inactive(self):
         """Test that ChildrenLocationAPIView excludes inactive locations"""
         url = reverse('children-location', kwargs={'location_id': self.parent_loc.id})
+        self.client.force_authenticate(self.user)
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -224,8 +225,8 @@ class TestChildrenLocationAPIView(BaseAPITestCase):
         location_ids = [loc['id'] for loc in response.data]
         self.assertNotIn(self.inactive_child.id, location_ids)
 
-        self.assertIn(self.child_loc1.id, location_ids)
-        self.assertIn(self.child_loc2.id, location_ids)
+        self.assertIn(str(self.child_loc1.id), location_ids)
+        self.assertIn(str(self.child_loc2.id), location_ids)
 
 
 class TestResponsePlanAPIView(BaseAPITestCase):
