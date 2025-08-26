@@ -43,7 +43,7 @@ export class GpdDetailsReport extends connect(store)(LitElement) {
     return html`
       ${tableStyles}
       <page-body>
-        <pd-report-filters></pd-report-filters>
+        <pd-report-filters ?isGpd="true"></pd-report-filters>
         <pd-reports-toolbar></pd-reports-toolbar>
         <pd-reports-list is-gpd></pd-reports-list>
       </page-body>
