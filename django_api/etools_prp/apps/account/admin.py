@@ -79,7 +79,7 @@ class CustomUserAdmin(UserAdmin):
     def get_inlines(self, request, obj):
         """Show realm inline as read-only for users with more than 10 realms"""
         if obj and obj.realms.count() > 10:
-            return [ReadOnlyRealmInline]  # Read-only inline for users with many realms
+            return [ReadOnlyRealmInline]
         return [RealmInline]
 
     def country(self, obj):
