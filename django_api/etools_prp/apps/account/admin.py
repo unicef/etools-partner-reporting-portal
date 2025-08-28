@@ -14,6 +14,19 @@ class RealmInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyRealmInline(admin.StackedInline):
+    verbose_name_plural = "User Realms (Read Only - 10+ realms)"
+
+    model = Realm
+    fields = ('user', 'workspace', 'partner', 'group', 'is_active')
+    readonly_fields = ('user', 'workspace', 'partner', 'group', 'is_active')
+    extra = 0
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 class CustomUserAdmin(UserAdmin):
     list_display = (
         'email', 'username', 'workspace', 'partner', 'realm_count', 'last_login', 'date_joined',
@@ -64,9 +77,9 @@ class CustomUserAdmin(UserAdmin):
     filter_horizontal = ('user_permissions',)
 
     def get_inlines(self, request, obj):
-        """Only show realm inline for users with equal of fewer than 10 realms"""
+        """Show realm inline as read-only for users with more than 10 realms"""
         if obj and obj.realms.count() > 10:
-            return []  # No inlines for users with many realms
+            return [ReadOnlyRealmInline]  # Read-only inline for users with many realms
         return [RealmInline]
 
     def country(self, obj):
