@@ -1019,6 +1019,16 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertEquals(len(response.data), 1)
         self.assertEquals(response.data[0]['title'], indicator_report.title)
 
+    def test_list_api_with_pks_forbidden(self):
+        default_unicef_user = factories.NonPartnerUserFactory(username='some_random_username')
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-direct-list-api') + f'?pks={indicator_report.id}'
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_list_api_with_limit(self):
         indicator_report = IndicatorReport.objects.last()
         url = reverse('indicator-report-list-api',
