@@ -259,12 +259,20 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
 
     def get_locations(self, obj):
-        qs = Location.objects.filter(
-            reportablelocationgoal__is_active=True,
-            indicator_location_data__indicator_report__progress_report__programme_document=obj,
-            reportables__lower_level_outputs__cp_output__programme_document=obj
-        ).distinct()
+        qs = (
+            Location.objects.filter(
+                indicator_location_data__indicator_report__progress_report__programme_document=obj
+            )
+            .values("id")
+            .union(
+                Location.objects.filter(
+                    reportables__lower_level_outputs__cp_output__programme_document=obj
+                )
+                .values("id")
+            )
+        )
 
+        qs = Location.objects.filter(id__in=qs)
         return ShortLocationSerializer(qs, many=True).data
 
 
