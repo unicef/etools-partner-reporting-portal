@@ -22,6 +22,9 @@ export class PdReportFilters extends connect(store)(LitElement) {
   @property({type: Array})
   statuses: any[] = [];
 
+  @property({type: Boolean})
+  isGpd = false;
+
   _localizeStatuses() {
     return [
       {title: getTranslation('OVERDUE'), id: 'Ove'},
@@ -46,7 +49,7 @@ export class PdReportFilters extends connect(store)(LitElement) {
         <div class="row">
           <dropdown-filter
             class="col-md-4 col-12"
-            .label=${translate('GPD_STATUS')}
+            .label=${translate(this.isGpd ? 'GPD_STATUS' : 'REPORT_STATUS')}
             name="status"
             .value=${valueWithDefaultStatuses(this.queryParams?.status, '-1')}
             .data=${this.statuses}

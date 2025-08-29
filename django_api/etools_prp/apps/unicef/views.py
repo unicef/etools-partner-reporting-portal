@@ -348,13 +348,6 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         exporter_class = self.get_exporter_class()
         if exporter_class:
             filter_qs = self.filter_queryset(self.get_queryset())
-            # if exporting limit to submitted or accepted reports only
-            filter_qs = filter_qs.filter(
-                status__in=[
-                    PROGRESS_REPORT_STATUS.submitted,
-                    PROGRESS_REPORT_STATUS.accepted,
-                ],
-            )
             if not filter_qs.exists():
                 return Response({"error": "no data"}, status=statuses.HTTP_400_BAD_REQUEST)
             return exporter_class(filter_qs).get_as_response(request)
