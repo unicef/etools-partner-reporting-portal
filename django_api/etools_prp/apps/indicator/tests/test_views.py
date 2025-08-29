@@ -1039,29 +1039,7 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertEquals(len(response.data), 2)
 
 
-class TestIndicatorDataLocationAPIView(BaseAPITestCase):
-    """Test for IndicatorDataLocationAPIView."""
 
-    def test_get_locations_for_indicator_report(self):
-        """Test that the API doesn't crash with our fix."""
-        user = factories.NonPartnerUserFactory()
-        self.client.force_authenticate(user)
-
-        # Use any existing indicator report or create one with ID 1
-        url = reverse('indicator-data-location', kwargs={'ir_id': 1})
-        response = self.client.get(url, format='json')
-
-        # Should not crash - validates our ManyToMany fix works
-        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND])
-
-    def test_invalid_indicator_report_returns_404(self):
-        """Test 404 for invalid ID."""
-        user = factories.NonPartnerUserFactory()
-        self.client.force_authenticate(user)
-
-        url = reverse('indicator-data-location', kwargs={'ir_id': 99999})
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestClusterIndicatorAPIView(BaseAPITestCase):
@@ -1448,6 +1426,20 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             response.data["cs_dates"],
             ['12-Apr-2020', '15-Apr-2020', '18-Apr-2020', '21-Apr-2020'],
         )
+
+    def test_get_locations_for_indicator_report(self):
+        """Test that locations are returned for a valid indicator report."""
+        # Use existing indicator report from setup
+        ir = self.partneractivity_reportable.indicator_reports.first()
+        url = reverse('indicator-data-location', kwargs={'ir_id': ir.id})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_invalid_indicator_report_returns_404(self):
+        """Test 404 for invalid ID."""
+        url = reverse('indicator-data-location', kwargs={'ir_id': 99999})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
