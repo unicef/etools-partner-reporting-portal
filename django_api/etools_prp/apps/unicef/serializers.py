@@ -260,6 +260,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             )
             .union(
                 Location.objects.filter(
+                    reportablelocationgoal__is_active=True,
                     reportables__lower_level_outputs__cp_output__programme_document=obj
                 )
             )
