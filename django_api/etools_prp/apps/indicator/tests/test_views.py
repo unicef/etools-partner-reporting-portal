@@ -1039,9 +1039,6 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertEquals(len(response.data), 2)
 
 
-
-
-
 class TestClusterIndicatorAPIView(BaseAPITestCase):
 
     def setUp(self):
