@@ -278,7 +278,7 @@ class TestChangeUserWorkspaceView(BaseAPITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.partner = factories.PartnerFactory()
-        cls.user = factories.PartnerUserFactory(partner=cls.partner)
+        cls.user = factories.PartnerUserFactory(partner=cls.partner, username='regular_user')
 
     def setUp(self):
         self.url = reverse("workspace-change")
