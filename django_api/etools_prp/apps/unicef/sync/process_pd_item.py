@@ -80,38 +80,39 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
     # Create Reporting Date Periods for SR report type
     item = update_create_sr_date_periods(item, pd, workspace)
 
-    if item['status'] not in ("draft", "signed",):
+    if item['status'] in ["draft", "signed"]:
+        return True
 
-        # Update LLOs and Reportable entities
-        update_llos_and_reportables(pd)
+    # Update LLOs and Reportable entities
+    update_llos_and_reportables(pd)
 
-        # Parsing expecting results and set them active, rest will stay inactive for this PD
-        for d in item['expected_results']:
+    # Parsing expecting results and set them active, rest will stay inactive for this PD
+    for d in item['expected_results']:
 
-            # Create PDResultLink
-            pdresultlink = update_create_expected_result_rl(d, workspace, pd)
+        # Create PDResultLink
+        pdresultlink = update_create_expected_result_rl(d, workspace, pd)
 
-            # Create LLO
-            d, llo = update_create_expected_result_llo(d, workspace, pd, pdresultlink)
+        # Create LLO
+        d, llo = update_create_expected_result_llo(d, workspace, pd, pdresultlink)
 
-            # Iterate over indicators
-            for i in d['indicators']:
-                # Create Blueprint
-                i, blueprint = update_create_blueprint(i, pd)
+        # Iterate over indicators
+        for i in d['indicators']:
+            # Create Blueprint
+            i, blueprint = update_create_blueprint(i, pd)
 
-                # Create Locations
-                locations, locations_result = update_create_locations(i, workspace)
+            # Create Locations
+            locations, locations_result = update_create_locations(i, workspace)
 
-                if locations_result is None:
-                    continue
+            if locations_result is None:
+                continue
 
-                # Create Disaggregations
-                disaggregations = update_create_disaggregations(i, pd)
+            # Create Disaggregations
+            disaggregations = update_create_disaggregations(i, pd)
 
-                # Create Reportable
-                i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
+            # Create Reportable
+            i, reportable = update_create_reportable(i, blueprint, disaggregations, llo, item, pd)
 
-                # Create Reportable Location Goals
-                update_create_reportable_location_goals(reportable, locations)
+            # Create Reportable Location Goals
+            update_create_reportable_location_goals(reportable, locations)
 
     return True

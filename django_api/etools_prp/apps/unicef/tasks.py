@@ -18,31 +18,9 @@ LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
 @shared_task
 def process_programme_documents(fast=False, area=False):
-    """
-    Specifically each below expected_results instance has the following
-    mapping.
-
-    From this need to create indicator blueprint first, then disagg,
-    then PDResultLink, then LL output, then Reportable attached to that LLO.
-    {
-        id: 8,                  --> LLO.external_id
-        title: "blah",          --> LLO.title
-        result_link: 47,        --> PDResultLink.external_id
-        cp_output: {
-            id: 312,            --> PDResultLink.external_cp_output_id
-            title: "1.1 POLICY - NEWBORN & CHILD HEALTH"    --> PDResultLink.title
-        },
-        indicators: [ ]
-    }
-    """
-    # # Get/Create Group that will be assigned to persons
-    # partner_authorized_officer_group = PartnerAuthorizedOfficerRole.as_group()
-
-    # Iterate over all workspaces
+    workspaces = Workspace.objects.all()
     if fast:
-        workspaces = Workspace.objects.filter(business_area_code=area)  # 2130 for Iraq
-    else:
-        workspaces = Workspace.objects.all()
+        workspaces = Workspace.objects.filter(business_area_code=area)
 
     for workspace in workspaces:
         # Skip global workspace and Syria Cross Border / MENARO
@@ -53,10 +31,8 @@ def process_programme_documents(fast=False, area=False):
         page_url = None
 
         while True:
-            # last time this work perfectly
             try:
-                api = PMP_API()
-                list_data = api.programme_documents(
+                list_data = PMP_API().programme_documents(
                     business_area_code=str(
                         workspace.business_area_code), url=page_url)
             except Exception as e:

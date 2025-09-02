@@ -187,9 +187,7 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
         return response_plan
 
 
-# PMP API Serializers
 class PMPWorkspaceSerializer(serializers.ModelSerializer):
-
     id = serializers.CharField(source='external_id')
     name = serializers.CharField(source='title')
     country_short_code = serializers.CharField(source='workspace_code')
