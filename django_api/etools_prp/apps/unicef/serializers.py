@@ -19,7 +19,7 @@ from etools_prp.apps.core.common import (
     PROGRESS_REPORT_STATUS,
     PRP_IP_ROLE_TYPES,
 )
-from etools_prp.apps.core.models import Location, Workspace
+from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.models import IndicatorBlueprint
 from etools_prp.apps.indicator.serializers import (

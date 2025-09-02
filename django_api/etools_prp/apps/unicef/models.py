@@ -32,7 +32,11 @@ from etools_prp.apps.core.common import (
     REPORTING_TYPES,
     SR_TYPE,
 )
-from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
+from etools_prp.apps.core.models import (
+    Location,
+    TimeStampedExternalBusinessAreaModel,
+    TimeStampedExternalSyncModelMixin,
+)
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
 from etools_prp.apps.utils.emails import send_email_from_template
 
@@ -387,8 +391,6 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     @property
     def locations_queryset(self):
-        from etools_prp.apps.core.models import Location
-
         return Location.objects.filter(
             Q(
                 indicator_location_data__indicator_report__progress_report__programme_document=self
