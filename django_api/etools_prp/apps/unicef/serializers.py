@@ -256,7 +256,8 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
     def get_locations(self, obj):
         qs = (
             Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj
+                indicator_location_data__indicator_report__progress_report__programme_document=obj,
+                reportablelocationgoal__is_active=True,
             )
             .union(
                 Location.objects.filter(
