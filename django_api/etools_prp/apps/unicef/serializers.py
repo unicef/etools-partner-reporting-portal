@@ -104,7 +104,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_focal_point = serializers.SerializerMethodField()
     partner_focal_point = serializers.SerializerMethodField()
     document_type_display = serializers.CharField(source='get_document_type_display')
-    locations = serializers.SerializerMethodField(allow_null=True)
+    locations = ShortLocationSerializer(source='locations_queryset', many=True, read_only=True, allow_null=True)
     amendments = serializers.JSONField(read_only=True)
     reporting_periods = ReportingPeriodDatesSerializer(many=True)
 
@@ -160,19 +160,6 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     def get_funds_received_to_date_currency(self, obj):
         return obj.funds_received_to_date_currency
 
-    def get_locations(self, obj):
-        qs = (
-            Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj
-            )
-            .union(
-                Location.objects.filter(
-                    reportables__lower_level_outputs__cp_output__programme_document=obj
-                )
-            )
-        )
-        return ShortLocationSerializer(qs, many=True).data
-
     def get_unicef_officers(self, obj):
         return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
 
@@ -204,7 +191,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 
     total_unicef_supplies = serializers.CharField(source='in_kind_amount')
     total_unicef_supplies_currency = serializers.CharField(source='in_kind_amount_currency')
-    locations = serializers.SerializerMethodField(allow_null=True)
+    locations = ShortLocationSerializer(source='locations_queryset', many=True, read_only=True, allow_null=True)
     reporting_periods = ReportingPeriodDatesSerializer(many=True)
     amendments = serializers.JSONField(read_only=True)
 
@@ -252,21 +239,6 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 
     def get_partner_focal_point(self, obj):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
-
-    def get_locations(self, obj):
-        qs = (
-            Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj,
-                reportablelocationgoal__is_active=True,
-            )
-            .union(
-                Location.objects.filter(
-                    reportablelocationgoal__is_active=True,
-                    reportables__lower_level_outputs__cp_output__programme_document=obj
-                )
-            )
-        )
-        return ShortLocationSerializer(qs, many=True).data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):

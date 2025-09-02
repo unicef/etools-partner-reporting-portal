@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -383,6 +384,19 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     @property
     def is_gpd(self):
         return self.document_type == PD_DOCUMENT_TYPE.GDD
+
+    @property
+    def locations_queryset(self):
+        from etools_prp.apps.core.models import Location
+
+        return Location.objects.filter(
+            Q(
+                indicator_location_data__indicator_report__progress_report__programme_document=self
+            ) | Q(
+                reportables__lower_level_outputs__cp_output__programme_document=self
+            ),
+            reportablelocationgoal__is_active=True,
+        ).distinct()
 
 
 class ProgressReport(TimeStampedModel):
