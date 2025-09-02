@@ -941,23 +941,20 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
 
         else:
             hide_children = -1
-        active_location_goals = obj.reportable.reportablelocationgoal_set.filter(is_active=True)
-        objects = list(obj.indicator_location_data.filter(
-            location__reportablelocationgoal__in=active_location_goals).distinct())
+
+        objects = list(obj.indicator_location_data.all())
 
         if hide_children == -1:
             child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
 
             if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
                 child_ir_ild_ids = child_ir_ild_ids.filter(
-                    location__reportablelocationgoal__in=active_location_goals,
                     reporting_entity__title="UNICEF",
                     reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
                 )
 
             child_ilds = IndicatorLocationData.objects.filter(
                 id__in=child_ir_ild_ids,
-                location__reportablelocationgoal__in=active_location_goals
             )
 
             if obj.children.exists():
