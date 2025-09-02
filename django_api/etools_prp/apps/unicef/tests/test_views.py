@@ -588,108 +588,114 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
             self.pd.reference_number,
             response.data['reference_number'])
 
-    # def test_locations_from_different_sources(self):
-    #     """
-    #     Test that locations are returned from both sources:
-    #     1. Locations linked through reportables -> lower_level_outputs -> cp_output -> programme_document
-    #     2. Locations linked through indicator_location_data -> indicator_report -> progress_report -> programme_document
-    #     """
-    #     # Create additional locations for isolated testing
-    #     loc3 = factories.LocationFactory()
-    #     loc4 = factories.LocationFactory()
-    #     loc3.workspaces.add(self.workspace)
-    #     loc4.workspaces.add(self.workspace)
-    #
-    #     # Create a second PD to ensure isolation
-    #     pd_isolated = factories.ProgrammeDocumentFactory(
-    #         workspace=self.workspace,
-    #         partner=self.partner,
-    #         sections=[factories.SectionFactory(), ],
-    #         unicef_officers=[self.unicef_officer, ],
-    #         unicef_focal_point=[self.unicef_focal_point, ],
-    #         partner_focal_point=[self.partner_focal_point, ]
-    #     )
-    #
-    #     # Scenario 1: Location only through reportables path (no progress reports)
-    #     cp_output_isolated = factories.PDResultLinkFactory(
-    #         programme_document=pd_isolated,
-    #     )
-    #     llo_isolated = factories.LowerLevelOutputFactory(
-    #         cp_output=cp_output_isolated,
-    #     )
-    #     llo_reportable_isolated = factories.QuantityReportableToLowerLevelOutputFactory(
-    #         content_object=llo_isolated,
-    #         blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
-    #             unit=IndicatorBlueprint.NUMBER,
-    #             calculation_formula_across_locations=IndicatorBlueprint.SUM,
-    #         )
-    #     )
-    #
-    #     # Link loc3 to reportable (reportables path)
-    #     factories.LocationWithReportableLocationGoalFactory(
-    #         location=loc3,
-    #         reportable=llo_reportable_isolated,
-    #     )
-    #
-    #     # Scenario 2: Location only through progress reports path
-    #     # Create progress report
-    #     qpr_period_isolated = factories.QPRReportingPeriodDatesFactory(programme_document=pd_isolated)
-    #     pr_isolated = factories.ProgressReportFactory(
-    #         start_date=qpr_period_isolated.start_date,
-    #         end_date=qpr_period_isolated.end_date,
-    #         due_date=qpr_period_isolated.due_date,
-    #         report_number=1,
-    #         report_type=qpr_period_isolated.report_type,
-    #         is_final=False,
-    #         programme_document=pd_isolated,
-    #         submitted_by=self.user,
-    #         submitting_user=self.user,
-    #     )
-    #
-    #     # Create a reportable NOT linked to this PD's lower level outputs
-    #     external_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
-    #         content_object=self.project_context,
-    #         blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
-    #             unit=IndicatorBlueprint.NUMBER,
-    #             calculation_formula_across_locations=IndicatorBlueprint.SUM,
-    #         )
-    #     )
-    #
-    #     # Create indicator report linked to progress report
-    #     indicator_report_isolated = factories.ProgressReportIndicatorReportFactory(
-    #         progress_report=pr_isolated,
-    #         reportable=external_reportable,
-    #         report_status=INDICATOR_REPORT_STATUS.submitted,
-    #         overall_status=OVERALL_STATUS.met,
-    #     )
-    #
-    #     # Create indicator location data linking loc4 to the progress report (but not through LLO)
-    #     factories.IndicatorLocationDataFactory(
-    #         indicator_report=indicator_report_isolated,
-    #         location=loc4,
-    #     )
-    #
-    #     # Test the API response
-    #     url = reverse(
-    #         'programme-document-details',
-    #         kwargs={'pd_id': pd_isolated.id, 'workspace_id': self.workspace.id})
-    #     response = self.client.get(url, format='json')
-    #
-    #     self.assertTrue(status.is_success(response.status_code))
-    #
-    #     # Should return both locations from different sources
-    #     locations = response.data['locations']
-    #     actual_location_ids = [str(loc["id"]) for loc in locations]
-    #
-    #     # Verify both locations are present
-    #     self.assertIn(str(loc3.id), actual_location_ids,
-    #                   "Location from reportables path should be included")
-    #     self.assertIn(str(loc4.id), actual_location_ids,
-    #                   "Location from progress reports path should be included")
-    #
-    #     # Should have at least these 2 locations (might have more from the union)
-    #     self.assertGreaterEqual(len(locations), 2,
-    #                             "Should return locations from both reportables and progress reports paths")
+    def test_locations_from_different_sources(self):
+        """
+        Test that locations are returned from both sources:
+        1. Locations linked through reportables -> lower_level_outputs -> cp_output -> programme_document
+        2. Locations linked through indicator_location_data -> indicator_report -> progress_report -> programme_document
+        """
+        # Create additional locations for isolated testing
+        loc3 = factories.LocationFactory()
+        loc4 = factories.LocationFactory()
+        loc3.workspaces.add(self.workspace)
+        loc4.workspaces.add(self.workspace)
+
+        # Create a second PD to ensure isolation
+        pd_isolated = factories.ProgrammeDocumentFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            sections=[factories.SectionFactory(), ],
+            unicef_officers=[self.unicef_officer, ],
+            unicef_focal_point=[self.unicef_focal_point, ],
+            partner_focal_point=[self.partner_focal_point, ]
+        )
+
+        # Scenario 1: Location only through reportables path (no progress reports)
+        cp_output_isolated = factories.PDResultLinkFactory(
+            programme_document=pd_isolated,
+        )
+        llo_isolated = factories.LowerLevelOutputFactory(
+            cp_output=cp_output_isolated,
+        )
+        llo_reportable_isolated = factories.QuantityReportableToLowerLevelOutputFactory(
+            content_object=llo_isolated,
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+
+        # Link loc3 to reportable (reportables path)
+        factories.LocationWithReportableLocationGoalFactory(
+            location=loc3,
+            reportable=llo_reportable_isolated,
+        )
+
+        # Scenario 2: Location only through progress reports path
+        # Create progress report
+        qpr_period_isolated = factories.QPRReportingPeriodDatesFactory(programme_document=pd_isolated)
+        pr_isolated = factories.ProgressReportFactory(
+            start_date=qpr_period_isolated.start_date,
+            end_date=qpr_period_isolated.end_date,
+            due_date=qpr_period_isolated.due_date,
+            report_number=1,
+            report_type=qpr_period_isolated.report_type,
+            is_final=False,
+            programme_document=pd_isolated,
+            submitted_by=self.user,
+            submitting_user=self.user,
+        )
+
+        # Create a reportable NOT linked to this PD's lower level outputs
+        external_reportable = factories.QuantityReportableToPartnerActivityProjectContextFactory(
+            content_object=self.project_context,
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+
+        # Create indicator report linked to progress report
+        indicator_report_isolated = factories.ProgressReportIndicatorReportFactory(
+            progress_report=pr_isolated,
+            reportable=external_reportable,
+            report_status=INDICATOR_REPORT_STATUS.submitted,
+            overall_status=OVERALL_STATUS.met,
+        )
+
+        # Create indicator location data linking loc4 to the progress report (but not through LLO)
+        factories.IndicatorLocationDataFactory(
+            indicator_report=indicator_report_isolated,
+            location=loc4,
+        )
+
+        # Also mark loc4 as active for this PD via an active ReportableLocationGoal
+        factories.LocationWithReportableLocationGoalFactory(
+            location=loc4,
+            reportable=llo_reportable_isolated,
+        )
+
+        # Test the API response
+        url = reverse(
+            'programme-document-details',
+            kwargs={'pd_id': pd_isolated.id, 'workspace_id': self.workspace.id})
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+
+        # Should return both locations from different sources
+        locations = response.data['locations']
+        actual_location_ids = [str(loc["id"]) for loc in locations]
+
+        # Verify both locations are present
+        self.assertIn(str(loc3.id), actual_location_ids,
+                      "Location from reportables path should be included")
+        self.assertIn(str(loc4.id), actual_location_ids,
+                      "Location from progress reports path should be included")
+
+        # Should have at least these 2 locations (might have more from the union)
+        self.assertGreaterEqual(len(locations), 2,
+                                "Should return locations from both reportables and progress reports paths")
 
 
 class BaseProgressReportAPITestCase(BaseAPITestCase):

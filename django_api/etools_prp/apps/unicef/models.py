@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -31,7 +32,11 @@ from etools_prp.apps.core.common import (
     REPORTING_TYPES,
     SR_TYPE,
 )
-from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
+from etools_prp.apps.core.models import (
+    Location,
+    TimeStampedExternalBusinessAreaModel,
+    TimeStampedExternalSyncModelMixin,
+)
 from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
 from etools_prp.apps.utils.emails import send_email_from_template
 
@@ -383,6 +388,17 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     @property
     def is_gpd(self):
         return self.document_type == PD_DOCUMENT_TYPE.GDD
+
+    @property
+    def locations_queryset(self):
+        return Location.objects.filter(
+            Q(
+                indicator_location_data__indicator_report__progress_report__programme_document=self
+            ) | Q(
+                reportables__lower_level_outputs__cp_output__programme_document=self
+            ),
+            reportablelocationgoal__is_active=True,
+        ).distinct()
 
 
 class ProgressReport(TimeStampedModel):
