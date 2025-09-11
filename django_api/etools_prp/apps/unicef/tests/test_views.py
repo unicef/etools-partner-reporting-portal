@@ -1372,6 +1372,47 @@ class TestProgressReportDetailUpdateAPIView(BaseProgressReportAPITestCase):
         for field in ["delivered_as_planned", "results_achieved"]:
             self.assertEqual(getattr(gpd_progress_report.gpd_report, field), data[field])
 
+    def test_detail_update_gpd_report_sr_updates_results_achieved(self):
+        """
+        PUT to update an SR-type GPD progress report with
+        results_achieved persists the value as part of GPD fields.
+        """
+        gpd_progress_report = self.gpd.progress_reports.filter(is_final=False).first()
+
+        self.partner_user.partner = self.government
+        self.partner_user.save()
+
+        url = reverse(
+            'progress-reports-details-update',
+            args=[self.workspace.pk, gpd_progress_report.pk],
+        )
+        initial_data = {
+            "delivered_as_planned": "partially",
+            "results_achieved": "initial value",
+            "other_information": "other info",
+        }
+        resp = self.client.put(url, format='json', data=initial_data)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        gpd_progress_report.refresh_from_db()
+        self.assertTrue(hasattr(gpd_progress_report, 'gpd_report'))
+        self.assertEqual(gpd_progress_report.gpd_report.results_achieved, initial_data["results_achieved"])
+
+        gpd_progress_report.report_type = REPORTING_TYPES.SR
+        gpd_progress_report.save(update_fields=['report_type'])
+
+        sr_payload = {
+            "results_achieved": "changed via SR",
+            "delivered_as_planned": "yes",
+        }
+        resp = self.client.put(url, format='json', data=sr_payload)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        gpd_progress_report.refresh_from_db()
+        self.assertTrue(hasattr(gpd_progress_report, 'gpd_report'))
+        self.assertEqual(gpd_progress_report.gpd_report.results_achieved, sr_payload["results_achieved"])
+        self.assertIn('results_achieved', resp.data)
+        self.assertEqual(resp.data['results_achieved'], sr_payload['results_achieved'])
+
     def test_detail_api_filter_incomplete(self):
         progress_report = self.pd.progress_reports.first()
         ir_qs = IndicatorReport.objects.filter(
