@@ -428,7 +428,29 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         pr = self.get_object(pk)
 
         if pr.report_type == "SR":
-            serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data)
+            if pr.programme_document.is_gpd:
+                narrative_serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data, partial=True)
+                narrative_serializer.is_valid(raise_exception=True)
+
+                gpd_payload = {
+                    key: request.data.get(key)
+                    for key in [
+                        'delivered_as_planned',
+                        'results_achieved',
+                        'other_information',
+                    ]
+                    if key in request.data
+                }
+                gpd_serializer = ProgressReportUpdateSerializer(instance=pr, data=gpd_payload, partial=True)
+                gpd_serializer.is_valid(raise_exception=True)
+
+                narrative_serializer.save()
+                gpd_serializer.save()
+
+                pr.refresh_from_db()
+                return Response(ProgressReportSerializer(instance=pr).data, status=statuses.HTTP_200_OK)
+            else:
+                serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data)
         else:
             if pr.is_final:
                 serializer = ProgressReportFinalUpdateSerializer(instance=pr, data=request.data)
