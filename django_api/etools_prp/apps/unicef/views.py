@@ -85,7 +85,7 @@ from .serializers import (
     ProgressReportSerializer,
     ProgressReportSimpleSerializer,
     ProgressReportSRUpdateSerializer,
-    ProgressReportUpdateSerializer,
+    ProgressReportUpdateSerializer, ProgrammeDocumentReportingSerializer,
 )
 from .services import ProgressReportHFDataService
 
@@ -220,6 +220,28 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
                 "endpoint": "ProgrammeDocumentProgressAPIView",
                 "request.data": self.request.data,
                 search_by: pd_id,
+                "exception": exp,
+            })
+            raise Http404
+
+
+class ProgrammeDocumentReportingAPIView(RetrieveAPIView):
+    serializer_class = ProgrammeDocumentReportingSerializer
+    permission_classes = (IsUNICEFAPIUser,)
+
+    def get(self, request, workspace_id, pd_external_id, *args, **kwargs):
+        self.workspace_id = workspace_id
+
+        query_params = dict(workspace=self.workspace_id, external_id=pd_external_id)
+        try:
+            pd = ProgrammeDocument.objects.get(**query_params)
+            serializer = self.get_serializer(pd)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+        except ProgrammeDocument.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgrammeDocumentReportingAPIView",
+                "request.data": self.request.data,
                 "exception": exp,
             })
             raise Http404

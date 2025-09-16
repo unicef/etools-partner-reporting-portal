@@ -990,6 +990,23 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
             'external_business_area_code',
         )
 
+class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    has_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ReportingPeriodDates
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date'
+            'report_type',
+            'has_data',
+            'programme_document',
+            'external_business_area_code',
+        )
+
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')

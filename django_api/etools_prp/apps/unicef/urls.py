@@ -22,7 +22,7 @@ from .views import (
     ProgressReportReviewAPIView,
     ProgressReportSRSubmitAPIView,
     ProgressReportSubmitAPIView,
-    UserRealmsImportView,
+    UserRealmsImportView, ProgrammeDocumentReportingAPIView,
 )
 
 urlpatterns = [
@@ -34,6 +34,9 @@ urlpatterns = [
             name="programme-document-details"),
     re_path(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/progress/$',
             ProgrammeDocumentProgressAPIView.as_view(),
+            name="programme-document-progress"),
+    re_path(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_external_id>\d+)/reporting/$',
+            ProgrammeDocumentReportingAPIView.as_view(),
             name="programme-document-progress"),
     re_path(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/calculation-methods/$',
             ProgrammeDocumentCalculationMethodsAPIView.as_view(),
