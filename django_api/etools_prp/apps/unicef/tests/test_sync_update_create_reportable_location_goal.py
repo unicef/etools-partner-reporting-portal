@@ -1,17 +1,14 @@
-from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 
 from etools_prp.apps.core.tests import factories
-from etools_prp.apps.indicator.models import ReportableLocationGoal, IndicatorBlueprint, Reportable
-from etools_prp.apps.unicef.sync.update_create_reportable_location_goal import (
-    update_create_reportable_location_goals,
-)
+from etools_prp.apps.indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
+from etools_prp.apps.unicef.sync.update_create_reportable_location_goal import update_create_reportable_location_goals
 
 
 class TestUpdateCreateReportableLocationGoals(TestCase):
 
     def setUp(self):
-        
         # creating pd, llos, etc.
         self.pd = factories.ProgrammeDocumentFactory()
         self.cp_output = factories.PDResultLinkFactory(programme_document=self.pd)
@@ -46,7 +43,6 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
         )
 
     def test_deactivates_removed_locations(self):
-        
         # asserting that locations are active initially
         rlg1 = ReportableLocationGoal.objects.get(
             reportable=self.reportable, location=self.loc1
@@ -57,7 +53,7 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
         self.assertTrue(rlg1.is_active)
         self.assertTrue(rlg2.is_active)
 
-        # this is what the process_pd_item script would run 
+        # this is what the process_pd_item script would run
         update_create_reportable_location_goals(self.reportable, [self.loc1])
 
         # asserting the locations are active
@@ -72,7 +68,7 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
         )
 
     def test_reactivate_and_deactivate_mixed_state(self):
-        # setting first location to inactive 
+        # setting first location to inactive
         # (what happens when a location is removed from the pd)
         ReportableLocationGoal.objects.filter(
             reportable=self.reportable, location=self.loc1
@@ -95,5 +91,3 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
         )
         self.assertTrue(rlg1.is_active)
         self.assertFalse(rlg2.is_active)
-
-
