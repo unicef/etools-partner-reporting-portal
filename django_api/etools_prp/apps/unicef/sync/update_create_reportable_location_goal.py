@@ -31,3 +31,5 @@ def update_create_reportable_location_goals(reportable: Reportable, locations: l
     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
     ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=True)
+
+    ReportableLocationGoal.objects.filter(reportable=reportable).exclude(location__in=locations).update(is_active=False)
