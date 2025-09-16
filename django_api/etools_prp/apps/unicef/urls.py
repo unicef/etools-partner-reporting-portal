@@ -8,6 +8,7 @@ from .views import (
     ProgrammeDocumentIndicatorsAPIView,
     ProgrammeDocumentLocationsAPIView,
     ProgrammeDocumentProgressAPIView,
+    ProgrammeDocumentReportingAPIView,
     ProgressReportAnnexCPDFView,
     ProgressReportAPIView,
     ProgressReportAttachmentAPIView,
@@ -22,7 +23,7 @@ from .views import (
     ProgressReportReviewAPIView,
     ProgressReportSRSubmitAPIView,
     ProgressReportSubmitAPIView,
-    UserRealmsImportView, ProgrammeDocumentReportingAPIView,
+    UserRealmsImportView,
 )
 
 urlpatterns = [

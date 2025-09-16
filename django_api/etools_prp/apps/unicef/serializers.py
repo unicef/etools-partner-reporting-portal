@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import transaction
+from django.db.models import Q
 from django.utils.functional import cached_property
 
 from rest_framework import serializers
@@ -990,22 +991,26 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
             'external_business_area_code',
         )
 
+
 class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='external_id')
-    has_data = serializers.SerializerMethodField()
+    has_partner_data = serializers.SerializerMethodField()
 
     class Meta:
-        model = ReportingPeriodDates
+        model = ProgressReport
         fields = (
             'id',
             'start_date',
             'end_date',
-            'due_date'
+            'due_date',
             'report_type',
-            'has_data',
-            'programme_document',
-            'external_business_area_code',
+            'report_number',
+            'has_partner_data',
         )
+
+    def get_has_partner_data(self, obj):
+        if obj.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists():
+            return True
+        return False
 
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
