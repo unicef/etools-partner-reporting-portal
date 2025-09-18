@@ -38,7 +38,7 @@ urlpatterns = [
             name="programme-document-progress"),
     re_path(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_external_id>\d+)/reporting/$',
             ProgrammeDocumentReportingAPIView.as_view(),
-            name="programme-document-progress"),
+            name="programme-document-reporting"),
     re_path(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/calculation-methods/$',
             ProgrammeDocumentCalculationMethodsAPIView.as_view(),
             name="programme-document-calculation-methods"),

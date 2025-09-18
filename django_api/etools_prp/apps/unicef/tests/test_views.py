@@ -2621,3 +2621,28 @@ class TestProgrammeDocumentCalculationMethodsAPIView(BaseProgressReportAPITestCa
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['ll_outputs_and_indicators'].__len__(), 1)
         self.assertEqual(response.data['ll_outputs_and_indicators'][0]['ll_output']['id'], self.llo.id)
+
+
+class TestProgrammeDocumentReportingAPIView(BaseProgressReportAPITestCase):
+    def setUp(self):
+        super().setUp()
+        self.pd.external_id = '1234'
+        self.pd.save(update_fields=['external_id'])
+        self.url = reverse("programme-document-reporting", args=[self.workspace.id, self.pd.external_id])
+
+    def test_get_programme_document_reporting_as_unicef_user(self):
+        default_unicef_user = factories.NonPartnerUserFactory(username=settings.DEFAULT_UNICEF_USER)
+
+        self.client.force_authenticate(default_unicef_user)
+        response = self.client.get(self.url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), self.pd.progress_reports.count())
+
+    def test_get_programme_document_reporting_forbidden(self):
+        user = factories.NonPartnerUserFactory()
+
+        self.client.force_authenticate(user)
+        response = self.client.get(self.url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

@@ -74,13 +74,12 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
     # Create sections
     item, pd = update_create_sections(item, pd, workspace)
 
-    # Create Reporting Date Periods for QPR and HR report type
-    item = update_create_qpr_n_hr_date_periods(item, pd, workspace)
-
-    # Create Reporting Date Periods for SR report type
-    item = update_create_sr_date_periods(item, pd, workspace)
-
     if item['status'] not in ("draft", "signed",):
+        # Create Reporting Date Periods for QPR and HR report type
+        item = update_create_qpr_n_hr_date_periods(item, pd, workspace)
+
+        # Create Reporting Date Periods for SR report type
+        item = update_create_sr_date_periods(item, pd, workspace)
 
         # Update LLOs and Reportable entities
         update_llos_and_reportables(pd)
