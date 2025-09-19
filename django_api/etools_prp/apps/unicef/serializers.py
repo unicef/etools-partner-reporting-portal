@@ -1011,7 +1011,8 @@ class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
         )
 
     def get_has_partner_data(self, obj):
-        if obj.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists():
+        if (obj.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists() or
+                obj.attachments.exists() or obj.created != obj.modified):
             return True
         return False
 

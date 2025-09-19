@@ -23,6 +23,7 @@ from etools_prp.apps.unicef.sync.update_create_reportable import update_create_r
 from etools_prp.apps.unicef.sync.update_create_reportable_location_goal import update_create_reportable_location_goals
 from etools_prp.apps.unicef.sync.update_create_section import update_create_sections
 from etools_prp.apps.unicef.sync.update_llos_and_reportables import update_llos_and_reportables
+from etools_prp.apps.unicef.sync.utils import handle_reporting_dates
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +76,9 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
     item, pd = update_create_sections(item, pd, workspace)
 
     if item['status'] not in ("draft", "signed",):
+        # Handle existing reporting periods and progress reports
+        handle_reporting_dates(workspace.business_area_code, pd, item['reporting_requirements'])
+
         # Create Reporting Date Periods for QPR and HR report type
         item = update_create_qpr_n_hr_date_periods(item, pd, workspace)
 
