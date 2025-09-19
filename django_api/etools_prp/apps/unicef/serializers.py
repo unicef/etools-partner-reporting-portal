@@ -994,6 +994,9 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
 
 class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
     has_partner_data = serializers.SerializerMethodField()
+    start_date = serializers.DateField(format='%Y-%m-%d')
+    end_date = serializers.DateField(format='%Y-%m-%d')
+    due_date = serializers.DateField(format='%Y-%m-%d')
 
     class Meta:
         model = ProgressReport
