@@ -171,6 +171,13 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
 
 
+class ProgrammeDocumentListSerializer(ProgrammeDocumentSerializer):
+    locations = None
+
+    class Meta(ProgrammeDocumentSerializer.Meta):
+        fields = tuple(f for f in ProgrammeDocumentSerializer.Meta.fields if f != 'locations')
+
+
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
