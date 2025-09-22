@@ -76,8 +76,8 @@ from .serializers import (
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
+    ProgrammeDocumentListSerializer,
     ProgrammeDocumentProgressSerializer,
-    ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
     ProgressReportFinalUpdateSerializer,
     ProgressReportPullHFDataSerializer,
@@ -97,7 +97,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     Endpoint for getting a list of Programme Documents and being able to
     filter by them.
     """
-    serializer_class = ProgrammeDocumentSerializer
+    serializer_class = ProgrammeDocumentListSerializer
     permission_classes = (
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
