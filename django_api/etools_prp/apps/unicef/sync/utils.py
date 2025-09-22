@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib.auth import get_user_model
-from django.db.models import Q
 
 from jsonschema.exceptions import ValidationError
 
@@ -76,7 +75,7 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     pd_periods = pd.reporting_periods.filter(external_business_area_code=business_area_code)
     report_type_set = {req['report_type'] for req in reporting_reqs}
 
-    # get all reporting periods that are not aligned
+    # get all reporting periods that have changed
     changed_periods = []
     for report_type in report_type_set:
         filtered_reqs = list(filter(lambda x: x['report_type'] == report_type, reporting_reqs))
@@ -99,15 +98,13 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
                 report_type=changed_period.report_type
             )
         except ProgressReport.DoesNotExist:
-            # if no progress report found, delete ReportingPeriodDates objects from the db
+            # if no progress report found, delete ReportingPeriodDates objects
             changed_period.delete()
             continue
 
         # if there is any data input from the partner on the progress report
         # (including indicator reports, indicator location data)
-        if (progress_rep.created != progress_rep.modified or
-                progress_rep.attachments.exists() or
-                progress_rep.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists()):
+        if progress_rep.has_partner_data:
             # log exception and skip the report in reporting_requirements
             logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} with user input data. Skipping..')
         else:

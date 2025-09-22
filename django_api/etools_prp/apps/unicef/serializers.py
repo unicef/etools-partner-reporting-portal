@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import transaction
-from django.db.models import Q
 from django.utils.functional import cached_property
 
 from rest_framework import serializers
@@ -1000,7 +999,6 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
 
 
 class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
-    has_partner_data = serializers.SerializerMethodField()
     start_date = serializers.DateField(format='%Y-%m-%d')
     end_date = serializers.DateField(format='%Y-%m-%d')
     due_date = serializers.DateField(format='%Y-%m-%d')
@@ -1016,12 +1014,6 @@ class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
             'report_number',
             'has_partner_data',
         )
-
-    def get_has_partner_data(self, obj):
-        if (obj.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists() or
-                obj.attachments.exists() or obj.created != obj.modified):
-            return True
-        return False
 
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
