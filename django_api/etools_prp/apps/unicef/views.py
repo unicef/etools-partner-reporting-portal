@@ -78,7 +78,6 @@ from .serializers import (
     ProgrammeDocumentDetailSerializer,
     ProgrammeDocumentListSerializer,
     ProgrammeDocumentProgressSerializer,
-    ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
     ProgressReportFinalUpdateSerializer,
     ProgressReportPullHFDataSerializer,
