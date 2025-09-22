@@ -227,8 +227,7 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
 
 
 class ProgrammeDocumentReportingAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
-    # permission_classes = (IsUNICEFAPIUser,)
+    permission_classes = (IsUNICEFAPIUser,)
 
     def get(self, request, workspace_id, pd_external_id, *args, **kwargs):
         query_params = dict(workspace=workspace_id, external_id=pd_external_id)
