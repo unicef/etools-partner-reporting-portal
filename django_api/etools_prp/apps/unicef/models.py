@@ -391,14 +391,14 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     @property
     def locations_queryset(self):
-        return Location.objects.only('id', 'name', 'admin_level', 'admin_level_name', 'p_code').filter(
+        return Location.objects.select_related(None).only('id', 'name', 'admin_level', 'admin_level_name', 'p_code').filter(
             Q(
                 indicator_location_data__indicator_report__progress_report__programme_document=self
             ) | Q(
                 reportables__lower_level_outputs__cp_output__programme_document=self
             ),
             reportablelocationgoal__is_active=True,
-        ).distinct('id')
+        ).order_by('id').distinct('id')
 
 
 class ProgressReport(TimeStampedModel):
