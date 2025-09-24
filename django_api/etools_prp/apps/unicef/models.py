@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -37,7 +37,7 @@ from etools_prp.apps.core.models import (
     TimeStampedExternalBusinessAreaModel,
     TimeStampedExternalSyncModelMixin,
 )
-from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
+from etools_prp.apps.indicator.models import Reportable, IndicatorLocationData, ReportableLocationGoal  # IndicatorReport
 from etools_prp.apps.utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
@@ -391,14 +391,18 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     @property
     def locations_queryset(self):
-        return Location.objects.filter(
-            Q(
-                indicator_location_data__indicator_report__progress_report__programme_document=self
-            ) | Q(
-                reportables__lower_level_outputs__cp_output__programme_document=self
-            ),
-            reportablelocationgoal__is_active=True,
-        ).distinct()
+        fields = ('id', 'name', 'admin_level', 'admin_level_name', 'p_code')
+        base = Location.super_objects.select_related(None).only(*fields)
+
+        qs_reports = base.filter(
+            indicator_location_data__indicator_report__progress_report__programme_document=self
+        )
+
+        qs_llos = base.filter(
+            reportables__lower_level_outputs__cp_output__programme_document=self
+        )
+
+        return qs_reports.union(qs_llos).order_by('id')
 
 
 class ProgressReport(TimeStampedModel):
