@@ -394,11 +394,13 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
         base = Location.super_objects.select_related(None).only(*fields)
 
         qs_reports = base.filter(
-            indicator_location_data__indicator_report__progress_report__programme_document=self
+            indicator_location_data__indicator_report__progress_report__programme_document=self,
+            reportablelocationgoal__is_active=True,
         )
 
         qs_llos = base.filter(
-            reportables__lower_level_outputs__cp_output__programme_document=self
+            reportables__lower_level_outputs__cp_output__programme_document=self,
+            reportablelocationgoal__is_active=True,
         )
 
         return qs_reports.union(qs_llos).order_by('id')
