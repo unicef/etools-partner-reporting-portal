@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
-from django.db.models import Q, Exists, OuterRef
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -37,7 +36,7 @@ from etools_prp.apps.core.models import (
     TimeStampedExternalBusinessAreaModel,
     TimeStampedExternalSyncModelMixin,
 )
-from etools_prp.apps.indicator.models import Reportable, IndicatorLocationData, ReportableLocationGoal  # IndicatorReport
+from etools_prp.apps.indicator.models import Reportable  # IndicatorReport  # noqa: F401
 from etools_prp.apps.utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
