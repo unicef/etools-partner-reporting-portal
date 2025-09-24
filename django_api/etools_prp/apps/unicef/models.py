@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
-from django.db.models import F, Q
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -37,7 +37,7 @@ from etools_prp.apps.core.models import (
     TimeStampedExternalBusinessAreaModel,
     TimeStampedExternalSyncModelMixin,
 )
-from etools_prp.apps.indicator.models import IndicatorLocationData, Reportable  # IndicatorReport
+from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
@@ -503,10 +503,7 @@ class ProgressReport(TimeStampedModel):
     def has_partner_data(self):
         if (self.created != self.modified or
                 self.attachments.exists() or
-                self.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists() or
-                self.indicator_reports.exclude(created=F('modified')).exists() or
-                IndicatorLocationData.objects.filter(
-                    indicator_report__progress_report=self).exclude(created=F('modified')).exists()):
+                self.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists()):
             return True
         return False
 
