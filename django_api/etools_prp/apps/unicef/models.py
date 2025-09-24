@@ -36,7 +36,7 @@ from etools_prp.apps.core.models import (
     TimeStampedExternalBusinessAreaModel,
     TimeStampedExternalSyncModelMixin,
 )
-from etools_prp.apps.indicator.models import Reportable  # IndicatorReport  # noqa: F401
+from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
 from etools_prp.apps.utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
