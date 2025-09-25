@@ -96,13 +96,11 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
         self.assertTrue(rlg1.is_active)
         self.assertFalse(rlg2.is_active)
 
-    def test_baseline_in_need_lists_active_and_inactive(self):
-        # One location is active, make the other inactive
+    def test_only_show_deactivated_reportable_locations(self):
         ReportableLocationGoal.objects.filter(
             reportable=self.reportable, location=self.loc2
         ).update(is_active=False)
 
-        # Authenticated request
         user = factories.NonPartnerUserFactory()
         factories.ClusterPRPRoleFactory(user=user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         api_client = APIClient()
@@ -113,7 +111,6 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
 
         self.assertEqual(response.status_code, 200, response.content)
 
-        # Endpoint should return only active ReportableLocationGoal for the reportable
         returned_ids = sorted([item['id'] for item in response.json()])
         expected_ids = sorted(list(ReportableLocationGoal.objects.filter(reportable=self.reportable, is_active=True).values_list('id', flat=True)))
         self.assertListEqual(returned_ids, expected_ids)
