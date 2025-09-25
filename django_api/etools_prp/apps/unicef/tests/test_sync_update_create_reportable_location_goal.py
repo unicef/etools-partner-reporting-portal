@@ -1,6 +1,10 @@
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.urls import reverse
 
+from rest_framework.test import APIClient
+
+from etools_prp.apps.core.common import PRP_ROLE_TYPES
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
 from etools_prp.apps.unicef.sync.update_create_reportable_location_goal import update_create_reportable_location_goals
@@ -91,3 +95,25 @@ class TestUpdateCreateReportableLocationGoals(TestCase):
         )
         self.assertTrue(rlg1.is_active)
         self.assertFalse(rlg2.is_active)
+
+    def test_baseline_in_need_lists_active_and_inactive(self):
+        # One location is active, make the other inactive
+        ReportableLocationGoal.objects.filter(
+            reportable=self.reportable, location=self.loc2
+        ).update(is_active=False)
+
+        # Authenticated request
+        user = factories.NonPartnerUserFactory()
+        factories.ClusterPRPRoleFactory(user=user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
+        api_client = APIClient()
+        api_client.force_authenticate(user)
+
+        url = reverse('indicator-location-goal-detail', args=[self.reportable.id])
+        response = api_client.get(url)
+
+        self.assertEqual(response.status_code, 200, response.content)
+
+        # Endpoint should return only active ReportableLocationGoal for the reportable
+        returned_ids = sorted([item['id'] for item in response.json()])
+        expected_ids = sorted(list(ReportableLocationGoal.objects.filter(reportable=self.reportable, is_active=True).values_list('id', flat=True)))
+        self.assertListEqual(returned_ids, expected_ids)
