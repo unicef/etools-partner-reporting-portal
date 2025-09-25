@@ -116,7 +116,12 @@ class TestHandleReportingDates(BaseAPITestCase):
         # recreate progress reports without any user input data
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             factories.ProgressReportFactory(
-                programme_document=self.pd, report_number=index, **reporting_reqs)
+                programme_document=self.pd, report_number=index, **reporting_reqs,
+                challenges_in_the_reporting_period=None,
+                financial_contribution_to_date=0,
+                proposed_way_forward=None,
+                partner_contribution_to_date=None
+            )
         self.assertEqual(self.pd.progress_reports.count(), 3)
         self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 0)
         self.assertEqual(
