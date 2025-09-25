@@ -118,7 +118,7 @@ class TestHandleReportingDates(BaseAPITestCase):
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
                 challenges_in_the_reporting_period=None,
-                financial_contribution_to_date=0,
+                financial_contribution_to_date=None,
                 proposed_way_forward=None,
                 partner_contribution_to_date=None
             )
@@ -147,7 +147,7 @@ class TestHandleReportingDates(BaseAPITestCase):
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
                 challenges_in_the_reporting_period=None,
-                financial_contribution_to_date=0,
+                financial_contribution_to_date=None,
                 proposed_way_forward=None,
                 partner_contribution_to_date=None
             )

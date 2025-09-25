@@ -508,7 +508,7 @@ class ProgressReport(TimeStampedModel):
     @cached_property
     def has_partner_data(self):
         if (any([self.challenges_in_the_reporting_period, self.partner_contribution_to_date,
-                 False if self.financial_contribution_to_date == '0' else True, self.proposed_way_forward]) or
+                 self.financial_contribution_to_date, self.proposed_way_forward]) or
                 self.attachments.exists() or
                 self.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists()):
             return True
