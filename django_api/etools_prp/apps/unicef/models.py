@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
-from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -391,14 +390,20 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
 
     @property
     def locations_queryset(self):
-        return Location.objects.filter(
-            Q(
-                indicator_location_data__indicator_report__progress_report__programme_document=self
-            ) | Q(
-                reportables__lower_level_outputs__cp_output__programme_document=self
-            ),
+        fields = ('id', 'name', 'admin_level', 'admin_level_name', 'p_code')
+        base = Location.super_objects.select_related(None).only(*fields)
+
+        qs_reports = base.filter(
+            indicator_location_data__indicator_report__progress_report__programme_document=self,
             reportablelocationgoal__is_active=True,
-        ).distinct()
+        )
+
+        qs_llos = base.filter(
+            reportables__lower_level_outputs__cp_output__programme_document=self,
+            reportablelocationgoal__is_active=True,
+        )
+
+        return qs_reports.union(qs_llos).order_by('id')
 
 
 class ProgressReport(TimeStampedModel):
