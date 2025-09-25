@@ -135,6 +135,35 @@ class TestHandleReportingDates(BaseAPITestCase):
         self.assertEqual(self.pd.reporting_periods.count(), 2)
         self.assertEqual(self.pd.progress_reports.count(), 2)
 
+    def test_handle_reporting_dates_remove_reporting_req(self):
+        self.assertEqual(self.pd.reporting_periods.count(), 3)
+        self.assertEqual(self.pd.progress_reports.count(), 3)
+        # delete existing progress reports with user input data
+        self.pd.progress_reports.all().delete()
+        self.assertEqual(self.pd.progress_reports.count(), 0)
+
+        # recreate progress reports without any user input data
+        for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
+            factories.ProgressReportFactory(
+                programme_document=self.pd, report_number=index, **reporting_reqs,
+                challenges_in_the_reporting_period=None,
+                financial_contribution_to_date=0,
+                proposed_way_forward=None,
+                partner_contribution_to_date=None
+            )
+        self.assertEqual(self.pd.progress_reports.count(), 3)
+        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 0)
+        self.assertEqual(
+            IndicatorLocationData.objects.filter(
+                indicator_report__progress_report__programme_document=self.pd).count(), 0)
+
+        # remove last 2 reporting requirement, only 1 remaining
+        self.reporting_requirements = self.reporting_requirements[2:]
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
+        # check ReportingPeriodDates and progress report are deleted when no user data input
+        self.assertEqual(self.pd.reporting_periods.count(), 1)
+        self.assertEqual(self.pd.progress_reports.count(), 1)
+
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_with_indicator_report_data_input(self, mock_logger_exc):
         self.assertEqual(self.pd.reporting_periods.count(), 3)

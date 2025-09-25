@@ -79,12 +79,19 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     changed_periods = []
     for report_type in report_type_set:
         filtered_reqs = list(filter(lambda x: x['report_type'] == report_type, reporting_reqs))
-        for existing, actual in zip(
-                pd_periods.filter(report_type=report_type).order_by('start_date'),
-                sorted(filtered_reqs, key=lambda x: x['start_date'])):
+        existing_periods = pd_periods.filter(report_type=report_type).order_by('start_date')
+        actual_periods = sorted(filtered_reqs, key=lambda x: x['start_date'])
+        existing_count = existing_periods.count()
 
+        for existing, actual in zip(existing_periods, actual_periods):
             if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
                 changed_periods.append(existing)
+
+        # check if periods were removed from etools
+        len_diff = existing_count - actual_periods.__len__()
+        if len_diff > 0:
+            for i in range(existing_count - len_diff - 1, existing_count - 1):
+                changed_periods.append(existing_periods[i])
 
     if not changed_periods:
         return
