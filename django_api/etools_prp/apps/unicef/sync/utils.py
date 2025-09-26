@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from jsonschema.exceptions import ValidationError
 
-from etools_prp.apps.unicef.models import Person, ProgressReport
+from etools_prp.apps.unicef.models import Person, ProgressReport, ReportingPeriodDates
 from etools_prp.apps.unicef.serializers import PMPPDPersonSerializer
 
 logger = logging.getLogger(__name__)
@@ -84,8 +84,12 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
         existing_count = existing_periods.count()
 
         for existing, actual in zip(existing_periods, actual_periods):
-            if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
-                changed_periods.append(existing)
+            if report_type == 'QPR':
+                if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
+                    changed_periods.append(existing)
+            elif report_type == 'HR':
+                if existing.due_date.strftime('%Y-%m-%d') != actual['due_date']:
+                    changed_periods.append(existing)
 
         # check if periods were removed from etools
         len_diff = existing_count - actual_periods.__len__()
@@ -96,6 +100,9 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     if not changed_periods:
         return
 
+    periods_to_delete_ids = []
+    pr_to_delete_ids = []
+
     for changed_period in changed_periods:
         # check the corresponding pd ProgressReports
         try:
@@ -104,17 +111,20 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
                 end_date=changed_period.end_date,
                 report_type=changed_period.report_type
             )
+            # if there is any data input from the partner on the progress report
+            # (including indicator reports, indicator location data)
+            if progress_rep.has_partner_data:
+                # log exception and skip the report in reporting_requirements
+                logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} '
+                                 f'with user input data. Skipping..')
+            else:
+                periods_to_delete_ids.append(changed_period.pk)
+                pr_to_delete_ids.append(progress_rep.pk)
+
         except ProgressReport.DoesNotExist:
             # if no progress report found, delete ReportingPeriodDates objects
-            changed_period.delete()
+            periods_to_delete_ids.append(changed_period.pk)
             continue
 
-        # if there is any data input from the partner on the progress report
-        # (including indicator reports, indicator location data)
-        if progress_rep.has_partner_data:
-            # log exception and skip the report in reporting_requirements
-            logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} with user input data. Skipping..')
-        else:
-            # if there is no user input data, delete the Progress Report and the ReportingPeriodDates obj
-            progress_rep.delete()
-            changed_period.delete()
+    ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
+    ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
