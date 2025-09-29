@@ -83,9 +83,22 @@ class TestHandleReportingDates(BaseAPITestCase):
                 "end_date": "2023-07-31",
                 "due_date": "2023-08-30",
                 "report_type": "HR"
+            },
+            {
+                "id": 7,
+                "description": "test SR1",
+                "due_date": "2023-11-30",
+                "report_type": "SR"
+            },
+            {
+                "id": 6,
+                "description": "test SR2",
+                "due_date": "2023-08-30",
+                "report_type": "SR"
             }
         ]
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
+            reporting_reqs.pop('description', None)
             factories.QPRReportingPeriodDatesFactory(
                 programme_document=self.pd, external_id=reporting_reqs['id'],
                 external_business_area_code=self.workspace.business_area_code, **reporting_reqs)
@@ -114,28 +127,29 @@ class TestHandleReportingDates(BaseAPITestCase):
         super().setUp()
 
     def test_handle_reporting_dates_no_misaligned(self):
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
 
         # no deletion occurs at this step as there are no misaligned dates
         handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
-        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
+        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 8)
         self.assertEqual(
             IndicatorLocationData.objects.filter(
-                indicator_report__progress_report__programme_document=self.pd).count(), 6)
+                indicator_report__progress_report__programme_document=self.pd).count(), 8)
 
     def test_handle_reporting_dates_no_data_input(self):
 
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
         # delete existing progress reports with user input data
         self.pd.progress_reports.all().delete()
         self.assertEqual(self.pd.progress_reports.count(), 0)
 
         # recreate progress reports without any user input data
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
+            reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
                 challenges_in_the_reporting_period=None,
@@ -143,7 +157,7 @@ class TestHandleReportingDates(BaseAPITestCase):
                 proposed_way_forward=None,
                 partner_contribution_to_date=None
             )
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
         self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 0)
         self.assertEqual(
             IndicatorLocationData.objects.filter(
@@ -153,12 +167,12 @@ class TestHandleReportingDates(BaseAPITestCase):
         self.reporting_requirements[2]['end_date'] = '2023-07-15'
         handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
         # check ReportingPeriodDates and progress report are deleted when no user data input
-        self.assertEqual(self.pd.reporting_periods.count(), 5)
-        self.assertEqual(self.pd.progress_reports.count(), 5)
+        self.assertEqual(self.pd.reporting_periods.count(), 7)
+        self.assertEqual(self.pd.progress_reports.count(), 7)
 
     def test_handle_reporting_dates_remove_reporting_req(self):
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
         # delete existing progress reports with user input data
         self.pd.progress_reports.all().delete()
         self.assertEqual(self.pd.progress_reports.count(), 0)
@@ -172,7 +186,7 @@ class TestHandleReportingDates(BaseAPITestCase):
                 proposed_way_forward=None,
                 partner_contribution_to_date=None
             )
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
         self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 0)
         self.assertEqual(
             IndicatorLocationData.objects.filter(
@@ -182,13 +196,13 @@ class TestHandleReportingDates(BaseAPITestCase):
         self.reporting_requirements = self.reporting_requirements[2:]
         handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
         # check ReportingPeriodDates and progress report are deleted when no user data input
-        self.assertEqual(self.pd.reporting_periods.count(), 6 - 2)
-        self.assertEqual(self.pd.progress_reports.count(), 6 - 2)
+        self.assertEqual(self.pd.reporting_periods.count(), 8 - 2)
+        self.assertEqual(self.pd.progress_reports.count(), 8 - 2)
 
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_with_report_data_input(self, mock_logger_exc):
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
 
         # alter end date for last reporting requirement
         self.reporting_requirements[2]['end_date'] = '2023-07-16'
@@ -199,17 +213,17 @@ class TestHandleReportingDates(BaseAPITestCase):
         handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
         # when there is user data input, an exception is logged, the record is skipped and nothing gets deleted
         self.assertTrue(mock_logger_exc.call_count, 1)
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
-        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
+        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 8)
         self.assertEqual(
             IndicatorLocationData.objects.filter(
-                indicator_report__progress_report__programme_document=self.pd).count(), 6)
+                indicator_report__progress_report__programme_document=self.pd).count(), 8)
 
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_with_indicator_location_data_input(self, mock_logger_exc):
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
 
         # alter end date for last QPR requirement
         self.reporting_requirements[2]['end_date'] = '2023-07-16'
@@ -229,9 +243,9 @@ class TestHandleReportingDates(BaseAPITestCase):
         handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
         # when there is user data input, an exception is logged, the record is skipped and nothing gets deleted
         self.assertTrue(mock_logger_exc.call_count, 1)
-        self.assertEqual(self.pd.reporting_periods.count(), 6)
-        self.assertEqual(self.pd.progress_reports.count(), 6)
-        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 6)
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
+        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 8)
         self.assertEqual(
             IndicatorLocationData.objects.filter(
-                indicator_report__progress_report__programme_document=self.pd).count(), 6)
+                indicator_report__progress_report__programme_document=self.pd).count(), 8)

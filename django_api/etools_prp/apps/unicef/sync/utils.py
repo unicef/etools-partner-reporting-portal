@@ -58,6 +58,44 @@ def save_person_and_user(person_data, create_user=False):
     return person, user
 
 
+def delete_changed_periods(pd, changed_periods):
+    periods_to_delete_ids = []
+    pr_to_delete_ids = []
+
+    for changed_period in changed_periods:
+        # check the corresponding pd ProgressReports
+        try:
+            if changed_period.report_type == 'SR':
+                progress_rep = pd.progress_reports.get(
+                    description=changed_period.description,
+                    due_date=changed_period.due_date,
+                    report_type=changed_period.report_type
+                )
+            else:
+                progress_rep = pd.progress_reports.get(
+                    start_date=changed_period.start_date,
+                    end_date=changed_period.end_date,
+                    report_type=changed_period.report_type
+                )
+            # if there is any data input from the partner on the progress report
+            # (including indicator reports, indicator location data)
+            if progress_rep.has_partner_data:
+                # log exception and skip the report in reporting_requirements
+                logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} '
+                                 f'with user input data. Skipping..')
+            else:
+                periods_to_delete_ids.append(changed_period.pk)
+                pr_to_delete_ids.append(progress_rep.pk)
+
+        except ProgressReport.DoesNotExist:
+            # if no progress report found, delete ReportingPeriodDates objects
+            periods_to_delete_ids.append(changed_period.pk)
+            continue
+
+    ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
+    ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
+
+
 def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     """
     Function that handles changed start/end dates from etools reporting requirements
@@ -79,15 +117,20 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     changed_periods = []
     for report_type in report_type_set:
         filtered_reqs = list(filter(lambda x: x['report_type'] == report_type, reporting_reqs))
-        existing_periods = pd_periods.filter(report_type=report_type).order_by('start_date')
-        actual_periods = sorted(filtered_reqs, key=lambda x: x['start_date'])
+        if report_type == 'SR':
+            existing_periods = pd_periods.filter(report_type=report_type).order_by('due_date')
+            actual_periods = sorted(filtered_reqs, key=lambda x: x['due_date'])
+        else:
+            existing_periods = pd_periods.filter(report_type=report_type).order_by('start_date')
+            actual_periods = sorted(filtered_reqs, key=lambda x: x['start_date'])
+
         existing_count = existing_periods.count()
 
         for existing, actual in zip(existing_periods, actual_periods):
             if report_type == 'QPR':
                 if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
                     changed_periods.append(existing)
-            elif report_type == 'HR':
+            elif report_type in ['HR', 'SR']:
                 if existing.due_date.strftime('%Y-%m-%d') != actual['due_date']:
                     changed_periods.append(existing)
 
@@ -100,31 +143,4 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     if not changed_periods:
         return
 
-    periods_to_delete_ids = []
-    pr_to_delete_ids = []
-
-    for changed_period in changed_periods:
-        # check the corresponding pd ProgressReports
-        try:
-            progress_rep = pd.progress_reports.get(
-                start_date=changed_period.start_date,
-                end_date=changed_period.end_date,
-                report_type=changed_period.report_type
-            )
-            # if there is any data input from the partner on the progress report
-            # (including indicator reports, indicator location data)
-            if progress_rep.has_partner_data:
-                # log exception and skip the report in reporting_requirements
-                logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} '
-                                 f'with user input data. Skipping..')
-            else:
-                periods_to_delete_ids.append(changed_period.pk)
-                pr_to_delete_ids.append(progress_rep.pk)
-
-        except ProgressReport.DoesNotExist:
-            # if no progress report found, delete ReportingPeriodDates objects
-            periods_to_delete_ids.append(changed_period.pk)
-            continue
-
-    ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
-    ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
+    delete_changed_periods(pd, changed_periods)
