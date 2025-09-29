@@ -91,7 +91,7 @@ def delete_changed_periods(pd, changed_periods):
             continue
         except ProgressReport.MultipleObjectsReturned:
             # log exception and skip the report in reporting_requirements
-            logger.exception(f'Multiple Special Progress Reports found with the same dates. Skipping removal..')
+            logger.exception('Multiple Special Progress Reports found with the same dates. Skipping removal..')
 
     ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
     ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
