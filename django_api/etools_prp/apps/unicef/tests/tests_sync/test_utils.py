@@ -1,3 +1,4 @@
+from copy import deepcopy
 from unittest import mock
 
 from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
@@ -197,8 +198,8 @@ class TestHandleReportingDates(BaseAPITestCase):
                 indicator_report__progress_report__programme_document=self.pd).count(), 0)
 
         # remove last 2 reporting requirement, only 1 remaining
-        self.reporting_requirements = self.reporting_requirements[2:]
-        handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
+        reporting_requirements = self.reporting_requirements[2:]
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
         # check ReportingPeriodDates and progress report are deleted when no user data input
         self.assertEqual(self.pd.reporting_periods.count(), 8 - 2)
         self.assertEqual(self.pd.progress_reports.count(), 8 - 2)
@@ -226,11 +227,20 @@ class TestHandleReportingDates(BaseAPITestCase):
                 indicator_report__progress_report__programme_document=self.pd).count(), 0)
 
         # remove first special report, only 1 remaining
-        self.reporting_requirements.pop(6)
-        handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
+        reporting_requirements = deepcopy(self.reporting_requirements)
+        reporting_requirements.pop(6)
+
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
         # check ReportingPeriodDates and progress report are deleted when no user data input
         self.assertEqual(self.pd.reporting_periods.count(), 8 - 1)
         self.assertEqual(self.pd.progress_reports.count(), 8 - 1)
+
+        # remove all special report, none remaining
+        reporting_requirements.pop(6)
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
+        # check ReportingPeriodDates and progress report are deleted when no user data input
+        self.assertEqual(self.pd.reporting_periods.count(), 7 - 1)
+        self.assertEqual(self.pd.progress_reports.count(), 7 - 1)
 
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_duplicate_special_reports(self, mock_logger_exc):
@@ -239,7 +249,7 @@ class TestHandleReportingDates(BaseAPITestCase):
         # delete existing progress reports with user input data
         self.pd.progress_reports.all().delete()
         self.assertEqual(self.pd.progress_reports.count(), 0)
-
+        reporting_requirements = self.reporting_requirements
         dupe_sr = {
             "id": 9,
             "start_date": None,
@@ -248,7 +258,7 @@ class TestHandleReportingDates(BaseAPITestCase):
             "due_date": "2023-11-30",
             "report_type": "SR"
         }
-        self.reporting_requirements.append(dupe_sr)
+        reporting_requirements.append(dupe_sr)
         factories.QPRReportingPeriodDatesFactory(
             programme_document=self.pd, external_id=dupe_sr['id'],
             external_business_area_code=self.workspace.business_area_code, **dupe_sr)
@@ -270,11 +280,11 @@ class TestHandleReportingDates(BaseAPITestCase):
                 indicator_report__progress_report__programme_document=self.pd).count(), 0)
 
         # remove first dupe special report, 2 remaining
-        self.reporting_requirements.pop(6)
-        handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
+        reporting_requirements.pop(6)
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
         self.assertTrue(mock_logger_exc.call_count, 1)
 
-        # check ReportingPeriodDates and progress report are deleted when no user data input
+        # check ReportingPeriodDates and progress report are not deleted because of duplicated data
         self.assertEqual(self.pd.reporting_periods.count(), 9)
         self.assertEqual(self.pd.progress_reports.count(), 9)
 

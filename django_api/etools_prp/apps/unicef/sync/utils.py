@@ -112,7 +112,7 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     :param reporting_reqs: the pd reporting requirements from etools API
     """
     pd_periods = pd.reporting_periods.filter(external_business_area_code=business_area_code)
-    report_type_set = {req['report_type'] for req in reporting_reqs}
+    report_type_set = {req.report_type for req in pd_periods}
 
     # get all reporting periods that have changed
     changed_periods = []
@@ -148,6 +148,7 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
                         if _sr_qs.count() > 1:
                             changed_periods.append(_sr_qs.last())
             else:
+                # remove last reports as they are in chronological order
                 changed_periods.extend([
                     existing_periods[i] for i in range(existing_count - len_diff - 1, existing_count - 1)])
 
