@@ -43,42 +43,42 @@ class TestHandleReportingDates(BaseAPITestCase):
         )
         self.reporting_requirements = [
             {
-                "id": 13,
+                "id": 1,
                 "start_date": "2023-11-01",
                 "end_date": "2024-01-15",
                 "due_date": "2024-02-14",
                 "report_type": "QPR"
             },
             {
-                "id": 12,
+                "id": 2,
                 "start_date": "2023-08-01",
                 "end_date": "2023-10-31",
                 "due_date": "2023-11-30",
                 "report_type": "QPR"
             },
             {
-                "id": 11,
+                "id": 3,
                 "start_date": "2023-05-01",
                 "end_date": "2023-07-31",
                 "due_date": "2023-08-30",
                 "report_type": "QPR"
             },
             {
-                "id": 10,
+                "id": 4,
                 "start_date": "2023-11-01",
                 "end_date": "2024-01-15",
                 "due_date": "2024-02-14",
                 "report_type": "HR"
             },
             {
-                "id": 9,
+                "id": 5,
                 "start_date": "2023-08-01",
                 "end_date": "2023-10-31",
                 "due_date": "2023-11-30",
                 "report_type": "HR"
             },
             {
-                "id": 8,
+                "id": 6,
                 "start_date": "2023-05-01",
                 "end_date": "2023-07-31",
                 "due_date": "2023-08-30",
@@ -86,22 +86,26 @@ class TestHandleReportingDates(BaseAPITestCase):
             },
             {
                 "id": 7,
+                "start_date": None,
+                "end_date": None,
                 "description": "test SR1",
                 "due_date": "2023-11-30",
                 "report_type": "SR"
             },
             {
-                "id": 6,
+                "id": 8,
+                "start_date": None,
+                "end_date": None,
                 "description": "test SR2",
                 "due_date": "2023-08-30",
                 "report_type": "SR"
             }
         ]
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
-            reporting_reqs.pop('description', None)
             factories.QPRReportingPeriodDatesFactory(
                 programme_document=self.pd, external_id=reporting_reqs['id'],
                 external_business_area_code=self.workspace.business_area_code, **reporting_reqs)
+            reporting_reqs.pop('description', None)
             progress_report = factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs)
             indicator_report = factories.ProgressReportIndicatorReportFactory(
@@ -198,6 +202,81 @@ class TestHandleReportingDates(BaseAPITestCase):
         # check ReportingPeriodDates and progress report are deleted when no user data input
         self.assertEqual(self.pd.reporting_periods.count(), 8 - 2)
         self.assertEqual(self.pd.progress_reports.count(), 8 - 2)
+
+    def test_handle_reporting_dates_remove_special_reports(self):
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
+        # delete existing progress reports with user input data
+        self.pd.progress_reports.all().delete()
+        self.assertEqual(self.pd.progress_reports.count(), 0)
+
+        # recreate progress reports without any user input data
+        for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
+            factories.ProgressReportFactory(
+                programme_document=self.pd, report_number=index, **reporting_reqs,
+                challenges_in_the_reporting_period=None,
+                financial_contribution_to_date=None,
+                proposed_way_forward=None,
+                partner_contribution_to_date=None
+            )
+        self.assertEqual(self.pd.progress_reports.count(), 8)
+        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 0)
+        self.assertEqual(
+            IndicatorLocationData.objects.filter(
+                indicator_report__progress_report__programme_document=self.pd).count(), 0)
+
+        # remove first special report, only 1 remaining
+        self.reporting_requirements.pop(6)
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
+        # check ReportingPeriodDates and progress report are deleted when no user data input
+        self.assertEqual(self.pd.reporting_periods.count(), 8 - 1)
+        self.assertEqual(self.pd.progress_reports.count(), 8 - 1)
+
+    @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
+    def test_handle_reporting_dates_duplicate_special_reports(self, mock_logger_exc):
+        self.assertEqual(self.pd.reporting_periods.count(), 8)
+        self.assertEqual(self.pd.progress_reports.count(), 8)
+        # delete existing progress reports with user input data
+        self.pd.progress_reports.all().delete()
+        self.assertEqual(self.pd.progress_reports.count(), 0)
+
+        dupe_sr = {
+            "id": 9,
+            "start_date": None,
+            "end_date": None,
+            "description": "test SR1",
+            "due_date": "2023-11-30",
+            "report_type": "SR"
+        }
+        self.reporting_requirements.append(dupe_sr)
+        factories.QPRReportingPeriodDatesFactory(
+            programme_document=self.pd, external_id=dupe_sr['id'],
+            external_business_area_code=self.workspace.business_area_code, **dupe_sr)
+
+        # recreate progress reports without any user input data
+        for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
+            reporting_reqs.pop('description', None)
+            factories.ProgressReportFactory(
+                programme_document=self.pd, report_number=index, **reporting_reqs,
+                challenges_in_the_reporting_period=None,
+                financial_contribution_to_date=None,
+                proposed_way_forward=None,
+                partner_contribution_to_date=None
+            )
+        self.assertEqual(self.pd.progress_reports.count(), 9)
+        self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 0)
+        self.assertEqual(
+            IndicatorLocationData.objects.filter(
+                indicator_report__progress_report__programme_document=self.pd).count(), 0)
+
+        # remove first dupe special report, 2 remaining
+        self.reporting_requirements.pop(6)
+        handle_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
+        self.assertTrue(mock_logger_exc.call_count, 1)
+
+        # check ReportingPeriodDates and progress report are deleted when no user data input
+        self.assertEqual(self.pd.reporting_periods.count(), 9)
+        self.assertEqual(self.pd.progress_reports.count(), 9)
 
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_with_report_data_input(self, mock_logger_exc):

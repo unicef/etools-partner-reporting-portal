@@ -67,7 +67,6 @@ def delete_changed_periods(pd, changed_periods):
         try:
             if changed_period.report_type == 'SR':
                 progress_rep = pd.progress_reports.get(
-                    description=changed_period.description,
                     due_date=changed_period.due_date,
                     report_type=changed_period.report_type
                 )
@@ -81,8 +80,7 @@ def delete_changed_periods(pd, changed_periods):
             # (including indicator reports, indicator location data)
             if progress_rep.has_partner_data:
                 # log exception and skip the report in reporting_requirements
-                logger.exception(f'Misaligned start and end dates for Progress Report id {progress_rep.pk} '
-                                 f'with user input data. Skipping..')
+                logger.exception(f'Progress Report id {progress_rep.pk} already has user input data. Skipping removal..')
             else:
                 periods_to_delete_ids.append(changed_period.pk)
                 pr_to_delete_ids.append(progress_rep.pk)
@@ -91,6 +89,9 @@ def delete_changed_periods(pd, changed_periods):
             # if no progress report found, delete ReportingPeriodDates objects
             periods_to_delete_ids.append(changed_period.pk)
             continue
+        except ProgressReport.MultipleObjectsReturned:
+            # log exception and skip the report in reporting_requirements
+            logger.exception(f'Multiple Special Progress Reports found with the same dates. Skipping removal..')
 
     ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
     ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
@@ -137,8 +138,18 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
         # check if periods were removed from etools
         len_diff = existing_count - actual_periods.__len__()
         if len_diff > 0:
-            for i in range(existing_count - len_diff - 1, existing_count - 1):
-                changed_periods.append(existing_periods[i])
+            if report_type == 'SR':
+                removed_srs = existing_periods.exclude(due_date__in=[actual['due_date'] for actual in actual_periods])
+                changed_periods.extend([sr for sr in removed_srs])
+                # if no periods where found as changed, the removed period is a duplicated one
+                if not changed_periods:
+                    for actual in actual_periods:
+                        _sr_qs = existing_periods.filter(due_date=actual['due_date'])
+                        if _sr_qs.count() > 1:
+                            changed_periods.append(_sr_qs.last())
+            else:
+                changed_periods.extend([
+                    existing_periods[i] for i in range(existing_count - len_diff - 1, existing_count - 1)])
 
     if not changed_periods:
         return
