@@ -472,7 +472,7 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
     start_date = reporting_period.start_date
 
     # Create ProgressReport first
-    logger.info("Creating {} ProgressReport for {} - {}".format(reporting_period.report_type,start_date, end_date))
+    logger.info("Creating {} ProgressReport for {} - {}".format(reporting_period.report_type, start_date, end_date))
 
     # Re-query latest ProgressReport by report type
     latest_progress_report = get_latest_pr_by_type(pd, reporting_period.report_type)
