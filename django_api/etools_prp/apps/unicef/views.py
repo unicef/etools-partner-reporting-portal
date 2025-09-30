@@ -4,6 +4,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 
@@ -70,14 +71,14 @@ from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
 from .import_report import ProgressReportXLSXReader
-from .models import ProgrammeDocument, ProgressReport, ProgressReportAttachment
+from .models import Person, ProgrammeDocument, ProgressReport, ProgressReportAttachment
 from .serializers import (
     ImportUserRealmsSerializer,
     LLOutputSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentDetailSerializer,
+    ProgrammeDocumentListSerializer,
     ProgrammeDocumentProgressSerializer,
-    ProgrammeDocumentSerializer,
     ProgressReportAttachmentSerializer,
     ProgressReportFinalUpdateSerializer,
     ProgressReportPullHFDataSerializer,
@@ -97,7 +98,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     Endpoint for getting a list of Programme Documents and being able to
     filter by them.
     """
-    serializer_class = ProgrammeDocumentSerializer
+    serializer_class = ProgrammeDocumentListSerializer
     permission_classes = (
         AnyPermission(
             IsPartnerAuthorizedOfficerForCurrentWorkspace,
@@ -166,7 +167,25 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
 
     def get_object(self, pd_id):
         try:
-            return ProgrammeDocument.objects.get(
+            return ProgrammeDocument.objects.prefetch_related(
+                'sections',
+                'reporting_periods',
+                Prefetch(
+                    'unicef_officers',
+                    queryset=Person.objects.filter(active=True),
+                    to_attr='prefetched_unicef_officers_active',
+                ),
+                Prefetch(
+                    'unicef_focal_point',
+                    queryset=Person.objects.filter(active=True),
+                    to_attr='prefetched_unicef_focal_point_active',
+                ),
+                Prefetch(
+                    'partner_focal_point',
+                    queryset=Person.objects.filter(active=True),
+                    to_attr='prefetched_partner_focal_point_active',
+                ),
+            ).get(
                 partner=self.request.user.partner,
                 workspace=self.workspace_id,
                 pk=pd_id)

@@ -161,13 +161,29 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         return obj.funds_received_to_date_currency
 
     def get_unicef_officers(self, obj):
-        return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
+        officers = getattr(obj, 'prefetched_unicef_officers_active', None)
+        if officers is None:
+            officers = obj.unicef_officers.filter(active=True)
+        return PersonSerializer(officers, read_only=True, many=True).data
 
     def get_unicef_focal_point(self, obj):
-        return PersonSerializer(obj.unicef_focal_point.filter(active=True), read_only=True, many=True).data
+        focal = getattr(obj, 'prefetched_unicef_focal_point_active', None)
+        if focal is None:
+            focal = obj.unicef_focal_point.filter(active=True)
+        return PersonSerializer(focal, read_only=True, many=True).data
 
     def get_partner_focal_point(self, obj):
-        return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
+        partner_fp = getattr(obj, 'prefetched_partner_focal_point_active', None)
+        if partner_fp is None:
+            partner_fp = obj.partner_focal_point.filter(active=True)
+        return PersonSerializer(partner_fp, read_only=True, many=True).data
+
+
+class ProgrammeDocumentListSerializer(ProgrammeDocumentSerializer):
+    locations = None
+
+    class Meta(ProgrammeDocumentSerializer.Meta):
+        fields = tuple(f for f in ProgrammeDocumentSerializer.Meta.fields if f != 'locations')
 
 
 class SectionSerializer(serializers.ModelSerializer):
