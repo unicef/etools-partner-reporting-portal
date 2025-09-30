@@ -137,7 +137,8 @@ def process_period_reports():
                             create_ir_for_cluster(reportable, start_date, end_date, project)
 
             # PD report generation
-            for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active).order_by("id"):
+            for pd in ProgrammeDocument.objects.filter(
+                    status__in=[PD_STATUS.active, PD_STATUS.ended]).order_by("-id"):
                 try:
                     _process_pd_reports(pd)
                 except Exception as e:
@@ -151,7 +152,7 @@ def process_period_reports():
 
 
 def _process_pd_reports(pd):
-    logger.info("\nProcessing ProgrammeDocument {}".format(pd.id))
+    logger.info("\nProcessing ProgrammeDocument id: {}, reference: no. {}".format(pd.id, pd.reference_number))
     logger.info(10 * "****")
     # Get Active LLO indicators only
     reportable_queryset = pd.reportable_queryset.filter(active=True)
