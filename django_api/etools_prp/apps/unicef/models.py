@@ -511,7 +511,7 @@ class ProgressReport(TimeStampedModel):
                      self.financial_contribution_to_date, self.proposed_way_forward]) or
                 self.attachments.exists() or
                 self.indicator_reports.filter(
-                    Q(total__c__gt=0) | Q(total__v__gt=0)|
+                    Q(total__c__gt=0) | Q(total__v__gt=0) |
                     Q(narrative_assessment__isnull=False) |
                     Q(overall_status__in=[OVERALL_STATUS.met, OVERALL_STATUS.on_track,
                                           OVERALL_STATUS.no_progress, OVERALL_STATUS.constrained])).exists())
