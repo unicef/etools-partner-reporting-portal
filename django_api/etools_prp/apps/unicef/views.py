@@ -252,10 +252,6 @@ class ProgrammeDocumentReportingAPIView(APIView):
         query_params = dict(workspace=workspace_id, external_id=pd_external_id)
         try:
             pd = ProgrammeDocument.objects.get(**query_params)
-            progress_reports = pd.progress_reports.prefetch_related('indicator_reports').order_by('id')
-            serializer = ProgrammeDocumentReportingSerializer(progress_reports, many=True)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentReportingAPIView",
@@ -263,6 +259,11 @@ class ProgrammeDocumentReportingAPIView(APIView):
                 "exception": exp,
             })
             raise Http404
+
+        progress_reports = pd.progress_reports.prefetch_related('indicator_reports').order_by('id')
+        serializer = ProgrammeDocumentReportingSerializer(progress_reports, many=True)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ProgrammeDocumentLocationsAPIView(ListAPIView):
