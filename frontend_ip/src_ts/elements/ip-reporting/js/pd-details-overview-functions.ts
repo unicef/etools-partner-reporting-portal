@@ -23,8 +23,10 @@ export function computeReportingRequirements(reportingPeriods: any[], dateFormat
 
   Object.keys(byType).forEach(function (type) {
     byType[type].sort(function (a: any, b: any) {
-      const dateA = dayjs(a.start_date, dateFormat).unix();
-      const dateB = dayjs(b.start_date, dateFormat).unix();
+      const dateA =
+        a.report_type === 'SR' ? dayjs(a.due_date, dateFormat).unix() : dayjs(a.start_date, dateFormat).unix();
+      const dateB =
+        b.report_type === 'SR' ? dayjs(b.due_date, dateFormat).unix() : dayjs(b.start_date, dateFormat).unix();
 
       return dateA - dateB;
     });
