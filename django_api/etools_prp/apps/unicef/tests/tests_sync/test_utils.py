@@ -157,8 +157,6 @@ class TestHandleReportingDates(BaseAPITestCase):
             reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
-                review_overall_status=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -188,8 +186,6 @@ class TestHandleReportingDates(BaseAPITestCase):
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
-                review_overall_status=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -219,8 +215,6 @@ class TestHandleReportingDates(BaseAPITestCase):
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
-                review_overall_status=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -274,8 +268,6 @@ class TestHandleReportingDates(BaseAPITestCase):
             reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
-                review_overall_status=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,

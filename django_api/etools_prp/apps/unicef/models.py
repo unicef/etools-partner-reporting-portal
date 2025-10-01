@@ -507,11 +507,14 @@ class ProgressReport(TimeStampedModel):
 
     @cached_property
     def has_partner_data(self):
-        return (any([self.review_overall_status, self.narrative,
-                     self.challenges_in_the_reporting_period, self.partner_contribution_to_date,
+        return (any([self.challenges_in_the_reporting_period, self.partner_contribution_to_date,
                      self.financial_contribution_to_date, self.proposed_way_forward]) or
                 self.attachments.exists() or
-                self.indicator_reports.filter(Q(total__c__gt=0) | Q(total__v__gt=0)).exists())
+                self.indicator_reports.filter(
+                    Q(total__c__gt=0) | Q(total__v__gt=0) |
+                    Q(narrative_assessment__isnull=False) |
+                    Q(overall_status__in=[OVERALL_STATUS.met, OVERALL_STATUS.on_track,
+                                          OVERALL_STATUS.no_progress, OVERALL_STATUS.constrained])).exists())
 
 
 class GPDProgressReport(TimeStampedModel):
