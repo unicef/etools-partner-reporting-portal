@@ -74,6 +74,7 @@ def delete_changed_periods(pd, changed_periods):
                 progress_rep = pd.progress_reports.get(
                     start_date=changed_period.start_date,
                     end_date=changed_period.end_date,
+                    due_date=changed_period.due_date,
                     report_type=changed_period.report_type
                 )
             # if there is any data input from the partner on the progress report
@@ -91,7 +92,7 @@ def delete_changed_periods(pd, changed_periods):
             continue
         except ProgressReport.MultipleObjectsReturned:
             # log exception and skip the report in reporting_requirements
-            logger.exception('Multiple Special Progress Reports found with the same dates. Skipping removal..')
+            logger.exception(f'Multiple Special Progress Reports found with the same due date {changed_period.due_date}. Skipping removal..')
 
     ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
     ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
@@ -129,7 +130,9 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
 
         for existing, actual in zip(existing_periods, actual_periods):
             if report_type == 'QPR':
-                if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
+                if (existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or
+                        existing.end_date.strftime('%Y-%m-%d') != actual['end_date'] or
+                        existing.due_date.strftime('%Y-%m-%d') != actual['due_date']):
                     changed_periods.append(existing)
             elif report_type in ['HR', 'SR']:
                 if existing.due_date.strftime('%Y-%m-%d') != actual['due_date']:
