@@ -475,15 +475,15 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
     is_final = idx == pd.reporting_periods.filter(report_type='SR').count()
 
     next_progress_report, created = ProgressReport.objects.update_or_create(
-        start_date=start_date,
-        end_date=end_date,
-        due_date=due_date,
-        defaults={
-            'programme_document': pd,
-            'report_type': 'SR',
-            'report_number': idx
-        },
+        programme_document=pd,
+        report_type='SR',
+        report_number=idx,
         is_final=is_final,
+        defaults={
+            'start_date': start_date,
+            'end_date': end_date,
+            'due_date': due_date,
+        }
     )
     if created:
         logger.info(f"Created new SR{idx} ProgressReport id {next_progress_report.id} for due date {due_date}")
