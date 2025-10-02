@@ -466,34 +466,27 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
     """
     from etools_prp.apps.unicef.models import ProgressReport
 
+    start_date = reporting_period.start_date
     end_date = reporting_period.end_date
     due_date = reporting_period.due_date
-    start_date = reporting_period.start_date
-    report_type = reporting_period.report_type
 
-    logger.info("Update or Create SR ProgressReport for {} - {}".format(start_date, end_date))
+    logger.info(f"SR ProgressReport with due date: {due_date}")
 
-    is_final = idx == pd.reporting_periods.filter(report_type=reporting_period.report_type).count()
+    is_final = idx == pd.reporting_periods.filter(report_type='SR').count()
 
-    next_progress_report = ProgressReport.objects.update_or_create(
+    next_progress_report, created = ProgressReport.objects.update_or_create(
         start_date=start_date,
         end_date=end_date,
         due_date=due_date,
         defaults={
             'programme_document': pd,
-            'report_type': report_type,
+            'report_type': 'SR',
             'report_number': idx
         },
         is_final=is_final,
     )
-    if pd.document_type == PD_DOCUMENT_TYPE.GDD:
-        from etools_prp.apps.unicef.models import GPDProgressReport
-
-        GPDProgressReport.objects.create(
-            gpd_report=next_progress_report
-        )
-
-    return next_progress_report, start_date, end_date, due_date
+    if created:
+        logger.info(f"Created new SR{idx} ProgressReport id {next_progress_report.id} for due date {due_date}")
 
 
 def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
