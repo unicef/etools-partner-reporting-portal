@@ -1007,6 +1007,24 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
         )
 
 
+class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
+    start_date = serializers.DateField(format='%Y-%m-%d')
+    end_date = serializers.DateField(format='%Y-%m-%d')
+    due_date = serializers.DateField(format='%Y-%m-%d')
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'report_type',
+            'report_number',
+            'has_partner_data',
+        )
+
+
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
