@@ -74,6 +74,7 @@ def delete_changed_periods(pd, changed_periods):
                 progress_rep = pd.progress_reports.get(
                     start_date=changed_period.start_date,
                     end_date=changed_period.end_date,
+                    due_date=changed_period.due_date,
                     report_type=changed_period.report_type
                 )
             # if there is any data input from the partner on the progress report
@@ -91,13 +92,13 @@ def delete_changed_periods(pd, changed_periods):
             continue
         except ProgressReport.MultipleObjectsReturned:
             # log exception and skip the report in reporting_requirements
-            logger.exception('Multiple Special Progress Reports found with the same dates. Skipping removal..')
+            logger.exception(f'Multiple Special Progress Reports found with the same due date {changed_period.due_date}. Skipping removal..')
 
     ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
     ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
 
 
-def handle_reporting_dates(business_area_code, pd, reporting_reqs):
+def handle_qpr_hr_reporting_dates(business_area_code, pd, reporting_reqs):
     """
     Function that handles changed start/end dates from etools reporting requirements
     1. see which are last dates (ReportingPeriodDates) that still aligned (start/end dates)
@@ -112,45 +113,64 @@ def handle_reporting_dates(business_area_code, pd, reporting_reqs):
     :param reporting_reqs: the pd reporting requirements from etools API
     """
     pd_periods = pd.reporting_periods.filter(external_business_area_code=business_area_code)
-    report_type_set = {req.report_type for req in pd_periods}
+    report_type_set = {req['report_type'] for req in reporting_reqs}
 
     # get all reporting periods that have changed
     changed_periods = []
     for report_type in report_type_set:
+        existing_periods = pd_periods.filter(report_type=report_type).order_by('start_date')
+
         filtered_reqs = list(filter(lambda x: x['report_type'] == report_type, reporting_reqs))
-        if report_type == 'SR':
-            existing_periods = pd_periods.filter(report_type=report_type).order_by('due_date')
-            actual_periods = sorted(filtered_reqs, key=lambda x: x['due_date'])
-        else:
-            existing_periods = pd_periods.filter(report_type=report_type).order_by('start_date')
-            actual_periods = sorted(filtered_reqs, key=lambda x: x['start_date'])
+        actual_periods = sorted(filtered_reqs, key=lambda x: x['start_date'])
 
         existing_count = existing_periods.count()
 
         for existing, actual in zip(existing_periods, actual_periods):
             if report_type == 'QPR':
-                if existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or existing.end_date.strftime('%Y-%m-%d') != actual['end_date']:
+                if (existing.start_date.strftime('%Y-%m-%d') != actual['start_date'] or
+                        existing.end_date.strftime('%Y-%m-%d') != actual['end_date'] or
+                        existing.due_date.strftime('%Y-%m-%d') != actual['due_date']):
                     changed_periods.append(existing)
-            elif report_type in ['HR', 'SR']:
+            elif report_type == 'HR':
                 if existing.due_date.strftime('%Y-%m-%d') != actual['due_date']:
                     changed_periods.append(existing)
 
         # check if periods were removed from etools
         len_diff = existing_count - actual_periods.__len__()
         if len_diff > 0:
-            if report_type == 'SR':
-                removed_srs = existing_periods.exclude(due_date__in=[actual['due_date'] for actual in actual_periods])
-                changed_periods.extend([sr for sr in removed_srs])
-                # if no periods where found as changed, the removed period is a duplicated one
-                if not changed_periods:
-                    for actual in actual_periods:
-                        _sr_qs = existing_periods.filter(due_date=actual['due_date'])
-                        if _sr_qs.count() > 1:
-                            changed_periods.append(_sr_qs.last())
-            else:
-                # remove last reports as they are in chronological order
-                changed_periods.extend([
-                    existing_periods[i] for i in range(existing_count - len_diff - 1, existing_count - 1)])
+            # remove last reports as they are in chronological order
+            changed_periods.extend([
+                existing_periods[i] for i in range(existing_count - len_diff - 1, existing_count - 1)])
+
+    if not changed_periods:
+        return
+
+    delete_changed_periods(pd, changed_periods)
+
+
+def handle_sr_reporting_dates(business_area_code, pd, special_reports):
+    """
+    :param business_area_code: workspace business_area_code
+    :param pd: programme document
+    :param special_reports: the pd special reports from etools API
+    """
+    changed_periods = []
+    existing_periods = pd.reporting_periods.filter(
+        external_business_area_code=business_area_code, report_type='SR').order_by('external_id')
+    actual_periods = sorted(special_reports, key=lambda x: x['id'])
+
+    existing_count = existing_periods.count()
+
+    for existing, actual in zip(existing_periods, actual_periods):
+        if (existing.external_id == actual['id'].__str__() and
+                existing.due_date.strftime('%Y-%m-%d') != actual['due_date']):
+            changed_periods.append(existing)
+
+    # check if periods were removed from etools
+    len_diff = existing_count - actual_periods.__len__()
+    if len_diff > 0:
+        removed_srs = existing_periods.exclude(external_id__in=[actual['id'] for actual in actual_periods])
+        changed_periods.extend([sr for sr in removed_srs])
 
     if not changed_periods:
         return
