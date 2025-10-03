@@ -3,12 +3,15 @@ from typing import Any
 from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.models import ProgrammeDocument, ReportingPeriodDates
 from etools_prp.apps.unicef.serializers import PMPReportingPeriodDatesSerializer, PMPReportingPeriodDatesSRSerializer
-from etools_prp.apps.unicef.sync.utils import process_model
+from etools_prp.apps.unicef.sync.utils import handle_qpr_hr_reporting_dates, handle_sr_reporting_dates, process_model
 
 
 def update_create_qpr_n_hr_date_periods(item: Any, pd: ProgrammeDocument, workspace: Workspace) -> Any:
-
     reporting_requirements = item['reporting_requirements']
+
+    # Handle existing reporting periods and progress reports
+    handle_qpr_hr_reporting_dates(workspace.business_area_code, pd, reporting_requirements)
+
     for reporting_requirement in reporting_requirements:
         reporting_requirement['programme_document'] = pd.id
         reporting_requirement['external_business_area_code'] = workspace.business_area_code
@@ -28,8 +31,11 @@ def update_create_qpr_n_hr_date_periods(item: Any, pd: ProgrammeDocument, worksp
 
 
 def update_create_sr_date_periods(item: Any, pd: ProgrammeDocument, workspace: Workspace) -> Any:
-
     special_reports = item['special_reports'] if 'special_reports' in item else []
+
+    # Handle existing special reports
+    handle_sr_reporting_dates(workspace.business_area_code, pd, special_reports)
+
     for special_report in special_reports:
         special_report['programme_document'] = pd.id
         special_report['report_type'] = 'SR'
