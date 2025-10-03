@@ -88,9 +88,12 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             factories.QPRReportingPeriodDatesFactory(
                 programme_document=self.pd, external_id=reporting_reqs['id'],
-                external_business_area_code=self.workspace.business_area_code, **reporting_reqs)
+                external_business_area_code=self.workspace.business_area_code, **reporting_reqs
+            )
             progress_report = factories.ProgressReportFactory(
-                programme_document=self.pd, report_number=index, **reporting_reqs)
+                programme_document=self.pd, report_number=index, **reporting_reqs,
+                submitted_by=None, submitting_user=None
+            )
             indicator_report = factories.ProgressReportIndicatorReportFactory(
                 progress_report=progress_report,
                 reportable=self.llo_reportable,
@@ -139,7 +142,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
             reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
+                narrative=None, submitted_by=None, submitting_user=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -169,7 +172,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
+                narrative=None, submitted_by=None, submitting_user=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -242,7 +245,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
 
 class TestHandleReportingDatesSR(BaseAPITestCase):
     def setUp(self):
-        self.workspace = factories.WorkspaceFactory(business_area_code=1234)
+        self.workspace = factories.WorkspaceFactory(business_area_code=4321)
         self.pd = factories.ProgrammeDocumentFactory(workspace=self.workspace)
 
         self.special_reports = [
@@ -275,7 +278,7 @@ class TestHandleReportingDatesSR(BaseAPITestCase):
             reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, report_type='SR', **reporting_reqs,
-                narrative=None,
+                narrative=None, submitted_by=None, submitting_user=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -339,7 +342,7 @@ class TestHandleReportingDatesSR(BaseAPITestCase):
         # add progress reports without any user input data
         factories.ProgressReportFactory(
             programme_document=self.pd, report_number=self.pd.progress_reports.count() + 1,
-            report_type='SR', due_date=dupe_sr['due_date'],
+            report_type='SR', due_date=dupe_sr['due_date'], submitted_by=None, submitting_user=None,
             narrative=None, challenges_in_the_reporting_period=None, financial_contribution_to_date=None,
             proposed_way_forward=None, partner_contribution_to_date=None
         )
