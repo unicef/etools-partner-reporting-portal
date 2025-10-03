@@ -1190,11 +1190,11 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
         cluster_obj_pa_reportable_loc = ReportableLocationGoal.objects.filter(
             reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__in=objectives
-        ).distinct().values_list('location_id', flat=True)
+        ).filter(is_active=True).distinct().values_list('location_id', flat=True)
 
         cluster_obj_pa_custom_reportable_loc = ReportableLocationGoal.objects.filter(
             reportable__partner_activity_project_contexts__activity__cluster_objective__in=objectives
-        ).distinct().values_list('location_id', flat=True)
+        ).filter(is_active=True).distinct().values_list('location_id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')

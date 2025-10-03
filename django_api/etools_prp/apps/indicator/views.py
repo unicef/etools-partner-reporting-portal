@@ -334,7 +334,7 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
         reportable_id = self.kwargs.get('reportable_id', None)
 
         if reportable_id:
-            return ReportableLocationGoal.objects.filter(reportable_id=reportable_id)
+            return ReportableLocationGoal.objects.filter(reportable_id=reportable_id, is_active=True)
         else:
             raise Http404
 
