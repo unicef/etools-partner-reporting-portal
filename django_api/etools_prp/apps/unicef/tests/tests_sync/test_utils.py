@@ -167,48 +167,6 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         self.assertEqual(self.pd.reporting_periods.count(), 5)
         self.assertEqual(self.pd.progress_reports.count(), 5)
 
-    def test_handle_reporting_dates_HR_remove_last(self):
-        self.reporting_requirements = {
-        "reporting_requirements": [
-            {
-                "id": 3346,
-                "start_date": "2025-09-02",
-                "end_date": "2025-09-23",
-                "due_date": "2025-09-24"
-            },
-            {
-                "id": 3345,
-                "start_date": "2025-08-21",
-                "end_date": "2025-09-01",
-                "due_date": "2025-09-02"
-            },
-            {
-                "id": 3344,
-                "start_date": "2025-08-01",
-                "end_date": "2025-08-20",
-                "due_date": "2025-08-21"
-            },
-            {
-                "id": 3343,
-                "start_date": "2025-07-08",
-                "end_date": "2025-07-31",
-                "due_date": "2025-08-01"
-            },
-            {
-                "id": 3342,
-                "start_date": "2025-03-02",
-                "end_date": "2025-07-07",
-                "due_date": "2025-07-08"
-            },
-            {
-                "id": 3341,
-                "start_date": "2025-12-11",
-                "end_date": "2025-12-31",
-                "due_date": "2026-01-01"
-            }
-        ]
-    }
-
     def test_handle_reporting_dates_remove_reporting_req(self):
         self.assertEqual(self.pd.reporting_periods.count(), 6)
         self.assertEqual(self.pd.reporting_periods.filter(report_type='QPR').count(), 3)
