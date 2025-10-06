@@ -88,14 +88,14 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             if reporting_reqs['report_type'] == 'QPR':
                 factories.QPRReportingPeriodDatesFactory(
-                programme_document=self.pd, external_id=reporting_reqs['id'],
-                external_business_area_code=self.workspace.business_area_code, **reporting_reqs
-            )
+                    programme_document=self.pd, external_id=reporting_reqs['id'],
+                    external_business_area_code=self.workspace.business_area_code, **reporting_reqs
+                )
             elif reporting_reqs['report_type'] == 'HR':
                 factories.HRReportingPeriodDatesFactory(
-                programme_document=self.pd, external_id=reporting_reqs['id'],
-                external_business_area_code=self.workspace.business_area_code, **reporting_reqs
-            )
+                    programme_document=self.pd, external_id=reporting_reqs['id'],
+                    external_business_area_code=self.workspace.business_area_code, **reporting_reqs
+                )
             progress_report = factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
                 submitted_by=None, submitting_user=None
@@ -224,7 +224,6 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         self.assertEqual(self.pd.progress_reports.filter(report_type='HR').count(), 0)
         self.assertEqual(self.pd.reporting_periods.filter(report_type='QPR').count(), 1)
         self.assertEqual(self.pd.progress_reports.filter(report_type='QPR').count(), 1)
-
 
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_with_report_data_input(self, mock_logger_exc):
