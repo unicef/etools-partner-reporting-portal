@@ -156,7 +156,7 @@ def _process_pd_reports(pd):
     logger.info("\nProcessing ProgrammeDocument id: {}, reference: no. {}".format(pd.id, pd.reference_number))
     logger.info(10 * "****")
     # Get Active LLO indicators only
-    reportable_queryset = pd.reportable_queryset.filter(active=True)
+    reportable_queryset = pd.reportable_queryset
     latest_progress_report_qpr = get_latest_pr_by_type(pd, "QPR")
     latest_progress_report_hr = get_latest_pr_by_type(pd, "HR")
 
