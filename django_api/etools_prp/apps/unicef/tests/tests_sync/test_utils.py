@@ -65,32 +65,41 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
             },
             {
                 "id": 4,
-                "start_date": "2023-11-01",
+                "start_date": "2023-11-02",
                 "end_date": "2024-01-15",
                 "due_date": "2024-02-14",
                 "report_type": "HR"
             },
             {
                 "id": 5,
-                "start_date": "2023-08-01",
+                "start_date": "2023-08-02",
                 "end_date": "2023-10-31",
                 "due_date": "2023-11-30",
                 "report_type": "HR"
             },
             {
                 "id": 6,
-                "start_date": "2023-05-01",
+                "start_date": "2023-05-02",
                 "end_date": "2023-07-31",
                 "due_date": "2023-08-30",
                 "report_type": "HR"
             }
         ]
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
-            factories.QPRReportingPeriodDatesFactory(
-                programme_document=self.pd, external_id=reporting_reqs['id'],
-                external_business_area_code=self.workspace.business_area_code, **reporting_reqs)
+            if reporting_reqs['report_type'] == 'QPR':
+                factories.QPRReportingPeriodDatesFactory(
+                    programme_document=self.pd, external_id=reporting_reqs['id'],
+                    external_business_area_code=self.workspace.business_area_code, **reporting_reqs
+                )
+            elif reporting_reqs['report_type'] == 'HR':
+                factories.HRReportingPeriodDatesFactory(
+                    programme_document=self.pd, external_id=reporting_reqs['id'],
+                    external_business_area_code=self.workspace.business_area_code, **reporting_reqs
+                )
             progress_report = factories.ProgressReportFactory(
-                programme_document=self.pd, report_number=index, **reporting_reqs)
+                programme_document=self.pd, report_number=index, **reporting_reqs,
+                submitted_by=None, submitting_user=None
+            )
             indicator_report = factories.ProgressReportIndicatorReportFactory(
                 progress_report=progress_report,
                 reportable=self.llo_reportable,
@@ -139,7 +148,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
             reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
+                narrative=None, submitted_by=None, submitting_user=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -160,7 +169,11 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
 
     def test_handle_reporting_dates_remove_reporting_req(self):
         self.assertEqual(self.pd.reporting_periods.count(), 6)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='QPR').count(), 3)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='HR').count(), 3)
         self.assertEqual(self.pd.progress_reports.count(), 6)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='QPR').count(), 3)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='HR').count(), 3)
         # delete existing progress reports with user input data
         self.pd.progress_reports.all().delete()
         self.assertEqual(self.pd.progress_reports.count(), 0)
@@ -169,7 +182,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         for index, reporting_reqs in enumerate(self.reporting_requirements, start=1):
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, **reporting_reqs,
-                narrative=None,
+                narrative=None, submitted_by=None, submitting_user=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -181,12 +194,36 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
             IndicatorLocationData.objects.filter(
                 indicator_report__progress_report__programme_document=self.pd).count(), 0)
 
-        # remove last 2 reporting requirement, only 1 remaining
+        # remove first 2 QPR reporting requirement, only 1 QPR remaining
         reporting_requirements = self.reporting_requirements[2:]
         handle_qpr_hr_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
         # check ReportingPeriodDates and progress report are deleted when no user data input
         self.assertEqual(self.pd.reporting_periods.count(), 6 - 2)
         self.assertEqual(self.pd.progress_reports.count(), 6 - 2)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='QPR').count(), 1)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='QPR').count(), 1)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='HR').count(), 3)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='HR').count(), 3)
+
+        # remove last HR report from chronological orger, 1 QPR, 2HRs reports remaining
+        reporting_requirements.pop(1)
+        handle_qpr_hr_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
+        # check ReportingPeriodDates and progress report are deleted when no user data input
+        self.assertEqual(self.pd.reporting_periods.count(), 3)
+        self.assertEqual(self.pd.progress_reports.count(), 3)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='HR').count(), 2)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='QPR').count(), 1)
+
+        # remove all HR reports, 1 QPR, none HR remaining as all following deleted
+        reporting_requirements = reporting_requirements[:-2]
+        handle_qpr_hr_reporting_dates(self.workspace.business_area_code, self.pd, reporting_requirements)
+        # check ReportingPeriodDates and progress report are deleted when no user data input
+        self.assertEqual(self.pd.reporting_periods.count(), 1)
+        self.assertEqual(self.pd.progress_reports.count(), 1)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='HR').count(), 0)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='HR').count(), 0)
+        self.assertEqual(self.pd.reporting_periods.filter(report_type='QPR').count(), 1)
+        self.assertEqual(self.pd.progress_reports.filter(report_type='QPR').count(), 1)
 
     @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
     def test_handle_reporting_dates_with_report_data_input(self, mock_logger_exc):
@@ -242,7 +279,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
 
 class TestHandleReportingDatesSR(BaseAPITestCase):
     def setUp(self):
-        self.workspace = factories.WorkspaceFactory(business_area_code=1234)
+        self.workspace = factories.WorkspaceFactory(business_area_code=4321)
         self.pd = factories.ProgrammeDocumentFactory(workspace=self.workspace)
 
         self.special_reports = [
@@ -275,7 +312,7 @@ class TestHandleReportingDatesSR(BaseAPITestCase):
             reporting_reqs.pop('description', None)
             factories.ProgressReportFactory(
                 programme_document=self.pd, report_number=index, report_type='SR', **reporting_reqs,
-                narrative=None,
+                narrative=None, submitted_by=None, submitting_user=None,
                 challenges_in_the_reporting_period=None,
                 financial_contribution_to_date=None,
                 proposed_way_forward=None,
@@ -339,7 +376,7 @@ class TestHandleReportingDatesSR(BaseAPITestCase):
         # add progress reports without any user input data
         factories.ProgressReportFactory(
             programme_document=self.pd, report_number=self.pd.progress_reports.count() + 1,
-            report_type='SR', due_date=dupe_sr['due_date'],
+            report_type='SR', due_date=dupe_sr['due_date'], submitted_by=None, submitting_user=None,
             narrative=None, challenges_in_the_reporting_period=None, financial_contribution_to_date=None,
             proposed_way_forward=None, partner_contribution_to_date=None
         )
