@@ -1070,16 +1070,22 @@ class ProgressReportAttachmentListCreateAPIView(ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
-        if self.get_queryset().count() == 3:
-            raise ValidationError('This progress report already has 3 attachments')
+        parent = get_object_or_404(ProgressReport, id=self.kwargs['progress_report_id'])
 
-        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.face \
-                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.face).count() == 1:
-            raise ValidationError('This progress report already has 1 FACE attachment')
+        if parent.programme_document.document_type == PD_DOCUMENT_TYPE.GDD:
+            if self.get_queryset().count() == 7:
+                raise ValidationError('This progress report already has 7 attachments')
+        else:
+            if self.get_queryset().count() == 3:
+                raise ValidationError('This progress report already has 3 attachments')
 
-        if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
-                and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 3:
-            raise ValidationError('This progress report already has 3 Other attachments')
+            if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.face \
+                    and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.face).count() == 1:
+                raise ValidationError('This progress report already has 1 FACE attachment')
+
+            if serializer.validated_data['type'] == PR_ATTACHMENT_TYPES.other \
+                    and self.get_queryset().filter(type=PR_ATTACHMENT_TYPES.other).count() == 3:
+                raise ValidationError('This progress report already has 3 Other attachments')
 
         serializer.save(progress_report_id=self.kwargs['progress_report_id'])
 
