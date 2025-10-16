@@ -113,7 +113,7 @@ def handle_qpr_hr_reporting_dates(business_area_code, pd, reporting_reqs):
     :param reporting_reqs: the pd reporting requirements from etools API
     """
     pd_periods = pd.reporting_periods.filter(external_business_area_code=business_area_code)
-    report_type_set = {req['report_type'] for req in reporting_reqs}
+    report_type_set = {'HR', 'QPR'}
 
     # get all reporting periods that have changed
     changed_periods = []
@@ -140,7 +140,7 @@ def handle_qpr_hr_reporting_dates(business_area_code, pd, reporting_reqs):
         if len_diff > 0:
             # remove last reports as they are in chronological order
             changed_periods.extend([
-                existing_periods[i] for i in range(existing_count - len_diff - 1, existing_count - 1)])
+                existing_periods[i] for i in range(existing_count - len_diff, existing_count)])
 
     if not changed_periods:
         return
