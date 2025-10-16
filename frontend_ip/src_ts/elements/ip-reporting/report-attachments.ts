@@ -315,7 +315,7 @@ export class ReportAttachments extends connect(store)(LitElement) {
             <div id="other-six-container">
               <etools-upload
                 id="otherSixAttachmentComponent"
-                label="${translate(this.uploadText)} #5"
+                label="${translate(this.uploadText)} #6"
                 .fileUrl="${this.otherSixAttachment?.path}"
                 .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherSixAttachment?.id)}"
                 @upload-started="${() => this._uploadStarted('otherSixAttachmentComponent')}"
@@ -336,7 +336,7 @@ export class ReportAttachments extends connect(store)(LitElement) {
             <div id="other-seven-container">
               <etools-upload
                 id="otherSevenAttachmentComponent"
-                label="${translate(this.uploadText)} #5"
+                label="${translate(this.uploadText)} #7"
                 .fileUrl="${this.otherSevenAttachment?.path}"
                 .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherSevenAttachment?.id)}"
                 @upload-started="${() => this._uploadStarted('otherSevenAttachmentComponent')}"
