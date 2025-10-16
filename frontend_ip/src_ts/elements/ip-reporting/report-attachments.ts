@@ -61,6 +61,18 @@ export class ReportAttachments extends connect(store)(LitElement) {
   @property({type: Object})
   otherThreeAttachment!: any;
 
+  @property({type: Object})
+  otherFourAttachment!: any;
+
+  @property({type: Object})
+  otherFiveAttachment!: any;
+
+  @property({type: Object})
+  otherSixAttachment!: any;
+
+  @property({type: Object})
+  otherSevenAttachment!: any;
+
   @property({type: Boolean})
   faceLoading!: boolean;
 
@@ -75,6 +87,18 @@ export class ReportAttachments extends connect(store)(LitElement) {
 
   @property({type: Boolean})
   otherThreeLoading!: boolean;
+
+  @property({type: Boolean})
+  otherFourLoading!: boolean;
+
+  @property({type: Boolean})
+  otherFiveLoading!: boolean;
+
+  @property({type: Boolean})
+  otherSixLoading!: boolean;
+
+  @property({type: Boolean})
+  otherSevenLoading!: boolean;
 
   @property({type: Boolean})
   pending!: boolean;
@@ -109,7 +133,11 @@ export class ReportAttachments extends connect(store)(LitElement) {
       faceAttachmentComponent: this.faceLoading,
       otherOneAttachmentComponent: this.otherOneLoading,
       otherTwoAttachmentComponent: this.otherTwoLoading,
-      otherThreeAttachmentComponent: this.otherThreeLoading
+      otherThreeAttachmentComponent: this.otherThreeLoading,
+      otherFourAttachmentComponent: this.otherFourLoading,
+      otherFiveAttachmentComponent: this.otherFiveLoading,
+      otherSixAttachmentComponent: this.otherSixLoading,
+      otherSevenAttachmentComponent: this.otherSevenLoading
     };
   }
 
@@ -221,7 +249,7 @@ export class ReportAttachments extends connect(store)(LitElement) {
       ${!this.showFace
         ? html` <div id="other-three-container">
             <etools-upload
-              id="otherTwoAttachmentComponent"
+              id="otherThreeAttachmentComponent"
               label="${translate(this.uploadText)} #3"
               .fileUrl="${this.otherThreeAttachment?.path}"
               .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherThreeAttachment?.id)}"
@@ -240,6 +268,92 @@ export class ReportAttachments extends connect(store)(LitElement) {
             </etools-upload>
             <sl-spinner ?hidden="${!this.otherThreeLoading}"></sl-spinner>
           </div>`
+        : ''}
+      ${this.isGpd
+        ? html`<div id="other-four-container">
+              <etools-upload
+                id="otherFourAttachmentComponent"
+                label="${translate(this.uploadText)} #4"
+                .fileUrl="${this.otherFourAttachment?.path}"
+                .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherFourAttachment?.id)}"
+                @upload-started="${() => this._uploadStarted('otherFourAttachmentComponent')}"
+                @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherFourAttachmentComponent')}"
+                @delete-file="${() => this._deleteFile('otherFourAttachmentComponent', this.otherFourAttachment?.id)}"
+                .endpointInfo="${{
+                  rawFilePropertyName: 'path',
+                  extraInfo: {type: 'Other'},
+                  rejectWithRequest: true,
+                  method: this.otherFourAttachment?.id ? 'PUT' : 'POST'
+                }}"
+                ?disabled="${this.pending}"
+                ?readonly="${this.readonly}"
+              >
+              </etools-upload>
+              <sl-spinner ?hidden="${!this.otherFourLoading}"></sl-spinner>
+            </div>
+            <div id="other-five-container">
+              <etools-upload
+                id="otherFiveAttachmentComponent"
+                label="${translate(this.uploadText)} #5"
+                .fileUrl="${this.otherFiveAttachment?.path}"
+                .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherFiveAttachment?.id)}"
+                @upload-started="${() => this._uploadStarted('otherFiveAttachmentComponent')}"
+                @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherFiveAttachmentComponent')}"
+                @delete-file="${() => this._deleteFile('otherFiveAttachmentComponent', this.otherFiveAttachment?.id)}"
+                .endpointInfo="${{
+                  rawFilePropertyName: 'path',
+                  extraInfo: {type: 'Other'},
+                  rejectWithRequest: true,
+                  method: this.otherFiveAttachment?.id ? 'PUT' : 'POST'
+                }}"
+                ?disabled="${this.pending}"
+                ?readonly="${this.readonly}"
+              >
+              </etools-upload>
+              <sl-spinner ?hidden="${!this.otherFiveLoading}"></sl-spinner>
+            </div>
+            <div id="other-six-container">
+              <etools-upload
+                id="otherSixAttachmentComponent"
+                label="${translate(this.uploadText)} #5"
+                .fileUrl="${this.otherSixAttachment?.path}"
+                .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherSixAttachment?.id)}"
+                @upload-started="${() => this._uploadStarted('otherSixAttachmentComponent')}"
+                @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherSixAttachmentComponent')}"
+                @delete-file="${() => this._deleteFile('otherSixAttachmentComponent', this.otherSixAttachment?.id)}"
+                .endpointInfo="${{
+                  rawFilePropertyName: 'path',
+                  extraInfo: {type: 'Other'},
+                  rejectWithRequest: true,
+                  method: this.otherSixAttachment?.id ? 'PUT' : 'POST'
+                }}"
+                ?disabled="${this.pending}"
+                ?readonly="${this.readonly}"
+              >
+              </etools-upload>
+              <sl-spinner ?hidden="${!this.otherSixLoading}"></sl-spinner>
+            </div>
+            <div id="other-seven-container">
+              <etools-upload
+                id="otherSevenAttachmentComponent"
+                label="${translate(this.uploadText)} #5"
+                .fileUrl="${this.otherSevenAttachment?.path}"
+                .uploadEndpoint="${this.getUploadUrl(this.attachmentsListUrl, this.otherSevenAttachment?.id)}"
+                @upload-started="${() => this._uploadStarted('otherSevenAttachmentComponent')}"
+                @upload-finished="${(e: CustomEvent) => this._uploadFinished(e, 'otherSevenAttachmentComponent')}"
+                @delete-file="${() => this._deleteFile('otherSevenAttachmentComponent', this.otherSevenAttachment?.id)}"
+                .endpointInfo="${{
+                  rawFilePropertyName: 'path',
+                  extraInfo: {type: 'Other'},
+                  rejectWithRequest: true,
+                  method: this.otherSevenAttachment?.id ? 'PUT' : 'POST'
+                }}"
+                ?disabled="${this.pending}"
+                ?readonly="${this.readonly}"
+              >
+              </etools-upload>
+              <sl-spinner ?hidden="${!this.otherSevenLoading}"></sl-spinner>
+            </div>`
         : ''}
     `;
   }
@@ -281,6 +395,18 @@ export class ReportAttachments extends connect(store)(LitElement) {
         case 'otherThreeAttachmentComponent':
           this.otherThreeAttachment = uploadResponse;
           break;
+        case 'otherFourAttachmentComponent':
+          this.otherFourAttachment = uploadResponse;
+          break;
+        case 'otherFiveAttachmentComponent':
+          this.otherFiveAttachment = uploadResponse;
+          break;
+        case 'otherSixAttachmentComponent':
+          this.otherSixAttachment = uploadResponse;
+          break;
+        case 'otherSevenAttachmentComponent':
+          this.otherSevenAttachment = uploadResponse;
+          break;
       }
     }
     this.pending = false;
@@ -299,6 +425,10 @@ export class ReportAttachments extends connect(store)(LitElement) {
     this.otherOneAttachment = undefined;
     this.otherTwoAttachment = undefined;
     this.otherThreeAttachment = undefined;
+    this.otherFourAttachment = undefined;
+    this.otherFiveAttachment = undefined;
+    this.otherSixAttachment = undefined;
+    this.otherSevenAttachment = undefined;
     if (!this.attachments) {
       this.attachments = [];
     }
@@ -314,6 +444,14 @@ export class ReportAttachments extends connect(store)(LitElement) {
           this.otherTwoAttachment = attachment;
         } else if (!this.otherThreeAttachment || !Object.keys(this.otherThreeAttachment).length) {
           this.otherThreeAttachment = attachment;
+        } else if (!this.otherFourAttachment || !Object.keys(this.otherFourAttachment).length) {
+          this.otherFourAttachment = attachment;
+        } else if (!this.otherFiveAttachment || !Object.keys(this.otherFiveAttachment).length) {
+          this.otherFiveAttachment = attachment;
+        } else if (!this.otherSixAttachment || !Object.keys(this.otherSixAttachment).length) {
+          this.otherSixAttachment = attachment;
+        } else if (!this.otherSevenAttachment || !Object.keys(this.otherSevenAttachment).length) {
+          this.otherSevenAttachment = attachment;
         }
       } else if (attachment.type === 'FACE') {
         this.faceAttachment = attachment;
@@ -355,6 +493,18 @@ export class ReportAttachments extends connect(store)(LitElement) {
             break;
           case 'otherThreeAttachmentComponent':
             this.otherThreeAttachment = undefined;
+            break;
+          case 'otherFourAttachmentComponent':
+            this.otherFourAttachment = undefined;
+            break;
+          case 'otherFiveAttachmentComponent':
+            this.otherFiveAttachment = undefined;
+            break;
+          case 'otherSixAttachmentComponent':
+            this.otherSixAttachment = undefined;
+            break;
+          case 'otherSevenAttachmentComponent':
+            this.otherSevenAttachment = undefined;
             break;
         }
         this.requestUpdate();
