@@ -220,7 +220,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitEl
                       no-label-float
                       char-counter
                       .charCount=${this.localData?.results_achieved?.length}
-                      maxlength="2000"
+                      maxlength="5000"
                     ></etools-input>
                   `}
             </labelled-item>
@@ -239,7 +239,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitEl
                       no-label-float
                       char-counter
                       .charCount=${this.localData?.challenges_in_the_reporting_period?.length}
-                      maxlength="2000"
+                      maxlength="5000"
                     ></etools-input>
                   `}
             </labelled-item>
@@ -258,7 +258,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitEl
                       no-label-float
                       char-counter
                       .charCount=${this.localData?.proposed_way_forward?.length}
-                      maxlength="2000"
+                      maxlength="5000"
                     ></etools-input>
                   `}
             </labelled-item>
@@ -276,7 +276,7 @@ export class GPdReportInfo extends ProgressReportUtilsMixin(connect(store)(LitEl
                       no-label-float
                       char-counter
                       .charCount=${this.localData?.other_information?.length}
-                      maxlength="2000"
+                      maxlength="5000"
                     ></etools-input>
                   `}
             </labelled-item>
