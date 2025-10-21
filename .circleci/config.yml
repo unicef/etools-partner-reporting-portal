@@ -47,7 +47,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: 'postgres://postgres:postgres@127.0.0.1:5432/test_prp'
-          DEPLOY_BRANCHES: 'develop|staging|master|274658-reporting-periods-changes'
+          DEPLOY_BRANCHES: 'develop|staging|master|gpd-reporting-improvements'
       - image: cimg/redis:6.2
       - image: cimg/postgres:12.9-postgis
         environment:
@@ -182,4 +182,4 @@ workflows:
                 - master
                 - staging
                 - develop
-                - 274658-reporting-periods-changes
+                - gpd-reporting-improvements
