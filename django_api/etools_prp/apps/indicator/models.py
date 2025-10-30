@@ -773,16 +773,21 @@ class IndicatorReport(TimeStampedModel):
             field_object = self._meta.get_field('overall_status')
             return self._get_FIELD_display(field_object)
 
+    @cached_property
+    def active_indicator_location_data(self):
+        active_goals = ReportableLocationGoal.objects.filter(reportable=self.reportable, is_active=True)
+        return IndicatorLocationData.objects.filter(indicator_report=self, location__reportablelocationgoal__in=active_goals)
+
     @property
     def is_complete(self):
-        for location_disaggregation in IndicatorLocationData.objects.filter(indicator_report=self):
+        for location_disaggregation in self.active_indicator_location_data:
             if not location_disaggregation.is_complete:
                 return False
         return True
 
     @property
     def is_draft(self):
-        if self.submission_date is None and IndicatorLocationData.objects.filter(indicator_report=self).exists():
+        if self.submission_date is None and self.active_indicator_location_data:
             return True
         return False
 
@@ -811,7 +816,7 @@ class IndicatorReport(TimeStampedModel):
                 INDICATOR_REPORT_STATUS.submitted]:
             return False
 
-        for data in self.indicator_location_data.all():
+        for data in self.active_indicator_location_data.all():
             if not data.is_complete:
                 return False
 
