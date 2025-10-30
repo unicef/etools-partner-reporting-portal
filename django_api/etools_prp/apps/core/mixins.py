@@ -13,6 +13,9 @@ from storages.backends.azure_storage import AzureStorage
 from storages.utils import setting
 
 
+logger = logging.getLogger(__name__)
+
+
 def social_details(backend, details, response, *args, **kwargs):
     r = social_auth.social_details(backend, details, response, *args, **kwargs)
 
@@ -74,7 +77,6 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
         super().__init__(*args, **kwargs)
         self.redirect_uri = settings.FRONTEND_HOST + '/social/complete/azuread-b2c-oauth2/'
 
-
     def request_access_token(self, *args, **kwargs):
         logger.info("Params for requesting token - args:{} -- kwargs:{}".format(args, kwargs))  # Temporal
 
@@ -88,12 +90,12 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
 
             logger.info("Exception raised in request_access_token - {}".format(exception.__dict__))  # Temporal
 
-            error_message = self._get_response_error_message(exception, error_message, response)
+            error_message = self._get_response_error_message(exception, response)
 
             logger.error("Failed to exchange code for token with Azure B2C: %s", error_message, exc_info=True)
             raise
 
-    def _get_response_error_message(self, e, error_message, response):
+    def _get_response_error_message(self, exception, response):
         if response is not None:
             try:
                 error_message = response.json()
