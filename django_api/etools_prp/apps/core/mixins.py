@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
@@ -102,7 +103,7 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
             except Exception:
                 error_message = response.text
         else:
-            error_message = str(e)
+            error_message = str(exception)
 
         return error_message
 
@@ -118,7 +119,7 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
         # Timestamp: 2018-11-13 11:37:56Z\r\n']
         error_description = request.GET.get('error_description', None)
         if error == "access_denied" and error_description is not None:
-            logger.error("Failed while getting redirect uri: %s", error_message, exc_info=True)
+            logger.error("Failed while getting redirect uri: %s", error_description, exc_info=True)
 
             if 'AADB2C90118' in error_description:
                 auth_class = CustomAzureADBBCOAuth2()
