@@ -13,7 +13,6 @@ from social_django.middleware import SocialAuthExceptionMiddleware
 from storages.backends.azure_storage import AzureStorage
 from storages.utils import setting
 
-
 logger = logging.getLogger(__name__)
 
 
