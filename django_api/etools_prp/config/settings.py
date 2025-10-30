@@ -304,10 +304,6 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
         },
-        # 'elasticapm': {
-        #     'level': 'ERROR',
-        #     'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
-        # },
     },
     'loggers': {
         'django': {
@@ -329,11 +325,6 @@ LOGGING = {
             'handlers': ['default'],
             'level': 'INFO',
         }
-        # 'elasticapm.errors': {
-        #     'level': 'ERROR',
-        #     'handlers': ['default'],
-        #     'propagate': False,
-        # },
     }
 }
 
@@ -563,3 +554,4 @@ SESSION_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SAMESITE = 'None'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True   # social-auth hint for https behind proxy
+# SOCIAL_AUTH_RAISE_EXCEPTIONS = False
