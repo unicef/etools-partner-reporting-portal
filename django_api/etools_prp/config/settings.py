@@ -553,9 +553,14 @@ MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)
 
 
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+
+# Keep these as this for b2c integration to work - otherwise cookie with session_id is lost in the exchange
 SESSION_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = True   # social-auth hint for https behind proxy
-# SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
+
+# Cookie busting for the login fix
+SESSION_COOKIE_NAME = "prp_session"
+CSRF_COOKIE_NAME = "prp_csrf"
