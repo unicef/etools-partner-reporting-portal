@@ -78,8 +78,6 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
         self.redirect_uri = settings.FRONTEND_HOST + '/social/complete/azuread-b2c-oauth2/'
 
     def request_access_token(self, *args, **kwargs):
-        logger.info("Params for requesting token - args:{} -- kwargs:{}".format(args, kwargs))  # Temporal
-
         try:
             return super().request_access_token(*args, **kwargs)
         except Exception as exception:
