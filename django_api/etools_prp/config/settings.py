@@ -101,9 +101,7 @@ INSTALLED_APPS = [
     'leaflet',
     'django_cron',
     'social_django',
-
     'unicef_locations',
-
     'etools_prp.apps.account',
     'etools_prp.apps.cluster',
     'etools_prp.apps.core',
@@ -112,7 +110,6 @@ INSTALLED_APPS = [
     'etools_prp.apps.unicef',
     'etools_prp.apps.ocha',
     'etools_prp.apps.id_management',
-
     'post_office',
     'unicef_notification',
     'django_extensions',
@@ -307,10 +304,6 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
         },
-        # 'elasticapm': {
-        #     'level': 'ERROR',
-        #     'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
-        # },
     },
     'loggers': {
         'django': {
@@ -332,11 +325,10 @@ LOGGING = {
             'handlers': ['default'],
             'level': 'INFO',
         }
-        # 'elasticapm.errors': {
-        #     'level': 'ERROR',
-        #     'handlers': ['default'],
-        #     'propagate': False,
-        # },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
     }
 }
 
@@ -562,5 +554,8 @@ MATOMO_SITE_ID = env('MATOMO_SITE_ID', default=None)
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'Strict'
-CSRF_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True   # social-auth hint for https behind proxy
+# SOCIAL_AUTH_RAISE_EXCEPTIONS = False
