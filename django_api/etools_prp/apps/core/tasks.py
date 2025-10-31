@@ -12,6 +12,7 @@ from etools_prp.apps.core.helpers import (
     create_ir_and_ilds_for_pr,
     create_ir_for_cluster,
     create_pr_for_report_type,
+    create_pr_sr_for_report_type,
     find_missing_frequency_period_dates_for_indicator_report,
     get_latest_pr_by_type,
 )
@@ -155,33 +156,31 @@ def _process_pd_reports(pd):
     logger.info("\nProcessing ProgrammeDocument id: {}, reference: no. {}".format(pd.id, pd.reference_number))
     logger.info(10 * "****")
     # Get Active LLO indicators only
-    reportable_queryset = pd.reportable_queryset.filter(active=True)
+    reportable_queryset = pd.reportable_queryset
     latest_progress_report_qpr = get_latest_pr_by_type(pd, "QPR")
     latest_progress_report_hr = get_latest_pr_by_type(pd, "HR")
-    latest_progress_report_sr = get_latest_pr_by_type(pd, "SR")
+
     generate_from_date_qpr = None
     generate_from_date_hr = None
-    generate_from_date_sr = None
     if latest_progress_report_qpr:
         generate_from_date_qpr = latest_progress_report_qpr.start_date
     if latest_progress_report_hr:
         generate_from_date_hr = latest_progress_report_hr.start_date
-    if latest_progress_report_sr:
-        generate_from_date_sr = latest_progress_report_sr.due_date
+
     logger.info("Last QPR report: %s for PD %s" % (generate_from_date_qpr, pd))
     logger.info("Last HR report: %s for PD %s" % (generate_from_date_hr, pd))
-    logger.info("Last SR report: %s for PD %s" % (generate_from_date_sr, pd))
+
     with transaction.atomic():
         # Handling QPR reporting periods
         for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="QPR").order_by(
                 'start_date')):
             # If PR start date is greater than now, skip!
             if reporting_period.start_date > datetime.now().date():
-                logger.info("No new reports to generate")
+                logger.info("No new QPR reports to generate")
                 continue
             # If PR was already generated, skip!
             if generate_from_date_qpr and reporting_period.start_date <= generate_from_date_qpr:
-                logger.info("No new reports to generate")
+                logger.info("No new QPR reports to generate")
                 continue
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                 pd, idx, reporting_period, generate_from_date_qpr
@@ -199,15 +198,15 @@ def _process_pd_reports(pd):
                 'start_date')):
             # If there is no start and/or end date from reporting period, skip!
             if not reporting_period.start_date or not reporting_period.end_date:
-                logger.info("No new reports to generate: No start & end date pair available.")
+                logger.info("No new HR reports to generate: No start & end date pair available.")
                 continue
             # If PR start date is greater than now, skip!
             if reporting_period.start_date > datetime.now().date():
-                logger.info("No new reports to generate")
+                logger.info("No new HR reports to generate")
                 continue
             # If PR was already generated, skip!
             if generate_from_date_hr and reporting_period.start_date <= generate_from_date_hr:
-                logger.info("No new reports to generate")
+                logger.info("No new HR reports to generate")
                 continue
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                 pd, idx, reporting_period, generate_from_date_hr
@@ -221,26 +220,13 @@ def _process_pd_reports(pd):
                 due_date
             )
         # Handling SR reporting periods
-        for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR").order_by('due_date')):
+        for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR").order_by('due_date'), start=1):
             # If PR due date is greater than now, skip!
             if reporting_period.due_date >= datetime.now().date() + timedelta(days=30):
-                logger.info("No new reports to generate")
+                logger.info(f"No new SR reports to generate for due date: {reporting_period.due_date}")
                 continue
-            # If PR was already generated, skip!
-            if generate_from_date_sr and reporting_period.due_date <= generate_from_date_sr:
-                logger.info("No new reports to generate")
-                continue
-            next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
-                pd, idx, reporting_period, generate_from_date_sr
-            )
-            create_ir_and_ilds_for_pr(
-                pd,
-                reportable_queryset,
-                next_progress_report,
-                start_date,
-                end_date,
-                due_date
-            )
+
+            create_pr_sr_for_report_type(pd, idx, reporting_period)
 
 
 @shared_task

@@ -19,7 +19,7 @@ from etools_prp.apps.core.common import (
     PROGRESS_REPORT_STATUS,
     PRP_IP_ROLE_TYPES,
 )
-from etools_prp.apps.core.models import Location, Workspace
+from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.models import IndicatorBlueprint
 from etools_prp.apps.indicator.serializers import (
@@ -104,7 +104,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_focal_point = serializers.SerializerMethodField()
     partner_focal_point = serializers.SerializerMethodField()
     document_type_display = serializers.CharField(source='get_document_type_display')
-    locations = serializers.SerializerMethodField(allow_null=True)
+    locations = ShortLocationSerializer(source='locations_queryset', many=True, read_only=True, allow_null=True)
     amendments = serializers.JSONField(read_only=True)
     reporting_periods = ReportingPeriodDatesSerializer(many=True)
 
@@ -160,27 +160,30 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     def get_funds_received_to_date_currency(self, obj):
         return obj.funds_received_to_date_currency
 
-    def get_locations(self, obj):
-        qs = (
-            Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj
-            )
-            .union(
-                Location.objects.filter(
-                    reportables__lower_level_outputs__cp_output__programme_document=obj
-                )
-            )
-        )
-        return ShortLocationSerializer(qs, many=True).data
-
     def get_unicef_officers(self, obj):
-        return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
+        officers = getattr(obj, 'prefetched_unicef_officers_active', None)
+        if officers is None:
+            officers = obj.unicef_officers.filter(active=True)
+        return PersonSerializer(officers, read_only=True, many=True).data
 
     def get_unicef_focal_point(self, obj):
-        return PersonSerializer(obj.unicef_focal_point.filter(active=True), read_only=True, many=True).data
+        focal = getattr(obj, 'prefetched_unicef_focal_point_active', None)
+        if focal is None:
+            focal = obj.unicef_focal_point.filter(active=True)
+        return PersonSerializer(focal, read_only=True, many=True).data
 
     def get_partner_focal_point(self, obj):
-        return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
+        partner_fp = getattr(obj, 'prefetched_partner_focal_point_active', None)
+        if partner_fp is None:
+            partner_fp = obj.partner_focal_point.filter(active=True)
+        return PersonSerializer(partner_fp, read_only=True, many=True).data
+
+
+class ProgrammeDocumentListSerializer(ProgrammeDocumentSerializer):
+    locations = None
+
+    class Meta(ProgrammeDocumentSerializer.Meta):
+        fields = tuple(f for f in ProgrammeDocumentSerializer.Meta.fields if f != 'locations')
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -204,7 +207,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 
     total_unicef_supplies = serializers.CharField(source='in_kind_amount')
     total_unicef_supplies_currency = serializers.CharField(source='in_kind_amount_currency')
-    locations = serializers.SerializerMethodField(allow_null=True)
+    locations = ShortLocationSerializer(source='locations_queryset', many=True, read_only=True, allow_null=True)
     reporting_periods = ReportingPeriodDatesSerializer(many=True)
     amendments = serializers.JSONField(read_only=True)
 
@@ -252,21 +255,6 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 
     def get_partner_focal_point(self, obj):
         return PersonSerializer(obj.partner_focal_point.filter(active=True), read_only=True, many=True).data
-
-    def get_locations(self, obj):
-        qs = (
-            Location.objects.filter(
-                indicator_location_data__indicator_report__progress_report__programme_document=obj,
-                reportablelocationgoal__is_active=True,
-            )
-            .union(
-                Location.objects.filter(
-                    reportablelocationgoal__is_active=True,
-                    reportables__lower_level_outputs__cp_output__programme_document=obj
-                )
-            )
-        )
-        return ShortLocationSerializer(qs, many=True).data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):
@@ -521,13 +509,13 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
     partner_contribution_to_date = serializers.CharField(
-        max_length=2000,
+        max_length=5000,
         required=False,
         allow_blank=True,
         allow_null=True
     )
     financial_contribution_to_date = serializers.CharField(
-        max_length=2000,
+        max_length=5000,
         required=False,
         allow_blank=True,
         allow_null=True,
@@ -539,13 +527,13 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     challenges_in_the_reporting_period = serializers.CharField(
-        max_length=2000,
+        max_length=5000,
         required=False,
         allow_blank=True,
         allow_null=True,
     )
     proposed_way_forward = serializers.CharField(
-        max_length=2000,
+        max_length=5000,
         required=False,
         allow_blank=True,
         allow_null=True
@@ -559,12 +547,12 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     results_achieved = serializers.CharField(
-        max_length=2000,
+        max_length=5000,
         required=False,
         allow_blank=True,
     )
     other_information = serializers.CharField(
-        max_length=2000,
+        max_length=5000,
         required=False,
         allow_blank=True,
         allow_null=True
@@ -1016,6 +1004,24 @@ class PMPReportingPeriodDatesSRSerializer(BasePMPReportingPeriodDatesSerializer)
             'description',
             'programme_document',
             'external_business_area_code',
+        )
+
+
+class ProgrammeDocumentReportingSerializer(serializers.ModelSerializer):
+    start_date = serializers.DateField(format='%Y-%m-%d')
+    end_date = serializers.DateField(format='%Y-%m-%d')
+    due_date = serializers.DateField(format='%Y-%m-%d')
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'report_type',
+            'report_number',
+            'has_partner_data',
         )
 
 

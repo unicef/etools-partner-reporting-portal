@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -31,8 +32,12 @@ from etools_prp.apps.core.common import (
     REPORTING_TYPES,
     SR_TYPE,
 )
-from etools_prp.apps.core.models import TimeStampedExternalBusinessAreaModel, TimeStampedExternalSyncModelMixin
-from etools_prp.apps.indicator.models import Reportable  # IndicatorReport
+from etools_prp.apps.core.models import (
+    Location,
+    TimeStampedExternalBusinessAreaModel,
+    TimeStampedExternalSyncModelMixin,
+)
+from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.utils.emails import send_email_from_template
 
 logger = logging.getLogger(__name__)
@@ -384,6 +389,21 @@ class ProgrammeDocument(TimeStampedExternalBusinessAreaModel):
     def is_gpd(self):
         return self.document_type == PD_DOCUMENT_TYPE.GDD
 
+    @property
+    def locations_queryset(self):
+        fields = ('id', 'name', 'admin_level', 'admin_level_name', 'p_code')
+        base = Location.super_objects.select_related(None).only(*fields)
+
+        qs_reports = base.filter(
+            indicator_location_data__indicator_report__progress_report__programme_document=self).exclude(
+            reportablelocationgoal__is_active=False).distinct()
+
+        qs_llos = base.filter(
+            reportables__lower_level_outputs__cp_output__programme_document=self).exclude(
+            reportablelocationgoal__is_active=False).distinct()
+
+        return qs_reports.union(qs_llos).order_by('id')
+
 
 class ProgressReport(TimeStampedModel):
     """
@@ -482,6 +502,17 @@ class ProgressReport(TimeStampedModel):
     def __str__(self):
         dates = f", due {self.due_date}" if self.report_type == SR_TYPE else f"{self.start_date} to {self.end_date} [due {self.due_date}]"
         return "Progress Report {} <pk:{}>: {} {}".format(self.report_type, self.id, self.programme_document, dates)
+
+    @cached_property
+    def has_partner_data(self):
+        return (any([self.challenges_in_the_reporting_period, self.partner_contribution_to_date,
+                     self.financial_contribution_to_date, self.proposed_way_forward, self.narrative]) or
+                self.attachments.exists() or
+                self.indicator_reports.filter(
+                    Q(total__c__gt=0) | Q(total__v__gt=0) |
+                    Q(narrative_assessment__isnull=False) |
+                    Q(overall_status__in=[OVERALL_STATUS.met, OVERALL_STATUS.on_track,
+                                          OVERALL_STATUS.no_progress, OVERALL_STATUS.constrained])).exists())
 
 
 class GPDProgressReport(TimeStampedModel):

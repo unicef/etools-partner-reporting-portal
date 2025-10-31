@@ -146,7 +146,7 @@ export class GpdDetailsOverview extends connect(store)(LitElement) {
               </labelled-item>
             </div>
             <div class="col-2">
-              <labelled-item label="${translate('CSO_CONTRIBUTION')}">
+              <labelled-item label="${translate('PARTNER_CONTRIBUTION')}">
                 <span class="field-value">
                   <etools-prp-currency
                     value="${this.pd.cso_contribution}"

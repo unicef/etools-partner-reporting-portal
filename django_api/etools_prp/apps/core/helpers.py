@@ -451,6 +451,44 @@ def get_latest_pr_by_type(pd, report_type):
     return qs.filter(report_type=report_type).order_by(order_by_field).last()
 
 
+def create_pr_sr_for_report_type(pd, idx, reporting_period):
+    """
+    Create ProgressReport SR instance by its ReportingPeriodDate
+
+    Arguments:
+        pd {ProgrammeDocument} -- ProgrammeDocument instance for ProgressReport to generate
+        idx {int} -- Integer to denote report number
+        reporting_period {ReportingPeriodDates} -- ReportingPeriodDates instance for new ProgressReport
+
+    Returns:
+        Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
+        - Newly generated ProgressReport & 3 datetime objects
+    """
+    from etools_prp.apps.unicef.models import ProgressReport
+
+    start_date = reporting_period.start_date
+    end_date = reporting_period.end_date
+    due_date = reporting_period.due_date
+
+    logger.info(f"SR ProgressReport with due date: {due_date}")
+
+    is_final = idx == pd.reporting_periods.filter(report_type='SR').count()
+
+    next_progress_report, created = ProgressReport.objects.update_or_create(
+        programme_document=pd,
+        report_type='SR',
+        report_number=idx,
+        is_final=is_final,
+        defaults={
+            'start_date': start_date,
+            'end_date': end_date,
+            'due_date': due_date,
+        }
+    )
+    if created:
+        logger.info(f"Created new SR{idx} ProgressReport id {next_progress_report.id} for due date {due_date}")
+
+
 def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
     """
     Create ProgressReport instance by its ReportingPeriodDate instance's report type
@@ -472,7 +510,7 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
     start_date = reporting_period.start_date
 
     # Create ProgressReport first
-    logger.info("Creating ProgressReport for {} - {}".format(start_date, end_date))
+    logger.info("Creating {} ProgressReport for {} - {}".format(reporting_period.report_type, start_date, end_date))
 
     # Re-query latest ProgressReport by report type
     latest_progress_report = get_latest_pr_by_type(pd, reporting_period.report_type)

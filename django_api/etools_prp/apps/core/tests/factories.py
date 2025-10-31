@@ -1060,6 +1060,20 @@ class HRReportingPeriodDatesFactory(AbstractReportingPeriodDatesFactory):
         model = ReportingPeriodDates
 
 
+class SRReportingPeriodDatesFactory(AbstractReportingPeriodDatesFactory):
+    """
+    Arguments:
+
+    Ex) SRReportingPeriodDatesFactory(programme_document=programme_document1)
+    """
+
+    due_date = factory.Sequence(lambda n: beginning_of_this_year + relativedelta(months=1 * (n - 1)) + relativedelta(months=1, days=1))
+    report_type = 'SR'
+
+    class Meta:
+        model = ReportingPeriodDates
+
+
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     """
     Arguments:
