@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
@@ -12,8 +11,6 @@ from social_core.pipeline import social_auth, user as social_core_user
 from social_django.middleware import SocialAuthExceptionMiddleware
 from storages.backends.azure_storage import AzureStorage
 from storages.utils import setting
-
-logger = logging.getLogger(__name__)
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -77,35 +74,6 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
         super().__init__(*args, **kwargs)
         self.redirect_uri = settings.FRONTEND_HOST + '/social/complete/azuread-b2c-oauth2/'
 
-    def request_access_token(self, *args, **kwargs):
-        logger.info("Params for requesting token - args:{} -- kwargs:{}".format(args, kwargs))  # Temporal
-
-        try:
-            return super().request_access_token(*args, **kwargs)
-        except Exception as exception:
-            response = exception.response if hasattr(exception, 'response') else None
-            error_message = response.json() if response else str(exception)
-            logger.error("Failed to exchange code for token with Azure B2C: {}".format(error_message), exc_info=True)
-            response = getattr(exception, 'response', None)
-
-            logger.info("Exception raised in request_access_token - {}".format(exception.__dict__))  # Temporal
-
-            error_message = self._get_response_error_message(exception, response)
-
-            logger.error("Failed to exchange code for token with Azure B2C: %s", error_message, exc_info=True)
-            raise
-
-    def _get_response_error_message(self, exception, response):
-        if response is not None:
-            try:
-                error_message = response.json()
-            except Exception:
-                error_message = response.text
-        else:
-            error_message = str(exception)
-
-        return error_message
-
 
 class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
 
@@ -118,8 +86,6 @@ class CustomSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
         # Timestamp: 2018-11-13 11:37:56Z\r\n']
         error_description = request.GET.get('error_description', None)
         if error == "access_denied" and error_description is not None:
-            logger.error("Failed while getting redirect uri: %s", error_description, exc_info=True)
-
             if 'AADB2C90118' in error_description:
                 auth_class = CustomAzureADBBCOAuth2()
                 redirect_home = auth_class.get_redirect_uri()
