@@ -88,7 +88,7 @@ jobs:
           name: Trigger correct workflow per branch
           command: |
             # Deploy branches: build only (no tests)
-            if (echo "develop|staging|master|test-fixes-prp-login" | grep -q "$CIRCLE_BRANCH"); then
+            if (echo "develop|staging|master" | grep -q "$CIRCLE_BRANCH"); then
               curl --user ${CIRCLE_TOKEN}: \
                 --data build_parameters[CIRCLE_JOB]=build_and_upload \
                 --data revision=$CIRCLE_SHA1 \
