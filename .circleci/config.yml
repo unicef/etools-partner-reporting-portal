@@ -39,7 +39,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
           PIPENV_VENV_IN_PROJECT: 1
           DATABASE_URL: 'postgres://postgres:postgres@127.0.0.1:5432/test_prp'
-          DEPLOY_BRANCHES: 'develop|staging|master|test-fixes-prp-login'
+          DEPLOY_BRANCHES: 'develop|staging|master'
       - image: cimg/redis:6.2
       - image: cimg/postgres:12.9-postgis
         environment:
@@ -89,7 +89,7 @@ jobs:
           name: Trigger correct workflow per branch
           command: |
             # Deploy branches: build only (no tests)
-            if (echo "develop|staging|master|test-fixes-prp-login" | grep -q "$CIRCLE_BRANCH"); then
+            if (echo "develop|staging|master" | grep -q "$CIRCLE_BRANCH"); then
               curl --user ${CIRCLE_TOKEN}: \
                 --data build_parameters[CIRCLE_JOB]=build_and_upload \
                 --data revision=$CIRCLE_SHA1 \
