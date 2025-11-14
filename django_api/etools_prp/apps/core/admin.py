@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.gis import admin
 
 from admin_extra_urls.decorators import button
@@ -8,7 +9,7 @@ from unicef_locations.models import CartoDBTable
 from .cartodb import import_locations, rebuild_tree
 from .forms import CartoDBTableForm
 from .models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
-from .tasks import import_etools_locations
+from .tasks import bulk_delete_locations, import_etools_locations
 
 
 class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
@@ -38,6 +39,26 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
 
     def get_workspaces(self, obj):
         return "\n".join([p.title for p in obj.workspaces.all()])
+    
+    def delete_queryset(self, request, queryset):
+        """
+        Override bulk delete to use async task for large operations.
+        """
+        count = queryset.count()
+        
+        # For small deletions (< 10), use synchronous delete
+        if count < 10:
+            queryset.delete()
+            messages.success(request, f"Successfully deleted {count} location(s).")
+        else:
+            # For large deletions, use async task
+            location_ids = list(queryset.values_list('id', flat=True))
+            bulk_delete_locations.delay(location_ids)
+            messages.success(
+                request, 
+                f"Bulk deletion of {count} locations has been queued. "
+                f"This will be processed in the background. Check the logs for completion status."
+            )
 
 
 class CartoDBTableAdmin(admin.ModelAdmin):

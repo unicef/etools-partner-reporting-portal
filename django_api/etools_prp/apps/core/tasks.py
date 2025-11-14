@@ -232,3 +232,42 @@ def _process_pd_reports(pd):
 @shared_task
 def import_etools_locations(pk):
     EToolsLocationSynchronizer(pk).sync()
+
+
+@shared_task
+def bulk_delete_locations(location_ids):
+    """
+    Asynchronously delete locations in batches to avoid timeouts.
+    
+    Args:
+        location_ids: List of location IDs to delete
+    """
+    from etools_prp.apps.core.models import Location
+    
+    logger.info(f"Starting bulk deletion of {len(location_ids)} locations")
+    
+    batch_size = 10
+    deleted_count = 0
+    failed_ids = []
+    
+    for i in range(0, len(location_ids), batch_size):
+        batch_ids = location_ids[i:i + batch_size]
+        
+        try:
+            with transaction.atomic():
+                locations = Location.objects.filter(id__in=batch_ids)
+                count = locations.count()
+                locations.delete()
+                deleted_count += count
+                logger.info(f"Deleted batch {i // batch_size + 1}: {count} locations")
+        except Exception as e:
+            logger.error(f"Error deleting batch {batch_ids}: {str(e)}")
+            failed_ids.extend(batch_ids)
+    
+    logger.info(f"Bulk deletion completed. Deleted: {deleted_count}, Failed: {len(failed_ids)}")
+    
+    return {
+        'deleted': deleted_count,
+        'failed': len(failed_ids),
+        'failed_ids': failed_ids
+    }
