@@ -39,13 +39,13 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
 
     def get_workspaces(self, obj):
         return "\n".join([p.title for p in obj.workspaces.all()])
-    
+
     def delete_queryset(self, request, queryset):
         """
         Override bulk delete to use async task for large operations.
         """
         count = queryset.count()
-        
+
         # For small deletions (< 10), use synchronous delete
         if count < 10:
             queryset.delete()
@@ -55,7 +55,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
             location_ids = list(queryset.values_list('id', flat=True))
             bulk_delete_locations.delay(location_ids)
             messages.success(
-                request, 
+                request,
                 f"Bulk deletion of {count} locations has been queued. "
                 f"This will be processed in the background. Check the logs for completion status."
             )
