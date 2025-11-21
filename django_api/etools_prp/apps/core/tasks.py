@@ -5,6 +5,7 @@ from django.db import transaction
 
 from celery import shared_task
 
+from etools_prp.apps.account.models import User
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_STATUS
 from etools_prp.apps.core.helpers import (
@@ -17,6 +18,7 @@ from etools_prp.apps.core.helpers import (
     get_latest_pr_by_type,
 )
 from etools_prp.apps.core.locations_sync import EToolsLocationSynchronizer
+from etools_prp.apps.core.models import BulkActionLog, Location
 from etools_prp.apps.core.serializers import PMPWorkspaceSerializer
 from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.unicef.models import ProgrammeDocument
@@ -235,20 +237,20 @@ def import_etools_locations(pk):
 
 
 @shared_task
-def bulk_delete_locations(location_ids):
+def bulk_delete_locations(location_ids, user_id=None):
     """
     Asynchronously delete locations in batches to avoid timeouts.
 
     Args:
         location_ids: List of location IDs to delete
+        user_id: Optional ID of user performing the deletion
     """
-    from etools_prp.apps.core.models import Location
-
     logger.info(f"Starting bulk deletion of {len(location_ids)} locations")
 
     batch_size = 10
     deleted_count = 0
     failed_ids = []
+    deleted_ids = []
 
     for i in range(0, len(location_ids), batch_size):
         batch_ids = location_ids[i:i + batch_size]
@@ -257,14 +259,33 @@ def bulk_delete_locations(location_ids):
             with transaction.atomic():
                 locations = Location.objects.filter(id__in=batch_ids)
                 count = locations.count()
+                batch_deleted_ids = list(locations.values_list('id', flat=True))
                 locations.delete()
                 deleted_count += count
+                deleted_ids.extend(batch_deleted_ids)
                 logger.info(f"Deleted batch {i // batch_size + 1}: {count} locations")
         except Exception as e:
             logger.error(f"Error deleting batch {batch_ids}: {str(e)}")
             failed_ids.extend(batch_ids)
 
     logger.info(f"Bulk deletion completed. Deleted: {deleted_count}, Failed: {len(failed_ids)}")
+
+    # Log the bulk action
+    if deleted_count > 0:
+        user = None
+        if user_id:
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                pass
+
+        BulkActionLog.objects.create(
+            user=user,
+            affected_ids=deleted_ids,
+            affected_count=deleted_count,
+            model_name="Location",
+            app_label="core",
+        )
 
     return {
         'deleted': deleted_count,

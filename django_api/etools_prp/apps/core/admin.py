@@ -8,7 +8,7 @@ from unicef_locations.models import CartoDBTable
 
 from .cartodb import import_locations, rebuild_tree
 from .forms import CartoDBTableForm
-from .models import Location, PRPRoleOld, Realm, ResponsePlan, Workspace
+from .models import BulkActionLog, Location, PRPRoleOld, Realm, ResponsePlan, Workspace
 from .tasks import bulk_delete_locations, import_etools_locations
 
 
@@ -53,7 +53,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         else:
             # For large deletions, use async task
             location_ids = list(queryset.values_list('id', flat=True))
-            bulk_delete_locations.delay(location_ids)
+            bulk_delete_locations.delay(location_ids, user_id=request.user.id)
             messages.success(
                 request,
                 f"Bulk deletion of {count} locations has been queued. "
@@ -121,6 +121,21 @@ class RealmAdmin(admin.ModelAdmin):
     autocomplete_fields = ('partner', 'workspace', 'group')
 
 
+class BulkActionLogAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'model_name', 'affected_count', 'user')
+    list_filter = ('model_name', 'app_label', 'created_at')
+    readonly_fields = ('created_at', 'user', 'affected_count', 'model_name',
+                       'app_label', 'affected_ids')
+    search_fields = ('user__email', 'user__first_name', 'user__last_name',
+                     'model_name')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
@@ -128,3 +143,4 @@ admin.site.unregister(CartoDBTable)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
 admin.site.register(PRPRoleOld, PRPRoleAdmin)
 admin.site.register(Realm, RealmAdmin)
+admin.site.register(BulkActionLog, BulkActionLogAdmin)
