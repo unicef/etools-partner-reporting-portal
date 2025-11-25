@@ -1000,9 +1000,19 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.rep_loc_goal_1.is_active = False
         self.rep_loc_goal_1.save(update_fields=['is_active'])
 
+        self.assertEqual(indicator_report.report_status, INDICATOR_REPORT_STATUS.submitted)
+
         url = reverse('indicator-report-direct-list-api') + f'?pks={indicator_report.id}'
         response = self.client.get(url, format='json')
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data[0]['indicator_location_data']), 2)
+
+        indicator_report.report_status = INDICATOR_REPORT_STATUS.due
+        indicator_report.save(update_fields=['report_status'])
+        self.assertEqual(indicator_report.report_status, INDICATOR_REPORT_STATUS.due)
+
+        response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data[0]['indicator_location_data']), 1)
         self.assertEqual(response.data[0]['indicator_location_data'][0]['location']['id'], self.rep_loc_goal_2.location.id)
