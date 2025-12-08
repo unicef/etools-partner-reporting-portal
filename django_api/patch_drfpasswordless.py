@@ -5,6 +5,7 @@ Patch drfpasswordless to work with Django 4.x by replacing ugettext_lazy with ge
 import os
 import sys
 
+
 def patch_file(filepath, old_text, new_text):
     try:
         with open(filepath, 'r') as f:
@@ -22,6 +23,7 @@ def patch_file(filepath, old_text, new_text):
     except Exception as e:
         print(f"✗ Error patching {filepath}: {e}")
         return False
+
 
 def main():
     try:
@@ -55,6 +57,7 @@ def main():
             )
 
     print("✓ Patching complete!")
+
 
 if __name__ == '__main__':
     main()
