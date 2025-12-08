@@ -25,7 +25,7 @@ services:
       - .env
     build:
       context: ./django_api
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-local
       args:
         ENV: dev
     volumes:

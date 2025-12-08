@@ -1,7 +1,7 @@
 # Dockerfile base
 
-# unicef/etools-prp-base:base-39
-FROM python:3.9.6-alpine3.14
+# unicef/etools-prp-base:base-312
+FROM python:3.12-alpine3.19
 
 RUN apk update
 
@@ -15,7 +15,9 @@ RUN apk add --upgrade apk-tools \
     libxslt \
     geos \
     gdal \
-    postgresql-client
+    postgresql-client \
+    bash \
+    gettext
 
 
 # Build-deps
@@ -34,7 +36,7 @@ RUN apk add --no-cache --virtual .build-deps --update \
 
 RUN pip install --no-cache-dir --upgrade \
     pip \
-    pipenv
+    pdm
 
 # End Dockerfile base
 
@@ -51,12 +53,14 @@ RUN apk add --no-cache --virtual --update \
     ttf-opensans
 
 WORKDIR /etools/
-ADD Pipfile .
-ADD Pipfile.lock .
-RUN cat Pipfile.lock
-RUN pipenv install --dev --system  --ignore-pipfile
+ADD .pdm-python .
+ADD pdm.lock .
+ADD pyproject.toml .
+RUN pdm sync
 
-RUN CFLAGS="-I/usr/local/include/python3.9" UWSGI_PROFILE="asyncio"
+ENV PYTHONPATH=/etools/__pypackages__/3.12/lib
+
+RUN CFLAGS="-I/usr/local/include/python3.12" UWSGI_PROFILE="asyncio"
 
 RUN mkdir -p /data/django_api/logs
 RUN mkdir -p /data/uploads
@@ -76,13 +80,12 @@ ENV ENV ${env:-dev}
 ADD . /code/
 
 WORKDIR /code/
-RUN apk add bash
 
-# Patch drfpasswordless for Django 4.x compatibility
+
+
 RUN python patch_drfpasswordless.py
 
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /code
 
 RUN python manage.py collectstatic --noinput
 
