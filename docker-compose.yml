@@ -1,5 +1,3 @@
-version: '3.8'
-
 volumes:
   pg-data-prp: {}
 
@@ -208,6 +206,4 @@ services:
 
 
 networks:
-  etools-network:
-    external:
-      name: etools_network
+  etools-network: {} 

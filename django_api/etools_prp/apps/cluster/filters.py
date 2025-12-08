@@ -17,9 +17,11 @@ class ClusterFilter(django_filters.FilterSet):
         fields = ['partner', ]
 
     def get_partner(self, queryset, name, value):
+        # Add distinct() to avoid duplicates when filtering by many-to-many relationship
+        # Need to ensure consistent ordering for distinct() in Django 4.2
         return queryset.filter(
             partners=value
-        )
+        ).order_by('id').distinct()
 
 
 class ClusterObjectiveFilter(django_filters.FilterSet):
@@ -102,7 +104,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             Q(reportable__cluster_activities__cluster_objective__cluster=value) |
             Q(reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster=value) |
             Q(reportable__partner_projects__clusters__id__exact=value)
-        )
+        ).distinct()
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(
@@ -133,10 +135,10 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             reportable__indicator_reports__indicator_location_data__location=value).distinct()
 
     def get_cluster_objective(self, queryset, name, value):
-        return queryset.filter(reportable__cluster_objectives=value)
+        return queryset.filter(reportable__cluster_objectives=value).distinct()
 
     def get_cluster_activity(self, queryset, name, value):
-        return queryset.filter(reportable__cluster_activities=value)
+        return queryset.filter(reportable__cluster_activities=value).distinct()
 
     def get_indicator_type(self, queryset, name, value):
         if value == "partner_activity":

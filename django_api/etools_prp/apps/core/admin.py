@@ -1,7 +1,6 @@
 from django.contrib.gis import admin
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.api import button, ExtraButtonsMixin
 from leaflet.admin import LeafletGeoAdmin
 from unicef_locations.models import CartoDBTable
 
@@ -66,7 +65,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
         rebuild_tree.delay()
 
 
-class WorkspaceAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class WorkspaceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('title', 'workspace_code', 'business_area_code',
                     'external_id')
     search_fields = ('title', 'workspace_code', 'business_area_code',
