@@ -60,6 +60,8 @@ jobs:
             cd django_api/
             # Install dev dependencies for testing (flake8, isort, etc.)
             pdm sync --dev
+            # Add PDM bin directory to PATH for dev tools
+            export PATH=/etools/__pypackages__/3.12/bin:$PATH
             flake8 etools_prp
             isort . --check-only
             python manage.py test
