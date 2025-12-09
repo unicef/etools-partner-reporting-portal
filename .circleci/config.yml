@@ -85,12 +85,14 @@ jobs:
             DOCKERFILE_BASE_HASH="$(md5sum django_api/Dockerfile-base | cut -c1-6)"
             BASE_IMAGE_TAG="base-312-${DOCKERFILE_BASE_HASH}"
 
-            # Check if base-312 image exists
+            # Check if hash-tagged base image exists
             if (curl --silent -f -lSL https://index.docker.io/v1/repositories/unicef/etools-prp-base/tags/$BASE_IMAGE_TAG > /dev/null); then
-              echo "Base image exists: $BASE_IMAGE_TAG"
+              echo "Base image with hash exists: $BASE_IMAGE_TAG - skipping build"
             else
-              echo "Building base image: $BASE_IMAGE_TAG"
+              echo "Building new base image: $BASE_IMAGE_TAG"
               docker build -t unicef/etools-prp-base:$BASE_IMAGE_TAG -f django_api/Dockerfile-base django_api/
+              docker push unicef/etools-prp-base:$BASE_IMAGE_TAG
+              # Update the latest base-312 tag to point to this hash
               docker tag unicef/etools-prp-base:$BASE_IMAGE_TAG unicef/etools-prp-base:base-312
               docker push unicef/etools-prp-base:base-312
             fi
