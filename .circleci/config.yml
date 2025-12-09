@@ -161,3 +161,4 @@ workflows:
                 - staging
                 - develop
                 - gpd-reporting-improvements
+                - 289125_update_libs
