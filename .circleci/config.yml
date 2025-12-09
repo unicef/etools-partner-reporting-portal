@@ -53,7 +53,6 @@ jobs:
       - run:
           name: run tests
           command: |
-            export PATH=/home/circleci/.local/bin:$PATH
             export PYTHONHASHSEED=${RANDOM}
             export ENV=dev
             export PYTHONPATH=/etools/__pypackages__/3.12/lib
@@ -64,6 +63,7 @@ jobs:
             export PATH=/etools/__pypackages__/3.12/bin:$PATH
             flake8 etools_prp
             isort . --check-only
+            python patch_drfpasswordless.py
             python manage.py test
       - save_cache:
           key: source-{{ .Branch }}--{{ checksum "django_api/pdm.lock" }}-{{ checksum ".circleci/config.yml" }}
