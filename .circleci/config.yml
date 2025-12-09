@@ -58,6 +58,8 @@ jobs:
             export ENV=dev
             export PYTHONPATH=/etools/__pypackages__/3.12/lib
             cd django_api/
+            # Install dev dependencies for testing (flake8, isort, etc.)
+            pdm sync --dev
             flake8 etools_prp
             isort . --check-only
             python manage.py test
@@ -88,7 +90,6 @@ jobs:
               echo "Building base image: $BASE_IMAGE_TAG"
               docker build -t unicef/etools-prp-base:$BASE_IMAGE_TAG -f django_api/Dockerfile-base django_api/
               docker tag unicef/etools-prp-base:$BASE_IMAGE_TAG unicef/etools-prp-base:base-312
-              docker push unicef/etools-prp-base:$BASE_IMAGE_TAG
               docker push unicef/etools-prp-base:base-312
             fi
       - run:
