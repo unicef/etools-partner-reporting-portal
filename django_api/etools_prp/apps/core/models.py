@@ -615,3 +615,44 @@ class GatewayType(TimeStampedModel):
 
     def __str__(self):
         return '{} - {}'.format(self.name, self.admin_level)
+
+
+class BulkActionLog(models.Model):
+    """
+    Generic model for tracking bulk operations (deletions, deactivations, etc).
+    Similar to eTools BulkDeactivationLog.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_("User who performed the bulk action")
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    affected_count = models.IntegerField(
+        help_text=_("Number of records affected")
+    )
+    model_name = models.CharField(
+        max_length=100,
+        help_text=_("Name of the model that was bulk modified")
+    )
+    app_label = models.CharField(
+        max_length=100,
+        help_text=_("App label of the model")
+    )
+    affected_ids = models.JSONField(
+        default=list,
+        help_text=_("List of IDs of the records that were affected")
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _("Bulk Action Log")
+        verbose_name_plural = _("Bulk Action Logs")
+
+    def __str__(self):
+        return (
+            f"Bulk modified {self.affected_count} {self.model_name} "
+            f"records on {self.created_at:%Y-%m-%d %H:%M}"
+        )
