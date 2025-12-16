@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import path from 'path';
 import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
+import postcss from 'rollup-plugin-postcss';
 
 const importMetaUrlCurrentModulePlugin = () => {
   return {
@@ -29,7 +30,23 @@ const config = {
     if (warning.code === 'THIS_IS_UNDEFINED') return;
     warn(warning);
   },
-  plugins: [importMetaUrlCurrentModulePlugin(), resolve(), commonjs(), esbuild(), dynamicImportVars()],
+  plugins: [
+      importMetaUrlCurrentModulePlugin(),
+      //handle CSS *before* anything that parses JS
+      postcss({
+          extract: 'fonts.css',  // will end up as src/assets/fonts/fonts.css
+          inject: false,
+          minimize: true,
+      }),
+      resolve(),
+      commonjs(),
+      esbuild(),
+      // Make sure this runs after CSS is already transformed
+      dynamicImportVars({
+          // extra safety: ignore CSS files entirely
+          exclude: [/\.css$/],
+      }),
+  ],
   preserveEntrySignatures: false
 };
 

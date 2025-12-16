@@ -115,7 +115,6 @@
   --sl-input-background-color-disabled: inherit;
   --sl-input-background-color-focus: inherit;
   --sl-input-height-small: 26px;
-  --sl-font-sans: 'Roboto', 'Noto', sans-serif;
   --sl-input-color: rgba(0, 0, 0, 0.87);
   --sl-input-label-font-size-small: var(--etools-font-size-12, 12px);
   --sl-input-label-color: var(--secondary-text-color);
