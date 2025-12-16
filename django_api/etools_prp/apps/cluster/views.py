@@ -71,11 +71,10 @@ class ClusterListAPIView(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get(self.lookup_field)
-        # Add explicit ordering for consistent distinct() behavior in Django 4.2
-        queryset = Cluster.objects.filter(response_plan_id=response_plan_id).order_by('id')
+        queryset = Cluster.objects.filter(response_plan_id=response_plan_id)
 
         if not self.request.user.is_cluster_system_admin:
-            queryset = queryset.filter(old_prp_roles__user=self.request.user).distinct()
+            queryset = queryset.filter(old_prp_roles__user=self.request.user)
 
         return queryset
 
@@ -221,12 +220,11 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        # Clear default ordering before distinct() to avoid issues in Django 4.2
         queryset = ClusterObjective.objects.select_related('cluster').filter(
-            cluster__response_plan_id=response_plan_id).order_by('id').distinct()
+            cluster__response_plan_id=response_plan_id).distinct()
 
         if not self.request.user.is_cluster_system_admin:
-            queryset = queryset.filter(cluster__old_prp_roles__user=self.request.user).distinct()
+            queryset = queryset.filter(cluster__old_prp_roles__user=self.request.user)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -365,12 +363,11 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        # Clear default ordering before distinct() to avoid issues in Django 4.2
         queryset = ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
-            cluster_objective__cluster__response_plan_id=response_plan_id).order_by('id').distinct()
+            cluster_objective__cluster__response_plan_id=response_plan_id).distinct()
 
         if not self.request.user.is_cluster_system_admin:
-            queryset = queryset.filter(cluster_objective__cluster__old_prp_roles__user=self.request.user).distinct()
+            queryset = queryset.filter(cluster_objective__cluster__old_prp_roles__user=self.request.user)
 
         order = self.request.query_params.get('sort', None)
         if order:
@@ -451,7 +448,6 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
 
     def get_queryset(self):
         response_plan_id = self.kwargs['response_plan_id']
-        # Clear default ordering before distinct() to avoid issues in Django 4.2
         queryset = IndicatorReport.objects.filter(
             Q(reportable__cluster_objectives__isnull=False) |
             Q(reportable__cluster_activities__isnull=False) |
@@ -468,7 +464,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
               **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_activity__cluster_objective__cluster__')) |  # noqa: E501
             Q(reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__response_plan=response_plan_id,   # noqa: E501
               **self.get_user_check_kwarg('reportable__partner_activity_project_contexts__activity__cluster_objective__cluster__'))   # noqa: E501
-        ).order_by('id').distinct()
+        ).distinct()
         return queryset
 
 

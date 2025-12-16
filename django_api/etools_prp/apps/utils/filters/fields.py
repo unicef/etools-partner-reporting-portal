@@ -14,9 +14,4 @@ class CommaSeparatedListFilter(CharFilter):
     def filter(self, qs, value):
         value = parse.unquote(value).split(self.separator)
         value = list(filter(None, value))
-        # Ensure consistent ordering for distinct() in Django 4.2
-        result = super().filter(qs, value)
-        # Preserve existing ordering or add default ordering before distinct
-        if not result.query.order_by:
-            result = result.order_by('id')
-        return result.distinct()
+        return super().filter(qs, value).distinct()
