@@ -32,18 +32,15 @@ const config = {
   },
   plugins: [
       importMetaUrlCurrentModulePlugin(),
-      //handle CSS *before* anything that parses JS
       postcss({
-          extract: 'fonts.css',  // will end up as src/assets/fonts/fonts.css
+          extract: 'fonts.css',
           inject: false,
           minimize: true,
       }),
       resolve(),
       commonjs(),
       esbuild(),
-      // Make sure this runs after CSS is already transformed
       dynamicImportVars({
-          // extra safety: ignore CSS files entirely
           exclude: [/\.css$/],
       }),
   ],
