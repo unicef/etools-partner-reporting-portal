@@ -32,6 +32,8 @@
   },
   "private": true,
   "dependencies": {
+    "@fontsource/roboto": "^5.2.9",
+    "@fontsource/roboto-mono": "^5.2.8",
     "@google-web-components/google-chart": "^3.4.0",
     "@shoelace-style/shoelace": "2.18.0",
     "@types/lodash-es": "^4.17.6",
@@ -76,6 +78,7 @@
     "rollup-plugin-esbuild": "6.1.1",
     "rollup-plugin-license": "3.5.3",
     "rollup-plugin-livereload": "2.0.5",
+    "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-serve": "3.0.0",
     "rollup-plugin-workbox": "^8.1.2",
     "svg-sprite": "^2.0.4",

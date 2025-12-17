@@ -17,12 +17,26 @@ const copyConfig = {
     {
       src: 'src_ts/**/*.json',
       dest: 'src'
-    }
+    },
   ],
   copyOnce: true,
   flatten: false
 };
 
+const fontsCopyConfig = {
+    targets: [
+        {
+            src: 'node_modules/@fontsource/roboto/files/*',
+            dest: 'src/files'
+        },
+        {
+            src: 'node_modules/@fontsource/roboto-mono/files/*',
+            dest: 'src/files'
+        }
+    ],
+    copyOnce: true,
+    flatten: true
+};
 
 const config = {
   ...defaultConfig,
@@ -38,7 +52,8 @@ const config = {
   },
   plugins: [
     ...defaultConfig.plugins,
-    copy(copyConfig),
+      copy(copyConfig),
+      copy(fontsCopyConfig),
     serve({
       historyApiFallback: true,
       openPage: 'index.html',

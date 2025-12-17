@@ -62,16 +62,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     src="https://static.zdassets.com/ekr/snippet.js?key=fd275a17-bb04-499b-bc03-ffe711fa1ba8"> </script>
   <!-- End of prphelp Zendesk Widget script -->
 
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-  <link rel="preconnect" crossorigin="anonymous" href="https://fonts.googleapis.com">
-  <link rel="preconnect" crossorigin="anonymous" href="https://fonts.gstatic.com">
-  <link rel="preload" as="style" crossorigin="anonymous" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,300,300italic,400italic,500,500italic,700,700italic&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" crossorigin="anonymous" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,300,300italic,400italic,500,500italic,700,700italic&display=swap"></noscript>
-  
+  <link rel="preload" href="./src/fonts.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="./src/fonts.css"></noscript>
+
   <link rel="preload" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/dist/themes/light.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/dist/themes/light.css"></noscript>
-  
+
   <link rel="preload" href="assets/css/app-theme.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="assets/css/app-theme.css"></noscript>
 
@@ -96,7 +92,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     body {
         margin: 0;
-        font-family: var(--sl-font-sans, 'Roboto, Noto, sans-serif');
+        font-family: var(--sl-font-sans, 'Roboto', 'Noto', sans-serif);
         font-size: var(--etools-font-size-14, 14px);
         font-weight: 400;
         line-height: 1.5;
