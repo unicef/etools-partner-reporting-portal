@@ -43,22 +43,7 @@ const copyConfig = {
         {src: 'node_modules/numeral/min', dest: 'src/node_modules/numeral'}
     ]
 };
-const fontsCopyConfig = {
-    targets: [
-        {
-            src: 'node_modules/@fontsource/roboto/files/*',
-            dest: 'src/files'
-        },
-        {
-            src: 'node_modules/@fontsource/roboto-mono/files/*',
-            dest: 'src/files'
-        }
-    ],
-    copyOnce: true,
-    flatten: true,
-    hook: 'writeBundle',
-    verbose: true
-};
+
 
 const config = {
     ...defaultConfig,
@@ -68,7 +53,6 @@ const config = {
         license(licenseConfig),
         terser(terserConfig),
         copy(copyConfig),
-        copy(fontsCopyConfig),
         generateSW(workboxConfig)
     ],
     preserveEntrySignatures: false
