@@ -3,8 +3,6 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import path from 'path';
 import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
-import postcss from 'rollup-plugin-postcss';
-import copy from "rollup-plugin-copy";
 
 const importMetaUrlCurrentModulePlugin = () => {
   return {
@@ -17,22 +15,7 @@ const importMetaUrlCurrentModulePlugin = () => {
     }
   };
 };
-const fontsCopyConfig = {
-    targets: [
-        {
-            src: 'node_modules/@fontsource/roboto/files/*',
-            dest: 'src/files'
-        },
-        {
-            src: 'node_modules/@fontsource/roboto-mono/files/*',
-            dest: 'src/files'
-        }
-    ],
-    copyOnce: true,
-    flatten: true,
-    hook: 'writeBundle',
-    verbose: true
-};
+
 const config = {
   input: 'src_ts/app-shell.ts',
   output: {
@@ -48,18 +31,10 @@ const config = {
   },
   plugins: [
       importMetaUrlCurrentModulePlugin(),
-      postcss({
-          extract: 'fonts.css',
-          inject: false,
-          minimize: true,
-      }),
-      copy(fontsCopyConfig),
       resolve(),
       commonjs(),
       esbuild(),
-      dynamicImportVars({
-          exclude: [/\.css$/],
-      }),
+      dynamicImportVars(),
   ],
   preserveEntrySignatures: false
 };
