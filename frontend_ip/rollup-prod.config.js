@@ -55,7 +55,9 @@ const fontsCopyConfig = {
         }
     ],
     copyOnce: true,
-    flatten: true
+    flatten: true,
+    hook: 'writeBundle',
+    verbose: true
 };
 
 const config = {
