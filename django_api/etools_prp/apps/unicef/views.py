@@ -110,7 +110,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = ProgrammeDocumentFilter
+    filterset_class = ProgrammeDocumentFilter
     exporters = {
         'xlsx': ProgrammeDocumentsXLSXExporter,
         'pdf': ProgrammeDocumentsPDFExporter,
@@ -279,7 +279,7 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
         )
         return super().get_queryset().filter(
             indicator_location_data__indicator_report__progress_report__programme_document__in=programme_documents
-        ).distinct()
+        ).order_by('id').distinct()
 
 
 class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
@@ -288,7 +288,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = ProgrammeDocumentIndicatorFilter
+    filterset_class = ProgrammeDocumentIndicatorFilter
     exporters = {
         'xlsx': ReportableListXLSXExporter,
         'pdf': ReportableListPDFExporter,
@@ -313,7 +313,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
 
         return super().get_queryset().filter(
             indicator_reports__progress_report__programme_document__in=programme_documents
-        ).distinct()
+        ).order_by('id').distinct()
 
 
 class ProgressReportAPIView(ListExportMixin, ListAPIView):
@@ -336,7 +336,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = ProgressReportFilter
+    filterset_class = ProgressReportFilter
     exporters = {
         'xlsx': AnnexCXLSXExporter,
         'pdf': ProgressReportListPDFExporter,
@@ -534,7 +534,7 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = PDReportsFilter
+    filterset_class = PDReportsFilter
 
     def get_queryset(self):
         # Limit reports to partner only

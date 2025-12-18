@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.gis import admin
 
-from admin_extra_urls.decorators import button
-from admin_extra_urls.mixins import ExtraUrlMixin
+from admin_extra_buttons.api import button, ExtraButtonsMixin
 from leaflet.admin import LeafletGeoAdmin
+from post_office.admin import AttachmentInline as BaseAttachmentInline, EmailAdmin as BaseEmailAdmin
+from post_office.models import Email
 from unicef_locations.models import CartoDBTable
 
 from .cartodb import import_locations, rebuild_tree
@@ -87,7 +88,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
         rebuild_tree.delay()
 
 
-class WorkspaceAdmin(ExtraUrlMixin, admin.ModelAdmin):
+class WorkspaceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     list_display = ('title', 'workspace_code', 'business_area_code',
                     'external_id')
     search_fields = ('title', 'workspace_code', 'business_area_code',
@@ -136,6 +137,20 @@ class BulkActionLogAdmin(admin.ModelAdmin):
         return False
 
 
+class AttachmentInline(BaseAttachmentInline):
+    def get_queryset(self, request):
+        queryset = admin.StackedInline.get_queryset(self, request)
+
+        if self.parent_obj:
+            queryset = queryset.filter(email=self.parent_obj)
+
+        return queryset.select_related('attachment')
+
+
+class EmailAdmin(BaseEmailAdmin):
+    inlines = [AttachmentInline, BaseEmailAdmin.inlines[1]]
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan, ResponsePlanAdmin)
@@ -144,3 +159,6 @@ admin.site.register(CartoDBTable, CartoDBTableAdmin)
 admin.site.register(PRPRoleOld, PRPRoleAdmin)
 admin.site.register(Realm, RealmAdmin)
 admin.site.register(BulkActionLog, BulkActionLogAdmin)
+
+admin.site.unregister(Email)
+admin.site.register(Email, EmailAdmin)

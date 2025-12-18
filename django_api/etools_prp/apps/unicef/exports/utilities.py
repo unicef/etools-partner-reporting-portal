@@ -13,7 +13,7 @@ def group_indicator_reports_by_lower_level_output(indicator_reports):
     indicator_reports.order_by('reportable')
     results = defaultdict(list)
     for ir in indicator_reports:
-        if type(ir.reportable.content_object) == LowerLevelOutput:
+        if type(ir.reportable.content_object) is LowerLevelOutput:
             results[ir.reportable.content_object.id].append(ir)
 
     return [
@@ -44,7 +44,7 @@ class HTMLTableCell:
         return '<{0}{1}>{2}</{0}>'.format(self.element, attrs_string, self.render_value())
 
     def render_value(self):
-        if type(self.value) == date:
+        if type(self.value) is date:
             return self.value.strftime(settings.PRINT_DATA_FORMAT)
         if self.value in {'', None}:
             return '&nbsp;'  # Rendering empty tags brakes layout in pdf export

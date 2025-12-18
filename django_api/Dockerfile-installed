@@ -1,4 +1,4 @@
-FROM unicef/etools-prp-base:base-39
+FROM unicef/etools-prp-base:base-312
 
 ARG env
 ENV ENV ${env:-dev}
@@ -11,11 +11,14 @@ RUN apk add --no-cache --virtual --update \
     ttf-opensans
 
 WORKDIR /etools/
-ADD Pipfile .
-ADD Pipfile.lock .
-RUN pipenv install --dev --system  --ignore-pipfile
+ADD .pdm-python .
+ADD pdm.lock .
+ADD pyproject.toml .
+RUN pdm sync
 
-RUN CFLAGS="-I/usr/local/include/python3.9" UWSGI_PROFILE="asyncio"
+ENV PYTHONPATH=/etools/__pypackages__/3.12/lib
+
+RUN CFLAGS="-I/usr/local/include/python3.12" UWSGI_PROFILE="asyncio"
 
 RUN mkdir -p /data/django_api/logs
 RUN mkdir -p /data/uploads
