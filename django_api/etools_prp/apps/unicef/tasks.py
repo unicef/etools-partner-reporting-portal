@@ -10,6 +10,8 @@ from etools_prp.apps.core.models import Workspace
 from etools_prp.apps.unicef.sync.process_gd_item import process_gd_item
 from etools_prp.apps.unicef.sync.process_pd_item import process_pd_item
 
+from etools_prp.apps.unicef.tasks_pdf_export import generate_and_email_progress_report_pdf  # noqa: F401
+
 logger = logging.getLogger(__name__)
 User = get_user_model()
 FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
