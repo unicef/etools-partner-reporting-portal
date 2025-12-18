@@ -17,12 +17,11 @@ const copyConfig = {
     {
       src: 'src_ts/**/*.json',
       dest: 'src'
-    }
+    },
   ],
   copyOnce: true,
   flatten: false
 };
-
 
 const config = {
   ...defaultConfig,
@@ -38,7 +37,7 @@ const config = {
   },
   plugins: [
     ...defaultConfig.plugins,
-    copy(copyConfig),
+      copy(copyConfig),
     serve({
       historyApiFallback: true,
       openPage: 'index.html',
