@@ -29,7 +29,13 @@ const config = {
     if (warning.code === 'THIS_IS_UNDEFINED') return;
     warn(warning);
   },
-  plugins: [importMetaUrlCurrentModulePlugin(), resolve(), commonjs(), esbuild(), dynamicImportVars()],
+  plugins: [
+      importMetaUrlCurrentModulePlugin(),
+      resolve(),
+      commonjs(),
+      esbuild(),
+      dynamicImportVars(),
+  ],
   preserveEntrySignatures: false
 };
 
