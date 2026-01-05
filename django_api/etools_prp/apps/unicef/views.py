@@ -46,12 +46,7 @@ from etools_prp.apps.core.permissions import (
 )
 from etools_prp.apps.core.serializers import ShortLocationSerializer
 from etools_prp.apps.indicator.filters import PDReportsFilter
-from etools_prp.apps.indicator.models import (
-    IndicatorBlueprint,
-    IndicatorLocationData,
-    IndicatorReport,
-    Reportable,
-)
+from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorLocationData, IndicatorReport, Reportable
 from etools_prp.apps.indicator.serializers import (
     IndicatorBlueprintSimpleSerializer,
     IndicatorListSerializer,
@@ -69,11 +64,11 @@ from etools_prp.apps.unicef.exports.progress_reports import (
 )
 from etools_prp.apps.unicef.exports.reportables import ReportableListPDFExporter, ReportableListXLSXExporter
 from etools_prp.apps.unicef.exports.utilities import group_indicator_reports_by_lower_level_output
+from etools_prp.apps.unicef.pdf_export import ProgressReportPDFService
+from etools_prp.apps.unicef.tasks_pdf_export import generate_and_email_progress_report_pdf
 from etools_prp.apps.unicef.utils import render_pdf_to_response
 from etools_prp.apps.utils.emails import send_email_from_template
 from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
-from etools_prp.apps.unicef.tasks_pdf_export import generate_and_email_progress_report_pdf
-from etools_prp.apps.unicef.pdf_export import ProgressReportPDFService
 
 from .export_report import ProgressReportXLSXExporter
 from .filters import ProgrammeDocumentFilter, ProgrammeDocumentIndicatorFilter, ProgressReportFilter
@@ -425,7 +420,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
                 )
 
                 return Response({
-                    'message': f'PDF export started. You will receive an email at {request.user.email} when it\'s ready. This may take 5-15 minutes for large exports.',
+                    'message': f'PDF export started. You will receive an email at {request.user.email} when it\'s ready.',
                     'task_id': task.id,
                     'email': request.user.email,
                     'filters_applied': filter_params

@@ -2,12 +2,13 @@ import logging
 import time
 from datetime import datetime
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.models import Prefetch
 from django.http import QueryDict
 from django.template.loader import render_to_string
-from django.conf import settings
+
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
 
@@ -126,7 +127,7 @@ class ProgressReportPDFService:
 
     @staticmethod
     def generate_pdf_bytes(queryset):
-        logger.info(f"Starting PDF generation")
+        logger.info("Starting PDF generation")
         start_time = time.time()
 
         exporter = ProgressReportListPDFExporter(queryset)
@@ -152,8 +153,7 @@ class ProgressReportPDFService:
 
         pdf_time = time.time()
         estimated_time = report_count * 0.08
-        logger.info(f"Starting WeasyPrint PDF generation for {report_count} reports "
-                   f"(estimated time: ~{estimated_time:.0f}s)...")
+        logger.info(f"Starting WeasyPrint PDF generation for {report_count} reports (estimated time: ~{estimated_time:.0f}s)...")
 
         pdf_bytes = html.write_pdf(
             stylesheets=[css],

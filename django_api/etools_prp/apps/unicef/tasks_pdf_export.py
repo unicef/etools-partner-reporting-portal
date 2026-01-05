@@ -1,9 +1,10 @@
 import logging
 import time
 
-from celery import shared_task
-from django.core.mail import EmailMessage
 from django.conf import settings
+from django.core.mail import EmailMessage
+
+from celery import shared_task
 
 from etools_prp.apps.unicef.pdf_export import ProgressReportPDFService
 
@@ -43,10 +44,7 @@ def generate_and_email_progress_report_pdf(self, user_email, workspace_id, filte
             }
         pdf_bytes, _ = ProgressReportPDFService.generate_pdf_bytes(queryset)
 
-
-
         file_path, file_url = ProgressReportPDFService.save_pdf_to_storage(pdf_bytes, workspace_id)
-
 
         duration = time.time() - start_time
 
@@ -84,7 +82,7 @@ UNICEF PRP System
         try:
             EmailMessage(
                 subject='Progress Reports Export - Error',
-                body=f'An error occurred while generating your progress reports export.\nPlease try again or contact support.',
+                body='An error occurred while generating your progress reports export.\nPlease try again or contact support.',
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[user_email],
             ).send()
