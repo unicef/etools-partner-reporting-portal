@@ -9,9 +9,6 @@ ADD . /code/
 WORKDIR /code/
 RUN apk add bash
 
-# Patch drfpasswordless for Django 4.x compatibility
-RUN python patch_drfpasswordless.py
-
 ENV PYTHONUNBUFFERED 1
 
 RUN python manage.py collectstatic --noinput
