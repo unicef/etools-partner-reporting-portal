@@ -10,6 +10,7 @@ from cryptography.x509 import load_pem_x509_certificate
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
+
 from etools_prp.apps.core.patches import apply_drfpasswordless_patch
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
