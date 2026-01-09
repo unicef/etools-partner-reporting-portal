@@ -10,6 +10,8 @@ from contextlib import contextmanager
 from datetime import date, timedelta
 from itertools import combinations, product
 
+from django.db import transaction
+
 from dateutil.relativedelta import relativedelta
 
 from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
@@ -451,6 +453,7 @@ def get_latest_pr_by_type(pd, report_type):
     return qs.filter(report_type=report_type).order_by(order_by_field).last()
 
 
+@transaction.atomic
 def create_pr_sr_for_report_type(pd, idx, reporting_period):
     """
     Create ProgressReport SR instance by its ReportingPeriodDate
@@ -489,6 +492,7 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
         logger.info(f"Created new SR{idx} ProgressReport id {next_progress_report.id} for due date {due_date}")
 
 
+@transaction.atomic
 def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
     """
     Create ProgressReport instance by its ReportingPeriodDate instance's report type
@@ -833,40 +837,22 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                         latest_hr.save()
 
 
-def update_ir_and_ilds_for_pr(pd, progress_report, reportable_queryset, reporting_period):
-    queryset = reportable_queryset
-    start_date = reporting_period.start_date,
-    end_date = reporting_period.end_date,
-    due_date = reporting_period.due_date
-    # ir_list = list()
+@transaction.atomic
+def update_ir_and_ilds_for_pr(pd, progress_report, active_reportables, reporting_period):
+    from etools_prp.apps.indicator.models import Reportable
+    active_irs = progress_report.indicator_reports.filter(reportable__active=True).all()
 
-    # for reportable in queryset:
-        # indicator_report = update_pr_ir_for_reportable(
-        #     progress_report,
-        #     reportable,
-        #     None,
-        #     start_date,
-        #     end_date,
-        #     due_date,
-        # )
+    existing_reportabes = Reportable.objects.filter(indicator_reports__in=active_irs)
+    to_create = active_reportables.difference(existing_reportabes)
+
+    for reportable in to_create:
+        indicator_report = create_pr_ir_for_reportable(
+            progress_report, reportable, None,
+            reporting_period.start_date, reporting_period.end_date, reporting_period.due_date
+        )
         # Save Signal to recalculate reportable totals
-        # indicator_report.save()
-
-    # if progress_report.report_type == "HR":
-    #     hr_reports = list()
-    #
-    #     # If there are no UNICEF HF indicator reports then delete blank ProgressReport
-    #     if len(ir_list) == 0:
-    #         # Re-assign report_number to new HR
-    #         report_number = progress_report.report_number
-    #         is_final_hr_req = progress_report.is_final
-    #         progress_report.delete()
-    #
-    #     else:
-    #         # Pre-populate new HR report_number in case a new Progress Report needs to be generated
-    #         report_number = progress_report.report_number + 1
-    #         is_final_hr_req = progress_report.is_final
-    #         hr_reports.append(progress_report)
+        indicator_report.progress_report = progress_report
+        indicator_report.save()
 
 
 def create_ir_for_cluster(reportable, start_date, end_date, project):
