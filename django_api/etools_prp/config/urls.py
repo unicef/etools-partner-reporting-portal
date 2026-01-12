@@ -20,26 +20,16 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, re_path
 
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework import permissions
+from rest_framework_swagger.views import get_swagger_view
 
 from etools_prp.apps.core.views import HomeView, RedirectAppView, SocialLogoutView, UnauthorizedView
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="eTools PRP API",
-        default_version='v1',
-        description="eTools Partner Reporting Portal API",
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+schema_view = get_swagger_view(title='eTools PRP API')
 
 urlpatterns = [
     re_path(r'^$', HomeView.as_view(), name='home'),
     re_path(r'^app/', RedirectAppView.as_view()),
-    re_path(settings.DOCS_URL, schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    re_path(settings.DOCS_URL, schema_view),
     re_path(r'^api/admin/', admin.site.urls),
     re_path(r'^api/core/', include('etools_prp.apps.core.urls')),
     re_path(r'^api/account/', include('etools_prp.apps.account.urls')),

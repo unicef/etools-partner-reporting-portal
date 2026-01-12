@@ -1,5 +1,5 @@
-# unicef/etools-prp-base:base-312
-FROM python:3.12-alpine3.19
+# unicef/etools-prp-base:base-39
+FROM python:3.9.6-alpine3.14
 
 RUN apk update
 
@@ -13,9 +13,7 @@ RUN apk add --upgrade apk-tools \
     libxslt \
     geos \
     gdal \
-    postgresql-client \
-    bash \
-    gettext
+    postgresql-client
 
 
 # Build-deps
@@ -34,4 +32,4 @@ RUN apk add --no-cache --virtual .build-deps --update \
 
 RUN pip install --no-cache-dir --upgrade \
     pip \
-    pdm
+    pipenv

@@ -96,7 +96,7 @@ class PDReportsAPIView(ListAPIView):
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filterset_class = PDReportsFilter
+    filter_class = PDReportsFilter
 
     def get_queryset(self):
         from etools_prp.apps.unicef.models import ProgrammeDocument
@@ -192,7 +192,7 @@ class IndicatorListAPIView(ListAPIView):
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = IndicatorFilter
+    filter_class = IndicatorFilter
     lookup_url_kwarg = 'content_object'
 
     def get_queryset(self):

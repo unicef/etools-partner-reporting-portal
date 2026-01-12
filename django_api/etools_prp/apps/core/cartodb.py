@@ -1,7 +1,7 @@
 import time
 
 from django.db import IntegrityError, transaction
-from django.utils.encoding import force_str
+from django.utils.encoding import force_text
 
 from carto.auth import _BaseUrlChecker
 from carto.exceptions import CartoException
@@ -288,7 +288,7 @@ def update_sites_from_cartodb(carto_table_pk):
                                 parent_code
                             )
                         except Exception as exp:  # pragma: no-cover
-                            msg = force_str(exp)
+                            msg = force_text(exp)
 
                         if msg is not None:
                             logger.warning(msg)
