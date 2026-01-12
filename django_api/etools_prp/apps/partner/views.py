@@ -83,7 +83,7 @@ class PartnerListCreateAPIView(ListCreateAPIView):
     )
     queryset = Partner.objects.prefetch_related('clusters').order_by('-id')
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, OrderingFilter)
-    filter_class = PartnerIDManagementFilter
+    filterset_class = PartnerIDManagementFilter
     pagination_class = SmallPagination
     ordering_fields = ('title', 'partner_type')
 
@@ -127,7 +127,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = PartnerProjectFilter
+    filterset_class = PartnerProjectFilter
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -261,7 +261,7 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = PartnerProjectFilter
+    filterset_class = PartnerProjectFilter
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
@@ -274,7 +274,7 @@ class PartnerSimpleListAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = PartnerFilter
+    filterset_class = PartnerFilter
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
@@ -426,7 +426,7 @@ class ClusterActivityPartnersAPIView(ListAPIView):
     )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = ClusterActivityPartnersFilter
+    filterset_class = ClusterActivityPartnersFilter
     lookup_field = lookup_url_kwarg = 'pk'
 
     def get_queryset(self, *args, **kwargs):
@@ -441,7 +441,7 @@ class PartnerActivityListAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = PartnerActivityFilter
+    filterset_class = PartnerActivityFilter
 
     def check_permissions(self, request):
         super().check_permissions(request)
