@@ -43,6 +43,6 @@ def convert_string_values_to_numeric(d):
     :param d: dict
     """
     for k, v in d.items():
-        if type(v) is str:
+        if type(v) == str:
             d[k] = d[k].replace(',', '')
             d[k] = float(d[k]) if '.' in d[k] else int(d[k])

@@ -70,7 +70,7 @@ class LocationListAPIView(ListAPIView):
     serializer_class = ShortLocationSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filterset_class = LocationFilter
+    filter_class = LocationFilter
 
     def get_queryset(self):
         """
@@ -79,7 +79,7 @@ class LocationListAPIView(ListAPIView):
         """
         response_plan_id = self.kwargs.get(self.lookup_field)
         response_plan = get_object_or_404(ResponsePlan, id=response_plan_id)
-        return response_plan.workspace.locations.all()
+        return response_plan.workspace.locations
 
 
 class ChildrenLocationAPIView(ListAPIView):
@@ -141,14 +141,6 @@ class ResponsePlanCreateAPIView(CreateAPIView):
             IsIMOForCurrentWorkspace,
         ),
     )
-
-    def perform_create(self, serializer):
-        workspace_id = self.kwargs.get('workspace_id')
-        if workspace_id:
-            workspace = Workspace.objects.get(pk=workspace_id)
-            serializer.save(workspace=workspace)
-        else:
-            serializer.save()
 
 
 class ConfigurationAPIView(APIView):

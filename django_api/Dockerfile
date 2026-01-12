@@ -10,6 +10,7 @@ WORKDIR /code/
 RUN apk add bash
 
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH /code
 
 RUN python manage.py collectstatic --noinput
 

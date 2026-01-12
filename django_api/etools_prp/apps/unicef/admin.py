@@ -9,7 +9,7 @@ from django.template.response import TemplateResponse
 from django.urls import re_path, reverse
 from django.utils.translation import gettext as _
 
-from admin_extra_buttons.api import button, ExtraButtonsMixin
+from admin_extra_urls.api import button, ExtraUrlMixin
 
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import SR_TYPE
@@ -30,7 +30,7 @@ from etools_prp.apps.unicef.models import (
 from etools_prp.apps.unicef.tasks import process_programme_documents
 
 
-class ProgrammeDocumentAdmin(ExtraButtonsMixin, admin.ModelAdmin):
+class ProgrammeDocumentAdmin(ExtraUrlMixin, admin.ModelAdmin):
     list_display = ('title', 'reference_number', 'agreement', 'partner',
                     'status', 'workspace', 'external_id')
     list_filter = ('status', 'document_type', 'workspace',)
@@ -45,14 +45,11 @@ class ProgrammeDocumentAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     ]
     change_list_template = "admin/unicef/change_list.html"
 
-    def _check_superuser_permission(self, request, obj):
-        return request.user.is_superuser
-
     @button(css_class="btn-warning auto-disable")
     def reconcile(self, request, pk):
         return self._reconcile(request, pk, False)
 
-    @button(css_class="btn-error auto-disable", permission=_check_superuser_permission)
+    @button(css_class="btn-error auto-disable", permission=lambda request, obj: request.user.is_superuser)
     def force_reconcile(self, request, pk):
         return self._reconcile(request, pk, True)
 

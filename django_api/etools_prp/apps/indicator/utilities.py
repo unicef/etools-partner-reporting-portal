@@ -8,7 +8,7 @@ from etools_prp.apps.indicator.constants import ValueType
 
 
 def convert_string_number_to_float(num):
-    return float(num.replace(',', '')) if type(num) is str else float(num)
+    return float(num.replace(',', '')) if type(num) == str else float(num)
 
 
 def format_total_value_to_string(total, is_percentage=False, percentage_display_type=None):

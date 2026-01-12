@@ -515,9 +515,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 class PRPLocationsManager(TreeManager):
 
     def get_queryset(self):
-        # Removed select_related('parent') to avoid Django 4.2 FieldError
-        # when using .only() with MPTT's rebuild() method
-        return super().get_queryset().defer('geom', 'point')
+        return super().get_queryset().select_related('parent').defer('geom', 'point')
 
     def active(self):
         return self.get_queryset().filter(is_active=True)

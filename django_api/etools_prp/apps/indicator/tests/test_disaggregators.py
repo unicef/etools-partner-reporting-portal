@@ -120,7 +120,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             QuantityIndicatorDisaggregator.post_process(loc_data)
             loc_total += loc_data.disaggregation['()']['c']
 
-        self.assertEqual(ir.total['c'], loc_total)
+        self.assertEquals(ir.total['c'], loc_total)
 
     def test_post_process_location_max_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -167,7 +167,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             if loc_data.disaggregation['()']['c'] > max_value:
                 max_value = loc_data.disaggregation['()']['c']
 
-        self.assertEqual(ir.total['c'], max_value)
+        self.assertEquals(ir.total['c'], max_value)
 
     def test_post_process_location_avg_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -214,7 +214,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
         avg_value /= (ir.indicator_location_data.count() * 1.0)
 
-        self.assertEqual(ir.total['c'], avg_value)
+        self.assertEquals(ir.total['c'], avg_value)
 
     def test_post_process_reporting_period_sum_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -266,7 +266,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             ir.save()
             report_total += ir.total['c']
 
-        self.assertEqual(partneractivity_reportable.total['c'], report_total)
+        self.assertEquals(partneractivity_reportable.total['c'], report_total)
 
     def test_post_process_reporting_period_max_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -320,7 +320,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
             if ir.total['c'] > report_total:
                 report_total = ir.total['c']
 
-        self.assertEqual(partneractivity_reportable.total['c'], report_total)
+        self.assertEquals(partneractivity_reportable.total['c'], report_total)
 
     def test_post_process_reporting_period_avg_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -372,7 +372,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
         report_total /= (partneractivity_reportable.indicator_reports.count() * 1.0)
 
-        self.assertEqual(partneractivity_reportable.total['v'], report_total)
+        self.assertEquals(partneractivity_reportable.total['v'], report_total)
 
 
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
@@ -490,7 +490,7 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
 
         ratio_value = v_total / (d_total * 1.0)
 
-        self.assertEqual(ir.total['c'], ratio_value)
+        self.assertEquals(ir.total['c'], ratio_value)
 
     def test_post_process_location_percentage_calc(self):
         unit_type = IndicatorBlueprint.PERCENTAGE
@@ -542,7 +542,7 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
 
         ratio_value = v_total / (d_total * 1.0)
 
-        self.assertEqual(ir.total['c'], ratio_value * 100)
+        self.assertEquals(ir.total['c'], ratio_value * 100)
 
     def test_post_process_location_calc_with_zero_value_entry(self):
         unit_type = IndicatorBlueprint.PERCENTAGE
@@ -653,7 +653,7 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
 
         latest_accepted_indicator_report = partneractivity_reportable.indicator_reports.order_by('-time_period_start').first()
 
-        self.assertEqual(partneractivity_reportable.total['c'], latest_accepted_indicator_report.total['c'])
+        self.assertEquals(partneractivity_reportable.total['c'], latest_accepted_indicator_report.total['c'])
 
     def test_post_process_reporting_period_percentage_calc(self):
         unit_type = IndicatorBlueprint.PERCENTAGE
@@ -706,4 +706,4 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
 
         latest_accepted_indicator_report = partneractivity_reportable.indicator_reports.order_by('-time_period_start').first()
 
-        self.assertEqual(partneractivity_reportable.total['c'] * 100, latest_accepted_indicator_report.total['c'] * 100)
+        self.assertEquals(partneractivity_reportable.total['c'] * 100, latest_accepted_indicator_report.total['c'] * 100)
