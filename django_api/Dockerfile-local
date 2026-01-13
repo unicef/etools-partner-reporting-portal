@@ -59,6 +59,7 @@ ADD pyproject.toml .
 RUN pdm sync
 
 ENV PYTHONPATH=/etools/__pypackages__/3.12/lib
+ENV PATH="/etools/__pypackages__/3.12/bin:${PATH}"
 
 RUN CFLAGS="-I/usr/local/include/python3.12" UWSGI_PROFILE="asyncio"
 
