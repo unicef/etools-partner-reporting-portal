@@ -11,8 +11,15 @@ from cryptography.x509 import load_pem_x509_certificate
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from etools_prp.apps.core.patches import apply_drfpasswordless_patch
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Apply patches for third-party package compatibility
+apply_drfpasswordless_patch()
 env = environ.Env()
+
+# Detect if we're running tests
+# TESTING = 'test' in sys.argv
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY', default='prp-123')
@@ -70,7 +77,7 @@ if ADMIN_MAIL:
 
 CACHES = {
     "default": {
-        'BACKEND': 'redis_cache.RedisCache',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         "LOCATION": REDIS_URL,
         "KEY_PREFIX": "PRP",
     }
@@ -91,7 +98,7 @@ INSTALLED_APPS = [
     'storages',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_swagger',
+    'drf_yasg',
     'rest_framework_gis',
     'drfpasswordless',
     'django_filters',
@@ -113,7 +120,7 @@ INSTALLED_APPS = [
     'post_office',
     'unicef_notification',
     'django_extensions',
-    'admin_extra_urls',
+    'admin_extra_buttons',
 ]
 
 MIDDLEWARE = [
@@ -249,8 +256,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -390,7 +395,7 @@ CRON_CLASSES = [
 
 # DRF settings
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -481,6 +486,9 @@ AWS_S3_ACCESS_KEY_ID = env('AWS_S3_ACCESS_KEY_ID', default=None)
 AWS_S3_SECRET_ACCESS_KEY = env('AWS_S3_SECRET_ACCESS_KEY', default=None)
 AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default=None)
 
+# Use local file storage during tests to avoid S3 credentials issues
+# if TESTING:
+#     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 if all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_S3_FILE_OVERWRITE = False
@@ -537,10 +545,13 @@ if SENTRY_DSN:
 if DEBUG:
     CORS_ORIGIN_WHITELIST += ('http://etools.localhost:8082', 'http://prp.localhost:8081')
     FIXTURE_DIRS += ["fixtures"]
-    INSTALLED_APPS += [
-        'debug_toolbar',
-    ]
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
+    # Only enable debug toolbar if not testing
+    import sys
+    if 'test' not in sys.argv:
+        INSTALLED_APPS += [
+            'debug_toolbar',
+        ]
+        MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
 
 DOCS_URL = 'api/docs/'
 

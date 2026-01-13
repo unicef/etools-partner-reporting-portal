@@ -286,7 +286,7 @@ class ProgressReportsXLSXExporter:
         disaggregation_value_combinations = map(tuple, map(sorted, disaggregation_value_combinations))
         disaggregation_value_combinations = sorted(
             disaggregation_value_combinations,
-            key=lambda l: (len(l), [disaggregation_value_id_to_type[value_id] for value_id in l])
+            key=lambda combination: (len(combination), [disaggregation_value_id_to_type[value_id] for value_id in combination])
         )
 
         combination_to_column = {}

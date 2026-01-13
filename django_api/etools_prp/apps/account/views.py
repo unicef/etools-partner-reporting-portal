@@ -87,7 +87,7 @@ class UserListCreateAPIView(ListCreateAPIView):
     serializer_class = UserWithPRPRolesSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, OrderingFilter)
-    filter_class = UserFilter
+    filterset_class = UserFilter
     pagination_class = SmallPagination
     ordering_fields = ('last_login', 'first_name', 'last_name', 'partner')
 
