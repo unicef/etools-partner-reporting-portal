@@ -116,7 +116,7 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.cluster.cluster_objectives.all().count(),
             response.data['count']
         )
@@ -124,7 +124,7 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
         # Sorting
         response = self.client.get(url + '?sort=title.desc')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.cluster.cluster_objectives.order_by('-title').first().id,
             response.data['results'][0]['id']
         )
@@ -135,7 +135,7 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             target_objective.id,
             response.data['results'][0]['id']
         )
@@ -155,7 +155,7 @@ class ClusterObjectiveListCreateAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(
+        self.assertEquals(
             self.cluster.cluster_objectives.all().count(),
             base_count + 1
         )
@@ -245,7 +245,7 @@ class ClusterObjectiveAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             obj.id,
             response.data['id']
         )
@@ -385,7 +385,7 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.objective.cluster_activities.all().count(),
             response.data['count']
         )
@@ -393,7 +393,7 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
         # Sorting
         response = self.client.get(url + '?sort=title.desc')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.objective.cluster_activities.order_by('-title').first().id,
             response.data['results'][0]['id']
         )
@@ -404,7 +404,7 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             target_activity.id,
             response.data['results'][0]['id']
         )
@@ -425,7 +425,7 @@ class ClusterActivityListAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(
+        self.assertEquals(
             self.objective.cluster_activities.all().count(),
             base_count + 1
         )
@@ -528,7 +528,7 @@ class ClusterActivityAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             obj.id,
             response.data['id']
         )
@@ -727,7 +727,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(4, response.data['count'])
+        self.assertEquals(4, response.data['count'])
 
         # Filterings
         filter_args = '?submitted=1&cluster={}&partner={}&indicator_type={}'.format(
@@ -738,7 +738,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.partneractivity_indicator_report.id,
             response.data['results'][0]['id']
         )
@@ -749,7 +749,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.clusterobjective_indicator_report.id,
             response.data['results'][0]['id']
         )
@@ -760,7 +760,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.partnerproject_indicator_report.id,
             response.data['results'][0]['id']
         )
@@ -771,7 +771,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.clusteractivity_indicator_report.id,
             response.data['results'][0]['id']
         )
@@ -782,7 +782,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.clusteractivity_indicator_report.id,
             response.data['results'][0]['id']
         )
@@ -798,7 +798,7 @@ class IndicatorReportsListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url + filter_args)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             self.clusteractivity_indicator_report.id,
             response.data['results'][0]['id']
         )
@@ -952,7 +952,7 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.clusteractivity_indicator_report.id, response.data['id'])
+        self.assertEquals(self.clusteractivity_indicator_report.id, response.data['id'])
 
         # Query PartnerActivity indicator report
         url = reverse(
@@ -961,7 +961,7 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.partneractivity_indicator_report.id, response.data['id'])
+        self.assertEquals(self.partneractivity_indicator_report.id, response.data['id'])
 
         # Query Custom PartnerActivity indicator report
         url = reverse(
@@ -970,7 +970,7 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.custom_partneractivity_indicator_report.id, response.data['id'])
+        self.assertEquals(self.custom_partneractivity_indicator_report.id, response.data['id'])
 
         # Query ClusterObjective indicator report
         url = reverse(
@@ -979,7 +979,7 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.clusterobjective_indicator_report.id, response.data['id'])
+        self.assertEquals(self.clusterobjective_indicator_report.id, response.data['id'])
 
         # Query PartnerProject indicator report
         url = reverse(
@@ -988,7 +988,7 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.partnerproject_indicator_report.id, response.data['id'])
+        self.assertEquals(self.partnerproject_indicator_report.id, response.data['id'])
 
         # Cluster system admin should also be able to query indicator report details
         self.admin_user = factories.NonPartnerUserFactory()
@@ -1001,7 +1001,7 @@ class IndicatorReportDetailAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.clusterobjective_indicator_report.id, response.data['id'])
+        self.assertEquals(self.clusterobjective_indicator_report.id, response.data['id'])
 
 
 class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
@@ -1094,7 +1094,7 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(4, len(response.data))
+        self.assertEquals(4, len(response.data))
 
         # Cluster system admin should also be able to query cluster reportables
         self.admin_user = factories.NonPartnerUserFactory()
@@ -1103,7 +1103,7 @@ class ClusterReportablesIdListAPIViewTestCase(BaseAPITestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
+        self.assertEquals(
             4, len(response.data)
         )
 

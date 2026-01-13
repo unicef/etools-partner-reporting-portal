@@ -449,7 +449,7 @@ class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
         geo_field = 'geom'
         fields = (
             'id',
-            'name',
+            'title',
             'latitude',
             'longitude',
             'p_code',

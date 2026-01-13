@@ -67,7 +67,7 @@ class ClusterListAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = ClusterFilter
+    filter_class = ClusterFilter
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get(self.lookup_field)
@@ -198,7 +198,7 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filterset_class = ClusterObjectiveFilter
+    filter_class = ClusterObjectiveFilter
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -341,7 +341,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filterset_class = ClusterActivityFilter
+    filter_class = ClusterActivityFilter
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -421,7 +421,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
     serializer_class = ClusterIndicatorReportSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filterset_class = ClusterIndicatorsFilter
+    filter_class = ClusterIndicatorsFilter
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -532,7 +532,7 @@ class ClusterReportablesIdListAPIView(ListAPIView):
     """
     permission_classes = (IsAuthenticated, )
     serializer_class = ReportableIdSerializer
-    pagination_class = filterset_class = None
+    pagination_class = filter_class = None
 
     def check_permissions(self, request):
         super().check_permissions(request)
@@ -761,7 +761,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filterset_class = ClusterIndicatorsFilter
+    filter_class = ClusterIndicatorsFilter
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def check_permissions(self, request):

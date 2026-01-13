@@ -658,7 +658,6 @@ def update_pr_ir_for_reportable(progress_report, reportable, pai_ir_for_period, 
         time_period_start=start_date,
         time_period_end=end_date,
         due_date=due_date,
-        title=ir_title,
         total={'c': 0, 'd': 0, 'v': 0},
         overall_status="NoS",
         report_status="Due",
@@ -666,54 +665,21 @@ def update_pr_ir_for_reportable(progress_report, reportable, pai_ir_for_period, 
         reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
     )
 
-        for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-            logger.info("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
-                indicator_report, start_date, end_date
-            ))
-            IndicatorLocationData.objects.create(
-                indicator_report=indicator_report,
-                location=location_goal.location,
-                num_disaggregation=indicator_report.disaggregations.count(),
-                level_reported=indicator_report.disaggregations.count(),
-                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                    'id', flat=True)),
-                disaggregation={
-                    '()': {'c': 0, 'd': 0, 'v': 0}
-                },
-            )
-
-    else:
-        logger.info("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
-        indicator_report = IndicatorReport.objects.create(
-            progress_report=None,
-            reportable=reportable,
-            parent=pai_ir_for_period,
-            time_period_start=start_date,
-            time_period_end=end_date,
-            due_date=due_date,
-            title=ir_title,
-            total={'c': 0, 'd': 0, 'v': 0},
-            overall_status="NoS",
-            report_status="Due",
-            submission_date=None,
-            reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
+    for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
+        logger.info("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
+            indicator_report, start_date, end_date
+        ))
+        IndicatorLocationData.objects.create(
+            indicator_report=indicator_report,
+            location=location_goal.location,
+            num_disaggregation=indicator_report.disaggregations.count(),
+            level_reported=indicator_report.disaggregations.count(),
+            disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                'id', flat=True)),
+            disaggregation={
+                '()': {'c': 0, 'd': 0, 'v': 0}
+            },
         )
-
-        for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-            logger.info("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
-                indicator_report, start_date, end_date
-            ))
-            IndicatorLocationData.objects.create(
-                indicator_report=indicator_report,
-                location=location_goal.location,
-                num_disaggregation=indicator_report.disaggregations.count(),
-                level_reported=indicator_report.disaggregations.count(),
-                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                    'id', flat=True)),
-                disaggregation={
-                    '()': {'c': 0, 'd': 0, 'v': 0}
-                },
-            )
 
 
 def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, start_date, end_date, due_date):
@@ -913,7 +879,7 @@ def update_ir_and_ilds_for_pr(pd, progress_report, reportable_queryset, reportin
     due_date = reporting_period.due_date
     # ir_list = list()
 
-    for reportable in queryset:
+    # for reportable in queryset:
         # indicator_report = update_pr_ir_for_reportable(
         #     progress_report,
         #     reportable,
@@ -923,7 +889,7 @@ def update_ir_and_ilds_for_pr(pd, progress_report, reportable_queryset, reportin
         #     due_date,
         # )
         # Save Signal to recalculate reportable totals
-        indicator_report.save()
+        # indicator_report.save()
 
     # if progress_report.report_type == "HR":
     #     hr_reports = list()

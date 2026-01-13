@@ -1,3 +1,5 @@
+version: '3.8'
+
 volumes:
   pg-data-prp: {}
 
@@ -25,7 +27,7 @@ services:
       - .env
     build:
       context: ./django_api
-      dockerfile: ./Dockerfile-local
+      dockerfile: ./Dockerfile
       args:
         ENV: dev
     volumes:
@@ -206,4 +208,6 @@ services:
 
 
 networks:
-  etools-network: {} 
+  etools-network:
+    external:
+      name: etools_network
