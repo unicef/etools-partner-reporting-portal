@@ -106,7 +106,7 @@ jobs:
   build_and_deploy_fe_ip:
     working_directory: ~/code/frontend_ip
     docker:
-      - image: node:20.18.1
+      - image: node:22.21.1
     steps:
       - checkout:
           path: ~/code
@@ -159,4 +159,4 @@ workflows:
                 - master
                 - staging
                 - develop
-                - gpd-reporting-improvements
+                - packages-update
