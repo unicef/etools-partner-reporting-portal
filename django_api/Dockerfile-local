@@ -1,0 +1,93 @@
+# Dockerfile base
+
+# unicef/etools-prp-base:base-312
+FROM python:3.12-alpine3.19
+
+RUN apk update
+
+RUN apk add \
+    --update alpine-sdk
+
+RUN apk add --upgrade apk-tools \
+    openssl \
+    ca-certificates \
+    libmagic \
+    libxslt \
+    geos \
+    gdal \
+    postgresql-client \
+    bash \
+    gettext
+
+
+# Build-deps
+RUN apk add --no-cache --virtual .build-deps --update \
+    alpine-sdk \
+    libxml2-dev \
+    libxslt-dev \
+    xmlsec-dev \
+    postgresql-dev \
+    libffi-dev \
+    jpeg-dev \
+    geos-dev \
+    gdal-dev \
+    gcc \
+    g++
+
+RUN pip install --no-cache-dir --upgrade \
+    pip \
+    pdm
+
+# End Dockerfile base
+
+# Dockerfile-installed
+
+ARG env
+ENV ENV ${env:-dev}
+
+# these packages are required
+RUN apk add --no-cache --virtual --update \
+    cairo-dev \
+    pango-dev \
+    gdk-pixbuf \
+    ttf-opensans
+
+WORKDIR /etools/
+ADD .pdm-python .
+ADD pdm.lock .
+ADD pyproject.toml .
+RUN pdm sync
+
+ENV PYTHONPATH=/etools/__pypackages__/3.12/lib
+ENV PATH="/etools/__pypackages__/3.12/bin:${PATH}"
+
+RUN CFLAGS="-I/usr/local/include/python3.12" UWSGI_PROFILE="asyncio"
+
+RUN mkdir -p /data/django_api/logs
+RUN mkdir -p /data/uploads
+RUN touch /data/django_api/logs/django.log
+
+RUN chmod -R a+rw /data
+
+ENV PYTHONUNBUFFERED 1
+WORKDIR /code/
+
+# End Dockerfile-installed
+
+
+ARG env
+ENV ENV ${env:-dev}
+
+ADD . /code/
+
+WORKDIR /code/
+
+
+ENV PYTHONUNBUFFERED 1
+
+RUN python manage.py collectstatic --noinput
+
+RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/v2.2.0/waitforit-linux_amd64
+RUN chmod +x /usr/local/bin/waitforit
+
+EXPOSE 8000

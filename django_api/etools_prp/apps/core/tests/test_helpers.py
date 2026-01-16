@@ -25,11 +25,11 @@ class TestCombinatorics(TestCase):
         self.combination_entry_input = [[1, 2, 3], [1, 2, 4]]
 
     def test_get_combination_pairs(self):
-        self.assertEquals(get_combination_pairs(self.entries, r=0), [tuple()])
+        self.assertEqual(get_combination_pairs(self.entries, r=0), [tuple()])
 
         r_1_result = [(1,), (2,), (3,), (4,), (5,)]
 
-        self.assertEquals(get_combination_pairs(self.entries, r=1), r_1_result)
+        self.assertEqual(get_combination_pairs(self.entries, r=1), r_1_result)
 
         r_2_result = [
             (1, 2),
@@ -44,7 +44,7 @@ class TestCombinatorics(TestCase):
             (4, 5)
         ]
 
-        self.assertEquals(get_combination_pairs(self.entries, r=2), r_2_result)
+        self.assertEqual(get_combination_pairs(self.entries, r=2), r_2_result)
 
         r_3_result = [
             (1, 2, 3),
@@ -59,7 +59,7 @@ class TestCombinatorics(TestCase):
             (3, 4, 5)
         ]
 
-        self.assertEquals(get_combination_pairs(self.entries, r=3), r_3_result)
+        self.assertEqual(get_combination_pairs(self.entries, r=3), r_3_result)
 
         r_4_result = [
             (1, 2, 3, 4),
@@ -69,13 +69,13 @@ class TestCombinatorics(TestCase):
             (2, 3, 4, 5)
         ]
 
-        self.assertEquals(get_combination_pairs(self.entries, r=4), r_4_result)
+        self.assertEqual(get_combination_pairs(self.entries, r=4), r_4_result)
 
         r_5_result = [(1, 2, 3, 4, 5)]
 
-        self.assertEquals(get_combination_pairs(self.entries, r=5), r_5_result)
+        self.assertEqual(get_combination_pairs(self.entries, r=5), r_5_result)
 
-        self.assertEquals(get_combination_pairs(self.entries, r=6), [])
+        self.assertEqual(get_combination_pairs(self.entries, r=6), [])
 
     def test_generate_data_combination_entries(self):
         key_combinations = generate_data_combination_entries(
@@ -105,7 +105,7 @@ class TestCombinatorics(TestCase):
             (1, 1),
         ])
 
-        self.assertEquals(key_combinations, expected)
+        self.assertEqual(key_combinations, expected)
 
 
 class TestDictionaryHelpers(TestCase):
@@ -123,7 +123,7 @@ class TestDictionaryHelpers(TestCase):
 
         expected_key_list = [(111,), (101,), (100,), ()]
 
-        self.assertEquals(list(sorted_dict.keys()), expected_key_list)
+        self.assertEqual(list(sorted_dict.keys()), expected_key_list)
 
     def test_get_sorted_ordered_dict_by_keys_ascending(self):
         sorted_dict = get_sorted_ordered_dict_by_keys(
@@ -132,7 +132,7 @@ class TestDictionaryHelpers(TestCase):
         expected_key_list = [(111,), (101,), (100,), ()]
         expected_key_list.reverse()
 
-        self.assertEquals(list(sorted_dict.keys()), expected_key_list)
+        self.assertEqual(list(sorted_dict.keys()), expected_key_list)
 
     def test_get_sorted_ordered_dict_by_keys_with_key_func(self):
         sorted_dict = get_sorted_ordered_dict_by_keys(
@@ -140,7 +140,7 @@ class TestDictionaryHelpers(TestCase):
 
         expected_key_list = [(), (100,), (101,), (111,)]
 
-        self.assertEquals(list(sorted_dict.keys()), expected_key_list)
+        self.assertEqual(list(sorted_dict.keys()), expected_key_list)
 
     def test_get_cast_dictionary_keys_as_string(self):
         converted_dict = get_cast_dictionary_keys_as_string(self.entry_dict)
