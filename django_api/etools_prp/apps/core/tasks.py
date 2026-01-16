@@ -189,7 +189,7 @@ def _process_pd_reports(pd):
         # If PR was already generated, check for indicator report and location updates
         if pr_qs.exists():
             logger.info("QPR report already exists, checking for updates.")
-            update_ir_and_ilds_for_pr(pd, pr_qs.last(), active_reportables, reporting_period)
+            update_ir_and_ilds_for_pr(pr_qs.last(), active_reportables, reporting_period)
         else:
             logger.info("Creating new QPR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
@@ -217,7 +217,7 @@ def _process_pd_reports(pd):
         # If PR was already generated, check for indicator and location updates
         if pr_qs.exists():
             logger.info("HR report already exists, checking for updates.")
-            update_ir_and_ilds_for_pr(pd, pr_qs.last(), active_reportables, reporting_period)
+            update_ir_and_ilds_for_pr(pr_qs.last(), active_reportables, reporting_period)
         else:
             logger.info("Creating new QPR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(

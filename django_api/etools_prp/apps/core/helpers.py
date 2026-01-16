@@ -838,7 +838,7 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
 
 
 @transaction.atomic
-def update_ir_and_ilds_for_pr(pd, progress_report, active_reportables, reporting_period):
+def update_ir_and_ilds_for_pr(progress_report, active_reportables, reporting_period):
     from etools_prp.apps.indicator.models import Reportable
     active_irs = progress_report.indicator_reports.filter(reportable__active=True).all()
 
