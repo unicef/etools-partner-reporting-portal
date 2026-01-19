@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import patch
 
 from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
 from etools_prp.apps.core.helpers import (
@@ -272,7 +273,8 @@ class TestUpdateIRAndILDsForPR(TestCase):
         )
         self.assertEqual(new_ir.progress_report, self.progress_report)
 
-    def test_difference_operation_with_queryset(self):
+    @patch('etools_prp.apps.core.helpers.logger.info')
+    def test_difference_operation_with_queryset(self, mock_logger):
         """Test the set difference operation between active_reportables and existing reportables"""
         active_irs = self.progress_report.indicator_reports.filter(reportable__active=True).all()
         existing_reportables = Reportable.objects.filter(indicator_reports__in=active_irs)
@@ -285,15 +287,7 @@ class TestUpdateIRAndILDsForPR(TestCase):
         update_ir_and_ilds_for_pr(
             self.progress_report, self.active_reportables, self.reporting_period
         )
-
-        # mock_create.assert_called_once_with(
-        #     self.progress_report,
-        #     self.reportable3,
-        #     None,
-        #     self.reporting_period.start_date,
-        #     self.reporting_period.end_date,
-        #     self.reporting_period.due_date
-        # )
+        mock_logger.assert_called_once_with('Creating Quantity IndicatorReport for 2024-01-01 - 2024-01-31')
 
     def test_empty_active_reportables(self):
         """Test with empty active reportables"""
