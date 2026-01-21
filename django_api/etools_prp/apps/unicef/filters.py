@@ -1,4 +1,3 @@
-from distutils.util import strtobool
 from urllib import parse
 
 from django.conf import settings
@@ -13,6 +12,16 @@ from etools_prp.apps.utils.filters.constants import Boolean
 from etools_prp.apps.utils.filters.fields import CommaSeparatedListFilter
 
 from .models import ProgrammeDocument, ProgressReport
+
+
+def strtobool(val):
+    val = str(val).lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return True
+    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return False
+    else:
+        raise ValueError(f"invalid truth value {val!r}")
 
 
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
