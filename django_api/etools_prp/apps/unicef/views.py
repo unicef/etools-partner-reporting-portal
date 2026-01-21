@@ -365,7 +365,8 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         return queryset.filter(programme_document__workspace=self.kwargs['workspace_id']).distinct()
 
     def get_optimized_export_queryset(self):
-        return ProgressReportPDFService.apply_optimizations(self.get_queryset())
+        pdf_service = ProgressReportPDFService()
+        return pdf_service.apply_optimizations(self.get_queryset())
 
     def list(self, request, *args, **kwargs):
         filtered = ProgressReportFilter(request.GET, queryset=self.get_queryset())
