@@ -7,11 +7,11 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.utils.deconstruct import deconstructible
 
+from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from social_core.backends.azuread_b2c import AzureADB2COAuth2
 from social_core.pipeline import social_auth, user as social_core_user
 from social_django.middleware import SocialAuthExceptionMiddleware
 from storages.backends.azure_storage import AzureStorage
-from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from storages.utils import setting
 
 logger = logging.getLogger(__name__)
