@@ -11,6 +11,7 @@ from social_core.backends.azuread_b2c import AzureADB2COAuth2
 from social_core.pipeline import social_auth, user as social_core_user
 from social_django.middleware import SocialAuthExceptionMiddleware
 from storages.backends.azure_storage import AzureStorage
+from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from storages.utils import setting
 
 logger = logging.getLogger(__name__)
@@ -150,27 +151,30 @@ class EToolsAzureStorage(AzureStorage):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._service = None
 
     def url(self, name, expire=None):
-        if hasattr(self.service, 'make_blob_url'):
-            if self.auto_sign:
-                start = (datetime.utcnow() + timedelta(seconds=-120)).strftime('%Y-%m-%dT%H:%M:%SZ')
-                expiry = (datetime.utcnow() + timedelta(seconds=self.ap_expiry)).strftime('%Y-%m-%dT%H:%M:%SZ')
-                sas_token = self.service.generate_blob_shared_access_signature(
-                    self.azure_container,
-                    name,
-                    permission=self.azure_access_policy_permission,
+        if self.auto_sign:
+            start = datetime.utcnow() + timedelta(seconds=-120)
+            expiry = datetime.utcnow() + timedelta(seconds=self.ap_expiry)
+
+            permissions = BlobSasPermissions(read=True) if self.azure_access_policy_permission == 'r' else BlobSasPermissions()
+
+            try:
+                sas_token = generate_blob_sas(
+                    account_name=self.account_name,
+                    container_name=self.azure_container,
+                    blob_name=name,
+                    account_key=self.account_key,
+                    permission=permissions,
                     expiry=expiry,
                     start=start,
                 )
-            else:
-                sas_token = None
-            return self.service.make_blob_url(
-                container_name=self.azure_container,
-                blob_name=name,
-                protocol=self.azure_protocol,
-                sas_token=sas_token,
-            )
+                protocol = 'https' if self.azure_ssl else 'http'
+                return f"{protocol}://{self.account_name}.blob.core.windows.net/{self.azure_container}/{name}?{sas_token}"
+            except Exception as e:
+                logger.error(f"Error generating SAS token: {e}")
+                # Return old fallback
+                return "{}{}/{}".format(setting('MEDIA_URL'), self.azure_container, name)
         else:
+            # Return old fallback
             return "{}{}/{}".format(setting('MEDIA_URL'), self.azure_container, name)
