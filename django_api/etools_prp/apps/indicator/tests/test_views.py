@@ -202,7 +202,7 @@ class TestPDReportsAPIView(BaseAPITestCase):
                       kwargs={'pd_id': self.pd.pk, 'report_id': first_ir.id})
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['id'], str(first_ir.id))
+        self.assertEqual(response.data['id'], str(first_ir.id))
 
 
 class TestIndicatorDataAPIView(BaseAPITestCase):
@@ -322,12 +322,12 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         # Submitting a valid indicator report will return as accepted
         url = reverse('indicator-data', kwargs={'ir_id': ir.id})
         response = self.client.post(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             response.data['submission_date'],
             today.strftime(settings.PRINT_DATA_FORMAT),
         )
-        self.assertEquals(
+        self.assertEqual(
             response.data['report_status'],
             INDICATOR_REPORT_STATUS.accepted)
 
@@ -534,8 +534,8 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         url += '?locations=' + location_id_list_string
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(self.reports), len(response.data['results']))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(self.reports), len(response.data['results']))
 
     def test_list_api_filter_by_pd_ids(self):
         self.reports = Reportable.objects.filter(
@@ -553,8 +553,8 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         url += '?pds=' + pd_id_list_string
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(self.reports), len(response.data['results']))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(self.reports), len(response.data['results']))
 
 
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
@@ -758,18 +758,18 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
         data = dict(overall_status=new_overall_status)
         response = self.client.patch(url, data=data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['overall_status'], new_overall_status)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['overall_status'], new_overall_status)
 
         updated_ir = IndicatorReport.objects.get(id=ir.id)
-        self.assertEquals(updated_ir.overall_status, new_overall_status)
+        self.assertEqual(updated_ir.overall_status, new_overall_status)
 
         new_narrative_assessment = "new narrative_assessment"
         data = dict(narrative_assessment=new_narrative_assessment)
         response = self.client.patch(url, data=data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_ir = IndicatorReport.objects.get(id=ir.id)
-        self.assertEquals(
+        self.assertEqual(
             updated_ir.narrative_assessment,
             new_narrative_assessment)
 
@@ -967,11 +967,9 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
                       kwargs={'reportable_id': indicator_report.reportable.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data),
-                          indicator_report.reportable.indicator_reports.count())
-        self.assertNotEquals(response.data[0]['indicator_location_data'][
-                             0]['disaggregation'], {})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), indicator_report.reportable.indicator_reports.count())
+        self.assertNotEqual(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
 
     def test_list_api_with_pks_query_param(self):
         indicator_report = IndicatorReport.objects.last()
@@ -979,9 +977,9 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         url = reverse('indicator-report-direct-list-api') + f'?pks={indicator_report.id}'
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 1)
-        self.assertEquals(response.data[0]['title'], indicator_report.title)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], indicator_report.title)
 
     def test_list_without_inactive_reportable_location_goal(self):
         indicator_report = IndicatorReport.objects.last()
@@ -1025,9 +1023,9 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 1)
-        self.assertEquals(response.data[0]['title'], indicator_report.title)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], indicator_report.title)
 
     def test_list_api_with_pks_forbidden(self):
         default_unicef_user = factories.NonPartnerUserFactory(username='some_random_username')
@@ -1037,7 +1035,7 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.client.force_authenticate(default_unicef_user)
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_api_with_limit(self):
         indicator_report = IndicatorReport.objects.last()
@@ -1045,8 +1043,8 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
                       kwargs={'reportable_id': indicator_report.reportable.id})
         url += '?limit=2'
         response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 2)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
 
 
 class TestClusterIndicatorAPIView(BaseAPITestCase):
@@ -1274,16 +1272,16 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
             Reportable.objects.count(),
             self.reportable_count + 1)
-        self.assertEquals(
+        self.assertEqual(
             IndicatorBlueprint.objects.count(),
             self.blueprint_count + 1)
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(
+        self.assertEqual(
             reportable.frequency,
             REPORTABLE_FREQUENCY_LEVEL.weekly)
 
@@ -1294,7 +1292,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data['locations'].append(dict(failkey=1))
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertFalse(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_percentage_indicator_reporting(self):
         self.data['blueprint']['calculation_formula_across_periods'] = IndicatorBlueprint.SUM
@@ -1303,16 +1301,16 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
             Reportable.objects.count(),
             self.reportable_count + 1)
-        self.assertEquals(
+        self.assertEqual(
             IndicatorBlueprint.objects.count(),
             self.blueprint_count + 1)
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(
+        self.assertEqual(
             reportable.blueprint.display_type,
             IndicatorBlueprint.PERCENTAGE)
 
@@ -1332,21 +1330,16 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data['frequency'] = REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(reportable.frequency,
-                          REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
-        self.assertEquals(len(reportable.cs_dates), len(cs_dates))
-        self.assertEquals(
-            Reportable.objects.count(),
-            self.reportable_count + 2)
-        self.assertEquals(
-            IndicatorBlueprint.objects.count(),
-            self.blueprint_count + 1)
+        self.assertEqual(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+        self.assertEqual(len(reportable.cs_dates), len(cs_dates))
+        self.assertEqual(Reportable.objects.count(), self.reportable_count + 2)
+        self.assertEqual(IndicatorBlueprint.objects.count(), self.blueprint_count + 1)
 
         # check that cs_dates are ordered correctly
-        self.assertEquals(
+        self.assertEqual(
             response.data["cs_dates"],
             ['12-Apr-2020', '15-Apr-2020', '18-Apr-2020', '21-Apr-2020'],
         )
@@ -1357,11 +1350,11 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data['object_type'] = 'partner.partnerproject'
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
             Reportable.objects.count(),
             self.reportable_count + 1)
-        self.assertEquals(
+        self.assertEqual(
             IndicatorBlueprint.objects.count(),
             self.blueprint_count + 1)
 
@@ -1373,11 +1366,11 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data['project_context_id'] = pa.partneractivityprojectcontext_set.first().id
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
             Reportable.objects.count(),
             self.reportable_count + 1)
-        self.assertEquals(
+        self.assertEqual(
             IndicatorBlueprint.objects.count(),
             self.blueprint_count + 1)
 
@@ -1386,9 +1379,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data['object_type'] = 'cluster.cluster'
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertFalse(status.is_success(response.status_code))
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(Reportable.objects.count(), self.reportable_count)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Reportable.objects.count(), self.reportable_count)
+        self.assertEqual(
             IndicatorBlueprint.objects.count(),
             self.blueprint_count)
 
@@ -1419,17 +1412,17 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         response = self.client.put(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(
+        self.assertEqual(
             response.data['means_of_verification'],
             new_means_of_verification)
-        self.assertEquals(response.data['blueprint']['title'], new_title)
-        self.assertEquals(
+        self.assertEqual(response.data['blueprint']['title'], new_title)
+        self.assertEqual(
             response.data['blueprint']['calculation_formula_across_locations'],
             IndicatorBlueprint.AVG)
-        self.assertEquals(reportable.locations.count(), 2)
+        self.assertEqual(reportable.locations.count(), 2)
 
         # check that cs_dates are ordered correctly
-        self.assertEquals(
+        self.assertEqual(
             response.data["cs_dates"],
             ['12-Apr-2020', '15-Apr-2020', '18-Apr-2020', '21-Apr-2020'],
         )
@@ -1655,8 +1648,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             response.data['disaggregation']['()']['v'],
             correct_total)
 
@@ -1670,7 +1663,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             'level_reported cannot be higher than its num_disaggregation',
             response.data['non_field_errors'][0]
@@ -1698,7 +1691,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data['disaggregation'][str(level_reported_3_key)]['c'] = 'aaaa'
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "'aaaa' is not of type 'number'",
             response.data['disaggregation'][0]
@@ -1708,7 +1701,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data['disaggregation'][str(level_reported_3_key)]['d'] = 'aaaa'
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "'aaaa' is not of type 'number'",
             response.data['disaggregation'][0]
@@ -1718,7 +1711,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data['disaggregation'][str(level_reported_3_key)]['v'] = 'aaaa'
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "'aaaa' is not of type 'number'",
             response.data['disaggregation'][0]
@@ -1745,7 +1738,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data['disaggregation'][str(level_reported_3_key)]['v'] = 100
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_wrong_disaggregation_reported_on_count_validation(self):
         indicator_location_data = self.partneractivity_reportable.indicator_reports.first().indicator_location_data.first()
@@ -1758,7 +1751,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             'disaggregation_reported_on list must have ' +
             'level_reported # of elements',
@@ -1776,7 +1769,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             u"num_disaggregation is not matched with " +
             "its IndicatorReport's Reportable disaggregation counts",
@@ -1798,7 +1791,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             'disaggregation_reported_on list must have all ' +
             'its elements mapped to disaggregation ids',
@@ -1820,7 +1813,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "IndicatorLocationData does not belong to ",
             response.data['non_field_errors'][0]
@@ -1841,8 +1834,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
             "Submitted disaggregation data entries do not contain " +
             "all level %d combination pair keys" % (indicator_location_data.level_reported),
             str(response.data['non_field_errors'][0])
@@ -1872,7 +1865,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "Submitted disaggregation data entries contains " +
             "extra combination pair keys",
@@ -1904,7 +1897,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "Disaggregation data coordinate " +
             "space cannot be higher than " +
@@ -1938,7 +1931,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "coordinate space does not " +
             "belong to disaggregation value id list",
@@ -1967,7 +1960,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "'bad key' does not match",
             response.data['disaggregation'][0]
@@ -1993,7 +1986,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
             "coordinate space value does not " +
             "have correct value key structure: c, d, v",
@@ -2208,7 +2201,7 @@ class TestReportRefreshAPIView(BaseAPITestCase):
         data['report_type'] = 'IR'
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_client_error(response.status_code))
-        self.assertEquals(
+        self.assertEqual(
             "This indicator report is linked to a progress report. Use the progress report ID instead.",
             response.data['non_field_errors'][0]
         )
@@ -2219,14 +2212,14 @@ class TestReportRefreshAPIView(BaseAPITestCase):
 
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['response'], "OK")
+        self.assertEqual(response.data['response'], "OK")
 
         # All indicator reports should be blank state
         for ir in self.progress_report.indicator_reports.all():
-            self.assertEquals(ir.total['c'], 0)
-            self.assertEquals(ir.overall_status, "NoS")
-            self.assertEquals(ir.report_status, "Due")
-            self.assertEquals(ir.submission_date, None)
+            self.assertEqual(ir.total['c'], 0)
+            self.assertEqual(ir.overall_status, "NoS")
+            self.assertEqual(ir.report_status, "Due")
+            self.assertEqual(ir.submission_date, None)
 
     def test_cluster_indicator_report_reset(self):
         ir = self.partneractivity_reportable.indicator_reports.first()
@@ -2235,20 +2228,20 @@ class TestReportRefreshAPIView(BaseAPITestCase):
 
         response = self.client.post(url, data=data, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['response'], "OK")
+        self.assertEqual(response.data['response'], "OK")
 
         ir = IndicatorReport.objects.get(id=ir.id)
 
         # All indicator report information should be initial state
-        self.assertEquals(ir.submission_date, None)
-        self.assertEquals(ir.overall_status, "NoS")
-        self.assertEquals(ir.report_status, "Due")
-        self.assertEquals(ir.total['c'], 0)
+        self.assertEqual(ir.submission_date, None)
+        self.assertEqual(ir.overall_status, "NoS")
+        self.assertEqual(ir.report_status, "Due")
+        self.assertEqual(ir.total['c'], 0)
 
         for ild in ir.indicator_location_data.all():
-            self.assertEquals(ild.disaggregation['()']['c'], 0)
-            self.assertEquals(ild.disaggregation['()']['d'], 0)
-            self.assertEquals(ild.disaggregation['()']['v'], 0)
+            self.assertEqual(ild.disaggregation['()']['c'], 0)
+            self.assertEqual(ild.disaggregation['()']['d'], 0)
+            self.assertEqual(ild.disaggregation['()']['v'], 0)
 
     def test_refresh_future_reports(self):
         report = self.partneractivity_reportable.indicator_reports.first()

@@ -29,8 +29,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         url = reverse('workspace')
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data),
             Workspace.objects.prefetch_related('locations').filter(
                 locations__isnull=False, response_plans=self.response_plan).distinct().count()
@@ -44,8 +44,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         url = reverse('workspace')
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data),
             Workspace.objects.prefetch_related('locations').filter(
                 locations__isnull=False, response_plans=self.response_plan).distinct().count()
@@ -56,8 +56,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         args = "?business_area_code={}&workspace_code={}".format(self.workspace.business_area_code, self.workspace.workspace_code)
         response = self.client.get(url + args, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
             len(response.data),
             Workspace.objects.prefetch_related('locations').filter(
                 locations__isnull=False,
@@ -154,8 +154,8 @@ class TestLocationListAPIView(BaseAPITestCase):
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
         expected = Location.objects.filter(pk__in=pks).count()
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), expected)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), expected)
 
     def test_api_filtering(self):
         url = reverse(
@@ -178,8 +178,8 @@ class TestLocationListAPIView(BaseAPITestCase):
             admin_level=self.admin_level,
             cluster_objectives__in=objective_ids).count()
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), expected)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), expected)
 
 
 class TestResponsePlanAPIView(BaseAPITestCase):
@@ -197,16 +197,16 @@ class TestResponsePlanAPIView(BaseAPITestCase):
         url = reverse("response-plan", kwargs={'workspace_id': self.workspace.id})
         response = self.client.get(url, format='json')
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), self.workspace.response_plans.count())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), self.workspace.response_plans.count())
 
         # Cluster system admin should also be able to query response plans
         self.admin_user = factories.NonPartnerUserFactory()
         factories.ClusterPRPRoleFactory(user=self.admin_user, workspace=None, cluster=None, role=PRP_ROLE_TYPES.cluster_system_admin)
         self.client.force_authenticate(self.admin_user)
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), self.workspace.response_plans.count())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), self.workspace.response_plans.count())
 
     def test_create_response_plan(self):
         rp_data = {
@@ -222,7 +222,7 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
         response = self.client.post(url, data=rp_data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, msg=response.content)
 
         # Cluster system admin should also be able to create response plan
         self.admin_user = factories.NonPartnerUserFactory()
@@ -231,7 +231,7 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         rp_data['title'] += ' 2'
         response = self.client.post(url, data=rp_data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, msg=response.content)
 
     def test_end_lt_start(self):
         rp_data = {
@@ -247,7 +247,7 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
         response = self.client.post(url, data=rp_data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
 
         # Cluster system admin should also be able to create response plan
         self.admin_user = factories.NonPartnerUserFactory()
@@ -256,7 +256,7 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         rp_data['title'] += ' 2'
         response = self.client.post(url, data=rp_data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
 
 
 class TestCurrenciesView(BaseAPITestCase):

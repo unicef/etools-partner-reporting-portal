@@ -10,6 +10,8 @@ from contextlib import contextmanager
 from datetime import date, timedelta
 from itertools import combinations, product
 
+from django.db import transaction
+
 from dateutil.relativedelta import relativedelta
 
 from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
@@ -451,6 +453,7 @@ def get_latest_pr_by_type(pd, report_type):
     return qs.filter(report_type=report_type).order_by(order_by_field).last()
 
 
+@transaction.atomic
 def create_pr_sr_for_report_type(pd, idx, reporting_period):
     """
     Create ProgressReport SR instance by its ReportingPeriodDate
@@ -489,6 +492,7 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
         logger.info(f"Created new SR{idx} ProgressReport id {next_progress_report.id} for due date {due_date}")
 
 
+@transaction.atomic
 def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
     """
     Create ProgressReport instance by its ReportingPeriodDate instance's report type
@@ -642,13 +646,14 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
     return indicator_report
 
 
+@transaction.atomic
 def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, start_date, end_date, due_date):
     """
     Create a set of new IndicatorReports and IndicatorLocationData instances per
     IndicatorReport instance, with passed-in new dates and new ProgressReport instance
 
     Arguments:
-        pd {ProgrammeDocument} -- ProgrammeDocument instnace
+        pd {ProgrammeDocument} -- ProgrammeDocument instance
         reportable_queryset {django.Queryset[Reportable]} -- Reportable queryset on LLO
         next_progress_report {ProgressReport} -- Newly generated Progress Report instance
         start_date {datetime.datetime} -- Start date for reporting
@@ -830,6 +835,24 @@ def create_ir_and_ilds_for_pr(pd, reportable_queryset, next_progress_report, sta
                         latest_hr = pd.progress_reports.filter(report_type="HR").order_by('id').last()
                         latest_hr.is_final = True
                         latest_hr.save()
+
+
+@transaction.atomic
+def update_ir_and_ilds_for_pr(progress_report, active_reportables, reporting_period):
+    from etools_prp.apps.indicator.models import Reportable
+    active_irs = progress_report.indicator_reports.filter(reportable__active=True).all()
+
+    existing_reportabes = Reportable.objects.filter(indicator_reports__in=active_irs)
+    to_create = active_reportables.difference(existing_reportabes)
+
+    for reportable in to_create:
+        indicator_report = create_pr_ir_for_reportable(
+            progress_report, reportable, None,
+            reporting_period.start_date, reporting_period.end_date, reporting_period.due_date
+        )
+        # Save Signal to recalculate reportable totals
+        indicator_report.progress_report = progress_report
+        indicator_report.save()
 
 
 def create_ir_for_cluster(reportable, start_date, end_date, project):
