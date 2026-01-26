@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.admindocs.utils import ROLES
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import transaction
@@ -50,6 +51,18 @@ class PersonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
+        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
+
+
+class UserAuthorizedOfficerSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[EmailValidator(
+        queryset=get_user_model().objects.all(),
+    )])
+    is_authorized_officer = True
+    active = True
+
+    class Meta:
+        model = get_user_model()
         fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
 
 
@@ -248,6 +261,11 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         )
 
     def get_unicef_officers(self, obj):
+        if obj.is_gpd:
+            auth_officers = get_user_model().objects.filter(
+                workspace=self.workspace, partner=self.partner,
+                group__name=ROLES.ip_authorized_officer, is_active=True)
+            return UserAuthorizedOfficerSerializer(auth_officers, read_only=True, many=True).data
         return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
 
     def get_unicef_focal_point(self, obj):
