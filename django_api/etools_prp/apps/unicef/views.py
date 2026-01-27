@@ -693,8 +693,9 @@ class ProgressReportSubmitAPIView(APIView):
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             provided_email = request.data.get('submitted_by_email')
-
-            if not progress_report.programme_document.is_gpd:
+            if progress_report.programme_document.is_gpd:
+                authorized_officer_user = get_user_model().objects.get(email=provided_email)
+            else:
                 authorized_officer_user = get_user_model().objects.filter(
                     email=provided_email or self.request.user.email,
                     realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
