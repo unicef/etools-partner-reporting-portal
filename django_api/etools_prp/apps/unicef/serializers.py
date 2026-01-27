@@ -55,15 +55,20 @@ class PersonSerializer(serializers.ModelSerializer):
 
 class UserAuthorizedOfficerSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
+    title = serializers.CharField(source='position')
+    phone_number = serializers.SerializerMethodField()
     is_authorized_officer = serializers.SerializerMethodField()
     active = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'is_authorized_officer', 'active')
+        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
 
     def get_name(self, obj):
         return obj.get_full_name()
+
+    def get_phone_number(self, obj):
+        return ''
 
     def get_is_authorized_officer(self, obj):
         return True
