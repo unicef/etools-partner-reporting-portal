@@ -53,6 +53,25 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer', 'active')
 
 
+class UserAuthorizedOfficerSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    is_authorized_officer = serializers.SerializerMethodField()
+    active = serializers.SerializerMethodField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('name', 'email', 'is_authorized_officer', 'active')
+
+    def get_name(self, obj):
+        return obj.get_full_name()
+
+    def get_is_authorized_officer(self, obj):
+        return True
+
+    def get_active(self, obj):
+        return True
+
+
 class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
@@ -248,6 +267,14 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         )
 
     def get_unicef_officers(self, obj):
+        if obj.is_gpd:
+            auth_officer_realms = Realm.objects.filter(
+                workspace=obj.workspace, partner=obj.partner, group__name=PRP_IP_ROLE_TYPES.ip_authorized_officer,
+                is_active=True).select_related('workspace', 'partner', 'group')
+
+            auth_officers = get_user_model().objects.filter(realms__in=auth_officer_realms)
+            return UserAuthorizedOfficerSerializer(auth_officers, read_only=True, many=True).data
+
         return PersonSerializer(obj.unicef_officers.filter(active=True), read_only=True, many=True).data
 
     def get_unicef_focal_point(self, obj):
