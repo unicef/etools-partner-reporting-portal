@@ -693,12 +693,23 @@ class ProgressReportSubmitAPIView(APIView):
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             provided_email = request.data.get('submitted_by_email')
+            authorized_officer_user = get_user_model().objects.filter(
+                email=provided_email or self.request.user.email,
+                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer)
             if progress_report.programme_document.is_gpd:
-                authorized_officer_user = get_user_model().objects.get(email=provided_email)
+                authorized_officer_user = authorized_officer_user.first()
+                if not authorized_officer_user:
+                    if provided_email:
+                        _error_message = 'Report could not be submitted, because {} is not an IP authorized ' \
+                                         'officer.'.format(provided_email)
+                    else:
+                        _error_message = 'Your report could not be submitted, because you are not an IP authorized ' \
+                                         'officer.'
+                    raise ValidationError(
+                        _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
+                    )
             else:
                 authorized_officer_user = get_user_model().objects.filter(
-                    email=provided_email or self.request.user.email,
-                    realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
                     email__in=progress_report.programme_document
                     .unicef_officers.filter(active=True).values_list('email', flat=True)
                 ).first()

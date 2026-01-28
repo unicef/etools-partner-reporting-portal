@@ -26,11 +26,12 @@ from etools_prp.apps.core.common import (
     PD_STATUS,
     PR_ATTACHMENT_TYPES,
     PROGRESS_REPORT_STATUS,
+    PRP_IP_ROLE_TYPES,
     PRP_ROLE_TYPES,
     REPORTING_TYPES,
 )
 from etools_prp.apps.core.management.commands._generate_disaggregation_fake_data import generate_3_num_disagg_data
-from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.models import Location, Realm
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.core.tests.factories import (
@@ -587,6 +588,25 @@ class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
         self.assertEqual(
             self.pd.reference_number,
             response.data['reference_number'])
+
+    def test_detail_officers_for_gpd(self):
+        self.pd.document_type = 'GDD'
+        self.pd.save()
+        self.assertTrue(self.pd.is_gpd)
+        url = reverse(
+            'programme-document-details',
+            kwargs={'pd_id': self.pd.id, 'workspace_id': self.workspace.id})
+        response = self.client.get(url, format='json')
+
+        realms_qs = Realm.objects.filter(
+            workspace=self.pd.workspace, partner=self.pd.partner,
+            group__name=PRP_IP_ROLE_TYPES.ip_authorized_officer,
+            is_active=True).select_related('workspace', 'partner', 'group')
+
+        auth_officers = get_user_model().objects.filter(realms__in=realms_qs)
+        self.assertEqual(len(response.data['unicef_officers']), auth_officers.count())
+        self.assertEqual(len(response.data['unicef_officers']), 1)
+        self.assertEqual(response.data['unicef_officers'][0]['name'], auth_officers.first().get_full_name())
 
     def test_locations_from_different_sources(self):
         """
@@ -1873,6 +1893,37 @@ class TestProgressReportSubmitAPIView(BaseProgressReportAPITestCase):
         progress_report.programme_document.save(update_fields=['status'])
         progress_report.submission_date = None
         progress_report.save(update_fields=['submission_date'])
+        url = reverse(
+            'progress-reports-submit',
+            args=[self.workspace.pk, progress_report.pk],
+        )
+        authorized_officer = factories.PartnerUserFactory(
+            workspace=self.workspace,
+            partner=self.partner,
+            email=self.unicef_officer.email,
+            realms__data=[PRP_ROLE_TYPES.ip_authorized_officer],
+        )
+        self.client.force_authenticate(authorized_officer)
+        response = self.client.post(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        progress_report.refresh_from_db()
+        self.assertEqual(progress_report.status, PROGRESS_REPORT_STATUS.submitted)
+        self.assertEqual(progress_report.submitted_by, authorized_officer)
+        self.assertEqual(progress_report.submitting_user, authorized_officer)
+        self.assertEqual(progress_report.submission_date, datetime.datetime.now().date())
+
+    def test_submit_pr_report_for_gpd(self):
+        progress_report = self.pd.progress_reports.filter(
+            is_final=False, report_type=REPORTING_TYPES.QPR).first()
+        progress_report.programme_document.status = PD_STATUS.active
+        progress_report.programme_document.document_type = 'GDD'
+        progress_report.programme_document.save(update_fields=['status', 'document_type'])
+        progress_report.submission_date = None
+        progress_report.save(update_fields=['submission_date'])
+
+        self.assertTrue(progress_report.programme_document.is_gpd)
+
         url = reverse(
             'progress-reports-submit',
             args=[self.workspace.pk, progress_report.pk],
