@@ -56,6 +56,7 @@ jobs:
             export PYTHONHASHSEED=${RANDOM}
             export ENV=dev
             export PYTHONPATH=/etools/__pypackages__/3.12/lib
+            export DEBUG=FALSE
             cd django_api/
             # Install dev dependencies for testing (flake8, isort, etc.)
             pdm sync --dev
