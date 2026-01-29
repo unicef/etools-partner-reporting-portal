@@ -39,7 +39,7 @@ dependencies = [
     "djangorestframework-simplejwt>=5.2.0",
     "drfpasswordless==1.5.7",
     "jsonschema<=4.4.0",
-    "newrelic<=6.8.0.163",
+    "newrelic==9.9.1",
     "openpyxl<=3.0.7",
     "psycopg2-binary~=2.9.9",
     "pycountry>=22.3.5",
