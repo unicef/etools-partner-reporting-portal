@@ -15,7 +15,7 @@ def update_create_reportable_location_goals(reportable: Reportable, locations: l
             ReportableLocationGoal(
                 reportable=reportable,
                 location=loc,
-                is_active=True,
+                is_active=reportable.active,
             ) for loc in Location.objects.filter(id__in=new_locs)
         ]
     else:
@@ -24,10 +24,10 @@ def update_create_reportable_location_goals(reportable: Reportable, locations: l
             ReportableLocationGoal(
                 reportable=reportable,
                 location=loc,
-                is_active=True,
+                is_active=reportable.active,
             ) for loc in locations
         ]
 
     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
-    ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=True)
+    ReportableLocationGoal.objects.filter(reportable=reportable, location__in=locations).update(is_active=reportable.active)

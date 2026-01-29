@@ -33,10 +33,7 @@ class ReportableLocationGoalInline(admin.StackedInline):
 
 class ReportableAdmin(admin.ModelAdmin):
     # inlines = (ReportableLocationGoalInline, )
-    list_display = ('id', 'blueprint', 'active', 'target', 'baseline', 'total',
-                    'parent_indicator', 'frequency', 'assumptions',
-                    'means_of_verification', 'is_cluster_indicator',
-                    'cs_dates', 'content_object', 'content_type', 'external_id')
+    list_display = ('id', 'active', 'blueprint')
     list_filter = ('is_cluster_indicator', 'content_type')
     search_fields = ('context_code', 'means_of_verification', 'target',
                      'baseline', 'object_id', 'blueprint__title')
@@ -50,7 +47,7 @@ class ReportableAdmin(admin.ModelAdmin):
 
 
 class ReportableLocationGoalAdmin(admin.ModelAdmin):
-    list_display = ('location', 'is_active')
+    list_display = ('location', 'is_active', 'reportable')
     raw_id_fields = ('reportable', 'location')
     search_fields = ('reportable__id', 'location__name')
 

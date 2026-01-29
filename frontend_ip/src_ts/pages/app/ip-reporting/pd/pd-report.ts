@@ -486,12 +486,9 @@ export class PageIpReportingPdReport extends ProgressReportUtilsMixin(connect(st
       endpoint: {url: this.submitUrl}
     })
       .then((res: any) => {
-        const newPath = buildUrl(this.baseUrl, 'pd/' + this.pdId + '/view/reports');
-
         store.dispatch(pdReportsUpdateSingle(this.pdId, this.reportId, res));
-
         this.busy = false;
-        this.path = newPath;
+        EtoolsRouter.updateAppLocation(`${this.baseUrl}/pd/${this.pdId}/view/reports`);
       })
       .catch((err: any) => {
         const authorizedError = err.response.error_codes.filter((error: string) => {
