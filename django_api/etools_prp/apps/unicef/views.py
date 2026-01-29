@@ -110,7 +110,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = ProgrammeDocumentFilter
+    filterset_class = ProgrammeDocumentFilter
     exporters = {
         'xlsx': ProgrammeDocumentsXLSXExporter,
         'pdf': ProgrammeDocumentsPDFExporter,
@@ -279,7 +279,7 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
         )
         return super().get_queryset().filter(
             indicator_location_data__indicator_report__progress_report__programme_document__in=programme_documents
-        ).distinct()
+        ).order_by('id').distinct()
 
 
 class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
@@ -288,7 +288,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = ProgrammeDocumentIndicatorFilter
+    filterset_class = ProgrammeDocumentIndicatorFilter
     exporters = {
         'xlsx': ReportableListXLSXExporter,
         'pdf': ReportableListPDFExporter,
@@ -313,7 +313,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
 
         return super().get_queryset().filter(
             indicator_reports__progress_report__programme_document__in=programme_documents
-        ).distinct()
+        ).order_by('id').distinct()
 
 
 class ProgressReportAPIView(ListExportMixin, ListAPIView):
@@ -336,7 +336,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = ProgressReportFilter
+    filterset_class = ProgressReportFilter
     exporters = {
         'xlsx': AnnexCXLSXExporter,
         'pdf': ProgressReportListPDFExporter,
@@ -534,7 +534,7 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
         ),
     )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    filter_class = PDReportsFilter
+    filterset_class = PDReportsFilter
 
     def get_queryset(self):
         # Limit reports to partner only
@@ -693,24 +693,37 @@ class ProgressReportSubmitAPIView(APIView):
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             provided_email = request.data.get('submitted_by_email')
-
-            authorized_officer_user = get_user_model().objects.filter(
+            authorized_officer_users = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer,
-                email__in=progress_report.programme_document
-                .unicef_officers.filter(active=True).values_list('email', flat=True)
-            ).first()
+                realms__group__name=PRP_ROLE_TYPES.ip_authorized_officer)
+            if progress_report.programme_document.is_gpd:
+                authorized_officer_user = authorized_officer_users.first()
+                if not authorized_officer_user:
+                    if provided_email:
+                        _error_message = 'Report could not be submitted, because {} is not an IP authorized ' \
+                                         'officer.'.format(provided_email)
+                    else:
+                        _error_message = 'Your report could not be submitted, because you are not an IP authorized ' \
+                                         'officer.'
+                    raise ValidationError(
+                        _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
+                    )
+            else:
+                authorized_officer_user = authorized_officer_users.filter(
+                    email__in=progress_report.programme_document
+                    .unicef_officers.filter(active=True).values_list('email', flat=True)
+                ).first()
 
-            if not authorized_officer_user:
-                if provided_email:
-                    _error_message = 'Report could not be submitted, because {} is not the authorized ' \
-                                     'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
-                else:
-                    _error_message = 'Your report could not be submitted, because you are not the authorized ' \
-                                     'officer assigned to the PCA that is connected to that PD.'
-                raise ValidationError(
-                    _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
-                )
+                if not authorized_officer_user:
+                    if provided_email:
+                        _error_message = 'Report could not be submitted, because {} is not the authorized ' \
+                                         'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
+                    else:
+                        _error_message = 'Your report could not be submitted, because you are not the authorized ' \
+                                         'officer assigned to the PCA that is connected to that PD.'
+                    raise ValidationError(
+                        _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
+                    )
 
             # HR report type progress report is automatically accepted
             if progress_report.report_type == "HR":

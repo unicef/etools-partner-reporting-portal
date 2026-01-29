@@ -5,6 +5,7 @@
 **/.env
 **/.envrc
 **/.venv/
+__pypackages__/
 
 # PyCharm etc.
 .idea/
