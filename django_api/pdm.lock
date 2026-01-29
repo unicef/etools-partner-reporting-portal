@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:03d3e96c147bb66e932ce7bf1c27b2aa641c0fb237f21599b946fcebf543c854"
+content_hash = "sha256:fad323a2bbbd475a7aba7f8a79c470251afd5967a957e01f463c86e02db7c41e"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<3.13"
@@ -1283,12 +1283,16 @@ files = [
 
 [[package]]
 name = "newrelic"
-version = "6.8.0.163"
-requires_python = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*"
+version = "9.9.1"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "New Relic Python Agent"
 groups = ["default"]
 files = [
-    {file = "newrelic-6.8.0.163.tar.gz", hash = "sha256:5c993040ff20f6807ae08492a507ef4b232f747ae8d04f3fcc826d0420e028b0"},
+    {file = "newrelic-9.9.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1e613f1ffd0d35b1f866382eeee52d8aa9576d82f3de818a84aa2e56c08f1868"},
+    {file = "newrelic-9.9.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c3264e305ae0e973f3a02f7394460f4c7366822e8a3509cd08b2093f9cb5def5"},
+    {file = "newrelic-9.9.1-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:2b165328c05fd2c006cf1f476bebb281579944418a13903e802344660b13332c"},
+    {file = "newrelic-9.9.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:e3226ac2c0c57955a00a11f6cf982dd6747490254ed322d6fcf36077bfc37386"},
+    {file = "newrelic-9.9.1.tar.gz", hash = "sha256:e49c734058c7b6a6c199e8c2657187143061a6eda92cc8ba67739de88a9e203d"},
 ]
 
 [[package]]
