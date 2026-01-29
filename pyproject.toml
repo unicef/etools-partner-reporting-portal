@@ -1,0 +1,15 @@
+[project]
+name = "etools-partner-reporting-portal"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Felipe Bonet", email = "fpbonet@gmail.com"},
+]
+dependencies = ["newrelic==9.9.1"]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
