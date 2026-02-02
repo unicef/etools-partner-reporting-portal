@@ -430,8 +430,12 @@ SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 SOCIAL_PASSWORD_RESET_POLICY = env('AZURE_B2C_PASS_RESET_POLICY', default="B2C_1_PasswordResetPolicy")
 POLICY = env('AZURE_B2C_POLICY_NAME', default="b2c_1A_UNICEF_PARTNERS_signup_signin")
 
-TENANT_ID = env('AZURE_B2C_TENANT', default='unicefpartners')
-TENANT_B2C_URL = f'{TENANT_ID}.b2clogin.com'
+
+TENANT_NAME = os.getenv('AZURE_B2C_TENANT', 'unicefpartners')
+TENANT_B2C_URL = f'{TENANT_NAME}.b2clogin.com'
+
+# TENANT_ID = env('AZURE_B2C_TENANT', default='unicefpartners')
+# TENANT_B2C_URL = f'{TENANT_ID}.b2clogin.com'
 
 
 SCOPE = ['openid', 'email']
