@@ -72,11 +72,10 @@ def user_details(strategy, details, backend, user=None, *args, **kwargs):
 
 
 class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
-    BASE_URL = 'https://{tenant_id}.b2clogin.com/{tenant_id}.onmicrosoft.com'
+    name = 'azuread-b2c-oauth2'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.redirect_uri = settings.FRONTEND_HOST + '/social/complete/azuread-b2c-oauth2/'
+    def get_redirect_uri(self, state=None):
+        return settings.FRONTEND_HOST + '/social/complete/azuread-b2c-oauth2/'
 
     def request_access_token(self, *args, **kwargs):
         try:
