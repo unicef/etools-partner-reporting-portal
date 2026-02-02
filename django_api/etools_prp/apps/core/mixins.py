@@ -72,7 +72,7 @@ def user_details(strategy, details, backend, user=None, *args, **kwargs):
 
 
 class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
-    name = 'azuread-b2c-oauth2'
+    BASE_URL = 'https://{tenant_id}.b2clogin.com/{tenant_id}.onmicrosoft.com'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
