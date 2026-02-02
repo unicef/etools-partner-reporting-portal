@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:44bf51e9d2fc78b51dfd9883706c79b07c471b9abdb9bdad0c6059602681d741"
+content_hash = "sha256:fad323a2bbbd475a7aba7f8a79c470251afd5967a957e01f463c86e02db7c41e"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<3.13"
@@ -1484,6 +1484,22 @@ files = [
 ]
 
 [[package]]
+name = "pyjwt"
+version = "2.10.1"
+extras = ["crypto"]
+requires_python = ">=3.9"
+summary = "JSON Web Token implementation in Python"
+groups = ["default"]
+dependencies = [
+    "PyJWT==2.10.1",
+    "cryptography>=3.4.0",
+]
+files = [
+    {file = "PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb"},
+    {file = "pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953"},
+]
+
+[[package]]
 name = "pyphen"
 version = "0.17.2"
 requires_python = ">=3.9"
@@ -1715,37 +1731,36 @@ files = [
 
 [[package]]
 name = "social-auth-app-django"
-version = "5.4.1"
-requires_python = ">=3.8"
+version = "5.4.3"
+requires_python = ">=3.9"
 summary = "Python Social Authentication, Django integration."
 groups = ["default"]
 dependencies = [
     "Django>=3.2",
-    "social-auth-core>=4.4.1",
+    "social-auth-core~=4.4",
 ]
 files = [
-    {file = "social-auth-app-django-5.4.1.tar.gz", hash = "sha256:2a43cde559dd34fdc7132417b6c52c780fa99ec2332dee9f405b4763f371c367"},
-    {file = "social_auth_app_django-5.4.1-py3-none-any.whl", hash = "sha256:7519f186c63c50f2d364457b236f051338d194bcface55e318a6a705c5213477"},
+    {file = "social_auth_app_django-5.4.3-py3-none-any.whl", hash = "sha256:db70b972faeb10ee1ec83d0dc7dbd0558d5f5830417bba317b712b10ff58d031"},
+    {file = "social_auth_app_django-5.4.3.tar.gz", hash = "sha256:d1f4286d5ca1e512c9b2f686e7ecb2a0128148f1a33d853b69dc07b58508362e"},
 ]
 
 [[package]]
 name = "social-auth-core"
-version = "4.5.4"
-requires_python = ">=3.8"
+version = "4.8.1"
+requires_python = ">=3.10"
 summary = "Python social authentication made simple."
 groups = ["default"]
 dependencies = [
-    "PyJWT>=2.7.0",
-    "cryptography>=1.4",
-    "defusedxml>=0.5.0rc1",
-    "oauthlib>=1.0.3",
-    "python3-openid>=3.0.10",
-    "requests-oauthlib>=0.6.1",
-    "requests>=2.9.1",
+    "PyJWT[crypto]>=2.10.1",
+    "defusedxml>=0.7.1",
+    "oauthlib>=3.3.1",
+    "python3-openid>=3.2.0",
+    "requests-oauthlib>=2.0.0",
+    "requests>=2.32.5",
 ]
 files = [
-    {file = "social-auth-core-4.5.4.tar.gz", hash = "sha256:d3dbeb0999ffd0e68aa4bd73f2ac698a18133fd11b3fc890e1366f18c8889fac"},
-    {file = "social_auth_core-4.5.4-py3-none-any.whl", hash = "sha256:33cf970a623c442376f9d4a86fb187579e4438649daa5b5be993d05e74d7b2db"},
+    {file = "social_auth_core-4.8.1-py3-none-any.whl", hash = "sha256:9fe54f7c7d566465ae34b165bfe1c0d3ba8fa1f7042dc17df5e7dcef8675f3a0"},
+    {file = "social_auth_core-4.8.1.tar.gz", hash = "sha256:6186576eb4e9f25c789d0ce19b942cc668a3a714a246f9e688c0fb93f65bf111"},
 ]
 
 [[package]]
