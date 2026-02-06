@@ -521,7 +521,7 @@ def create_pr_for_report_type(pd, idx, reporting_period):
     if latest_progress_report:
         report_type = latest_progress_report.report_type
         report_number = idx
-        is_final = idx == pd.reporting_periods.filter(report_type=reporting_period.report_type).count() - 1
+        is_final = idx == pd.reporting_periods.filter(report_type=reporting_period.report_type).count()
 
     else:
         report_number = 1
