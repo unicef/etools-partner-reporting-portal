@@ -14,7 +14,7 @@ from admin_extra_buttons.api import button, ExtraButtonsMixin
 from etools_prp.apps.core.api import PMP_API
 from etools_prp.apps.core.common import SR_TYPE
 from etools_prp.apps.core.models import Workspace
-from etools_prp.apps.core.tasks import process_period_reports, process_workspaces
+from etools_prp.apps.core.tasks import _process_pd_reports, process_period_reports, process_workspaces
 from etools_prp.apps.indicator.models import IndicatorLocationData
 from etools_prp.apps.unicef.models import (
     FinalReview,
@@ -27,6 +27,7 @@ from etools_prp.apps.unicef.models import (
     ReportingPeriodDates,
     Section,
 )
+from etools_prp.apps.unicef.sync.process_pd_item import process_pd_item
 from etools_prp.apps.unicef.tasks import process_programme_documents
 
 
@@ -45,14 +46,11 @@ class ProgrammeDocumentAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     ]
     change_list_template = "admin/unicef/change_list.html"
 
-    def _check_superuser_permission(self, request, obj):
-        return request.user.is_superuser
-
     @button(css_class="btn-warning auto-disable")
     def reconcile(self, request, pk):
         return self._reconcile(request, pk, False)
 
-    @button(css_class="btn-error auto-disable", permission=_check_superuser_permission)
+    @button(css_class="btn-error auto-disable")
     def force_reconcile(self, request, pk):
         return self._reconcile(request, pk, True)
 
@@ -153,6 +151,20 @@ class ProgrammeDocumentAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
         messages.add_message(request, messages.INFO, 'Cannot find data in eTools')
         return HttpResponseRedirect(reverse('admin:unicef_programmedocument_change', args=[obj.pk]))
+
+    @button(css_class="btn-error auto-disable")
+    def resync(self, request, pk):
+        pd = self.get_object(request, pk)
+        workspace_code = pd.workspace.business_area_code
+        workspace = Workspace.objects.get(business_area_code=workspace_code)
+
+        api = PMP_API()
+        item = api.programme_documents(
+            business_area_code=workspace_code, id=pd.external_id)['results'].pop()
+
+        if item:
+            process_pd_item(item, workspace)
+            _process_pd_reports(pd)
 
     def get_urls(self):
         urls = super().get_urls()
