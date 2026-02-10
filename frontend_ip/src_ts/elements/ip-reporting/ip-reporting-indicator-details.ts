@@ -20,7 +20,7 @@ import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import {formatIndicatorValue} from '@unicef-polymer/etools-utils/dist/general.util';
+import {formatIndicatorValue} from '../../utils/utils';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
