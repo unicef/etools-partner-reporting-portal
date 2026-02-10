@@ -14,7 +14,7 @@ export const formatIndicatorValue = (indicatorType: string, value: any, percenti
       if (!percentize) {
         return _toPercentage(value);
       }
-      return percentize === 1 ? Math.floor(_value) + '%' : _value + '%';
+      return Math.floor(_value) + '%';
     case 'ratio':
       return _value + '/1';
     default:
