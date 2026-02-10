@@ -27,7 +27,7 @@ import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {buildUrl} from '../../etools-prp-common/utils/util';
-import {formatIndicatorValue} from '@unicef-polymer/etools-utils/dist/general.util';
+import {formatIndicatorValue} from '../../utils/utils';
 
 @customElement('pd-output')
 export class PdOutput extends ProgressReportUtilsMixin(connect(store)(LitElement)) {
