@@ -20,7 +20,7 @@ import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import {formatIndicatorValue} from '../../utils/utils';
+import {displayIndicatorValueFromatted} from '../../utils/utils';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
@@ -134,7 +134,7 @@ export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
                       <dd>
                         ${report.display_type === 'number'
                           ? html`<etools-prp-number value="${report.total.v}"></etools-prp-number>`
-                          : html`${formatIndicatorValue(report.display_type, report.total.c, true)}`}
+                          : html`${displayIndicatorValueFromatted(report.display_type, report.total.c, true)}`}
                       </dd>
                     </dl>
                     <dl>
