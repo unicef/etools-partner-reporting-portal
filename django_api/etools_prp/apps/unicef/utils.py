@@ -51,14 +51,12 @@ def convert_string_values_to_numeric(d):
 indicator_map = {
     "target": {"default": dict([('d', 1), ('v', 0)])},
     "baseline": {"default": dict([('d', 1), ('v', 0)])},
-    "in_need": {"default": None},
-    "total": {"default": dict([('c', 0), ('d', 1), ('v', 0)])}
 }
 
 
 def sanitize_indicator(indicator_item):
     for field, default_dict in indicator_map.items():
-        indicator_dict = getattr(indicator_item, field)
+        indicator_dict = indicator_item.get(field)
 
         # if the field value is not a dict, then update with the default values
         if not isinstance(indicator_dict, dict):
@@ -67,9 +65,9 @@ def sanitize_indicator(indicator_item):
             if indicator_dict is None and default_dict['default'] is None:
                 continue
             else:
-                logger.warning(f'Expected dict on {field} for {indicator_item}, '
+                logger.warning(f'Expected dict on {field} for {indicator_item["id"]}, '
                                f'found {type(indicator_dict)}, updating to default dict values {default_dict["default"]}')
-                setattr(indicator_item, field, default_dict['default'])
+                indicator_item[field] = default_dict['default']
         else:
             # if there are missing keys in structure, update with default
             missing_keys = default_dict['default'].keys() - indicator_dict.keys()
@@ -80,6 +78,8 @@ def sanitize_indicator(indicator_item):
 
             for key, value in indicator_dict.items():
                 if value is None:
+                    logger.warning(f'{value} value found on {indicator_item["id"]}, field: {field}. '
+                                   f'Updating {key} value {value} to number 0')
                     indicator_dict[key] = 0
 
                 # if key is not in structure, remove it, else check for string value
@@ -90,16 +90,18 @@ def sanitize_indicator(indicator_item):
                 elif isinstance(value, str):
                     try:
                         if value == 'None':
+                            logger.warning(f'String {value} found on {indicator_item["id"]}, field: {field}. '
+                                           f'Updating {key} value "{value}" to number 0')
                             indicator_dict[key] = 0
-
-                        numeric = float(value.replace(',', '')) if '.' in value else int(
-                            value.replace(',', ''))
-                        logger.warning(f'String value found on {indicator_item}, field: {field}, {indicator_dict}. '
-                                       f'Updating {key} value "{value}" to number {numeric}')
-                        indicator_dict[key] = numeric
+                        else:
+                            numeric = float(value.replace(',', '')) if '.' in value else int(
+                                value.replace(',', ''))
+                            logger.warning(f'String value found on {indicator_item["id"]}, field: {field}. '
+                                           f'Updating {key} value "{value}" to number {numeric}')
+                            indicator_dict[key] = numeric
 
                     except (ValueError, TypeError):
-                        d = {"item": indicator_item, "field": field, "key": key}
+                        d = {"item": indicator_item["id"], "field": field, "key": key}
                         logger.warning(f'Could not cast value "{value}" to number. Requires manual handling. {d}')
 
-                setattr(indicator_item, field, indicator_dict)
+                indicator_item[field] = indicator_dict

@@ -286,7 +286,7 @@ def item_pd_reference():
                                                  "locally generated reports, if available) - see details in approved RM",
                         "baseline": {
                             "d": 100,
-                            "v": 0
+                            "v": None
                         },
                         "target": {
                             "d": 100,
@@ -336,7 +336,7 @@ def item_pd_reference():
                                                  "expressions of commitment may be in the form of letters, policy documents, etc.)",
                         "baseline": {
                             "d": 100,
-                            "v": 0
+                            "v": "None"
                         },
                         "target": {
                             "d": 100,
