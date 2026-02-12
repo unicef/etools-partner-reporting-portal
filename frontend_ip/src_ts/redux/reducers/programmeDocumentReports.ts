@@ -59,10 +59,32 @@ function reportsByPDReducer(state = {}, action: any) {
     case Constants.UPDATE_PD_REPORT:
       return (function () {
         const change: any = {};
-
         // @ts-ignore
         change[action.pdId] = (state[action.pdId] || []).map(function (report: any) {
           return Number(report.id) === Number(action.reportId) ? Object.assign({}, report, action.data) : report;
+        });
+
+        return Object.assign({}, state, change);
+      })();
+
+    case Constants.UPDATE_PD_REPORT_INDICATOR_TOTAL:
+      return (function () {
+        const change: any = {};
+        // @ts-ignore
+        change[action.pdId] = state[action.pdId].map(function (report: any) {
+          if (Number(report.id) === Number(action.reportId)) {
+            return report;
+          }
+
+          return Object.assign({}, report, {
+            indicator_reports: report.indicator_reports.map(function (indicatorReport: any) {
+              if (Number(indicatorReport.id) !== Number(action.reportId)) {
+                return indicatorReport;
+              }
+
+              return Object.assign({}, indicatorReport, {total: action.data});
+            })
+          });
         });
 
         return Object.assign({}, state, change);

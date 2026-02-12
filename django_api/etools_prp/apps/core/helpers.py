@@ -493,7 +493,7 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
 
 
 @transaction.atomic
-def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
+def create_pr_for_report_type(pd, idx, reporting_period):
     """
     Create ProgressReport instance by its ReportingPeriodDate instance's report type
 
@@ -501,7 +501,6 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
         pd {ProgrammeDocument} -- ProgrammeDocument instance for ProgressReport to generate
         idx {int} -- Integer to denote report number
         reporting_period {ReportingPeriodDates} -- ReportingPeriodDates instance for new ProgressReport
-        generate_from_date {datetime.datetime} -- datetime instance from latest ProgressReport on same report
 
     Returns:
         Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
@@ -522,7 +521,7 @@ def create_pr_for_report_type(pd, idx, reporting_period, generate_from_date):
     if latest_progress_report:
         report_type = latest_progress_report.report_type
         report_number = latest_progress_report.report_number + 1
-        is_final = idx == pd.reporting_periods.filter(report_type=reporting_period.report_type).count() - 1
+        is_final = report_number == pd.reporting_periods.filter(report_type=reporting_period.report_type).count()
 
     else:
         report_number = 1

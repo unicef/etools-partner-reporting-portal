@@ -100,10 +100,13 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             ir_total = max_total_loc.disaggregation['()']
         else:
             for loc_data in ilds:
-                loc_total = loc_data.disaggregation['()']
+                loc_total = loc_data.disaggregation.get('()', ir_total)
 
-                ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
-                ir_total[ValueType.CALCULATED] += loc_total[ValueType.CALCULATED]
+                ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE] \
+                    if ValueType.VALUE in loc_total and loc_total[ValueType.VALUE] else 0
+
+                ir_total[ValueType.CALCULATED] += loc_total[ValueType.CALCULATED] \
+                    if ValueType.CALCULATED in loc_total and loc_total[ValueType.CALCULATED] else 0
 
         if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.AVG \
                 and loc_count > 0:
@@ -174,10 +177,13 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         loc_count = ilds.count()
 
         for loc_data in ilds:
-            loc_total = loc_data.disaggregation['()']
+            loc_total = loc_data.disaggregation.get('()', ir_total)
 
-            ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE]
-            ir_total[ValueType.DENOMINATOR] += loc_total[ValueType.DENOMINATOR]
+            ir_total[ValueType.VALUE] += loc_total[ValueType.VALUE] \
+                if ValueType.VALUE in loc_total and loc_total[ValueType.VALUE] else 0
+
+            ir_total[ValueType.DENOMINATOR] += loc_total[ValueType.DENOMINATOR] \
+                if ValueType.DENOMINATOR in loc_total and loc_total[ValueType.DENOMINATOR] else 0
 
         if loc_count > 0:
             if ir_total[ValueType.DENOMINATOR]:

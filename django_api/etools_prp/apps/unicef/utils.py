@@ -46,3 +46,62 @@ def convert_string_values_to_numeric(d):
         if type(v) is str:
             d[k] = d[k].replace(',', '')
             d[k] = float(d[k]) if '.' in d[k] else int(d[k])
+
+
+indicator_map = {
+    "target": {"default": dict([('d', 1), ('v', 0)])},
+    "baseline": {"default": dict([('d', 1), ('v', 0)])},
+}
+
+
+def sanitize_indicator(indicator_item):
+    for field, default_dict in indicator_map.items():
+        indicator_dict = indicator_item.get(field)
+
+        # if the field value is not a dict, then update with the default values
+        if not isinstance(indicator_dict, dict):
+
+            # handle in_need field null=True, where the default is None so no need to update
+            if indicator_dict is None and default_dict['default'] is None:
+                continue
+            else:
+                logger.warning(f'Expected dict on {field} for {indicator_item["id"]}, '
+                               f'found {type(indicator_dict)}, updating to default dict values {default_dict["default"]}')
+                indicator_item[field] = default_dict['default']
+        else:
+            # if there are missing keys in structure, update with default
+            missing_keys = default_dict['default'].keys() - indicator_dict.keys()
+            if missing_keys:
+                for missing_key in missing_keys:
+                    logger.warning(f'Adding missing key {missing_key}, as default is {default_dict["default"]}')
+                    indicator_dict[missing_key] = default_dict['default'][missing_key]
+
+            for key, value in indicator_dict.items():
+                if value is None:
+                    logger.warning(f'{value} value found on {indicator_item["id"]}, field: {field}. '
+                                   f'Updating {key} value {value} to number 0')
+                    indicator_dict[key] = 0
+
+                # if key is not in structure, remove it, else check for string value
+                if key not in default_dict['default']:
+                    logger.warning(f'Extra key found in structure, removing {key}: {indicator_dict[key]}')
+                    del indicator_dict[key]
+
+                elif isinstance(value, str):
+                    try:
+                        if value == 'None':
+                            logger.warning(f'String {value} found on {indicator_item["id"]}, field: {field}. '
+                                           f'Updating {key} value "{value}" to number 0')
+                            indicator_dict[key] = 0
+                        else:
+                            numeric = float(value.replace(',', '')) if '.' in value else int(
+                                value.replace(',', ''))
+                            logger.warning(f'String value found on {indicator_item["id"]}, field: {field}. '
+                                           f'Updating {key} value "{value}" to number {numeric}')
+                            indicator_dict[key] = numeric
+
+                    except (ValueError, TypeError):
+                        d = {"item": indicator_item["id"], "field": field, "key": key}
+                        logger.warning(f'Could not cast value "{value}" to number. Requires manual handling. {d}')
+
+                indicator_item[field] = indicator_dict
