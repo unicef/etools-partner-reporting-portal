@@ -77,7 +77,7 @@ function reportsByPDReducer(state = {}, action: any) {
           }
 
           return Object.assign({}, report, {
-            indicator_reports: report.indicator_reports.map(function (indicatorReport: any) {
+            indicator_reports: (report.indicator_reports || []).map(function (indicatorReport: any) {
               if (Number(indicatorReport.id) !== Number(action.reportId)) {
                 return indicatorReport;
               }
