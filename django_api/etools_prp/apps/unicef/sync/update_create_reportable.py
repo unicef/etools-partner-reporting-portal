@@ -6,7 +6,7 @@ from etools_prp.apps.indicator.models import Reportable
 from etools_prp.apps.indicator.serializers import PMPReportableSerializer
 from etools_prp.apps.unicef.models import LowerLevelOutput, ProgrammeDocument
 from etools_prp.apps.unicef.sync.utils import process_model
-from etools_prp.apps.unicef.utils import convert_string_values_to_numeric
+from etools_prp.apps.unicef.utils import sanitize_indicator
 
 
 def update_create_reportable(i: dict, blueprint: Blueprint, disaggregations: list, llo: LowerLevelOutput, item: dict, pd: ProgrammeDocument) -> \
@@ -22,8 +22,7 @@ def update_create_reportable(i: dict, blueprint: Blueprint, disaggregations: lis
     i['start_date'] = item['start_date']
     i['end_date'] = item['end_date']
 
-    convert_string_values_to_numeric(i['target'])
-    convert_string_values_to_numeric(i['baseline'])
+    sanitize_indicator(i)
 
     reportable = process_model(
         Reportable,

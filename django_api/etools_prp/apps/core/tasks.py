@@ -199,7 +199,8 @@ def _process_pd_reports(pd):
                 pd, active_reportables, next_progress_report, start_date, end_date, due_date
             )
     # Handling HR reporting periods
-    for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="HR"), start=1):
+    for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="HR").order_by(
+            'start_date'), start=1):
         # If there is no start and/or end date from reporting period, skip!
         if not reporting_period.start_date or not reporting_period.end_date:
             logger.info("No new HR reports to generate: No start & end date pair available.")

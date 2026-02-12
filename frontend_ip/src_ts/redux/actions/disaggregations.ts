@@ -8,13 +8,25 @@ export const disaggregationsSet = function (indicatorId: string, data: any) {
   };
 };
 
+export const disaggregationsUpdateIndicatorProgress = function (pdId: string, reportId: string, data: any) {
+  return {
+    type: Constants.UPDATE_PD_REPORT_INDICATOR_TOTAL,
+    pdId: pdId,
+    reportId: reportId,
+    data: data
+  };
+};
+
 // use instead of App.Actions.Disaggregations
-export const disaggregationsFetch = function (disaggregationsThunk: any, indicatorId: string) {
+export const disaggregationsFetch = function (disaggregationsThunk: any, indicatorId: string, pdId: string) {
   return function (dispatch: any) {
     return disaggregationsThunk.then(function (res: any) {
       const firstItem = res[0];
 
       dispatch(disaggregationsSet(indicatorId, firstItem));
+      if (pdId) {
+        dispatch(disaggregationsUpdateIndicatorProgress(pdId, indicatorId, firstItem.total));
+      }
     });
   };
 };
