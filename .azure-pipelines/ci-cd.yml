@@ -7,6 +7,7 @@ trigger:
       - packages-update
       - gpd-reporting-improvements
       - 289125_update_libs
+      - azure-pipelines
 
   tags:
     include:
