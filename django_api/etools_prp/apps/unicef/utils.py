@@ -1,6 +1,6 @@
 import logging
-import tempfile
 import os
+import tempfile
 
 from django.contrib.auth import get_user_model
 from django.http import StreamingHttpResponse
