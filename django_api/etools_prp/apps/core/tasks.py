@@ -7,7 +7,7 @@ from celery import shared_task
 
 from etools_prp.apps.account.models import User
 from etools_prp.apps.core.api import PMP_API
-from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_STATUS
+from etools_prp.apps.core.common import PD_FREQUENCY_LEVEL, PD_STATUS, PROGRESS_REPORT_STATUS
 from etools_prp.apps.core.helpers import (
     calculate_end_date_given_start_date,
     create_ir_and_ilds_for_pr,
@@ -186,10 +186,12 @@ def _process_pd_reports(pd):
             due_date=reporting_period.due_date,
             report_number=idx,
             report_type=reporting_period.report_type)
+
         # If PR was already generated, check for indicator report and location updates
-        if pr_qs.exists():
-            logger.info("QPR report already exists, checking for updates.")
-            update_ir_and_ilds_for_pr(pr_qs.last(), active_reportables, reporting_period)
+        pr = pr_qs.last()
+        if pr and pr.status != PROGRESS_REPORT_STATUS.accepted and pr.submission_date and pr.review_date:
+            logger.info("QPR report already exists and was not accepted, checking for updates.")
+            update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
         else:
             logger.info("Creating new QPR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
@@ -215,10 +217,12 @@ def _process_pd_reports(pd):
             due_date=reporting_period.due_date,
             report_number=idx,
             report_type=reporting_period.report_type)
+
         # If PR was already generated, check for indicator and location updates
-        if pr_qs.exists():
-            logger.info("HR report already exists, checking for updates.")
-            update_ir_and_ilds_for_pr(pr_qs.last(), active_reportables, reporting_period)
+        pr = pr_qs.last()
+        if pr and pr.status != PROGRESS_REPORT_STATUS.accepted and pr.submission_date:
+            logger.info("HR report already exists and was not accepted, checking for updates.")
+            update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
         else:
             logger.info("Creating new HR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
