@@ -1,7 +1,12 @@
+from datetime import date
 from unittest import TestCase
 from unittest.mock import patch
 
-from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
+from django.db.models import signals
+
+import factory
+
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PROGRESS_REPORT_STATUS
 from etools_prp.apps.core.helpers import (
     generate_data_combination_entries,
     get_cast_dictionary_keys_as_string,
@@ -10,6 +15,7 @@ from etools_prp.apps.core.helpers import (
     get_sorted_ordered_dict_by_keys,
     update_ir_and_ilds_for_pr,
 )
+from etools_prp.apps.core.tasks import _process_pd_reports
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorReport, Reportable
 
@@ -231,6 +237,32 @@ class TestUpdateIRAndILDsForPR(TestCase):
         self.assertEqual(new_ir.time_period_start.strftime("%Y-%m-%d"), self.reporting_period.start_date)
         self.assertEqual(new_ir.time_period_end.strftime("%Y-%m-%d"), self.reporting_period.end_date)
         self.assertEqual(new_ir.due_date.strftime("%Y-%m-%d"), self.reporting_period.due_date)
+
+    @factory.django.mute_signals(signals.pre_save, signals.post_save)
+    def test_process_pd_reports_for_accepted_report_does_not_create_new_ir_ilds(self):
+        update_ir_and_ilds_for_pr(
+            self.progress_report, self.active_reportables, self.reporting_period
+        )
+        self.pd.progress_reports.all().update(
+            status=PROGRESS_REPORT_STATUS.accepted,
+            submission_date=date.today(),
+            review_date=date.today()
+        )
+
+        initial_count = IndicatorReport.objects.count()
+        self.assertEqual(self.pd.reportable_queryset.count(), 3)
+        self.reportable4 = factories.QuantityReportableToLowerLevelOutputFactory(
+            content_object=self.llo,
+            blueprint=factories.QuantityTypeIndicatorBlueprintFactory(
+                unit=IndicatorBlueprint.NUMBER,
+                calculation_formula_across_locations=IndicatorBlueprint.SUM,
+            )
+        )
+        # should not create new indicator reports on existing accepted progress report
+        self.assertEqual(self.pd.reportable_queryset.count(), 4)
+        _process_pd_reports(self.pd)
+        final_count = IndicatorReport.objects.count()
+        self.assertEqual(final_count, initial_count)
 
     def test_update_ir_and_ilds_no_new_reportables(self):
         factories.ProgressReportIndicatorReportFactory(
