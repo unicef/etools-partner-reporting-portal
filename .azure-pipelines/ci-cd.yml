@@ -78,3 +78,61 @@ stages:
         displayName: Update base-312 Alias
 
 
+# Compute content-addressed tag based on:
+# - pdm.lock
+# - Dockerfile-deps
+# - Base image tag
+- stage: InstalledDepsImage
+  displayName: Installed Dependencies Image (PRP) build and push
+  dependsOn: BaseImage
+  variables:
+    BASE_IMAGE_TAG: $[ stageDependencies.BaseImage.Base.outputs['vars.BASE_IMAGE_TAG'] ]
+
+  jobs:
+  - job: InstalledDeps
+    displayName: Build Installed Dependencies Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+
+      - script: |
+          LOCK_HASH=$(md5sum django_api/pdm.lock | cut -c1-6)
+          DOCKERFILE_HASH=$(md5sum django_api/Dockerfile-deps | cut -c1-6)
+          DEPS_IMAGE_TAG="deps-312-${LOCK_HASH}-${DOCKERFILE_HASH}"
+
+          echo "Computed DEPS_IMAGE_TAG=$DEPS_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG;isOutput=true]$DEPS_IMAGE_TAG"
+        name: vars
+        displayName: Compute Deps Image Tag (content-addressed)
+
+      - script: |
+          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(vars.DEPS_IMAGE_TAG) > /dev/null 2>&1; then
+            echo "Deps image exists."
+            echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]true"
+          else
+            echo "Deps image does NOT exist."
+            echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]false"
+          fi
+        displayName: Check if Deps Image Exists
+
+        # Build only if dependencies changed
+      - task: Docker@2
+        displayName: Build and Push Deps Image
+        condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
+        inputs:
+          command: buildAndPush
+          repository: $(DOCKER_BASE_IMAGE)
+          dockerfile: django_api/Dockerfile-deps
+          buildContext: django_api
+          containerRegistry: dockerhub
+          tags: |
+            $(vars.DEPS_IMAGE_TAG)
+
+      - script: |
+          docker pull $(DOCKER_BASE_IMAGE):$(vars.DEPS_IMAGE_TAG)
+          docker tag $(DOCKER_BASE_IMAGE):$(vars.DEPS_IMAGE_TAG) $(DOCKER_BASE_IMAGE):deps-312
+          docker push $(DOCKER_BASE_IMAGE):deps-312
+        condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
+        displayName: Update deps-312 Alias
