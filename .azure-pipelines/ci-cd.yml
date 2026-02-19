@@ -1,0 +1,79 @@
+trigger:
+  branches:
+    include:
+      - develop
+      - staging
+      - master
+      - packages-update
+      - gpd-reporting-improvements
+      - 289125_update_libs
+
+  tags:
+    include:
+      - '*'
+
+pr:
+  branches:
+    include:
+      - '*'
+
+variables:
+  DOCKER_BASE_IMAGE: unicef/etools-prp-base
+  DOCKER_APP_IMAGE: unicef/etools-prp
+
+stages:
+# BaseImage stage builds OS + Python dependencies layer.
+# It is Content-Addressed via pdm.lock + Dockerfile-base hash.
+# (this ensures the base image rebuilds ONLY when dependencies change)
+# AppImage builds on top of this layer and contains only application code.
+# This design avoids reinstalling dependencies on every commit and speeds up CI/CD.
+- stage: BaseImage
+  displayName: Base OS Image (PRP) build and push
+  jobs:
+  - job: Base
+    displayName: Build PRP Base Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+
+      - script: |
+          DOCKERFILE_BASE_HASH=$(md5sum django_api/Dockerfile-base | cut -c1-6)
+          BASE_IMAGE_TAG="base-312-${DOCKERFILE_BASE_HASH}"
+
+          echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=BASE_IMAGE_TAG;isOutput=true]$BASE_IMAGE_TAG"
+        name: vars
+        displayName: Compute Base Image Tag (content-addressed)
+
+      - script: |
+          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) > /dev/null 2>&1; then
+            echo "Base image exists."
+            echo "##vso[task.setvariable variable=BASE_IMAGE_EXISTS]true"
+          else
+            echo "Base image does NOT exist."
+            echo "##vso[task.setvariable variable=BASE_IMAGE_EXISTS]false"
+          fi
+        displayName: Check if Base Image Exists
+
+      - task: Docker@2
+        displayName: Build and Push Base Image
+        condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
+        inputs:
+          command: buildAndPush
+          repository: $(DOCKER_BASE_IMAGE)
+          dockerfile: django_api/Dockerfile-base
+          buildContext: django_api
+          containerRegistry: dockerhub
+          tags: |
+            $(vars.BASE_IMAGE_TAG)
+
+      - script: |
+          docker pull $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG)
+          docker tag $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
+          docker push $(DOCKER_BASE_IMAGE):base-312
+        condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
+        displayName: Update base-312 Alias
+
+
