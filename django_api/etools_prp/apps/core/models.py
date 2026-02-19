@@ -35,7 +35,7 @@ def get_random_color():
 
 class TimeStampedExternalSyncModelMixin(TimeStampedModel):
     """
-    A abstract class that provides external_id field that some models need since
+    An abstract class that provides external_id field that some models need since
     they might have been synced from an external system.
     """
     external_id = models.CharField(
