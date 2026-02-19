@@ -3,7 +3,7 @@ import tempfile
 import os
 
 from django.contrib.auth import get_user_model
-from django.http import FileResponse, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.template.loader import render_to_string
 
 from weasyprint import CSS, HTML
@@ -26,17 +26,14 @@ def render_pdf_to_response(request, template, data):
     
     result = html.write_pdf(stylesheets=[css], font_config=font_config)
 
-    # Create a temporary file that won't be deleted until response is sent
-    # Using delete=False so we can manage the file lifecycle properly
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
     temp_file_path = temp_file.name
     try:
         temp_file.write(result)
         temp_file.flush()
-        temp_file.close()  
+        temp_file.close()
 
         def file_iterator(file_path, chunk_size=8192):
-            """Generator to read file in chunks for streaming."""
             with open(file_path, 'rb') as file_obj:
                 while True:
                     chunk = file_obj.read(chunk_size)
@@ -54,7 +51,7 @@ def render_pdf_to_response(request, template, data):
         )
         response['Content-Disposition'] = f'attachment; filename="{template}.pdf"'
         
-        response['X-Accel-Buffering'] = 'no'  # Nginx
+        response['X-Accel-Buffering'] = 'no'
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
