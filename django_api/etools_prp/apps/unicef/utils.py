@@ -23,7 +23,7 @@ def render_pdf_to_response(request, template, data):
         string=render_to_string(f"{template}.css"),
         font_config=font_config,
     )
-    
+
     result = html.write_pdf(stylesheets=[css], font_config=font_config)
 
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
@@ -44,20 +44,20 @@ def render_pdf_to_response(request, template, data):
                 os.unlink(file_path)
             except OSError:
                 pass
-        
+
         response = StreamingHttpResponse(
             file_iterator(temp_file_path),
             content_type='application/pdf'
         )
         response['Content-Disposition'] = f'attachment; filename="{template}.pdf"'
-        
+
         response['X-Accel-Buffering'] = 'no'
         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response['Pragma'] = 'no-cache'
         response['Expires'] = '0'
-        
+
         return response
-        
+
     except Exception:
         try:
             if not temp_file.closed:
@@ -68,10 +68,8 @@ def render_pdf_to_response(request, template, data):
         raise
 
 
-
-
 def convert_string_values_to_numeric(d):
-    """
+    r"""
     Convert numbers as strings into numeric
     "1500"->1500 "2,000.9"->2000.9  "2.5"->2.5
     :param d: dict
