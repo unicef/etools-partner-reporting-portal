@@ -189,9 +189,10 @@ def _process_pd_reports(pd):
 
         # If PR was already generated, check for indicator report and location updates
         pr = pr_qs.last()
-        if pr and pr.status != PROGRESS_REPORT_STATUS.accepted and pr.submission_date and pr.review_date:
-            logger.info("QPR report already exists and was not accepted, checking for updates.")
-            update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
+        if pr:
+            if pr.status != PROGRESS_REPORT_STATUS.accepted and not pr.submission_date and not pr.review_date:
+                logger.info("QPR report already exists and was not accepted, checking for updates.")
+                update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
         else:
             logger.info("Creating new QPR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
@@ -220,9 +221,10 @@ def _process_pd_reports(pd):
 
         # If PR was already generated, check for indicator and location updates
         pr = pr_qs.last()
-        if pr and pr.status != PROGRESS_REPORT_STATUS.accepted and pr.submission_date:
-            logger.info("HR report already exists and was not accepted, checking for updates.")
-            update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
+        if pr:
+            if pr.status != PROGRESS_REPORT_STATUS.accepted and not pr.submission_date:
+                logger.info("HR report already exists and was not accepted, checking for updates.")
+                update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
         else:
             logger.info("Creating new HR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
