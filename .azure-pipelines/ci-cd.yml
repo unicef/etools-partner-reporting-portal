@@ -45,7 +45,7 @@ stages:
           BASE_IMAGE_TAG="base-312-${DOCKERFILE_BASE_HASH}"
 
           echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
-          echo "##vso[task.setvariable variable=BASE_IMAGE_TAG;isOutput=true]$BASE_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=BASE_IMAGE_TAG]$BASE_IMAGE_TAG"
         name: vars
         displayName: Compute Base Image Tag
 
