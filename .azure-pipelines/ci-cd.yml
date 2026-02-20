@@ -30,6 +30,7 @@ stages:
 # This design avoids reinstalling dependencies on every commit and speeds up CI/CD.
 - stage: BaseImage
   displayName: Base OS Image (PRP) build and push
+
   jobs:
   - job: Base
     displayName: Build PRP Base Image
@@ -46,10 +47,16 @@ stages:
           echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
           echo "##vso[task.setvariable variable=BASE_IMAGE_TAG;isOutput=true]$BASE_IMAGE_TAG"
         name: vars
-        displayName: Compute Base Image Tag (content-addressed)
+        displayName: Compute Base Image Tag
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
 
       - script: |
-          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) > /dev/null 2>&1; then
+          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG) > /dev/null 2>&1; then
             echo "Base image exists."
             echo "##vso[task.setvariable variable=BASE_IMAGE_EXISTS]true"
           else
@@ -68,23 +75,23 @@ stages:
           buildContext: django_api
           containerRegistry: dockerhub
           tags: |
-            $(vars.BASE_IMAGE_TAG)
+            $(BASE_IMAGE_TAG)
 
       - script: |
-          docker pull $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG)
-          docker tag $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
+          docker pull $(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG)
+          docker tag $(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
           docker push $(DOCKER_BASE_IMAGE):base-312
         condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
         displayName: Update base-312 Alias
 
-
 # Compute content-addressed tag based on:
 # - pdm.lock
-# - Dockerfile-deps
+# - Dockerfile-installed
 # - Base image tag
 - stage: InstalledDepsImage
   displayName: Installed Dependencies Image (PRP) build and push
   dependsOn: BaseImage
+
   variables:
     BASE_IMAGE_TAG: $[ stageDependencies.BaseImage.Base.outputs['vars.BASE_IMAGE_TAG'] ]
 
@@ -97,18 +104,25 @@ stages:
     steps:
       - checkout: self
 
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
       - script: |
           LOCK_HASH=$(md5sum django_api/pdm.lock | cut -c1-6)
-          DOCKERFILE_HASH=$(md5sum django_api/Dockerfile-deps | cut -c1-6)
-          DEPS_IMAGE_TAG="deps-312-${LOCK_HASH}-${DOCKERFILE_HASH}"
+          DOCKERFILE_HASH=$(md5sum django_api/Dockerfile-installed | cut -c1-6)
+          BASE_HASH=$(echo $(BASE_IMAGE_TAG) | cut -d'-' -f3)
+
+          DEPS_IMAGE_TAG="deps-312-${BASE_HASH}-${LOCK_HASH}-${DOCKERFILE_HASH}"
 
           echo "Computed DEPS_IMAGE_TAG=$DEPS_IMAGE_TAG"
-          echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG;isOutput=true]$DEPS_IMAGE_TAG"
-        name: vars
-        displayName: Compute Deps Image Tag (content-addressed)
+          echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG]$DEPS_IMAGE_TAG"
+        displayName: Compute Deps Image Tag
 
       - script: |
-          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(vars.DEPS_IMAGE_TAG) > /dev/null 2>&1; then
+          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(DEPS_IMAGE_TAG) > /dev/null 2>&1; then
             echo "Deps image exists."
             echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]true"
           else
@@ -117,22 +131,23 @@ stages:
           fi
         displayName: Check if Deps Image Exists
 
-        # Build only if dependencies changed
       - task: Docker@2
         displayName: Build and Push Deps Image
         condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
         inputs:
           command: buildAndPush
           repository: $(DOCKER_BASE_IMAGE)
-          dockerfile: django_api/Dockerfile-deps
+          dockerfile: django_api/Dockerfile-installed
           buildContext: django_api
           containerRegistry: dockerhub
           tags: |
-            $(vars.DEPS_IMAGE_TAG)
+            $(DEPS_IMAGE_TAG)
+          buildArguments: |
+            BASE_IMAGE=$(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG)
 
       - script: |
-          docker pull $(DOCKER_BASE_IMAGE):$(vars.DEPS_IMAGE_TAG)
-          docker tag $(DOCKER_BASE_IMAGE):$(vars.DEPS_IMAGE_TAG) $(DOCKER_BASE_IMAGE):deps-312
+          docker pull $(DOCKER_BASE_IMAGE):$(DEPS_IMAGE_TAG)
+          docker tag $(DOCKER_BASE_IMAGE):$(DEPS_IMAGE_TAG) $(DOCKER_BASE_IMAGE):deps-312
           docker push $(DOCKER_BASE_IMAGE):deps-312
         condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
         displayName: Update deps-312 Alias
