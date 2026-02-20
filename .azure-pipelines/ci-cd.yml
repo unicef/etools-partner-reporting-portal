@@ -115,9 +115,9 @@ stages:
           DOCKERFILE_HASH=$(md5sum django_api/Dockerfile-installed | cut -c1-6)
           BASE_HASH=$(echo $(BASE_IMAGE_TAG) | cut -d'-' -f3)
 
-          echo 'LOCK_HASH {LOCK_HASH}'
-          echo 'DOCKERFILE_HASH {DOCKERFILE_HASH}'
-          echo 'BASE_HASH {BASE_HASH}'
+          echo 'LOCK_HASH $LOCK_HASH'
+          echo 'DOCKERFILE_HASH $DOCKERFILE_HASH'
+          echo 'BASE_HASH $BASE_HASH'
 
           DEPS_IMAGE_TAG="deps-312-${BASE_HASH}-${LOCK_HASH}-${DOCKERFILE_HASH}"
 
