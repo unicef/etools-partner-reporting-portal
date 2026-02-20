@@ -48,7 +48,7 @@ stages:
           echo "BASE_IMAGE_TAG $BASE_IMAGE_TAG"
 
           echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
-          echo "##vso[task.setvariable variable=BASE_IMAGE_TAG]$BASE_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=BASE_IMAGE_TAG;isOutput=true]$BASE_IMAGE_TAG"          
         name: vars
         displayName: Compute Base Image Tag
 
@@ -59,7 +59,7 @@ stages:
           containerRegistry: dockerhub
 
       - script: |
-          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG) > /dev/null 2>&1; then
+          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) > /dev/null 2>&1; then
             echo "Base image exists."
             echo "##vso[task.setvariable variable=BASE_IMAGE_EXISTS]true"
           else
@@ -78,11 +78,11 @@ stages:
           buildContext: django_api
           containerRegistry: dockerhub
           tags: |
-            $(BASE_IMAGE_TAG)
+            $(vars.BASE_IMAGE_TAG)
 
       - script: |
-          docker pull $(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG)
-          docker tag $(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
+          docker pull $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG)
+          docker tag $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
           docker push $(DOCKER_BASE_IMAGE):base-312
         condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
         displayName: Update base-312 Alias
@@ -129,7 +129,7 @@ stages:
         displayName: Compute Deps Image Tag
 
       - script: |
-          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(DEPS_IMAGE_TAG) > /dev/null 2>&1; then
+          if docker manifest inspect $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) > /dev/null 2>&1; then
             echo "Deps image exists."
             echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]true"
           else
@@ -143,18 +143,18 @@ stages:
         condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
         inputs:
           command: buildAndPush
-          repository: $(DOCKER_BASE_IMAGE)
+          repository: $(DOCKER_APP_IMAGE)
           dockerfile: django_api/Dockerfile-installed
           buildContext: django_api
           containerRegistry: dockerhub
           tags: |
             $(DEPS_IMAGE_TAG)
           buildArguments: |
-            BASE_IMAGE=$(DOCKER_BASE_IMAGE):$(BASE_IMAGE_TAG)
+            BASE_IMAGE=$(DOCKER_APP_IMAGE):$(BASE_IMAGE_TAG)
 
       - script: |
-          docker pull $(DOCKER_BASE_IMAGE):$(DEPS_IMAGE_TAG)
-          docker tag $(DOCKER_BASE_IMAGE):$(DEPS_IMAGE_TAG) $(DOCKER_BASE_IMAGE):deps-312
-          docker push $(DOCKER_BASE_IMAGE):deps-312
+          docker pull $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG)
+          docker tag $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) $(DOCKER_APP_IMAGE):deps-312
+          docker push $(DOCKER_APP_IMAGE):deps-312
         condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
         displayName: Update deps-312 Alias
