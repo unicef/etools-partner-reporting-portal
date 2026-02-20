@@ -44,6 +44,9 @@ stages:
           DOCKERFILE_BASE_HASH=$(md5sum django_api/Dockerfile-base | cut -c1-6)
           BASE_IMAGE_TAG="base-312-${DOCKERFILE_BASE_HASH}"
 
+          echo "DOCKERFILE_BASE_HASH $DOCKERFILE_BASE_HASH"
+          echo "BASE_IMAGE_TAG $BASE_IMAGE_TAG"
+
           echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
           echo "##vso[task.setvariable variable=BASE_IMAGE_TAG]$BASE_IMAGE_TAG"
         name: vars
