@@ -21,6 +21,7 @@ pr:
 variables:
   DOCKER_BASE_IMAGE: unicef/etools-prp-base
   DOCKER_APP_IMAGE: unicef/etools-prp
+  DOCKER_UI_IMAGE: unicef/etools-prp-polymer
 
 stages:
 # BaseImage stage builds OS + Python dependencies layer.
@@ -363,7 +364,7 @@ stages:
         displayName: Build frontend image
         inputs:
           command: build
-          repository: unicef/etools-prp-polymer
+          repository: $(DOCKER_UI_IMAGE)
           dockerfile: frontend_ip/Dockerfile-bundle
           buildContext: frontend_ip
           containerRegistry: dockerhub
@@ -376,9 +377,96 @@ stages:
         displayName: Push frontend image
         inputs:
           command: push
-          repository: unicef/etools-prp-polymer
+          repository: $(DOCKER_UI_IMAGE)
           containerRegistry: dockerhub
           tags: |
             $(sanitize.SAFE_BRANCH)
             $(sanitize.BRANCH_DATE_TAG)
             $(Build.SourceVersion)
+
+- stage: DeployDevelop
+  displayName: Deploy to Develop (Rancher)
+  dependsOn: AppImage
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines')
+    )
+
+  variables:
+    - group: rke-cluster-prp
+    - name: DEV_APP_DEPLOYMENTS
+      value: |
+        api-prp-dev
+        beater-prp-dev
+        worker-prp-dev
+    - name: DEV_UI_DEPLOYMENTS
+      value: |
+        polymer3-prp-dev
+
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to develop
+      environment: dev
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+              - task: KubectlInstaller@0
+                displayName: Install kubectl
+                inputs:
+                  kubectlVersion: 'v1.16.2'
+
+              - script: |
+                  mkdir -p ~/.kube
+                  echo "$(KUBECONFIG_B64)" | base64 -d > ~/.kube/config
+                  chmod 600 ~/.kube/config
+                  kubectl config use-context rke-cluster-prp
+                displayName: Configure kubeconfig
+
+              - script: |
+                  echo "$(DEV_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-dev \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_APP_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Backend applications
+
+              - script: |
+                  echo "$(DEV_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-dev \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for Backend pods to start
+
+              - script: |
+                  echo "$(DEV_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-dev \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_UI_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Frontend applications
+
+              - script: |
+                  echo "$(DEV_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-dev \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for UI pods to start
