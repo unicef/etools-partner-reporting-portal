@@ -224,6 +224,7 @@ stages:
               python manage.py test
             "
         displayName: Run tests
+        timeoutInMinutes: 30
 
       - script: |
           docker rm -f postgres redis
@@ -239,8 +240,9 @@ stages:
   #     ne(variables['Build.Reason'], 'PullRequest')
   #   )
 
-  # dependsOn: InstalledDepsImage
-  dependsOn: Test
+  dependsOn: 
+  - InstalledDepsImage
+  - Test
   variables:
     DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
 
