@@ -483,7 +483,7 @@ stages:
   condition: |
     and(
       succeeded(),
-      eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines')
+      eq(variables['Build.SourceBranch'], 'refs/heads/staging')
     )
 
   variables:
@@ -559,6 +559,97 @@ stages:
                       echo "Waiting rollout for $APP..."
                       kubectl rollout status deployment/$APP \
                         -n prp-staging \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for UI pods to start
+
+- stage: DeployProd
+  displayName: Deploy to Prod (Rancher)
+  dependsOn:
+  - AppImage
+  - FrontendImage
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    )
+
+  variables:
+    - group: rke-cluster-prp
+    - name: PROD_APP_DEPLOYMENTS
+      value: |
+        api-prp-prod
+        beater-prp-prod
+        worker-prp-prod
+    - name: PROD_UI_DEPLOYMENTS
+      value: |
+        polymer3-prp-prod
+
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to production
+      environment: prod
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+              - task: KubectlInstaller@0
+                displayName: Install kubectl
+                inputs:
+                  kubectlVersion: 'v1.16.2'
+
+              - script: |
+                  mkdir -p ~/.kube
+                  echo "$(KUBECONFIG_B64)" | base64 -d > ~/.kube/config
+                  chmod 600 ~/.kube/config
+                  kubectl config use-context rke-cluster-prp
+                displayName: Configure kubeconfig
+
+              # Deploy sanitized tag (SAFE_BRANCH). For tag-triggered runs, SAFE_BRANCH == sanitized Git tag
+              - script: |
+                  echo "$(PROD_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-prod \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_APP_IMAGE):$(SAFE_BRANCH)
+                    fi
+                  done
+                displayName: Deploy Backend applications
+
+              - script: |
+                  echo "$(PROD_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-prod \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for Backend pods to start
+
+              # Deploy sanitized tag (SAFE_BRANCH). For tag-triggered runs, SAFE_BRANCH == sanitized Git tag
+              - script: |
+                  echo "$(PROD_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-prod \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_UI_IMAGE):$(SAFE_BRANCH)
+                    fi
+                  done
+                displayName: Deploy Frontend applications
+
+              - script: |
+                  echo "$(PROD_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-prod \
                         --timeout=300s
                     fi
                   done
