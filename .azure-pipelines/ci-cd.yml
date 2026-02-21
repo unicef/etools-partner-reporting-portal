@@ -561,18 +561,20 @@ stages:
                 displayName: Wait for UI pods to start
 
 - stage: DeployProd
-  displayName: Deploy to Prod (Rancher)
+  displayName: Deploy to Production (Rancher)
   dependsOn:
   - AppImage
   - FrontendImage
   condition: |
     and(
       succeeded(),
-      eq(variables['Build.SourceBranch'], 'refs/heads/master')
+      startsWith(variables['Build.SourceBranch'], 'refs/tags/')
     )
 
   variables:
     - group: rke-cluster-prp
+    - name: SAFE_BRANCH
+      value: $[ stageDependencies.AppImage.BuildApp.outputs['sanitize.SAFE_BRANCH'] ]
     - name: PROD_APP_DEPLOYMENTS
       value: |
         api-prp-prod
