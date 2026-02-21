@@ -302,3 +302,83 @@ stages:
             $(sanitize.SAFE_BRANCH)
             $(sanitize.BRANCH_DATE_TAG)
             $(Build.SourceVersion)
+
+- stage: FrontendImage
+  displayName: Build Frontend Image
+  dependsOn: Test
+
+  # condition: |
+  #   and(
+  #     succeeded(),
+  #     ne(variables['Build.Reason'], 'PullRequest')
+  #   )
+
+  jobs:
+  - job: BuildFrontend
+    displayName: Build and Push Frontend Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+        submodules: true
+        fetchDepth: 0
+
+      # SAFE_BRANCH is derived from Build.SourceBranchName.
+      # - On branch builds: it is the branch name (sanitized)
+      # - On tag builds: it is the *tag name* (sanitized)
+      # SAFE_BRANCH is used everywhere, so we NEVER use Build.SourceBranchName directly to avoid invalid Docker tags
+      - script: |
+          SAFE_BRANCH=$(echo "$(Build.SourceBranchName)" \
+            | tr '/' '-' \
+            | tr -cd 'a-zA-Z0-9._-')
+          BUILD_DATE=$(date -u +%Y%m%d)
+          BRANCH_DATE_TAG="${SAFE_BRANCH}${BUILD_DATE}"
+          echo "##vso[task.setvariable variable=SAFE_BRANCH;isOutput=true]$SAFE_BRANCH"
+          echo "##vso[task.setvariable variable=BRANCH_DATE_TAG;isOutput=true]$BRANCH_DATE_TAG"
+        name: sanitize
+        displayName: Sanitize branch name
+
+      - script: |
+          cd frontend_ip
+
+          REVNO=$(Build.SourceVersion)
+          BUILDDATE=$(date -u +%F_%T)
+
+          sed -i "0,/revNo/s//$REVNO/" package.json
+          sed -i "0,/revNo/s//$REVNO/" version.json
+          sed -i "0,/revNo/s//$REVNO/" index.html
+          sed -i "0,/bDate/s//$BUILDDATE/" package.json
+          sed -i "0,/bDate/s//$BUILDDATE/" version.json
+          sed -i "0,/bDate/s//$BUILDDATE/" index.html
+        displayName: Inject build metadata
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - task: Docker@2
+        displayName: Build frontend image
+        inputs:
+          command: build
+          repository: unicef/etools-prp-polymer
+          dockerfile: frontend_ip/Dockerfile-bundle
+          buildContext: frontend_ip
+          containerRegistry: dockerhub
+          tags: |
+            $(SAFE_BRANCH)
+            $(BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
+
+      - task: Docker@2
+        displayName: Push frontend image
+        inputs:
+          command: push
+          repository: unicef/etools-prp-polymer
+          containerRegistry: dockerhub
+          tags: |
+            $(SAFE_BRANCH)
+            $(BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
