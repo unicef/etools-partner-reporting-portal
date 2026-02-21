@@ -114,7 +114,6 @@ stages:
           LOCK_HASH=$(md5sum django_api/pdm.lock | cut -c1-6)
           DOCKERFILE_HASH=$(md5sum django_api/Dockerfile-installed | cut -c1-6)
           BASE_HASH=$(echo $(BASE_IMAGE_TAG) | cut -d'-' -f3)
-
           echo "LOCK_HASH $LOCK_HASH"
           echo "DOCKERFILE_HASH $DOCKERFILE_HASH"
           echo "BASE_HASH $BASE_HASH"
@@ -122,7 +121,8 @@ stages:
           DEPS_IMAGE_TAG="deps-312-${BASE_HASH}-${LOCK_HASH}-${DOCKERFILE_HASH}"
 
           echo "Computed DEPS_IMAGE_TAG=$DEPS_IMAGE_TAG"
-          echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG]$DEPS_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG;isOutput=true]$DEPS_IMAGE_TAG"
+        name: computeDeps
         displayName: Compute Deps Image Tag
 
       - script: |
@@ -165,7 +165,7 @@ stages:
   #   )
 
   variables:
-    BASE_IMAGE_TAG: $[ stageDependencies.BaseImage.Base.outputs['vars.BASE_IMAGE_TAG'] ]
+    DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['computeDeps.DEPS_IMAGE_TAG'] ]
 
   jobs:
   - job: Tests
