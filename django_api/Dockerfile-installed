@@ -27,5 +27,7 @@ RUN touch /data/django_api/logs/django.log
 
 RUN chmod -R a+rw /data
 
+RUN apk add curl
+
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code/
