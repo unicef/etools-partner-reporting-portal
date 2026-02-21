@@ -122,11 +122,11 @@ stages:
 
           echo "Computed DEPS_IMAGE_TAG=$DEPS_IMAGE_TAG"
           echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG;isOutput=true]$DEPS_IMAGE_TAG"
-        name: computeDeps
+        name: vars
         displayName: Compute Deps Image Tag
 
       - script: |
-          if docker manifest inspect $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) > /dev/null 2>&1; then
+          if docker manifest inspect $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG) > /dev/null 2>&1; then
             echo "Deps image exists."
             echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]true"
           else
@@ -145,11 +145,11 @@ stages:
           buildContext: django_api
           containerRegistry: dockerhub
           tags: |
-            $(DEPS_IMAGE_TAG)
+            $(vars.DEPS_IMAGE_TAG)
 
       - script: |
-          docker pull $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG)
-          docker tag $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) $(DOCKER_APP_IMAGE):deps-312
+          docker pull $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG)
+          docker tag $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG) $(DOCKER_APP_IMAGE):deps-312
           docker push $(DOCKER_APP_IMAGE):deps-312
         condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
         displayName: Update deps-312 Alias
@@ -165,7 +165,7 @@ stages:
   #   )
 
   variables:
-    DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['computeDeps.DEPS_IMAGE_TAG'] ]
+    DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
 
   jobs:
   - job: Tests
