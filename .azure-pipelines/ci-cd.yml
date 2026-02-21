@@ -229,3 +229,73 @@ stages:
           docker rm -f postgres redis
         condition: always()
         displayName: Cleanup
+
+- stage: AppImage
+  displayName: Build Application Image
+
+  # condition: |
+  #   and(
+  #     succeeded(),
+  #     ne(variables['Build.Reason'], 'PullRequest')
+  #   )
+
+  dependsOn: BaseImage
+  variables:
+    DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
+
+  jobs:
+  - job: BuildApp
+    displayName: Build and Push Final Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 0
+
+      # SAFE_BRANCH is derived from Build.SourceBranchName.
+      # - On branch builds: it is the branch name (sanitized)
+      # - On tag builds: it is the *tag name* (sanitized)
+      # SAFE_BRANCH is used everywhere, so we NEVER use Build.SourceBranchName directly to avoid invalid Docker tags
+      - script: |
+          SAFE_BRANCH=$(echo "$(Build.SourceBranchName)" \
+            | tr '/' '-' \
+            | tr -cd 'a-zA-Z0-9._-')
+          BUILD_DATE=$(date -u +%Y%m%d)
+          BRANCH_DATE_TAG="${SAFE_BRANCH}${BUILD_DATE}"
+          echo "##vso[task.setvariable variable=SAFE_BRANCH;isOutput=true]$SAFE_BRANCH"
+          echo "##vso[task.setvariable variable=BRANCH_DATE_TAG;isOutput=true]$BRANCH_DATE_TAG"
+        name: sanitize
+        displayName: Sanitize branch name
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - task: Docker@2
+        displayName: Build image
+        inputs:
+          command: build
+          repository: $(DOCKER_APP_IMAGE)
+          dockerfile: django_api/Dockerfile
+          buildContext: django_api
+          containerRegistry: dockerhub
+          arguments: |
+            --build-arg BASE_TAG=$(DEPS_IMAGE_TAG)
+          tags: |
+            $(sanitize.SAFE_BRANCH)
+            $(sanitize.BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
+
+      - task: Docker@2
+        displayName: Push image
+        inputs:
+          command: push
+          repository: $(DOCKER_APP_IMAGE)
+          containerRegistry: dockerhub
+          tags: |
+            $(sanitize.SAFE_BRANCH)
+            $(sanitize.BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
