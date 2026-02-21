@@ -4,10 +4,6 @@ trigger:
       - develop
       - staging
       - master
-      - packages-update
-      - gpd-reporting-improvements
-      - 289125_update_libs
-      - azure-pipelines
 
   tags:
     include:
@@ -159,11 +155,11 @@ stages:
   displayName: Run Backend Tests
   dependsOn: InstalledDepsImage
 
-  # condition: |
-  #   and(
-  #     succeeded(),
-  #     eq(variables['Build.Reason'], 'PullRequest')
-  #   )
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.Reason'], 'PullRequest')
+    )
 
   variables:
     DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
@@ -176,70 +172,70 @@ stages:
     steps:
       - checkout: self
 
-      # - task: Docker@2
-      #   displayName: Login to DockerHub
-      #   inputs:
-      #     command: login
-      #     containerRegistry: dockerhub
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
 
-      # - script: |
-      #     docker run -d \
-      #       --name postgres \
-      #       -e POSTGRES_USER=postgres \
-      #       -e POSTGRES_PASSWORD=postgres \
-      #       -e POSTGRES_DB=test_prp \
-      #       -p 5432:5432 \
-      #       cimg/postgres:12.9-postgis
-      #   displayName: Start Postgres
+      - script: |
+          docker run -d \
+            --name postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=test_prp \
+            -p 5432:5432 \
+            cimg/postgres:12.9-postgis
+        displayName: Start Postgres
 
-      # - script: |
-      #     docker run -d \
-      #       --name redis \
-      #       -p 6379:6379 \
-      #       cimg/redis:6.2
-      #   displayName: Start Redis
+      - script: |
+          docker run -d \
+            --name redis \
+            -p 6379:6379 \
+            cimg/redis:6.2
+        displayName: Start Redis
 
-      # - script: |
-      #     until docker exec postgres pg_isready -U postgres; do
-      #       echo "Waiting for postgres..."
-      #       sleep 2
-      #     done
-      #   displayName: Wait for Postgres
+      - script: |
+          until docker exec postgres pg_isready -U postgres; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+        displayName: Wait for Postgres
 
-      # - script: |
-      #     docker run --rm \
-      #       --network host \
-      #       -e POSTGRES_HOST=127.0.0.1 \
-      #       -e POSTGRES_DB=test_prp \
-      #       -e POSTGRES_USER=postgres \
-      #       -e POSTGRES_PASSWORD=postgres \
-      #       -e REDIS_URL=redis://127.0.0.1:6379/0 \
-      #       -e ENV=dev \
-      #       -v $(Build.SourcesDirectory):/code \
-      #       -w /code/django_api \
-      #       $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) \
-      #       bash -c "
-      #         pdm sync --dev &&
-      #         flake8 etools_prp &&
-      #         isort . --check-only &&
-      #         python manage.py test
-      #       "
-      #   displayName: Run tests
-      #   timeoutInMinutes: 30
+      - script: |
+          docker run --rm \
+            --network host \
+            -e POSTGRES_HOST=127.0.0.1 \
+            -e POSTGRES_DB=test_prp \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e REDIS_URL=redis://127.0.0.1:6379/0 \
+            -e ENV=dev \
+            -v $(Build.SourcesDirectory):/code \
+            -w /code/django_api \
+            $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) \
+            bash -c "
+              pdm sync --dev &&
+              flake8 etools_prp &&
+              isort . --check-only &&
+              python manage.py test
+            "
+        displayName: Run tests
+        timeoutInMinutes: 30
 
-      # - script: |
-      #     docker rm -f postgres redis
-      #   condition: always()
-      #   displayName: Cleanup
+      - script: |
+          docker rm -f postgres redis
+        condition: always()
+        displayName: Cleanup
 
 - stage: AppImage
   displayName: Build Application Image
 
-  # condition: |
-  #   and(
-  #     succeeded(),
-  #     ne(variables['Build.Reason'], 'PullRequest')
-  #   )
+  condition: |
+    and(
+      succeeded(),
+      ne(variables['Build.Reason'], 'PullRequest')
+    )
 
   dependsOn: 
   - InstalledDepsImage
@@ -310,11 +306,11 @@ stages:
   - InstalledDepsImage
   - Test
 
-  # condition: |
-  #   and(
-  #     succeeded(),
-  #     ne(variables['Build.Reason'], 'PullRequest')
-  #   )
+  condition: |
+    and(
+      succeeded(),
+      ne(variables['Build.Reason'], 'PullRequest')
+    )
 
   jobs:
   - job: BuildFrontend
