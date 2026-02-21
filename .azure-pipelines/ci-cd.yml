@@ -386,7 +386,9 @@ stages:
 
 - stage: DeployDevelop
   displayName: Deploy to Develop (Rancher)
-  dependsOn: AppImage
+  dependsOn:
+  - AppImage
+  - FrontendImage
   condition: |
     and(
       succeeded(),
