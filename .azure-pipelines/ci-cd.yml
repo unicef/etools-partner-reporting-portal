@@ -306,7 +306,9 @@ stages:
 
 - stage: FrontendImage
   displayName: Build Frontend Image
-  dependsOn: Test
+  dependsOn: 
+  - InstalledDepsImage
+  - Test
 
   # condition: |
   #   and(
@@ -392,7 +394,7 @@ stages:
   condition: |
     and(
       succeeded(),
-      eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines')
+      eq(variables['Build.SourceBranch'], 'refs/heads/develop')
     )
 
   variables:
@@ -468,6 +470,95 @@ stages:
                       echo "Waiting rollout for $APP..."
                       kubectl rollout status deployment/$APP \
                         -n prp-dev \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for UI pods to start
+
+- stage: DeployStaging
+  displayName: Deploy to Staging (Rancher)
+  dependsOn:
+  - AppImage
+  - FrontendImage
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines')
+    )
+
+  variables:
+    - group: rke-cluster-prp
+    - name: STAGING_APP_DEPLOYMENTS
+      value: |
+        api-prp-stg
+        beater-prp-stg
+        worker-prp-stg
+    - name: STAGING_UI_DEPLOYMENTS
+      value: |
+        polymer3-prp-stg
+
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to staging
+      environment: staging
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+              - task: KubectlInstaller@0
+                displayName: Install kubectl
+                inputs:
+                  kubectlVersion: 'v1.16.2'
+
+              - script: |
+                  mkdir -p ~/.kube
+                  echo "$(KUBECONFIG_B64)" | base64 -d > ~/.kube/config
+                  chmod 600 ~/.kube/config
+                  kubectl config use-context rke-cluster-prp
+                displayName: Configure kubeconfig
+
+              - script: |
+                  echo "$(STAGING_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-staging \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_APP_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Backend applications
+
+              - script: |
+                  echo "$(STAGING_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-staging \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for Backend pods to start
+
+              - script: |
+                  echo "$(STAGING_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-staging \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_UI_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Frontend applications
+
+              - script: |
+                  echo "$(STAGING_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-staging \
                         --timeout=300s
                     fi
                   done
