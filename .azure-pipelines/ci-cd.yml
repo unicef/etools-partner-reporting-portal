@@ -303,7 +303,6 @@ stages:
 - stage: FrontendImage
   displayName: Build Frontend Image
   dependsOn: 
-  - InstalledDepsImage
   - Test
 
   condition: |
