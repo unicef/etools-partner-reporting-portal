@@ -1,5 +1,8 @@
 from typing import List, Optional, Sequence, Tuple, Union
 
+from reportlab.lib.units import cm
+from reportlab.platypus import Table
+
 from etools_prp.apps.pdf_reports.styles import (
     LANDSCAPE_AVAILABLE_WIDTH_CM,
     header_cell_commands,
@@ -7,8 +10,6 @@ from etools_prp.apps.pdf_reports.styles import (
     subsection_cell_commands,
     table_style_with_overrides,
 )
-from reportlab.lib.units import cm
-from reportlab.platypus import Table
 
 
 def col_widths_equal(num_cols: int, total_width_cm: float = LANDSCAPE_AVAILABLE_WIDTH_CM) -> List[float]:
