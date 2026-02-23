@@ -47,7 +47,7 @@ dependencies = [
     "python-social-auth<=0.3.6",
     "pyrestcli<=0.6.11",
     "requests>=2.31.0",
-    "sentry-sdk==1.27.0",
+    "sentry-sdk==2.53",
     "social-auth-app-django>=5.4.0",
     "social-auth-core>=4.5.0",
     "unicef-notification>=1.4.1",
