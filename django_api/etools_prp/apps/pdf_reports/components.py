@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional, Sequence, Tuple, Union
 
-from reportlab.lib.units import cm
-from reportlab.platypus import Flowable, Paragraph, Spacer, Table
+from reportlab.platypus import Flowable, Paragraph, Spacer
 
 from etools_prp.apps.pdf_reports.styles import PARAGRAPH_STYLES
 from etools_prp.apps.pdf_reports.tables import create_platypus_table

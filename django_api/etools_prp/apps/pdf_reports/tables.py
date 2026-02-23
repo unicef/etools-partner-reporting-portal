@@ -1,8 +1,7 @@
 from typing import List, Optional, Sequence, Tuple, Union
 
-from reportlab.lib import colors
 from reportlab.lib.units import cm
-from reportlab.platypus import Table, TableStyle
+from reportlab.platypus import Table
 
 from etools_prp.apps.pdf_reports.styles import (
     header_cell_commands,

@@ -3,9 +3,9 @@ from typing import List, Optional, Union
 
 from django.http import HttpResponse, StreamingHttpResponse
 
-from reportlab.lib.pagesizes import A4, landscape  # noqa: F401 - landscape used in __init__
+from reportlab.lib.pagesizes import A4  # noqa: F401 - landscape used in __init__
 from reportlab.lib.units import cm
-from reportlab.platypus import BaseDocTemplate, Flowable, PageTemplate, SimpleDocTemplate
+from reportlab.platypus import Flowable, SimpleDocTemplate
 
 from etools_prp.apps.pdf_reports.components import BaseComponent
 from etools_prp.apps.pdf_reports.styles import DEFAULT_MARGIN_CM, PAGE_LANDSCAPE_A4, register_fonts
