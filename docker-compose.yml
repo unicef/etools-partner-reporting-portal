@@ -23,6 +23,8 @@ services:
     image: unicef/etools-prp:local
     env_file:
       - .env
+    environment:
+      PYTHONPATH: /code/__pypackages__/3.12/lib:/etools/__pypackages__/3.12/lib
     build:
       context: ./django_api
       dockerfile: ./Dockerfile-local

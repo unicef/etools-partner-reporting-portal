@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import warnings
 
 import environ
 import sentry_sdk
@@ -12,6 +13,13 @@ from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from etools_prp.apps.core.patches import apply_drfpasswordless_patch
+
+# Suppress invalid escape sequence warnings from third-party packages (carto, drfpasswordless)
+warnings.filterwarnings(
+    "ignore",
+    message=r"invalid escape sequence",
+    category=SyntaxWarning,
+)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Apply patches for third-party package compatibility

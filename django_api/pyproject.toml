@@ -57,6 +57,7 @@ dependencies = [
     "pydyf<0.11.0",
     "pypdf>=3.0.0",
     "reportlab>=4.4.10",
+    "setuptools>=82.0.0",
 ]
 
 [project.optional-dependencies]

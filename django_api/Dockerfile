@@ -9,6 +9,7 @@ ADD . /code/
 WORKDIR /code/
 RUN apk add bash
 
+
 ENV PYTHONUNBUFFERED 1
 
 RUN python manage.py collectstatic --noinput

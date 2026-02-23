@@ -38,6 +38,8 @@ RUN pip install --no-cache-dir --upgrade \
     pip \
     pdm
 
+RUN pip install reportlab
+
 # End Dockerfile base
 
 # Dockerfile-installed
@@ -54,6 +56,7 @@ RUN apk add --no-cache --virtual --update \
 
 WORKDIR /etools/
 ADD .pdm-python .
+
 ADD pdm.lock .
 ADD pyproject.toml .
 RUN pdm sync
