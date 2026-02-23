@@ -6,9 +6,9 @@ from reportlab.platypus import Table
 from etools_prp.apps.pdf_reports.styles import (
     LANDSCAPE_AVAILABLE_WIDTH_CM,
     header_cell_commands,
+    section_cell_commands,
     subsection_cell_commands,
     table_style_with_overrides,
-    section_cell_commands,
 )
 
 
