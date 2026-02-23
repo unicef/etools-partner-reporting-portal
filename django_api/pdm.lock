@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:e1b7b61e9f2b0377b3f3cb4b3d2d81a311fb69a5d23b6c29f79dc4de1303c0a3"
+content_hash = "sha256:90f5217e6b7ba619cfc6737e5711d9467aebf7110e8f14432db1d93372d86d2e"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<3.13"
@@ -1694,17 +1694,18 @@ files = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.53.0"
-requires_python = ">=3.6"
+version = "1.27.0"
 summary = "Python client for Sentry (https://sentry.io)"
 groups = ["default"]
 dependencies = [
     "certifi",
-    "urllib3>=1.26.11",
+    "urllib3>=1.25.7; python_version <= \"3.4\"",
+    "urllib3>=1.26.11; python_version >= \"3.6\"",
+    "urllib3>=1.26.9; python_version == \"3.5\"",
 ]
 files = [
-    {file = "sentry_sdk-2.53.0-py2.py3-none-any.whl", hash = "sha256:46e1ed8d84355ae54406c924f6b290c3d61f4048625989a723fd622aab838899"},
-    {file = "sentry_sdk-2.53.0.tar.gz", hash = "sha256:6520ef2c4acd823f28efc55e43eb6ce2e6d9f954a95a3aa96b6fd14871e92b77"},
+    {file = "sentry-sdk-1.27.0.tar.gz", hash = "sha256:eb2a5080912dc9b397925657669e3761d95d62c8aa4c0c6d6a73d5a31edaafe9"},
+    {file = "sentry_sdk-1.27.0-py2.py3-none-any.whl", hash = "sha256:8c0ba7a0ed4e39635d335fdac7c00840b14ce4319bb8629b934243d6306fee7d"},
 ]
 
 [[package]]
