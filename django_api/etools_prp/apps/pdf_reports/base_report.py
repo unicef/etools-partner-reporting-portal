@@ -8,11 +8,7 @@ from reportlab.lib.units import cm
 from reportlab.platypus import Flowable, SimpleDocTemplate
 
 from etools_prp.apps.pdf_reports.components import BaseComponent
-from etools_prp.apps.pdf_reports.styles import (
-    DEFAULT_MARGIN_CM,
-    PAGE_LANDSCAPE_A4,
-    register_fonts,
-)
+from etools_prp.apps.pdf_reports.styles import DEFAULT_MARGIN_CM, PAGE_LANDSCAPE_A4, register_fonts
 
 
 class BaseReport:
