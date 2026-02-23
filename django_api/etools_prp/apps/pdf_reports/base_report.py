@@ -14,6 +14,7 @@ from etools_prp.apps.pdf_reports.styles import (
     register_fonts,
 )
 
+
 class BaseReport:
     filename: str = "report.pdf"
     pagesize = PAGE_LANDSCAPE_A4
