@@ -55,12 +55,12 @@ jobs:
           command: |
             export PYTHONHASHSEED=${RANDOM}
             export ENV=dev
-            export PYTHONPATH=/etools/__pypackages__/3.12/lib
             cd django_api/
-            # Install dev dependencies for testing (flake8, isort, etc.)
+            # Install all dependencies (including dev) from the current lock file
             pdm sync --dev
-            # Add PDM bin directory to PATH for dev tools
-            export PATH=/etools/__pypackages__/3.12/bin:$PATH
+            # Use the freshly-synced local packages, not the Docker image's stale copy
+            export PYTHONPATH=$(pwd)/__pypackages__/3.12/lib
+            export PATH=$(pwd)/__pypackages__/3.12/bin:$PATH
             flake8 etools_prp
             isort . --check-only
             python manage.py test
