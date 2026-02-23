@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'etools_prp.apps.unicef',
     'etools_prp.apps.ocha',
     'etools_prp.apps.id_management',
+    'etools_prp.apps.pdf_reports',
     'post_office',
     'unicef_notification',
     'django_extensions',

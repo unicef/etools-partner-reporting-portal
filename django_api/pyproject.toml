@@ -55,6 +55,8 @@ dependencies = [
     "uWSGI>=2.0.24",
     "weasyprint~=61.0",
     "pydyf<0.11.0",
+    "pypdf>=3.0.0",
+    "reportlab>=4.0.0",
 ]
 
 [project.optional-dependencies]
