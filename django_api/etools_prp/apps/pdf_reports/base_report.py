@@ -2,9 +2,9 @@ from io import BytesIO
 from typing import List, Optional, Union
 
 from django.http import HttpResponse, StreamingHttpResponse
-from reportlab.lib.pagesizes import A4, landscape  # noqa: F401 - landscape used in __init__
+from reportlab.lib.pagesizes import A4, landscape as landscape_pagesize
 from reportlab.lib.units import cm
-from reportlab.platypus import BaseDocTemplate, Flowable, PageTemplate, SimpleDocTemplate
+from reportlab.platypus import Flowable, SimpleDocTemplate
 
 from etools_prp.apps.pdf_reports.components import BaseComponent
 from etools_prp.apps.pdf_reports.styles import (
@@ -38,7 +38,7 @@ class BaseReport:
         if landscape is not None:
             self.landscape = landscape
         if self.landscape and self.pagesize == A4:
-            self.pagesize = landscape(A4)
+            self.pagesize = landscape_pagesize(A4)
         if logo_path is not None:
             self.logo_path = logo_path
 
