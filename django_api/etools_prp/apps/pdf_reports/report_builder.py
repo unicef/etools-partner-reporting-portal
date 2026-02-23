@@ -1,11 +1,6 @@
 from typing import Any, List, Optional
 
-from etools_prp.apps.pdf_reports.components import (
-    Container,
-    SpacerComponent,
-    TableComponent,
-    Text,
-)
+from etools_prp.apps.pdf_reports.components import Container, SpacerComponent, TableComponent, Text
 
 
 class ReportBuilder:

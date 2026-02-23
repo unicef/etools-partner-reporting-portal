@@ -2,9 +2,6 @@ from io import BytesIO
 from typing import List, Optional, Union
 
 from django.http import HttpResponse, StreamingHttpResponse
-from reportlab.lib.pagesizes import A4, landscape as landscape_pagesize
-from reportlab.lib.units import cm
-from reportlab.platypus import Flowable, SimpleDocTemplate
 
 from etools_prp.apps.pdf_reports.components import BaseComponent
 from etools_prp.apps.pdf_reports.styles import (
@@ -12,6 +9,9 @@ from etools_prp.apps.pdf_reports.styles import (
     PAGE_LANDSCAPE_A4,
     register_fonts,
 )
+from reportlab.lib.pagesizes import A4, landscape as landscape_pagesize
+from reportlab.lib.units import cm
+from reportlab.platypus import Flowable, SimpleDocTemplate
 
 
 class BaseReport:
