@@ -88,7 +88,6 @@ stages:
 - stage: InstalledDepsImage
   displayName: Installed Dependencies Image (PRP) build and push
   dependsOn: BaseImage
-
   variables:
     BASE_IMAGE_TAG: $[ stageDependencies.BaseImage.Base.outputs['vars.BASE_IMAGE_TAG'] ]
 
@@ -154,13 +153,13 @@ stages:
 - stage: Test
   displayName: Run Backend Tests
   dependsOn: InstalledDepsImage
-
+  # Tests only on PR to Develop. Staging and Master assume tested code
   condition: |
     and(
       succeeded(),
-      eq(variables['Build.Reason'], 'PullRequest')
+      eq(variables['Build.Reason'], 'PullRequest'),
+      eq(variables['System.PullRequest.TargetBranch'], 'develop')
     )
-
   variables:
     DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
 
@@ -230,16 +229,13 @@ stages:
 
 - stage: AppImage
   displayName: Build Application Image
-
+  dependsOn:
+  - InstalledDepsImage
   condition: |
     and(
       succeeded(),
       ne(variables['Build.Reason'], 'PullRequest')
     )
-
-  dependsOn: 
-  - InstalledDepsImage
-  - Test
   variables:
     DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
 
@@ -305,7 +301,6 @@ stages:
   dependsOn: 
   - InstalledDepsImage
   - Test
-
   condition: |
     and(
       succeeded(),
@@ -392,7 +387,6 @@ stages:
       succeeded(),
       eq(variables['Build.SourceBranch'], 'refs/heads/develop')
     )
-
   variables:
     - group: rke-cluster-prp
     - name: DEV_APP_DEPLOYMENTS
@@ -481,7 +475,6 @@ stages:
       succeeded(),
       eq(variables['Build.SourceBranch'], 'refs/heads/staging')
     )
-
   variables:
     - group: rke-cluster-prp
     - name: STAGING_APP_DEPLOYMENTS
@@ -570,7 +563,6 @@ stages:
       succeeded(),
       startsWith(variables['Build.SourceBranch'], 'refs/tags/')
     )
-
   variables:
     - group: rke-cluster-prp
     - name: SAFE_BRANCH
@@ -582,7 +574,7 @@ stages:
         worker-prp-prod
     - name: PROD_UI_DEPLOYMENTS
       value: |
-        polymer3-prp-prod
+        polymer-prp-prod
 
   jobs:
     - deployment: Deploy

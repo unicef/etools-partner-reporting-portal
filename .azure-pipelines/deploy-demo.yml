@@ -24,7 +24,7 @@ stages:
         worker-prp-demo
     - name: DEMO_UI_DEPLOYMENTS
       value: |
-        polymer3-prp-demo
+        polymer-prp-demo
 
   jobs:
   - deployment: Deploy
