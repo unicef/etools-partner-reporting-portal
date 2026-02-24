@@ -237,7 +237,7 @@ class TestPDItem(BaseAPITestCase):
 
         self.assertFalse(person_fp_qs.exists())
         self.assertFalse(user_qs.exists())
-        
+
         pd = update_create_partner_focal_points(_item['focal_points'], pd, _workspace, partner)
 
         self.assertTrue(person_fp_qs.exists())
