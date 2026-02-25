@@ -140,12 +140,29 @@ class ProgressReportDetailPDFExporter:
         return context
 
     def get_as_response(self, request):
+        """
+        Generate PDF export. Supports multiple PDF engines via query parameter.
+
+        Query parameters:
+        - pdf_engine=weasyprint (default) - WeasyPrint (HTML/CSS)
+        - pdf_engine=reportlab - ReportLab/platypus (direct PDF, fastest)
+        """
+        pdf_engine = request.GET.get('pdf_engine', 'weasyprint').lower()
+        context = self.get_context()
+
         try:
-            response = render_pdf_to_response(
-                request,
-                self.template_name,
-                self.get_context(),
-            )
+            if pdf_engine == 'reportlab':
+                logger.info("Using PDF Reports library (ReportLab/platypus) for PDF generation")
+                from etools_prp.apps.pdf_reports.reports import IndicatorsReport
+                report = IndicatorsReport(context, filename=self.file_name)
+                response = report.build_response()
+            else:
+                logger.info("Using WeasyPrint engine for PDF generation")
+                response = render_pdf_to_response(
+                    request,
+                    self.template_name,
+                    context,
+                )
             return response
         except Exception as exc:
             error_message = 'Error trying to render PDF'
