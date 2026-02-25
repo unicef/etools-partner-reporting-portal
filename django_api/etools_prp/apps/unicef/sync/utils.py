@@ -1,6 +1,8 @@
 import logging
+import time
 
 from django.contrib.auth import get_user_model
+from django.db import OperationalError, transaction
 
 from jsonschema.exceptions import ValidationError
 
@@ -14,10 +16,28 @@ LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
 
 def process_model(model_to_process, process_serializer, data, filter_dict):
+    max_retries = 3
     instance = model_to_process.objects.filter(**filter_dict).first()
-    serializer = process_serializer(instance=instance, data=data)
-    serializer.is_valid(raise_exception=True)
-    return serializer.save()
+
+    for retry in range(0, max_retries, 1):
+        try:
+            with transaction.atomic():
+                if instance:
+                    instance = model_to_process.objects.select_for_update().get(pk=instance.pk)
+                serializer = process_serializer(instance=instance, data=data)
+                serializer.is_valid(raise_exception=True)
+                return serializer.save()
+
+        except OperationalError as e:
+            if 'deadlock detected' in str(e):
+                if retry < max_retries - 1:
+                    sleep_time = 2 ** retry
+                    time.sleep(sleep_time)
+                else:
+                    logger.debug("Max retry retries reached. Aborting.")
+                    raise
+            else:
+                raise
 
 
 def create_user_for_person(person):
@@ -80,8 +100,8 @@ def delete_changed_periods(pd, changed_periods):
             # if there is any data input from the partner on the progress report
             # (including indicator reports, indicator location data)
             if progress_rep.has_partner_data:
-                # log exception and skip the report in reporting_requirements
-                logger.exception(f'Progress Report id {progress_rep.pk} already has user input data. Skipping removal..')
+                # log info and skip the report in reporting_requirements
+                logger.info(f'Progress Report id {progress_rep.pk} already has user input data. Skipping removal..')
             else:
                 periods_to_delete_ids.append(changed_period.pk)
                 pr_to_delete_ids.append(progress_rep.pk)
@@ -91,8 +111,8 @@ def delete_changed_periods(pd, changed_periods):
             periods_to_delete_ids.append(changed_period.pk)
             continue
         except ProgressReport.MultipleObjectsReturned:
-            # log exception and skip the report in reporting_requirements
-            logger.exception(f'Multiple Progress Reports found within the same dates {changed_period.__dict__}. Skipping removal..')
+            # log info and skip the report in reporting_requirements
+            logger.info(f'Multiple Progress Reports found within the same dates {changed_period.__dict__}. Skipping removal..')
 
     ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
     ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()
