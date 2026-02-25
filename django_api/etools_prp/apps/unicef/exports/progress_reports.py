@@ -87,10 +87,23 @@ class ProgressReportDetailPDFExporter:
                 ]
                 tables.append(indicator_table)
 
+                inactive_location_ids = set()
+                if hasattr(indicator.reportable, 'inactive_location_goals'):
+                    inactive_location_ids = {goal.location_id for goal in indicator.reportable.inactive_location_goals}
+
+                previous_location_data_map = {}
+                if hasattr(indicator.reportable, 'indicator_reports'):
+                    all_reports = list(indicator.reportable.indicator_reports.all())
+
+                    for ir in all_reports:
+                        if ir.id != indicator.id and ir.time_period_start < indicator.time_period_start:
+                            for prev_loc_data in ir.indicator_location_data.all():
+                                previous_location_data_map[prev_loc_data.location_id] = prev_loc_data
+                            break
+
                 for location_data in indicator.indicator_location_data.all():
 
-                    if indicator.reportable.reportablelocationgoal_set.filter(
-                            location=location_data.location, is_active=False).exists():
+                    if location_data.location_id in inactive_location_ids:
                         continue
 
                     location_progress = format_total_value_to_string(
@@ -98,8 +111,10 @@ class ProgressReportDetailPDFExporter:
                         is_percentage=is_percentage,
                         percentage_display_type="ratio" if indicator.reportable.blueprint.display_type == 'ratio' else None
                     )
-                    if location_data.previous_location_data:
-                        prev_value = location_data.previous_location_data.disaggregation.get('()', {})
+
+                    prev_loc_data = previous_location_data_map.get(location_data.location_id)
+                    if prev_loc_data:
+                        prev_value = prev_loc_data.disaggregation.get('()', {})
                     else:
                         prev_value = {}
                     previous_location_progress = format_total_value_to_string(
@@ -176,21 +191,38 @@ class ProgressReportListPDFExporter(ProgressReportDetailPDFExporter):
 
     def __init__(self, progress_reports):
         self.progress_reports = progress_reports or []
+        self._progress_reports_list = None
+        self._count = None
+
         super().__init__(progress_reports.first())
+
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Progress Reports Summary'.format(
-            timezone.now(), progress_reports.count()
+            timezone.now(), len(self._get_progress_reports_list())
         )
         self.file_name = self.display_name + '.pdf'
 
+    def _get_progress_reports_list(self):
+        if self._progress_reports_list is None:
+            self._progress_reports_list = list(self.progress_reports)
+        return self._progress_reports_list
+
     def get_context(self):
         section_list = []
-        same_pd_across_all_reports = self.progress_reports.values_list('programme_document').distinct().count() == 1
+        progress_reports_list = self._get_progress_reports_list()
+
+        if progress_reports_list:
+            first_pd_id = progress_reports_list[0].programme_document_id
+            same_pd_across_all_reports = all(
+                pr.programme_document_id == first_pd_id for pr in progress_reports_list
+            )
+        else:
+            same_pd_across_all_reports = True
 
         context = {
             'same_pd_across_all_reports': same_pd_across_all_reports,
         }
 
-        for progress_report in self.progress_reports:
+        for progress_report in progress_reports_list:
             section_data = {
                 'progress_report': progress_report,
                 'tables': self.create_tables_for_indicator_reports(progress_report.indicator_reports.all())
