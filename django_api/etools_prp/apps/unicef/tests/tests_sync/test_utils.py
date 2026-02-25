@@ -1,5 +1,3 @@
-from unittest import mock
-
 from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
 from etools_prp.apps.core.helpers import generate_data_combination_entries
 from etools_prp.apps.core.tests import factories
