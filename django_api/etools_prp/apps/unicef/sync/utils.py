@@ -1,6 +1,8 @@
 import logging
+import time
 
 from django.contrib.auth import get_user_model
+from django.db import OperationalError, transaction
 
 from jsonschema.exceptions import ValidationError
 
@@ -14,10 +16,28 @@ LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
 
 def process_model(model_to_process, process_serializer, data, filter_dict):
+    max_retries = 3
     instance = model_to_process.objects.filter(**filter_dict).first()
-    serializer = process_serializer(instance=instance, data=data)
-    serializer.is_valid(raise_exception=True)
-    return serializer.save()
+
+    for retry in range(0, max_retries, 1):
+        try:
+            with transaction.atomic():
+                if instance:
+                    instance = model_to_process.objects.select_for_update().get(pk=instance.pk)
+                serializer = process_serializer(instance=instance, data=data)
+                serializer.is_valid(raise_exception=True)
+                return serializer.save()
+
+        except OperationalError as e:
+            if 'deadlock detected' in str(e):
+                if retry < max_retries - 1:
+                    sleep_time = 2 ** retry
+                    time.sleep(sleep_time)
+                else:
+                    logger.debug("Max retry retries reached. Aborting.")
+                    raise
+            else:
+                raise
 
 
 def create_user_for_person(person):
