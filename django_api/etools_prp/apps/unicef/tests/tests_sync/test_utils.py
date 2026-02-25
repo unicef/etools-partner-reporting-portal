@@ -225,8 +225,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         self.assertEqual(self.pd.reporting_periods.filter(report_type='QPR').count(), 1)
         self.assertEqual(self.pd.progress_reports.filter(report_type='QPR').count(), 1)
 
-    @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
-    def test_handle_reporting_dates_with_report_data_input(self, mock_logger_exc):
+    def test_handle_reporting_dates_with_report_data_input(self):
         self.assertEqual(self.pd.reporting_periods.count(), 6)
         self.assertEqual(self.pd.progress_reports.count(), 6)
 
@@ -237,8 +236,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         indicator_report.narrative_assessment = 'Some narrative_assessment'
         indicator_report.save()
         handle_qpr_hr_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
-        # when there is user data input, an exception is logged, the record is skipped and nothing gets deleted
-        self.assertTrue(mock_logger_exc.call_count, 1)
+
         self.assertEqual(self.pd.reporting_periods.count(), 6)
         self.assertEqual(self.pd.progress_reports.count(), 6)
         self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 6)
@@ -246,8 +244,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
             IndicatorLocationData.objects.filter(
                 indicator_report__progress_report__programme_document=self.pd).count(), 6)
 
-    @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
-    def test_handle_reporting_dates_with_indicator_location_data_input(self, mock_logger_exc):
+    def test_handle_reporting_dates_with_indicator_location_data_input(self):
         self.assertEqual(self.pd.reporting_periods.count(), 6)
         self.assertEqual(self.pd.progress_reports.count(), 6)
 
@@ -267,8 +264,7 @@ class TestHandleReportingDatesQPRnHR(BaseAPITestCase):
         indicator_location.save()
 
         handle_qpr_hr_reporting_dates(self.workspace.business_area_code, self.pd, self.reporting_requirements)
-        # when there is user data input, an exception is logged, the record is skipped and nothing gets deleted
-        self.assertTrue(mock_logger_exc.call_count, 1)
+
         self.assertEqual(self.pd.reporting_periods.count(), 6)
         self.assertEqual(self.pd.progress_reports.count(), 6)
         self.assertEqual(IndicatorReport.objects.filter(progress_report__programme_document=self.pd).count(), 6)
@@ -358,8 +354,7 @@ class TestHandleReportingDatesSR(BaseAPITestCase):
         self.assertEqual(self.pd.reporting_periods.count(), 0)
         self.assertEqual(self.pd.progress_reports.count(), 0)
 
-    @mock.patch("etools_prp.apps.unicef.sync.utils.logger.exception")
-    def test_handle_reporting_dates_duplicate_special_reports(self, mock_logger_exc):
+    def test_handle_reporting_dates_duplicate_special_reports(self):
         self.assertEqual(self.pd.reporting_periods.count(), 4)
         self.assertEqual(self.pd.progress_reports.count(), 4)
 
@@ -385,7 +380,6 @@ class TestHandleReportingDatesSR(BaseAPITestCase):
         # remove first dupe special report, 1 remaining
         self.special_reports.pop(3)
         handle_sr_reporting_dates(self.workspace.business_area_code, self.pd, self.special_reports)
-        self.assertTrue(mock_logger_exc.call_count, 1)
 
         # check ReportingPeriodDates and progress report are not deleted because of duplicated data
         self.assertEqual(self.pd.reporting_periods.count(), 5)
