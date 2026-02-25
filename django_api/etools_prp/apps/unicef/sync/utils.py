@@ -80,8 +80,8 @@ def delete_changed_periods(pd, changed_periods):
             # if there is any data input from the partner on the progress report
             # (including indicator reports, indicator location data)
             if progress_rep.has_partner_data:
-                # log exception and skip the report in reporting_requirements
-                logger.exception(f'Progress Report id {progress_rep.pk} already has user input data. Skipping removal..')
+                # log info and skip the report in reporting_requirements
+                logger.info(f'Progress Report id {progress_rep.pk} already has user input data. Skipping removal..')
             else:
                 periods_to_delete_ids.append(changed_period.pk)
                 pr_to_delete_ids.append(progress_rep.pk)
@@ -91,8 +91,8 @@ def delete_changed_periods(pd, changed_periods):
             periods_to_delete_ids.append(changed_period.pk)
             continue
         except ProgressReport.MultipleObjectsReturned:
-            # log exception and skip the report in reporting_requirements
-            logger.exception(f'Multiple Progress Reports found within the same dates {changed_period.__dict__}. Skipping removal..')
+            # log info and skip the report in reporting_requirements
+            logger.info(f'Multiple Progress Reports found within the same dates {changed_period.__dict__}. Skipping removal..')
 
     ReportingPeriodDates.objects.filter(pk__in=periods_to_delete_ids).delete()
     ProgressReport.objects.filter(pk__in=pr_to_delete_ids).delete()

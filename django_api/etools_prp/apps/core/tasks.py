@@ -178,7 +178,6 @@ def _process_pd_reports(pd):
             'start_date'), start=1):
         # If PR start date is greater than now, skip!
         if reporting_period.start_date > datetime.now().date():
-            logger.info("No new QPR reports to generate when the start date is in the future.")
             continue
         pr_qs = pd.progress_reports.filter(
             start_date=reporting_period.start_date,
@@ -191,10 +190,8 @@ def _process_pd_reports(pd):
         pr = pr_qs.last()
         if pr:
             if pr.status != PROGRESS_REPORT_STATUS.accepted and not pr.submission_date and not pr.review_date:
-                logger.info("QPR report already exists and was not accepted, checking for updates.")
                 update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
         else:
-            logger.info("Creating new QPR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                 pd, idx, reporting_period
             )
@@ -206,11 +203,9 @@ def _process_pd_reports(pd):
             'start_date'), start=1):
         # If there is no start and/or end date from reporting period, skip!
         if not reporting_period.start_date or not reporting_period.end_date:
-            logger.info("No new HR reports to generate: No start & end date pair available.")
             continue
         # If PR start date is greater than now, skip!
         if reporting_period.start_date > datetime.now().date():
-            logger.info("No new HR reports to generate when the start date is in the future.")
             continue
         pr_qs = pd.progress_reports.filter(
             start_date=reporting_period.start_date,
@@ -223,10 +218,8 @@ def _process_pd_reports(pd):
         pr = pr_qs.last()
         if pr:
             if pr.status != PROGRESS_REPORT_STATUS.accepted and not pr.submission_date:
-                logger.info("HR report already exists and was not accepted, checking for updates.")
                 update_ir_and_ilds_for_pr(pr, active_reportables, reporting_period)
         else:
-            logger.info("Creating new HR report.")
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                 pd, idx, reporting_period
             )
@@ -237,7 +230,6 @@ def _process_pd_reports(pd):
     for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR").order_by('due_date'), start=1):
         # If PR due date is greater than now, skip!
         if reporting_period.due_date >= datetime.now().date() + timedelta(days=30):
-            logger.info(f"No new SR reports to generate for due date: {reporting_period.due_date}")
             continue
 
         create_pr_sr_for_report_type(pd, idx, reporting_period)
