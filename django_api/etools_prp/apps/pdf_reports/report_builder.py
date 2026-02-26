@@ -50,10 +50,15 @@ class ReportBuilder:
 
     @staticmethod
     def from_context(data: dict) -> List[Any]:
-        """Build the report structure from context: title + one TableComponent per table in sections."""
+        """Build the report structure from context: title + tables (top-level or in sections)."""
         builder = ReportBuilder()
         if data.get("title"):
             builder.add_title(data["title"])
+        # Top-level "tables" (single progress report export)
+        for table_rows in data.get("tables", []):
+            if table_rows:
+                builder.add_table(raw_table_rows=table_rows)
+        # Or "sections" (list progress report export: each section has tables)
         for section in data.get("sections", []):
             for table_rows in section.get("tables", []):
                 if table_rows:
