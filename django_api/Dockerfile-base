@@ -35,3 +35,4 @@ RUN apk add --no-cache --virtual .build-deps --update \
 RUN pip install --no-cache-dir --upgrade \
     pip \
     pdm
+    
