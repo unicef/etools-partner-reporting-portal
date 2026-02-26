@@ -2,7 +2,7 @@ export const _toPercentage = (value: any) => {
   return value == null ? value : Math.floor(value * 100) + '%';
 };
 
-export const displayIndicatorValueFromatted = (indicatorType: string, value: any, percentize?: any) => {
+export const displayIndicatorValueFormatted = (indicatorType: string, value: any, percentize?: any) => {
   if (value == null) {
     return value;
   }

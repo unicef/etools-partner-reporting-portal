@@ -136,7 +136,7 @@ export class AppMenu extends MatomoMixin(connect(store)(LitElement)) {
 
         <a
           class="nav-menu-item lighter-item"
-          href="https://unpartnerportalcso.zendesk.com/hc/en-us/sections/12663538797975-Electronic-Programme-Document-ePD-"
+          href="https://prphelp.zendesk.com/hc/en-us"
           target="_blank"
           @click="${this.trackAnalytics}"
           tracker="Knowledge base"

@@ -10,7 +10,6 @@ from etools_prp.apps.unicef.exports.utilities import (
     HTMLTableCell,
     HTMLTableHeader,
 )
-from etools_prp.apps.unicef.utils import render_pdf_to_response
 
 logger = logging.getLogger(__name__)
 
@@ -140,12 +139,16 @@ class ProgressReportDetailPDFExporter:
         return context
 
     def get_as_response(self, request):
+        """
+        Generate PDF export. Supports multiple PDF engines via query parameter.
+        """
+        context = self.get_context()
+
         try:
-            response = render_pdf_to_response(
-                request,
-                self.template_name,
-                self.get_context(),
-            )
+            logger.info("Using PDF Reports library (ReportLab/platypus) for PDF generation")
+            from etools_prp.apps.pdf_reports.reports import IndicatorsReport
+            report = IndicatorsReport(context, filename=self.file_name)
+            response = report.build_response()
             return response
         except Exception as exc:
             error_message = 'Error trying to render PDF'

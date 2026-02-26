@@ -184,3 +184,4 @@ workflows:
                 - packages-update
                 - gpd-reporting-improvements
                 - 289125_update_libs
+                - 269336-test

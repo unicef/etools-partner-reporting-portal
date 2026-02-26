@@ -27,7 +27,7 @@ import {store} from '../../redux/store';
 import {RootState} from '../../typings/redux.types';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {buildUrl} from '../../etools-prp-common/utils/util';
-import {displayIndicatorValueFromatted} from '../../utils/utils';
+import {displayIndicatorValueFormatted} from '../../utils/utils';
 
 @customElement('pd-output')
 export class PdOutput extends ProgressReportUtilsMixin(connect(store)(LitElement)) {
@@ -301,7 +301,7 @@ export class PdOutput extends ProgressReportUtilsMixin(connect(store)(LitElement
                               `
                             : html`
                                 <dd class="flex">
-                                  ${displayIndicatorValueFromatted(
+                                  ${displayIndicatorValueFormatted(
                                     indicator.reportable.blueprint.display_type,
                                     indicator.reportable.achieved.c,
                                     true
@@ -321,7 +321,7 @@ export class PdOutput extends ProgressReportUtilsMixin(connect(store)(LitElement
                               `
                             : html`
                                 <dd class="flex">
-                                  ${displayIndicatorValueFromatted(
+                                  ${displayIndicatorValueFormatted(
                                     indicator.reportable.blueprint.display_type,
                                     indicator.total.c,
                                     true

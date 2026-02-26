@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from etools_prp.apps.core.models import Location
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.indicator.models import (
@@ -216,22 +218,33 @@ class TestPDItem(BaseAPITestCase):
 
         # Agreement Auth Officers section testing
         person_aao_qs = Person.objects.filter(email=_item['agreement_auth_officers'][0]['email'])
+        user_qs = get_user_model().objects.filter(email=_item['agreement_auth_officers'][0]['email'])
 
         self.assertFalse(person_aao_qs.exists())
+        self.assertFalse(user_qs.exists())
 
         pd = update_create_agreement_auth_officers(_item['agreement_auth_officers'], pd, _workspace, partner)
 
         self.assertTrue(person_aao_qs.exists())
+        self.assertTrue(user_qs.exists())
+        user_obj = user_qs.first()
+        self.assertEqual(user_obj.workspace, pd.workspace)
+        self.assertEqual(user_obj.partner, pd.partner)
 
         # Focal Points section testing
         person_fp_qs = Person.objects.filter(email=_item['focal_points'][0]['email'])
+        user_qs = get_user_model().objects.filter(email=_item['focal_points'][0]['email'])
 
         self.assertFalse(person_fp_qs.exists())
+        self.assertFalse(user_qs.exists())
 
         pd = update_create_partner_focal_points(_item['focal_points'], pd, _workspace, partner)
 
         self.assertTrue(person_fp_qs.exists())
-
+        self.assertTrue(user_qs.exists())
+        user_obj = user_qs.first()
+        self.assertEqual(user_obj.workspace, pd.workspace)
+        self.assertEqual(user_obj.partner, pd.partner)
         # Create sections
         section_qs = Section.objects.filter(external_id=_item['sections'][0]['id'])
 
