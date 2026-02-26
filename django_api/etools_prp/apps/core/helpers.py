@@ -473,11 +473,9 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
     end_date = reporting_period.end_date
     due_date = reporting_period.due_date
 
-    logger.info(f"SR ProgressReport with due date: {due_date}")
-
     is_final = idx == pd.reporting_periods.filter(report_type='SR').count()
 
-    next_progress_report, created = ProgressReport.objects.update_or_create(
+    ProgressReport.objects.update_or_create(
         programme_document=pd,
         report_type='SR',
         report_number=idx,
@@ -488,8 +486,6 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
             'due_date': due_date,
         }
     )
-    if created:
-        logger.info(f"Created new SR{idx} ProgressReport id {next_progress_report.id} for due date {due_date}")
 
 
 @transaction.atomic
@@ -594,9 +590,6 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
         )
 
         for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-            logger.info("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
-                indicator_report, start_date, end_date
-            ))
             IndicatorLocationData.objects.create(
                 indicator_report=indicator_report,
                 location=location_goal.location,
@@ -627,9 +620,6 @@ def create_pr_ir_for_reportable(pd, reportable, pai_ir_for_period, start_date, e
         )
 
         for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-            logger.info("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
-                indicator_report, start_date, end_date
-            ))
             IndicatorLocationData.objects.create(
                 indicator_report=indicator_report,
                 location=location_goal.location,
@@ -895,10 +885,6 @@ def create_ir_for_cluster(reportable, start_date, end_date, project):
         )
 
         for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-            logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                indicator_report, start_date, end_date
-            ))
-
             IndicatorLocationData.objects.create(
                 indicator_report=indicator_report,
                 location=location_goal.location,
@@ -931,10 +917,6 @@ def create_ir_for_cluster(reportable, start_date, end_date, project):
         )
 
         for location_goal in reportable.reportablelocationgoal_set.filter(is_active=True):
-            logger.info("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                indicator_report, start_date, end_date
-            ))
-
             IndicatorLocationData.objects.create(
                 indicator_report=indicator_report,
                 location=location_goal.location,
