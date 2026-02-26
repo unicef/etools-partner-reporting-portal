@@ -1,0 +1,645 @@
+trigger:
+  branches:
+    include:
+      - develop
+      - staging
+      - master
+
+  tags:
+    include:
+      - '*'
+
+pr:
+  branches:
+    include:
+      - '*'
+
+variables:
+  DOCKER_BASE_IMAGE: unicef/etools-prp-base
+  DOCKER_APP_IMAGE: unicef/etools-prp
+  DOCKER_UI_IMAGE: unicef/etools-prp-polymer
+
+stages:
+# BaseImage stage builds OS + Python dependencies layer.
+# It is Content-Addressed via pdm.lock + Dockerfile-base hash.
+# (this ensures the base image rebuilds ONLY when dependencies change)
+# AppImage builds on top of this layer and contains only application code.
+# This design avoids reinstalling dependencies on every commit and speeds up CI/CD.
+- stage: BaseImage
+  displayName: Base OS Image (PRP) build and push
+
+  jobs:
+  - job: Base
+    displayName: Build PRP Base Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+
+      - script: |
+          DOCKERFILE_BASE_HASH=$(md5sum django_api/Dockerfile-base | cut -c1-6)
+          BASE_IMAGE_TAG="base-312-${DOCKERFILE_BASE_HASH}"
+
+          echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=BASE_IMAGE_TAG;isOutput=true]$BASE_IMAGE_TAG"          
+        name: vars
+        displayName: Compute Base Image Tag
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - script: |
+          if docker manifest inspect $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) > /dev/null 2>&1; then
+            echo "Base image exists."
+            echo "##vso[task.setvariable variable=BASE_IMAGE_EXISTS]true"
+          else
+            echo "Base image does NOT exist."
+            echo "##vso[task.setvariable variable=BASE_IMAGE_EXISTS]false"
+          fi
+        displayName: Check if Base Image Exists
+
+      - task: Docker@2
+        displayName: Build and Push Base Image
+        condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
+        inputs:
+          command: buildAndPush
+          repository: $(DOCKER_BASE_IMAGE)
+          dockerfile: django_api/Dockerfile-base
+          buildContext: django_api
+          containerRegistry: dockerhub
+          tags: |
+            $(vars.BASE_IMAGE_TAG)
+
+      - script: |
+          docker pull $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG)
+          docker tag $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
+          docker push $(DOCKER_BASE_IMAGE):base-312
+        condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
+        displayName: Update base-312 Alias
+
+# Compute content-addressed tag based on:
+# - pdm.lock
+# - Dockerfile-installed
+# - Base image tag
+- stage: InstalledDepsImage
+  displayName: Installed Dependencies Image (PRP) build and push
+  dependsOn: BaseImage
+  variables:
+    BASE_IMAGE_TAG: $[ stageDependencies.BaseImage.Base.outputs['vars.BASE_IMAGE_TAG'] ]
+
+  jobs:
+  - job: InstalledDeps
+    displayName: Build Installed Dependencies Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - script: |
+          LOCK_HASH=$(md5sum django_api/pdm.lock | cut -c1-6)
+          DOCKERFILE_HASH=$(md5sum django_api/Dockerfile-installed | cut -c1-6)
+          BASE_HASH=$(echo $(BASE_IMAGE_TAG) | cut -d'-' -f3)
+          echo "LOCK_HASH $LOCK_HASH"
+          echo "DOCKERFILE_HASH $DOCKERFILE_HASH"
+          echo "BASE_HASH $BASE_HASH"
+
+          DEPS_IMAGE_TAG="deps-312-${BASE_HASH}-${LOCK_HASH}-${DOCKERFILE_HASH}"
+
+          echo "Computed DEPS_IMAGE_TAG=$DEPS_IMAGE_TAG"
+          echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG;isOutput=true]$DEPS_IMAGE_TAG"
+        name: vars
+        displayName: Compute Deps Image Tag
+
+      - script: |
+          if docker manifest inspect $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG) > /dev/null 2>&1; then
+            echo "Deps image exists."
+            echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]true"
+          else
+            echo "Deps image does NOT exist."
+            echo "##vso[task.setvariable variable=DEPS_IMAGE_EXISTS]false"
+          fi
+        displayName: Check if Deps Image Exists
+
+      - task: Docker@2
+        displayName: Build and Push Deps Image
+        condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
+        inputs:
+          command: buildAndPush
+          repository: $(DOCKER_APP_IMAGE)
+          dockerfile: django_api/Dockerfile-installed
+          buildContext: django_api
+          containerRegistry: dockerhub
+          tags: |
+            $(vars.DEPS_IMAGE_TAG)
+
+      - script: |
+          docker pull $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG)
+          docker tag $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG) $(DOCKER_APP_IMAGE):deps-312
+          docker push $(DOCKER_APP_IMAGE):deps-312
+        condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
+        displayName: Update deps-312 Alias
+
+- stage: Test
+  displayName: Run Backend Tests
+  dependsOn: InstalledDepsImage
+  # Tests only on PR to Develop. Staging and Master assume tested code
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.Reason'], 'PullRequest'),
+      eq(variables['System.PullRequest.TargetBranch'], 'develop')
+    )
+  variables:
+    DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
+
+  jobs:
+  - job: Tests
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - script: |
+          docker run -d \
+            --name postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=test_prp \
+            -p 5432:5432 \
+            cimg/postgres:12.9-postgis
+        displayName: Start Postgres
+
+      - script: |
+          docker run -d \
+            --name redis \
+            -p 6379:6379 \
+            cimg/redis:6.2
+        displayName: Start Redis
+
+      - script: |
+          until docker exec postgres pg_isready -U postgres; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+        displayName: Wait for Postgres
+
+      - script: |
+          docker run --rm \
+            --network host \
+            -e POSTGRES_HOST=127.0.0.1 \
+            -e POSTGRES_DB=test_prp \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e REDIS_URL=redis://127.0.0.1:6379/0 \
+            -e ENV=dev \
+            -v $(Build.SourcesDirectory):/code \
+            -w /code/django_api \
+            $(DOCKER_APP_IMAGE):$(DEPS_IMAGE_TAG) \
+            bash -c "
+              pdm sync --dev &&
+              flake8 etools_prp &&
+              isort . --check-only &&
+              python manage.py test
+            "
+        displayName: Run tests
+        timeoutInMinutes: 30
+
+      - script: |
+          docker rm -f postgres redis
+        condition: always()
+        displayName: Cleanup
+
+- stage: AppImage
+  displayName: Build Application Image
+  dependsOn:
+  - InstalledDepsImage
+  condition: |
+    and(
+      succeeded(),
+      ne(variables['Build.Reason'], 'PullRequest')
+    )
+  variables:
+    DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
+
+  jobs:
+  - job: BuildApp
+    displayName: Build and Push Final Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+        fetchDepth: 0
+
+      # SAFE_BRANCH is derived from Build.SourceBranchName.
+      # - On branch builds: it is the branch name (sanitized)
+      # - On tag builds: it is the *tag name* (sanitized)
+      # SAFE_BRANCH is used everywhere, so we NEVER use Build.SourceBranchName directly to avoid invalid Docker tags
+      - script: |
+          SAFE_BRANCH=$(echo "$(Build.SourceBranchName)" \
+            | tr '/' '-' \
+            | tr -cd 'a-zA-Z0-9._-')
+          BUILD_DATE=$(date -u +%Y%m%d)
+          BRANCH_DATE_TAG="${SAFE_BRANCH}${BUILD_DATE}"
+          echo "##vso[task.setvariable variable=SAFE_BRANCH;isOutput=true]$SAFE_BRANCH"
+          echo "##vso[task.setvariable variable=BRANCH_DATE_TAG;isOutput=true]$BRANCH_DATE_TAG"
+        name: sanitize
+        displayName: Sanitize branch name
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - task: Docker@2
+        displayName: Build image
+        inputs:
+          command: build
+          repository: $(DOCKER_APP_IMAGE)
+          dockerfile: django_api/Dockerfile
+          buildContext: django_api
+          containerRegistry: dockerhub
+          arguments: |
+            --build-arg BASE_TAG=$(DEPS_IMAGE_TAG)
+          tags: |
+            $(sanitize.SAFE_BRANCH)
+            $(sanitize.BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
+
+      - task: Docker@2
+        displayName: Push image
+        inputs:
+          command: push
+          repository: $(DOCKER_APP_IMAGE)
+          containerRegistry: dockerhub
+          tags: |
+            $(sanitize.SAFE_BRANCH)
+            $(sanitize.BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
+
+- stage: FrontendImage
+  displayName: Build Frontend Image
+  dependsOn: 
+  - InstalledDepsImage
+  condition: |
+    and(
+      succeeded(),
+      ne(variables['Build.Reason'], 'PullRequest')
+    )
+
+  jobs:
+  - job: BuildFrontend
+    displayName: Build and Push Frontend Image
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - checkout: self
+        submodules: true
+        fetchDepth: 0
+
+      # SAFE_BRANCH is derived from Build.SourceBranchName.
+      # - On branch builds: it is the branch name (sanitized)
+      # - On tag builds: it is the *tag name* (sanitized)
+      # SAFE_BRANCH is used everywhere, so we NEVER use Build.SourceBranchName directly to avoid invalid Docker tags
+      - script: |
+          SAFE_BRANCH=$(echo "$(Build.SourceBranchName)" \
+            | tr '/' '-' \
+            | tr -cd 'a-zA-Z0-9._-')
+          BUILD_DATE=$(date -u +%Y%m%d)
+          BRANCH_DATE_TAG="${SAFE_BRANCH}${BUILD_DATE}"
+          echo "##vso[task.setvariable variable=SAFE_BRANCH;isOutput=true]$SAFE_BRANCH"
+          echo "##vso[task.setvariable variable=BRANCH_DATE_TAG;isOutput=true]$BRANCH_DATE_TAG"
+        name: sanitize
+        displayName: Sanitize branch name
+
+      - script: |
+          cd frontend_ip
+
+          REVNO=$(Build.SourceVersion)
+          BUILDDATE=$(date -u +%F_%T)
+
+          sed -i "0,/revNo/s//$REVNO/" package.json
+          sed -i "0,/revNo/s//$REVNO/" version.json
+          sed -i "0,/revNo/s//$REVNO/" index.html
+          sed -i "0,/bDate/s//$BUILDDATE/" package.json
+          sed -i "0,/bDate/s//$BUILDDATE/" version.json
+          sed -i "0,/bDate/s//$BUILDDATE/" index.html
+        displayName: Inject build metadata
+
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: dockerhub
+
+      - task: Docker@2
+        displayName: Build frontend image
+        inputs:
+          command: build
+          repository: $(DOCKER_UI_IMAGE)
+          dockerfile: frontend_ip/Dockerfile-bundle
+          buildContext: frontend_ip
+          containerRegistry: dockerhub
+          tags: |
+            $(sanitize.SAFE_BRANCH)
+            $(sanitize.BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
+
+      - task: Docker@2
+        displayName: Push frontend image
+        inputs:
+          command: push
+          repository: $(DOCKER_UI_IMAGE)
+          containerRegistry: dockerhub
+          tags: |
+            $(sanitize.SAFE_BRANCH)
+            $(sanitize.BRANCH_DATE_TAG)
+            $(Build.SourceVersion)
+
+- stage: DeployDevelop
+  displayName: Deploy to Develop (Rancher)
+  dependsOn:
+  - AppImage
+  - FrontendImage
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+    )
+  variables:
+    - group: rke-cluster-prp
+    - name: DEV_APP_DEPLOYMENTS
+      value: |
+        api-prp-dev
+        beater-prp-dev
+        worker-prp-dev
+    - name: DEV_UI_DEPLOYMENTS
+      value: |
+        polymer3-prp-dev
+
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to develop
+      environment: dev
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+              - task: KubectlInstaller@0
+                displayName: Install kubectl
+                inputs:
+                  kubectlVersion: 'v1.16.2'
+
+              - script: |
+                  mkdir -p ~/.kube
+                  echo "$(KUBECONFIG_B64)" | base64 -d > ~/.kube/config
+                  chmod 600 ~/.kube/config
+                  kubectl config use-context rke-cluster-prp
+                displayName: Configure kubeconfig
+
+              - script: |
+                  echo "$(DEV_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-dev \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_APP_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Backend applications
+
+              - script: |
+                  echo "$(DEV_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-dev \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for Backend pods to start
+
+              - script: |
+                  echo "$(DEV_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-dev \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_UI_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Frontend applications
+
+              - script: |
+                  echo "$(DEV_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-dev \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for UI pods to start
+
+- stage: DeployStaging
+  displayName: Deploy to Staging (Rancher)
+  dependsOn:
+  - AppImage
+  - FrontendImage
+  condition: |
+    and(
+      succeeded(),
+      eq(variables['Build.SourceBranch'], 'refs/heads/staging')
+    )
+  variables:
+    - group: rke-cluster-prp
+    - name: STAGING_APP_DEPLOYMENTS
+      value: |
+        api-prp-stg
+        beater-prp-stg
+        worker-prp-stg
+    - name: STAGING_UI_DEPLOYMENTS
+      value: |
+        polymer3-prp-stg
+
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to staging
+      environment: staging
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+              - task: KubectlInstaller@0
+                displayName: Install kubectl
+                inputs:
+                  kubectlVersion: 'v1.16.2'
+
+              - script: |
+                  mkdir -p ~/.kube
+                  echo "$(KUBECONFIG_B64)" | base64 -d > ~/.kube/config
+                  chmod 600 ~/.kube/config
+                  kubectl config use-context rke-cluster-prp
+                displayName: Configure kubeconfig
+
+              - script: |
+                  echo "$(STAGING_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-staging \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_APP_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Backend applications
+
+              - script: |
+                  echo "$(STAGING_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-staging \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for Backend pods to start
+
+              - script: |
+                  echo "$(STAGING_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-staging \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_UI_IMAGE):$(Build.SourceVersion)
+                    fi
+                  done
+                displayName: Deploy Frontend applications
+
+              - script: |
+                  echo "$(STAGING_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-staging \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for UI pods to start
+
+- stage: DeployProd
+  displayName: Deploy to Production (Rancher)
+  dependsOn:
+  - AppImage
+  - FrontendImage
+  condition: |
+    and(
+      succeeded(),
+      startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+    )
+  variables:
+    - group: rke-cluster-prp
+    - name: SAFE_BRANCH
+      value: $[ stageDependencies.AppImage.BuildApp.outputs['sanitize.SAFE_BRANCH'] ]
+    - name: PROD_APP_DEPLOYMENTS
+      value: |
+        api-prp-prod
+        beater-prp-prod
+        worker-prp-prod
+    - name: PROD_UI_DEPLOYMENTS
+      value: |
+        polymer-prp-prod
+
+  jobs:
+    - deployment: Deploy
+      displayName: Deploy to production
+      environment: prod
+      pool:
+        vmImage: ubuntu-latest
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+
+              - task: KubectlInstaller@0
+                displayName: Install kubectl
+                inputs:
+                  kubectlVersion: 'v1.16.2'
+
+              - script: |
+                  mkdir -p ~/.kube
+                  echo "$(KUBECONFIG_B64)" | base64 -d > ~/.kube/config
+                  chmod 600 ~/.kube/config
+                  kubectl config use-context rke-cluster-prp
+                displayName: Configure kubeconfig
+
+              # Deploy sanitized tag (SAFE_BRANCH). For tag-triggered runs, SAFE_BRANCH == sanitized Git tag
+              - script: |
+                  echo "$(PROD_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-prod \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_APP_IMAGE):$(SAFE_BRANCH)
+                    fi
+                  done
+                displayName: Deploy Backend applications
+
+              - script: |
+                  echo "$(PROD_APP_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-prod \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for Backend pods to start
+
+              # Deploy sanitized tag (SAFE_BRANCH). For tag-triggered runs, SAFE_BRANCH == sanitized Git tag
+              - script: |
+                  echo "$(PROD_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Updating $APP..."
+                      kubectl -n prp-prod \
+                        set image deployment/$APP \
+                        $APP=$(DOCKER_UI_IMAGE):$(SAFE_BRANCH)
+                    fi
+                  done
+                displayName: Deploy Frontend applications
+
+              - script: |
+                  echo "$(PROD_UI_DEPLOYMENTS)" | while read APP; do
+                    if [ -n "$APP" ]; then
+                      echo "Waiting rollout for $APP..."
+                      kubectl rollout status deployment/$APP \
+                        -n prp-prod \
+                        --timeout=300s
+                    fi
+                  done
+                displayName: Wait for UI pods to start

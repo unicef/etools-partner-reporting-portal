@@ -1,8 +1,9 @@
 import logging
+import os
 import tempfile
 
 from django.contrib.auth import get_user_model
-from django.http import FileResponse
+from django.http import StreamingHttpResponse
 from django.template.loader import render_to_string
 
 from weasyprint import CSS, HTML
@@ -22,22 +23,53 @@ def render_pdf_to_response(request, template, data):
         string=render_to_string(f"{template}.css"),
         font_config=font_config,
     )
+
     result = html.write_pdf(stylesheets=[css], font_config=font_config)
 
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        output.write(result)
-        output.flush()
-        response = FileResponse(
-            open(output.name, "rb"),
-            as_attachment=True,
-            filename=f"{template}.pdf",
-        )
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    temp_file_path = temp_file.name
+    try:
+        temp_file.write(result)
+        temp_file.flush()
+        temp_file.close()
 
-    return response
+        def file_iterator(file_path, chunk_size=8192):
+            with open(file_path, 'rb') as file_obj:
+                while True:
+                    chunk = file_obj.read(chunk_size)
+                    if not chunk:
+                        break
+                    yield chunk
+            try:
+                os.unlink(file_path)
+            except OSError:
+                pass
+
+        response = StreamingHttpResponse(
+            file_iterator(temp_file_path),
+            content_type='application/pdf'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{template}.pdf"'
+
+        response['X-Accel-Buffering'] = 'no'
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+
+        return response
+
+    except Exception:
+        try:
+            if not temp_file.closed:
+                temp_file.close()
+            os.unlink(temp_file_path)
+        except OSError:
+            pass
+        raise
 
 
 def convert_string_values_to_numeric(d):
-    """
+    r"""
     Convert numbers as strings into numeric
     "1500"->1500 "2,000.9"->2000.9  "2.5"->2.5
     :param d: dict
@@ -65,43 +97,32 @@ def sanitize_indicator(indicator_item):
             if indicator_dict is None and default_dict['default'] is None:
                 continue
             else:
-                logger.warning(f'Expected dict on {field} for {indicator_item["id"]}, '
-                               f'found {type(indicator_dict)}, updating to default dict values {default_dict["default"]}')
                 indicator_item[field] = default_dict['default']
         else:
             # if there are missing keys in structure, update with default
             missing_keys = default_dict['default'].keys() - indicator_dict.keys()
             if missing_keys:
                 for missing_key in missing_keys:
-                    logger.warning(f'Adding missing key {missing_key}, as default is {default_dict["default"]}')
                     indicator_dict[missing_key] = default_dict['default'][missing_key]
 
             for key, value in indicator_dict.items():
                 if value is None:
-                    logger.warning(f'{value} value found on {indicator_item["id"]}, field: {field}. '
-                                   f'Updating {key} value {value} to number 0')
                     indicator_dict[key] = 0
 
                 # if key is not in structure, remove it, else check for string value
                 if key not in default_dict['default']:
-                    logger.warning(f'Extra key found in structure, removing {key}: {indicator_dict[key]}')
                     del indicator_dict[key]
 
                 elif isinstance(value, str):
                     try:
                         if value == 'None':
-                            logger.warning(f'String {value} found on {indicator_item["id"]}, field: {field}. '
-                                           f'Updating {key} value "{value}" to number 0')
                             indicator_dict[key] = 0
                         else:
                             numeric = float(value.replace(',', '')) if '.' in value else int(
                                 value.replace(',', ''))
-                            logger.warning(f'String value found on {indicator_item["id"]}, field: {field}. '
-                                           f'Updating {key} value "{value}" to number {numeric}')
                             indicator_dict[key] = numeric
 
                     except (ValueError, TypeError):
                         d = {"item": indicator_item["id"], "field": field, "key": key}
                         logger.warning(f'Could not cast value "{value}" to number. Requires manual handling. {d}')
-
                 indicator_item[field] = indicator_dict

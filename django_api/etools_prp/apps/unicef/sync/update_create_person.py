@@ -39,8 +39,10 @@ def update_create_agreement_auth_officers(agreement_auth_officers: dict, pd: Pro
         person.save()
         pd.unicef_officers.add(person)
 
-        user.partner = partner
-        user.save()
+        if user and (not user.partner or not user.workspace):
+            user.partner = partner
+            user.workspace = workspace
+            user.save(update_fields=['partner', 'workspace'])
 
         obj, created = Realm.objects.get_or_create(
             user=user,
@@ -75,8 +77,10 @@ def update_create_partner_focal_points(focal_points: dict, pd: ProgrammeDocument
         person.save()
         pd.partner_focal_point.add(person)
 
-        user.partner = partner
-        user.save()
+        if user and (not user.partner or not user.workspace):
+            user.partner = partner
+            user.workspace = workspace
+            user.save(update_fields=['partner', 'workspace'])
 
         obj, created = Realm.objects.get_or_create(
             user=user,
