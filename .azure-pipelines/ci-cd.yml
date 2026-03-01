@@ -39,7 +39,7 @@ stages:
 
       - script: |
           DOCKERFILE_BASE_HASH=$(md5sum django_api/Dockerfile-base | cut -c1-6)
-          BASE_IMAGE_TAG="base-312-${DOCKERFILE_BASE_HASH}"
+          BASE_IMAGE_TAG="base-${DOCKERFILE_BASE_HASH}"
 
           echo "Computed BASE_IMAGE_TAG=$BASE_IMAGE_TAG"
           echo "##vso[task.setvariable variable=BASE_IMAGE_TAG;isOutput=true]$BASE_IMAGE_TAG"          
@@ -76,10 +76,10 @@ stages:
 
       - script: |
           docker pull $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG)
-          docker tag $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base-312
-          docker push $(DOCKER_BASE_IMAGE):base-312
+          docker tag $(DOCKER_BASE_IMAGE):$(vars.BASE_IMAGE_TAG) $(DOCKER_BASE_IMAGE):base
+          docker push $(DOCKER_BASE_IMAGE):base
         condition: eq(variables.BASE_IMAGE_EXISTS, 'false')
-        displayName: Update base-312 Alias
+        displayName: Update base Alias
 
 # Compute content-addressed tag based on:
 # - pdm.lock
@@ -114,7 +114,7 @@ stages:
           echo "DOCKERFILE_HASH $DOCKERFILE_HASH"
           echo "BASE_HASH $BASE_HASH"
 
-          DEPS_IMAGE_TAG="deps-312-${BASE_HASH}-${LOCK_HASH}-${DOCKERFILE_HASH}"
+          DEPS_IMAGE_TAG="deps-${BASE_HASH}-${LOCK_HASH}-${DOCKERFILE_HASH}"
 
           echo "Computed DEPS_IMAGE_TAG=$DEPS_IMAGE_TAG"
           echo "##vso[task.setvariable variable=DEPS_IMAGE_TAG;isOutput=true]$DEPS_IMAGE_TAG"
@@ -145,10 +145,10 @@ stages:
 
       - script: |
           docker pull $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG)
-          docker tag $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG) $(DOCKER_APP_IMAGE):deps-312
-          docker push $(DOCKER_APP_IMAGE):deps-312
+          docker tag $(DOCKER_APP_IMAGE):$(vars.DEPS_IMAGE_TAG) $(DOCKER_APP_IMAGE):deps
+          docker push $(DOCKER_APP_IMAGE):deps
         condition: eq(variables.DEPS_IMAGE_EXISTS, 'false')
-        displayName: Update deps-312 Alias
+        displayName: Update deps Alias
 
 - stage: Test
   displayName: Run Backend Tests
