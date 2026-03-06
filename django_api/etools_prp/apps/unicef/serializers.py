@@ -514,7 +514,11 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return obj.programme_document.funds_received_to_date_percentage
 
     def get_indicator_reports(self, obj):
-        queryset = obj.indicator_reports.filter(reportable__active=True).all()
+        if obj.status == 'Acc':
+            queryset = obj.indicator_reports.filter(submission_date__isnull=False).all()
+        else:
+            queryset = obj.indicator_reports.filter(reportable__active=True).all()
+
         if self.llo_id and self.llo_id is not None:
             queryset = queryset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.location_id is not None:
