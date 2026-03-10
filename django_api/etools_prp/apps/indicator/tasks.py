@@ -17,8 +17,12 @@ def process_due_reports():
     updates = list()
     today = datetime.now().date()
     logger.info("Create due/overdue indicator reports")
-    # Get all open (without submission date) indicator reports
-    reports = IndicatorReport.objects.filter(submission_date__isnull=True)
+    # Get all open (without submission date) indicator reports, excluding closed PDs
+    reports = IndicatorReport.objects.filter(
+        submission_date__isnull=True
+    ).exclude(
+        progress_report__programme_document__status='closed'
+    )
     # Iterate and set proper status
     for report in reports:
         logger.info("Indicator Report: %s" % report.id)
@@ -32,7 +36,11 @@ def process_due_reports():
             report.save()
             updates.append(['Due', report])
 
-    reports = ProgressReport.objects.filter(submission_date__isnull=True)
+    reports = ProgressReport.objects.filter(
+        submission_date__isnull=True
+    ).exclude(
+        programme_document__status='closed'
+    )
     # Iterate and set proper status
     for report in reports:
         logger.info("Progress Report: %s" % report.id)
