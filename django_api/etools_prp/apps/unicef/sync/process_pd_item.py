@@ -1,6 +1,7 @@
 import logging
 
 from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.unicef.sync.accept_reports_for_closed_pd import accept_reports_for_closed_pd
 from etools_prp.apps.unicef.sync.update_create_blueprint import update_create_blueprint
 from etools_prp.apps.unicef.sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
@@ -22,7 +23,6 @@ from etools_prp.apps.unicef.sync.update_create_person import (
 from etools_prp.apps.unicef.sync.update_create_reportable import update_create_reportable
 from etools_prp.apps.unicef.sync.update_create_reportable_location_goal import update_create_reportable_location_goals
 from etools_prp.apps.unicef.sync.update_create_section import update_create_sections
-from etools_prp.apps.unicef.sync.accept_reports_for_closed_pd import accept_reports_for_closed_pd
 from etools_prp.apps.unicef.sync.update_llos_and_reportables import update_llos_and_reportables
 
 logger = logging.getLogger(__name__)

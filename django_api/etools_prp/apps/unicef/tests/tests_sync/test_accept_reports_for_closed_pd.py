@@ -1,10 +1,6 @@
 from datetime import date
 
-from etools_prp.apps.core.common import (
-    INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS,
-    PROGRESS_REPORT_STATUS,
-)
+from etools_prp.apps.core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS, PROGRESS_REPORT_STATUS
 from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.indicator.models import IndicatorBlueprint, IndicatorReport
