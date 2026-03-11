@@ -21,3 +21,7 @@ export const displayIndicatorValueFormatted = (indicatorType: string, value: any
       return _value;
   }
 };
+
+export const getDisaggregationsWithGroups = (disagg_lookup_map: any[]) => {
+  return (disagg_lookup_map || []).filter((x) => x.choices?.length);
+};

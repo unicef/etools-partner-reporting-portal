@@ -20,7 +20,7 @@ import {debounce} from 'lodash-es';
 import '@unicef-polymer/etools-modules-common/dist/layout/etools-tabs';
 import {sendRequest} from '@unicef-polymer/etools-utils/dist/etools-ajax';
 import {layoutStyles} from '@unicef-polymer/etools-unicef/src/styles/layout-styles';
-import {displayIndicatorValueFormatted} from '../../utils/utils';
+import {displayIndicatorValueFormatted, getDisaggregationsWithGroups} from '../../utils/utils';
 
 @customElement('ip-reporting-indicator-details')
 export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
@@ -172,7 +172,7 @@ export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
                     <div class="item col-6">
                       <disaggregation-table
                         .data="${location.current}"
-                        .mapping="${location.reportInfo.current.disagg_lookup_map}"
+                        .mapping="${getDisaggregationsWithGroups(location.reportInfo.current.disagg_lookup_map)}"
                       >
                       </disaggregation-table>
                     </div>
@@ -183,7 +183,7 @@ export class IpReportingIndicatorDetails extends connect(store)(LitElement) {
                     <div class="item col-6">
                       <disaggregation-table
                         .data="${location.previous}"
-                        .mapping="${location.reportInfo.previous.disagg_lookup_map}"
+                        .mapping="${getDisaggregationsWithGroups(location.reportInfo.previous.disagg_lookup_map)}"
                       >
                       </disaggregation-table>
                     </div>
