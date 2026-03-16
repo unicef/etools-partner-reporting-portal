@@ -15,4 +15,3 @@ class TestCustomUserAdminListFilter(TestCase):
 
         self.assertIn('workspace', list_filter)
         self.assertIn('partner', list_filter)
-
