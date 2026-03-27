@@ -64,6 +64,8 @@ from etools_prp.apps.unicef.exports.progress_reports import (
 )
 from etools_prp.apps.unicef.exports.reportables import ReportableListPDFExporter, ReportableListXLSXExporter
 from etools_prp.apps.unicef.exports.utilities import group_indicator_reports_by_lower_level_output
+from etools_prp.apps.unicef.pdf_export import ProgressReportPDFService
+from etools_prp.apps.unicef.tasks_pdf_export import generate_and_email_progress_report_pdf
 from etools_prp.apps.unicef.utils import render_pdf_to_response
 from etools_prp.apps.utils.emails import send_email_from_template
 from etools_prp.apps.utils.mixins import ListExportMixin, ObjectExportMixin
@@ -362,6 +364,10 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
                 queryset = ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
         return queryset.filter(programme_document__workspace=self.kwargs['workspace_id']).distinct()
 
+    def get_optimized_export_queryset(self):
+        pdf_service = ProgressReportPDFService()
+        return pdf_service.apply_optimizations(self.get_queryset())
+
     def list(self, request, *args, **kwargs):
         filtered = ProgressReportFilter(request.GET, queryset=self.get_queryset())
 
@@ -388,7 +394,40 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
     def get(self, request, *args, **kwargs):
         exporter_class = self.get_exporter_class()
         if exporter_class:
-            filter_qs = self.filter_queryset(self.get_queryset())
+            async_email = request.query_params.get('async', 'false').lower() == 'true'
+
+            if async_email:
+
+                filter_params = {
+                    key: value for key, value in request.query_params.items()
+                    if key not in ('export', 'async')
+                }
+
+                external_partner_id = request.GET.get('external_partner_id')
+                if external_partner_id:
+                    filter_params['external_partner_id'] = external_partner_id
+
+                user_info = {
+                    'email': request.user.email,
+                    'is_unicef': request.user.is_unicef,
+                    'partner_id': request.user.partner_id if hasattr(request.user, 'partner_id') else None,
+                }
+
+                task = generate_and_email_progress_report_pdf.delay(
+                    user_email=request.user.email,
+                    workspace_id=self.kwargs['workspace_id'],
+                    filter_params=filter_params,
+                    user_info=user_info
+                )
+
+                return Response({
+                    'message': f'PDF export started. You will receive an email at {request.user.email} when it\'s ready.',
+                    'task_id': task.id,
+                    'email': request.user.email,
+                    'filters_applied': filter_params
+                }, status=statuses.HTTP_202_ACCEPTED)
+
+            filter_qs = self.filter_queryset(self.get_optimized_export_queryset())
             if not filter_qs.exists():
                 return Response({"error": "no data"}, status=statuses.HTTP_400_BAD_REQUEST)
             return exporter_class(filter_qs).get_as_response(request)
