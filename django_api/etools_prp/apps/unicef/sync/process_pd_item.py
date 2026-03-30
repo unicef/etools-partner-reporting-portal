@@ -1,6 +1,7 @@
 import logging
 
 from etools_prp.apps.core.models import Workspace
+from etools_prp.apps.unicef.sync.accept_reports_for_closed_pd import accept_reports_for_closed_pd
 from etools_prp.apps.unicef.sync.update_create_blueprint import update_create_blueprint
 from etools_prp.apps.unicef.sync.update_create_date_period import (
     update_create_qpr_n_hr_date_periods,
@@ -73,6 +74,10 @@ def process_pd_item(item: dict, workspace: Workspace) -> bool:
 
     # Create sections
     item, pd = update_create_sections(item, pd, workspace)
+
+    # If PD is closed, accept all outstanding reports before other processing
+    if pd.status == 'closed':
+        accept_reports_for_closed_pd(pd)
 
     if item['status'] not in ("draft", "signed",):
 
