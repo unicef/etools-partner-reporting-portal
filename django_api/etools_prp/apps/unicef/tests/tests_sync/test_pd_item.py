@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from etools_prp.apps.core.models import Location
+from etools_prp.apps.core.tests import factories
 from etools_prp.apps.core.tests.base import BaseAPITestCase
 from etools_prp.apps.indicator.models import (
     Disaggregation,
@@ -322,3 +323,108 @@ class TestPDItem(BaseAPITestCase):
             self.assertTrue(_for_loop_pd_result_links_and_llos(_item['expected_results']))
 
             self.assertTrue(_for_loop_indicators(_item['expected_results']))
+
+    def test_update_create_disaggregations(self):
+        indicator_disaggregations_with_values = {
+            "id": 1429,
+            "title": "% of barangays covered with written expressions of support for ALS at the LGU level",
+            "blueprint_id": 1312,
+            "cluster_indicator_id": None,
+            "means_of_verification": "Written expression of commitments/ petitions to LGUs (Written official "
+                                     "expressions of commitment may be in the form of letters, policy documents, etc.)",
+            "baseline": {
+                "d": 100,
+                "v": None
+            },
+            "target": {
+                "d": 100,
+                "v": 80
+            },
+            "locations": [
+                {
+                    "id": 86,
+                    "name": "Zamboanga del Norte",
+                    "p_code": "PH097200000",
+                    "admin_level_name": "Province",
+                    "admin_level": 2,
+                    "parent_pcode": "PH"
+
+                }
+            ],
+            'disaggregation': [
+                {
+                    'id': 1,
+                    'name': 'Gender',
+                    'disaggregation_values': [
+                        {
+                            'value': 'Male',
+                            'active': True,
+                            'id': 1
+                        },
+                        {
+                            'value': 'Female',
+                            'active': True,
+                            'id': 2
+                        }
+                    ]
+                }
+            ],
+            "is_high_frequency": False,
+            "is_active": True,
+            "numerator_label": "barangays",
+            "denominator_label": "total barangays covered",
+            "unit": "percentage",
+            "display_type": "percentage"
+        }
+        pd = factories.ProgrammeDocumentFactory(title="Test PD", reference_number="TEST-PD-001")
+        disaggregations = update_create_disaggregations(indicator_disaggregations_with_values, pd)
+
+        self.assertEqual(len(disaggregations), 1)
+        self.assertEqual(len(disaggregations), Disaggregation.objects.count())
+
+    def test_update_create_disaggregations_wo_values(self):
+        indicator_disaggregations_without_values = {
+            "id": 1429,
+            "title": "% of barangays covered with written expressions of support for ALS at the LGU level",
+            "blueprint_id": 1312,
+            "cluster_indicator_id": None,
+            "means_of_verification": "Written expression of commitments/ petitions to LGUs (Written official "
+                                     "expressions of commitment may be in the form of letters, policy documents, etc.)",
+            "baseline": {
+                "d": 100,
+                "v": None
+            },
+            "target": {
+                "d": 100,
+                "v": 80
+            },
+            "locations": [
+                {
+                    "id": 86,
+                    "name": "Zamboanga del Norte",
+                    "p_code": "PH097200000",
+                    "admin_level_name": "Province",
+                    "admin_level": 2,
+                    "parent_pcode": "PH"
+
+                }
+            ],
+            'disaggregation': [
+                {
+                    'id': 1,
+                    'name': 'Gender',
+                    'disaggregation_values': []
+                }
+            ],
+            "is_high_frequency": False,
+            "is_active": True,
+            "numerator_label": "barangays",
+            "denominator_label": "total barangays covered",
+            "unit": "percentage",
+            "display_type": "percentage"
+        }
+        pd = factories.ProgrammeDocumentFactory(title="Test PD", reference_number="TEST-PD-001")
+        disaggregations = update_create_disaggregations(indicator_disaggregations_without_values, pd)
+
+        self.assertEqual(len(disaggregations), 0)
+        self.assertEqual(len(disaggregations), Disaggregation.objects.count())

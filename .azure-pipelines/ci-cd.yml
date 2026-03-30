@@ -153,12 +153,15 @@ stages:
 - stage: Test
   displayName: Run Backend Tests
   dependsOn: InstalledDepsImage
-  # Tests only on PR to Develop. Staging and Master assume tested code
+  # Tests only on PR to Develop and Staging. Master assume tested code
   condition: |
     and(
       succeeded(),
       eq(variables['Build.Reason'], 'PullRequest'),
-      eq(variables['System.PullRequest.TargetBranch'], 'develop')
+      or(
+        eq(variables['System.PullRequest.TargetBranch'], 'develop'),
+        eq(variables['System.PullRequest.TargetBranch'], 'staging')
+      )
     )
   variables:
     DEPS_IMAGE_TAG: $[ stageDependencies.InstalledDepsImage.InstalledDeps.outputs['vars.DEPS_IMAGE_TAG'] ]
@@ -421,12 +424,14 @@ stages:
                 displayName: Configure kubeconfig
 
               - script: |
+                  IMAGE="$(DOCKER_APP_IMAGE):$(Build.SourceVersion)"
+                  echo "Deploying image: $IMAGE"
                   echo "$(DEV_APP_DEPLOYMENTS)" | while read APP; do
                     if [ -n "$APP" ]; then
                       echo "Updating $APP..."
                       kubectl -n prp-dev \
                         set image deployment/$APP \
-                        $APP=$(DOCKER_APP_IMAGE):$(Build.SourceVersion)
+                        $APP=$IMAGE
                     fi
                   done
                 displayName: Deploy Backend applications
@@ -443,12 +448,14 @@ stages:
                 displayName: Wait for Backend pods to start
 
               - script: |
+                  IMAGE="$(DOCKER_UI_IMAGE):$(Build.SourceVersion)"
+                  echo "Deploying image: $IMAGE"
                   echo "$(DEV_UI_DEPLOYMENTS)" | while read APP; do
                     if [ -n "$APP" ]; then
                       echo "Updating $APP..."
                       kubectl -n prp-dev \
                         set image deployment/$APP \
-                        $APP=$(DOCKER_UI_IMAGE):$(Build.SourceVersion)
+                        $APP=$IMAGE
                     fi
                   done
                 displayName: Deploy Frontend applications
@@ -509,12 +516,14 @@ stages:
                 displayName: Configure kubeconfig
 
               - script: |
+                  IMAGE="$(DOCKER_APP_IMAGE):$(Build.SourceVersion)"
+                  echo "Deploying image: $IMAGE"
                   echo "$(STAGING_APP_DEPLOYMENTS)" | while read APP; do
                     if [ -n "$APP" ]; then
                       echo "Updating $APP..."
                       kubectl -n prp-staging \
                         set image deployment/$APP \
-                        $APP=$(DOCKER_APP_IMAGE):$(Build.SourceVersion)
+                        $APP=$IMAGE
                     fi
                   done
                 displayName: Deploy Backend applications
@@ -531,12 +540,14 @@ stages:
                 displayName: Wait for Backend pods to start
 
               - script: |
+                  IMAGE="$(DOCKER_UI_IMAGE):$(Build.SourceVersion)"
+                  echo "Deploying image: $IMAGE"
                   echo "$(STAGING_UI_DEPLOYMENTS)" | while read APP; do
                     if [ -n "$APP" ]; then
                       echo "Updating $APP..."
                       kubectl -n prp-staging \
                         set image deployment/$APP \
-                        $APP=$(DOCKER_UI_IMAGE):$(Build.SourceVersion)
+                        $APP=$IMAGE
                     fi
                   done
                 displayName: Deploy Frontend applications
@@ -600,12 +611,14 @@ stages:
 
               # Deploy sanitized tag (SAFE_BRANCH). For tag-triggered runs, SAFE_BRANCH == sanitized Git tag
               - script: |
+                  IMAGE="$(DOCKER_APP_IMAGE):$(SAFE_BRANCH)"
+                  echo "Deploying image: $IMAGE"
                   echo "$(PROD_APP_DEPLOYMENTS)" | while read APP; do
                     if [ -n "$APP" ]; then
                       echo "Updating $APP..."
                       kubectl -n prp-prod \
                         set image deployment/$APP \
-                        $APP=$(DOCKER_APP_IMAGE):$(SAFE_BRANCH)
+                        $APP=$IMAGE
                     fi
                   done
                 displayName: Deploy Backend applications
@@ -623,12 +636,14 @@ stages:
 
               # Deploy sanitized tag (SAFE_BRANCH). For tag-triggered runs, SAFE_BRANCH == sanitized Git tag
               - script: |
+                  IMAGE="$(DOCKER_UI_IMAGE):$(SAFE_BRANCH)"
+                  echo "Deploying image: $IMAGE"
                   echo "$(PROD_UI_DEPLOYMENTS)" | while read APP; do
                     if [ -n "$APP" ]; then
                       echo "Updating $APP..."
                       kubectl -n prp-prod \
                         set image deployment/$APP \
-                        $APP=$(DOCKER_UI_IMAGE):$(SAFE_BRANCH)
+                        $APP=$IMAGE
                     fi
                   done
                 displayName: Deploy Frontend applications
