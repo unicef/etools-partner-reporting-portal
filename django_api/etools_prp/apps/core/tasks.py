@@ -176,9 +176,7 @@ def _process_pd_reports(pd):
     # Handling QPR reporting periods
     for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="QPR").order_by(
             'start_date'), start=1):
-        # If PR start date is greater than now, skip!
-        if reporting_period.start_date > datetime.now().date():
-            continue
+        is_future = reporting_period.start_date > datetime.now().date()
         pr_qs = pd.progress_reports.filter(
             start_date=reporting_period.start_date,
             end_date=reporting_period.end_date,
@@ -195,6 +193,9 @@ def _process_pd_reports(pd):
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                 pd, idx, reporting_period
             )
+            if is_future:
+                next_progress_report.status = PROGRESS_REPORT_STATUS.not_yet_due
+                next_progress_report.save()
             create_ir_and_ilds_for_pr(
                 pd, active_reportables, next_progress_report, start_date, end_date, due_date
             )
@@ -204,9 +205,7 @@ def _process_pd_reports(pd):
         # If there is no start and/or end date from reporting period, skip!
         if not reporting_period.start_date or not reporting_period.end_date:
             continue
-        # If PR start date is greater than now, skip!
-        if reporting_period.start_date > datetime.now().date():
-            continue
+        is_future = reporting_period.start_date > datetime.now().date()
         pr_qs = pd.progress_reports.filter(
             start_date=reporting_period.start_date,
             end_date=reporting_period.end_date,
@@ -223,16 +222,16 @@ def _process_pd_reports(pd):
             next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
                 pd, idx, reporting_period
             )
+            if is_future:
+                next_progress_report.status = PROGRESS_REPORT_STATUS.not_yet_due
+                next_progress_report.save()
             create_ir_and_ilds_for_pr(
                 pd, active_reportables, next_progress_report, start_date, end_date, due_date
             )
     # Handling SR reporting periods
     for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR").order_by('due_date'), start=1):
-        # If PR due date is greater than now, skip!
-        if reporting_period.due_date >= datetime.now().date() + timedelta(days=30):
-            continue
-
-        create_pr_sr_for_report_type(pd, idx, reporting_period)
+        is_future = reporting_period.due_date >= datetime.now().date() + timedelta(days=30)
+        create_pr_sr_for_report_type(pd, idx, reporting_period, is_future=is_future)
 
 
 @shared_task

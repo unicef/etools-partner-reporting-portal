@@ -14,7 +14,7 @@ from django.db import transaction
 
 from dateutil.relativedelta import relativedelta
 
-from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL
+from etools_prp.apps.core.common import PD_DOCUMENT_TYPE, PD_FREQUENCY_LEVEL, PROGRESS_REPORT_STATUS
 
 logger = logging.getLogger("django")
 
@@ -454,7 +454,7 @@ def get_latest_pr_by_type(pd, report_type):
 
 
 @transaction.atomic
-def create_pr_sr_for_report_type(pd, idx, reporting_period):
+def create_pr_sr_for_report_type(pd, idx, reporting_period, is_future=False):
     """
     Create ProgressReport SR instance by its ReportingPeriodDate
 
@@ -462,6 +462,7 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
         pd {ProgrammeDocument} -- ProgrammeDocument instance for ProgressReport to generate
         idx {int} -- Integer to denote report number
         reporting_period {ReportingPeriodDates} -- ReportingPeriodDates instance for new ProgressReport
+        is_future {bool} -- Whether this reporting period is in the future
 
     Returns:
         Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
@@ -475,16 +476,20 @@ def create_pr_sr_for_report_type(pd, idx, reporting_period):
 
     is_final = idx == pd.reporting_periods.filter(report_type='SR').count()
 
+    defaults = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'due_date': due_date,
+    }
+    if is_future:
+        defaults['status'] = PROGRESS_REPORT_STATUS.not_yet_due
+
     ProgressReport.objects.update_or_create(
         programme_document=pd,
         report_type='SR',
         report_number=idx,
         is_final=is_final,
-        defaults={
-            'start_date': start_date,
-            'end_date': end_date,
-            'due_date': due_date,
-        }
+        defaults=defaults,
     )
 
 
