@@ -13,6 +13,10 @@ def update_create_disaggregations(i: dict, pd: ProgrammeDocument) -> list:
 
     # Create Disaggregation
     for dis in i['disaggregation']:
+        # bypass disaggregations without values
+        if not dis.get('disaggregation_values'):
+            continue
+
         dis['active'] = True
         disaggregation = process_model(
             Disaggregation, PMPDisaggregationSerializer,

@@ -32,7 +32,7 @@ class CustomUserAdmin(UserAdmin):
         'email', 'username', 'workspace', 'partner', 'realm_count', 'last_login', 'date_joined',
     )
     list_filter = (
-        'is_superuser', 'is_staff', 'is_active',
+        'is_superuser', 'is_staff', 'is_active', 'workspace', 'partner',
     )
     search_fields = ('email', 'username',)
     exclude = ('date_joined', 'last_login')
